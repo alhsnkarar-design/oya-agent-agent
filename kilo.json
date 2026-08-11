@@ -1,0 +1,12 @@
+{
+  "mcp": {
+    "telegram": {
+      "type": "local",
+      "command": ["npx", "-y", "telegram-mcp-bot"],
+      "environment": {
+        "TELEGRAM_BOT_TOKEN": "8824393054:AAFSTE0xIciEl5HZx_SvTzNru4yHe50Q7zI"
+      },
+      "enabled": true
+    }
+  }
+}
