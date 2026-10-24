@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>المساعد الصوتي المباشر</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Readex+Pro:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#06060B}
+svg.i{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+button{font:inherit;color:inherit;cursor:pointer;margin:0}
+@keyframes ripple{0%{transform:scale(.72);opacity:.55}100%{transform:scale(1.25);opacity:0}}
+.ring{animation:ripple 3s ease-out infinite}
+.ring2{animation-delay:1s}
+.ring3{animation-delay:2s}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.core{animation:breathe 2.4s ease-in-out infinite}
+@keyframes eq{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
+.eq{animation:eq 1s ease-in-out infinite;transform-origin:50% 50%}
+@keyframes rot{to{transform:rotate(360deg)}}
+.rot{animation:rot 14s linear infinite;transform-origin:50% 50%}
+</style>
+</helmet>
+<div dir="rtl" style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #0A0A12; color: #F3F2FA; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; display: flex; flex-direction: column; padding: 12px 20px 36px">
+
+  <header style="display: flex; align-items: center; justify-content: space-between; height: 52px">
+    <button aria-label="رجوع إلى المحادثة" style="width: 44px; height: 44px; border-radius: 14px; border: 1px solid #262636; background: #12121C; display: flex; align-items: center; justify-content: center; padding: 0">
+      <svg class="i" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+    </button>
+    <div role="tablist" aria-label="وضع المساعد" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; width: 176px; padding: 3px; border-radius: 14px; background: #12121C; border: 1px solid #222232">
+      <button role="tab" aria-selected="true" style="height: 34px; border: 0; border-radius: 11px; background: #6A58E8; color: #FFFFFF; font-size: 12.5px; font-weight: 600"><span dir="ltr">AI Agent</span></button>
+      <button role="tab" aria-selected="false" style="height: 34px; border: 0; border-radius: 11px; background: transparent; color: #B4B2C9; font-size: 12.5px; font-weight: 500"><span dir="ltr">Chat</span></button>
+    </div>
+    <button aria-label="إعدادات الصوت" style="width: 44px; height: 44px; border-radius: 14px; border: 1px solid #262636; background: #12121C; display: flex; align-items: center; justify-content: center; padding: 0">
+      <svg class="i" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"></path><circle cx="16" cy="7" r="2"></circle><circle cx="8" cy="17" r="2"></circle></svg>
+    </button>
+  </header>
+
+  <section aria-label="نص المحادثة" style="margin-top: 26px; display: flex; flex-direction: column; gap: 14px; min-height: 176px">
+    <div style="display: flex; flex-direction: column; gap: 4px; opacity: 0.6">
+      <span style="font-size: 12px; color: #B9AFFF; font-weight: 600">مدار</span>
+      <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #D6D4E6">اكتمل المونتاج. هل تريد إضافة دبلجة للمقطع قبل النشر؟</p>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <span style="font-size: 12px; color: #7FDDF7; font-weight: 600">أنت · مباشر</span>
+      <p style="margin: 0; font-family: 'Readex Pro', sans-serif; font-weight: 500; font-size: 21px; line-height: 1.6">نعم، دبلجه إلى الإسبانية بصوت هادئ <span style="color: #8A88A3">وحافظ على</span><span style="display: inline-block; width: 2px; height: 22px; margin-right: 4px; vertical-align: -4px; background: #5CD3F5"></span></p>
+    </div>
+  </section>
+
+  <section aria-label="حالة الاستماع" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px">
+    <div style="position: relative; width: 250px; height: 250px; display: flex; align-items: center; justify-content: center">
+      <span class="ring" aria-hidden="true" style="position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid #5CD3F5"></span>
+      <span class="ring ring2" aria-hidden="true" style="position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid #9B8CFF"></span>
+      <span class="ring ring3" aria-hidden="true" style="position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid #5CD3F5"></span>
+      <svg class="rot" aria-hidden="true" width="210" height="210" viewBox="0 0 210 210" style="position: absolute">
+        <ellipse cx="105" cy="105" rx="100" ry="40" fill="none" stroke="#33334A" stroke-width="1" transform="rotate(-28 105 105)"></ellipse>
+        <circle cx="193" cy="58" r="4" fill="#5CD3F5"></circle>
+      </svg>
+      <div class="core" style="width: 132px; height: 132px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #B5AAFF 0%, #6A58E8 45%, #2A2457 100%); box-shadow: 0 0 60px rgba(106,88,232,0.45), inset 0 0 0 1px rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; gap: 5px">
+        <span class="eq" style="display: block; width: 5px; height: 34px; border-radius: 3px; background: #FFFFFF"></span>
+        <span class="eq" style="display: block; width: 5px; height: 50px; border-radius: 3px; background: #FFFFFF; animation-delay: .15s"></span>
+        <span class="eq" style="display: block; width: 5px; height: 26px; border-radius: 3px; background: #FFFFFF; animation-delay: .3s"></span>
+        <span class="eq" style="display: block; width: 5px; height: 44px; border-radius: 3px; background: #FFFFFF; animation-delay: .45s"></span>
+        <span class="eq" style="display: block; width: 5px; height: 30px; border-radius: 3px; background: #FFFFFF; animation-delay: .6s"></span>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px">
+      <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 600"><span style="width: 8px; height: 8px; border-radius: 50%; background: #5CD3F5"></span>أستمع إليك…</span>
+      <span style="font-size: 12.5px; color: #8A88A3">تحدّث بشكل طبيعي، ويمكنك المقاطعة في أي وقت</span>
+    </div>
+  </section>
+
+  <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 22px">
+    <span style="display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 999px; background: #12121C; border: 1px solid #222232; font-size: 12px; color: #B4B2C9">
+      <svg class="i" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" style="color: #9B8CFF"><path d="M3.5 5.5h8M7.5 3.5v2M5 5.5c.6 3 2.8 5.6 6 7M10 5.5c-.6 3-2.8 5.6-6 7"></path><path d="M12.5 20.5l4-9 4 9M14 17.3h5"></path></svg>
+      سيستخدم الوكيل: دبلجة الفيديو
+    </span>
+  </div>
+
+  <footer style="display: flex; align-items: center; justify-content: space-between; padding: 0 12px">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+      <button aria-label="التبديل إلى الكتابة" style="width: 56px; height: 56px; border-radius: 50%; border: 1px solid #2A2A3D; background: #12121C; color: #D6D4E6; display: flex; align-items: center; justify-content: center; padding: 0">
+        <svg class="i" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2.5"></rect><path d="M7 10h.01M11 10h.01M15 10h.01M7.5 14h9"></path></svg>
+      </button>
+      <span style="font-size: 11.5px; color: #8A88A3">كتابة</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+      <button aria-label="الميكروفون يعمل — اضغط للإيقاف المؤقت" style="width: 84px; height: 84px; border-radius: 50%; border: 0; background: #5CD3F5; color: #06141B; display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 0 0 8px rgba(92,211,245,0.12)">
+        <svg class="i" width="32" height="32" viewBox="0 0 24 24" aria-hidden="true" style="stroke-width: 2"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"></path></svg>
+      </button>
+      <span style="font-size: 11.5px; color: #B4B2C9">إيقاف مؤقت</span>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+      <button aria-label="إنهاء المحادثة الصوتية" style="width: 56px; height: 56px; border-radius: 50%; border: 1px solid #5A2A36; background: #2A1219; color: #FF8A98; display: flex; align-items: center; justify-content: center; padding: 0">
+        <svg class="i" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="stroke-width: 2"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+      <span style="font-size: 11.5px; color: #8A88A3">إنهاء</span>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>موشن جرافيكس وتأثيرات بصرية</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Readex+Pro:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#06060B}
+svg.i{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+button{font:inherit;color:inherit;cursor:pointer;margin:0}
+input::placeholder{color:#8A88A3}
+@keyframes gather{0%{transform:translate(var(--dx),var(--dy)) scale(.6);opacity:0}25%{opacity:1}70%,100%{transform:translate(0,0) scale(1);opacity:.9}}
+.pt{animation:gather 4s cubic-bezier(.2,.7,.2,1) infinite}
+@keyframes reveal{0%,55%{opacity:0;transform:translateY(10px)}75%,100%{opacity:1;transform:translateY(0)}}
+.reveal{animation:reveal 4s ease-out infinite}
+@keyframes sweep{0%{transform:rotate(-28deg) scaleX(.2);opacity:0}60%{opacity:1}100%{transform:rotate(-28deg) scaleX(1);opacity:.8}}
+.sweep{animation:sweep 4s ease-out infinite}
+@keyframes head{0%{right:0}100%{right:100%}}
+.playhead{animation:head 4s linear infinite}
+</style>
+</helmet>
+<div dir="rtl" style="width: 390px; height: 844px; box-sizing: border-box; position: relative; overflow: hidden; background: #0A0A12; color: #F3F2FA; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; display: flex; flex-direction: column">
+
+  <header style="display: flex; align-items: center; gap: 10px; height: 64px; padding: 12px 16px 0; box-sizing: border-box">
+    <button aria-label="رجوع" style="width: 44px; height: 44px; border-radius: 14px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; padding: 0">
+      <svg class="i" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+    </button>
+    <span style="width: 34px; height: 34px; border-radius: 11px; background: rgba(92,211,245,0.12); color: #5CD3F5; display: flex; align-items: center; justify-content: center">
+      <svg class="i" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 3.5l1.9 5 5 1.9-5 1.9-1.9 5-1.9-5-5-1.9 5-1.9z"></path><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"></path></svg>
+    </span>
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 1px">
+      <span style="font-size: 16px; font-weight: 600">موشن جرافيكس</span>
+      <span style="font-size: 12px; color: #7FDDF7"><span dir="ltr" style="font-weight: 600">Chat</span><span style="color: #8A88A3"> · تأثيرات بصرية</span></span>
+    </div>
+    <button style="height: 36px; padding: 0 12px; border-radius: 11px; border: 1px solid #2A2A3D; background: #12121C; color: #F3F2FA; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px">
+      <svg class="i" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
+      تصدير
+    </button>
+  </header>
+
+  <main style="flex: 1; min-height: 0; padding: 10px 16px 0; display: flex; flex-direction: column; gap: 12px; overflow: hidden">
+
+    <section aria-label="معاينة المشهد" style="display: flex; flex-direction: column; gap: 10px">
+      <div style="position: relative; height: 290px; border-radius: 22px; overflow: hidden; background: #07070D; border: 1px solid #222232">
+        <svg aria-hidden="true" width="358" height="290" viewBox="0 0 358 290" style="position: absolute; inset: 0">
+          <defs>
+            <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#14141F" stroke-width="1"></path></pattern>
+          </defs>
+          <rect width="358" height="290" fill="url(#grid)"></rect>
+        </svg>
+        <div class="sweep" aria-hidden="true" style="position: absolute; top: 140px; left: 34px; width: 290px; height: 2px; background: linear-gradient(90deg, transparent, #5CD3F5, transparent); transform-origin: 50% 50%"></div>
+        <div aria-hidden="true" style="position: absolute; top: 145px; left: 179px; width: 0; height: 0">
+          <sc-for list="{{pts}}" as="p" hint-placeholder-count="18">
+            <span class="pt" style="{{p.style}}"></span>
+          </sc-for>
+        </div>
+        <div class="reveal" style="position: absolute; inset: auto 0 64px 0; display: flex; flex-direction: column; align-items: center; gap: 4px">
+          <span style="font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 34px; letter-spacing: 0">فن الإصغاء</span>
+          <span style="font-size: 12.5px; color: #9BE6FA">الحلقة الأولى · الآن</span>
+        </div>
+        <span style="position: absolute; top: 12px; right: 12px; height: 26px; padding: 0 10px; border-radius: 999px; background: rgba(10,10,18,0.75); border: 1px solid #262636; font-size: 11.5px; color: #D6D4E6; display: inline-flex; align-items: center; gap: 6px"><span style="width: 6px; height: 6px; border-radius: 50%; background: #5BE3A6"></span>المعاينة · النسخة 2</span>
+        <span style="position: absolute; top: 12px; left: 12px; height: 26px; padding: 0 10px; border-radius: 999px; background: rgba(10,10,18,0.75); border: 1px solid #262636; font-size: 11.5px; color: #D6D4E6; display: inline-flex; align-items: center" dir="ltr">16:9 · 6s</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px">
+        <button aria-label="إيقاف مؤقت" style="width: 40px; height: 40px; border-radius: 50%; border: 0; background: #F3F2FA; color: #0A0A12; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="5" width="3.5" height="14" rx="1"></rect><rect x="14" y="5" width="3.5" height="14" rx="1"></rect></svg></button>
+        <div style="flex: 1; position: relative; height: 28px; border-radius: 8px; background: #12121C; border: 1px solid #222232; overflow: hidden">
+          <div style="position: absolute; top: 6px; bottom: 6px; right: 6%; width: 38%; border-radius: 4px; background: rgba(92,211,245,0.22)"></div>
+          <div style="position: absolute; top: 6px; bottom: 6px; right: 48%; width: 46%; border-radius: 4px; background: rgba(155,140,255,0.24)"></div>
+          <span class="playhead" style="position: absolute; top: 0; bottom: 0; width: 2px; background: #F3F2FA"></span>
+        </div>
+        <span style="font-size: 11.5px; color: #8A88A3; flex-shrink: 0">‏0:03 / 0:06</span>
+      </div>
+    </section>
+
+    <div style="display: flex; gap: 10px; padding: 12px; border-radius: 16px; background: #12121C; border: 1px solid #222232">
+      <svg class="i" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="color: #5CD3F5; margin-top: 2px"><path d="M5 6h14M5 12h14M5 18h9"></path></svg>
+      <p style="margin: 0; font-size: 13.5px; line-height: 1.65; color: #D6D4E6">جزيئات ضوئية تتجمع في المنتصف، يعبرها خط ضوء مائل، ثم يظهر العنوان بحركة انسيابية.</p>
+    </div>
+
+    <section aria-label="خيارات المشهد" style="display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; gap: 8px">
+        <span style="width: 54px; font-size: 12.5px; color: #8A88A3">المقاس</span>
+        <button style="height: 34px; padding: 0 12px; border-radius: 10px; border: 1px solid #222232; background: #12121C; color: #B4B2C9; font-size: 12.5px" dir="ltr">9:16</button>
+        <button style="height: 34px; padding: 0 12px; border-radius: 10px; border: 1px solid #222232; background: #12121C; color: #B4B2C9; font-size: 12.5px" dir="ltr">1:1</button>
+        <button aria-pressed="true" style="height: 34px; padding: 0 12px; border-radius: 10px; border: 1.5px solid #5CD3F5; background: rgba(92,211,245,0.1); color: #9BE6FA; font-size: 12.5px; font-weight: 600" dir="ltr">16:9</button>
+        <span style="flex: 1"></span>
+        <button style="height: 34px; padding: 0 10px; border-radius: 10px; border: 1px solid #222232; background: #12121C; color: #F3F2FA; font-size: 12.5px; display: flex; align-items: center; gap: 4px">‏6 ث<svg class="i" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" style="color: #8A88A3"><path d="M6 9l6 6 6-6"></path></svg></button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px">
+        <span style="width: 54px; font-size: 12.5px; color: #8A88A3">الأسلوب</span>
+        <button aria-pressed="true" style="height: 34px; padding: 0 12px; border-radius: 10px; border: 1.5px solid #5CD3F5; background: rgba(92,211,245,0.1); color: #9BE6FA; font-size: 12.5px; font-weight: 600">ضوئي</button>
+        <button style="height: 34px; padding: 0 12px; border-radius: 10px; border: 1px solid #222232; background: #12121C; color: #B4B2C9; font-size: 12.5px">انسيابي</button>
+        <button style="height: 34px; padding: 0 12px; border-radius: 10px; border: 1px solid #222232; background: #12121C; color: #B4B2C9; font-size: 12.5px">هندسي</button>
+        <button style="height: 34px; padding: 0 12px; border-radius: 10px; border: 1px solid #222232; background: #12121C; color: #B4B2C9; font-size: 12.5px">بسيط</button>
+      </div>
+    </section>
+
+    <section aria-label="النسخ المولّدة" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+      <button style="height: 58px; border-radius: 12px; border: 1px solid #222232; background: #12121C; padding: 0; position: relative; overflow: hidden">
+        <span aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 4px"><span style="width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #9B8CFF"></span><span style="width: 26px; height: 3px; border-radius: 2px; background: #33334A"></span></span>
+        <span style="position: absolute; bottom: 4px; right: 8px; font-size: 10.5px; color: #B4B2C9">النسخة 1</span>
+      </button>
+      <button aria-pressed="true" style="height: 58px; border-radius: 12px; border: 1.5px solid #5CD3F5; background: #07070D; padding: 0; position: relative; overflow: hidden">
+        <span aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center"><span style="width: 60px; height: 2px; background: #5CD3F5; transform: rotate(-28deg)"></span></span>
+        <span style="position: absolute; bottom: 4px; right: 8px; font-size: 10.5px; color: #9BE6FA; font-weight: 600">النسخة 2</span>
+      </button>
+      <button style="height: 58px; border-radius: 12px; border: 1px dashed #33334A; background: transparent; padding: 0; display: flex; align-items: center; justify-content: center; gap: 6px; color: #B4B2C9; font-size: 12px">
+        <svg class="i" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+        نسخة جديدة
+      </button>
+    </section>
+  </main>
+
+  <footer style="padding: 10px 16px 24px; border-top: 1px solid #1A1A27">
+    <div style="display: flex; align-items: center; gap: 8px; height: 52px; padding: 0 6px; border-radius: 18px; background: #12121C; border: 1px solid #1F4A5A">
+      <input aria-label="وصف المشهد" placeholder="صِف المشهد أو الحركة أو التأثير…" style="flex: 1; min-width: 0; height: 40px; padding: 0 8px; border: 0; outline: none; background: transparent; color: #F3F2FA; font-family: inherit; font-size: 15px">
+      <button aria-label="المساعد الصوتي" style="width: 40px; height: 40px; border-radius: 50%; border: 0; background: transparent; color: #5CD3F5; display: flex; align-items: center; justify-content: center; padding: 0"><svg class="i" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"></path></svg></button>
+      <button aria-label="إنشاء" style="width: 40px; height: 40px; border-radius: 50%; border: 0; background: #5CD3F5; color: #06141B; display: flex; align-items: center; justify-content: center; padding: 0"><svg class="i" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="stroke-width: 2"><path d="M12 19V5M6 11l6-6 6 6"></path></svg></button>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const n = 18;
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      const r = 120 + (i % 3) * 30;
+      const dx = Math.round(Math.cos(a) * r);
+      const dy = Math.round(Math.sin(a) * r * 0.7);
+      const fx = Math.round(Math.cos(a) * (14 + (i % 4) * 7));
+      const fy = Math.round(Math.sin(a) * (10 + (i % 4) * 5)) - 26;
+      const size = 3 + (i % 3);
+      const color = i % 2 ? '#5CD3F5' : '#9B8CFF';
+      pts.push({
+        style: 'position:absolute;display:block;left:' + fx + 'px;top:' + fy + 'px;width:' + size + 'px;height:' + size + 'px;border-radius:50%;background:' + color + ';box-shadow:0 0 8px ' + color + ';--dx:' + dx + 'px;--dy:' + dy + 'px;animation-delay:' + ((i % 6) * 0.08).toFixed(2) + 's'
+      });
+    }
+    return { pts };
+  }
+}
+</script>
+</body>
+</html>

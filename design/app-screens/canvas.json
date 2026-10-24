@@ -1,0 +1,37 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-10-24T09:00:00Z"},
+  "title": "مدار — تصميم تطبيق وكيل الذكاء الاصطناعي",
+  "launch": {"view": "canvas"},
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 390, "h": 844, "title": "1 · الرئيسية — AI Agent", "radius": 44},
+    "ChatHome.dc.html": {"x": 470, "y": 0, "w": 390, "h": 844, "title": "2 · الرئيسية — Chat", "radius": 44},
+    "Task.dc.html": {"x": 940, "y": 0, "w": 390, "h": 844, "title": "3 · تنفيذ المهمة وظهور النتيجة", "radius": 44},
+    "Voice.dc.html": {"x": 1410, "y": 0, "w": 390, "h": 844, "title": "9 · المساعد الصوتي المباشر", "radius": 44},
+    "Podcast.dc.html": {"x": 0, "y": 1264, "w": 390, "h": 844, "title": "4 · صوت وبودكاست", "radius": 44},
+    "Motion.dc.html": {"x": 470, "y": 1264, "w": 390, "h": 844, "title": "5 · موشن جرافيكس وتأثيرات", "radius": 44},
+    "AutoEdit.dc.html": {"x": 940, "y": 1264, "w": 390, "h": 844, "title": "6 · المونتاج التلقائي", "radius": 44},
+    "VideoEdit.dc.html": {"x": 0, "y": 2528, "w": 390, "h": 844, "title": "7 · تعديل الفيديو بالأوامر", "radius": 44},
+    "Dubbing.dc.html": {"x": 470, "y": 2528, "w": 390, "h": 844, "title": "8 · دبلجة الفيديو", "radius": 44},
+    "DubbingVoices.dc.html": {"x": 940, "y": 2528, "w": 390, "h": 844, "title": "8ب · الدبلجة — قائمة الأصوات والنبرات", "radius": 44}
+  },
+  "order": [
+    "Main.dc.html",
+    "ChatHome.dc.html",
+    "Task.dc.html",
+    "Voice.dc.html",
+    "Podcast.dc.html",
+    "Motion.dc.html",
+    "AutoEdit.dc.html",
+    "VideoEdit.dc.html",
+    "Dubbing.dc.html",
+    "DubbingVoices.dc.html"
+  ],
+  "notes": {
+    "row1": {"x": 0, "y": -300, "text": "الأساس — وضعا AI Agent وChat، التنفيذ، والمساعد الصوتي", "kind": "title1", "maxW": 1800},
+    "row2": {"x": 0, "y": 964, "text": "أدوات الصوت والحركة والمونتاج", "kind": "title1", "maxW": 1330},
+    "row3": {"x": 0, "y": 2228, "text": "تعديل الفيديو بالأوامر والدبلجة", "kind": "title1", "maxW": 1330}
+  },
+  "designSystems": []
+}
