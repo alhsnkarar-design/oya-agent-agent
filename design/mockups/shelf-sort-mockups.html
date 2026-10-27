@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>رتّب المتجر — تصاميم الشاشات</title>
+<style>
+@font-face { font-family: "Cairo"; src: url("fonts/Cairo.ttf"); font-weight: 200 1000; }
+@font-face { font-family: "Lalezar"; src: url("fonts/Lalezar-Regular.ttf"); }
+
+:root {
+  --teal: #13a89e; --teal-d: #0b6e69; --teal-dd: #08403e;
+  --orange: #ff8a3d; --orange-d: #e0631b;
+  --yellow: #ffd23f; --cream: #fff6e5; --cream-d: #f4e3c3;
+  --wood: #c98a4b; --wood-d: #8f5a2c; --wood-l: #e2ae73;
+  --pink: #ff6b8b; --purple: #7b5cff; --green: #3cc46b; --red: #ff4d5e;
+  --ink: #2b2140;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink); padding: 48px; }
+.emoji { font-family: "Noto Color Emoji"; font-style: normal; line-height: 1; }
+
+/* ---------- overview page ---------- */
+.page-head { text-align: center; color: #fff; margin-bottom: 40px; }
+.page-head h1 { font-family: "Lalezar"; font-size: 64px; font-weight: 400; color: var(--yellow); }
+.page-head p { font-size: 22px; opacity: .8; }
+.grid { display: grid; grid-template-columns: repeat(4, 390px); gap: 48px 40px; justify-content: center; }
+.cell figcaption { color: #fff; text-align: center; margin-top: 14px; font-size: 20px; font-weight: 700; }
+.cell figcaption span { display: block; font-size: 15px; font-weight: 400; opacity: .7; }
+
+/* ---------- phone ---------- */
+.phone { width: 390px; height: 844px; border-radius: 44px; overflow: hidden; position: relative;
+  box-shadow: 0 0 0 10px #0d0a17, 0 30px 60px rgba(0,0,0,.5); }
+.bg-shop { background: radial-gradient(circle at 50% 0%, #4fd6c9 0%, var(--teal) 40%, var(--teal-d) 100%); }
+.bg-wall { background:
+  repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 26px, transparent 26px 52px),
+  linear-gradient(180deg, #ffe9c7 0%, #ffd9a0 100%); }
+
+/* HUD */
+.hud { position: absolute; top: 0; left: 0; right: 0; padding: 52px 18px 0; display: flex; gap: 8px; align-items: center; z-index: 5; }
+.pill { display: flex; align-items: center; gap: 6px; background: rgba(8,64,62,.55); color: #fff; border-radius: 30px;
+  padding: 3px 4px 3px 12px; font-weight: 800; font-size: 16px; border: 2px solid rgba(255,255,255,.25); }
+.pill .emoji { font-size: 20px; }
+.pill .plus { width: 24px; height: 24px; border-radius: 50%; background: var(--green); display: grid; place-items: center;
+  font-weight: 900; font-size: 18px; line-height: 1; box-shadow: inset 0 -3px 0 rgba(0,0,0,.2); }
+.pill.dark { background: rgba(43,33,64,.75); }
+.spacer { flex: 1; }
+.icon-btn { width: 44px; height: 44px; border-radius: 14px; background: #fff; display: grid; place-items: center;
+  box-shadow: 0 4px 0 #d9c7a5; font-size: 22px; }
+
+/* buttons */
+.btn { display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 22px; font-weight: 900;
+  color: #fff; font-size: 24px; height: 68px; text-shadow: 0 2px 0 rgba(0,0,0,.18); }
+.btn-green { background: linear-gradient(180deg, #5be08a, var(--green)); box-shadow: 0 6px 0 #22924a, 0 12px 20px rgba(0,0,0,.25); }
+.btn-orange { background: linear-gradient(180deg, #ffad6b, var(--orange)); box-shadow: 0 6px 0 var(--orange-d), 0 12px 20px rgba(0,0,0,.2); }
+.btn-purple { background: linear-gradient(180deg, #9c86ff, var(--purple)); box-shadow: 0 6px 0 #5134d4, 0 12px 20px rgba(0,0,0,.2); }
+.btn small { font-size: 15px; font-weight: 700; opacity: .95; }
+.ad-tag { background: rgba(255,255,255,.25); border-radius: 8px; padding: 0 8px; font-size: 14px; }
+
+/* ---------- 1 splash ---------- */
+.splash { display: flex; flex-direction: column; align-items: center; padding-top: 150px; text-align: center; }
+.sun { position: absolute; inset: -200px; background: repeating-conic-gradient(rgba(255,255,255,.07) 0 10deg, transparent 10deg 20deg); }
+.logo { position: relative; font-family: "Lalezar"; font-size: 92px; line-height: 1.05; color: var(--yellow);
+  -webkit-text-stroke: 4px var(--teal-dd); paint-order: stroke fill; text-shadow: 0 8px 0 var(--teal-dd), 0 16px 30px rgba(0,0,0,.35); transform: rotate(-3deg); }
+.logo-en { position: relative; margin-top: 14px; background: var(--orange); color: #fff; font-weight: 900; letter-spacing: 6px;
+  padding: 4px 22px; border-radius: 30px; font-size: 20px; box-shadow: 0 5px 0 var(--orange-d); direction: ltr; }
+.hero-shelf { position: relative; margin-top: 70px; }
+.splash .tagline { position: relative; color: #fff; font-weight: 700; font-size: 20px; margin-top: 60px; }
+.loader { position: relative; width: 250px; height: 22px; border-radius: 20px; background: rgba(0,0,0,.25); margin-top: 18px; padding: 4px; }
+.loader i { display: block; width: 68%; height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--yellow), var(--orange)); }
+.splash .ver { position: absolute; bottom: 26px; color: rgba(255,255,255,.6); font-size: 14px; }
+
+/* shelf (shared) */
+.shelf { position: relative; width: 112px; height: 98px; background: linear-gradient(180deg, #7a4a22, #5e3816);
+  border-radius: 12px; padding: 6px 6px 0; box-shadow: inset 0 0 0 3px #4a2b10, 0 6px 10px rgba(0,0,0,.25); }
+.shelf::after { content: ""; position: absolute; left: -4px; right: -4px; bottom: -6px; height: 18px; border-radius: 6px;
+  background: linear-gradient(180deg, var(--wood-l), var(--wood)); box-shadow: 0 4px 0 var(--wood-d); }
+.shelf .back { position: absolute; top: 8px; left: 0; right: 0; display: flex; justify-content: space-around; opacity: .4; filter: grayscale(.3) brightness(.6); }
+.shelf .back .emoji { font-size: 22px; }
+.shelf .front { position: absolute; bottom: 12px; left: 0; right: 0; display: flex; justify-content: space-around; align-items: flex-end; z-index: 2; }
+.shelf .front .emoji { font-size: 34px; filter: drop-shadow(0 3px 2px rgba(0,0,0,.35)); }
+.shelf .slot-empty { width: 30px; }
+.shelf.glow { box-shadow: inset 0 0 0 3px #4a2b10, 0 0 0 4px var(--yellow), 0 0 26px 8px rgba(255,210,63,.8); }
+.shelf .pop { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); background: var(--yellow); color: var(--ink);
+  font-weight: 900; font-size: 15px; border-radius: 12px; padding: 0 10px; z-index: 4; box-shadow: 0 3px 0 #d6a800; white-space: nowrap; }
+.shelf .lock { position: absolute; inset: 0; border-radius: 12px; background: rgba(0,0,0,.45); display: grid; place-items: center; z-index: 3; }
+.shelf .lock .emoji { font-size: 28px; }
+.shelf .lock b { position: absolute; bottom: 20px; color: #fff; font-size: 13px; }
+
+/* ---------- 2 home ---------- */
+.home { background: linear-gradient(180deg, #8fe3ff 0%, #c9f1ff 45%, #a8e07a 45.1%, #7cc85a 100%); }
+.cloud { position: absolute; background: #fff; border-radius: 50px; opacity: .9; }
+.store-front { position: absolute; top: 200px; left: 40px; width: 310px; }
+.store-roof { height: 26px; background: var(--teal-d); border-radius: 10px 10px 0 0; }
+.awning { height: 52px; background: repeating-linear-gradient(90deg, var(--red) 0 31px, #fff 31px 62px);
+  border-radius: 0 0 22px 22px; box-shadow: 0 8px 0 rgba(0,0,0,.12); position: relative; z-index: 2;
+  -webkit-mask: radial-gradient(circle 16px at 15.5px 52px, transparent 15px, #000 16px) repeat-x; -webkit-mask-size: 31px 100%; }
+.store-body { background: var(--cream); margin: 0 10px; height: 200px; position: relative; border: 4px solid var(--cream-d); border-top: 0; }
+.store-sign { position: absolute; top: -104px; left: 50%; transform: translateX(-50%); background: var(--wood); color: #fff;
+  font-weight: 900; font-size: 22px; padding: 2px 24px; border-radius: 12px; border: 3px solid var(--wood-d); white-space: nowrap; z-index: 3; }
+.win-l, .win-r { position: absolute; top: 24px; width: 110px; height: 100px; background: #bfeeff; border: 6px solid var(--wood);
+  border-radius: 8px; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 2px; }
+.win-l { right: 14px; } .win-r { left: 14px; }
+.win-l .emoji, .win-r .emoji { font-size: 26px; }
+.door { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 56px; height: 120px; background: var(--wood-d); border-radius: 28px 28px 0 0; border: 4px solid var(--wood); }
+.scaffold { position: absolute; top: 150px; left: 22px; font-size: 40px; z-index: 4; }
+.reno-badge { position: absolute; top: 480px; left: 50%; transform: translateX(-50%); width: 300px; background: #fff; border-radius: 20px;
+  padding: 12px 16px; box-shadow: 0 6px 0 #d8ccb2; }
+.reno-badge .row { display: flex; justify-content: space-between; font-weight: 800; font-size: 16px; }
+.bar { height: 16px; background: #eee3cf; border-radius: 10px; margin-top: 8px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--yellow), var(--orange)); border-radius: 10px; }
+.side-widgets { position: absolute; top: 120px; display: flex; flex-direction: column; gap: 14px; z-index: 6; }
+.side-widgets.r { right: 14px; } .side-widgets.l { left: 14px; }
+.widget { width: 64px; text-align: center; }
+.widget .ic { width: 60px; height: 60px; border-radius: 18px; background: #fff; display: grid; place-items: center; margin: 0 auto;
+  box-shadow: 0 5px 0 #c7b994; position: relative; }
+.widget .ic .emoji { font-size: 32px; }
+.widget b { display: block; font-size: 13px; color: var(--ink); background: rgba(255,255,255,.85); border-radius: 8px; margin-top: 4px; }
+.dot { position: absolute; top: -5px; left: -5px; min-width: 22px; height: 22px; border-radius: 11px; background: var(--red); color: #fff;
+  font-size: 13px; font-weight: 900; display: grid; place-items: center; padding: 0 5px; border: 2px solid #fff; }
+.play-wrap { position: absolute; bottom: 120px; left: 40px; right: 40px; }
+.play-wrap .btn { height: 84px; font-size: 32px; }
+.play-wrap .btn small { display: block; font-size: 16px; }
+.nav { position: absolute; bottom: 0; left: 0; right: 0; height: 96px; background: var(--teal-dd); display: flex; padding: 8px 10px 20px;
+  border-top: 4px solid var(--teal-d); }
+.nav a { flex: 1; text-align: center; color: rgba(255,255,255,.7); font-size: 13px; font-weight: 700; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 2px; border-radius: 16px; }
+.nav a .emoji { font-size: 28px; }
+.nav a.on { background: var(--teal); color: #fff; transform: translateY(-14px); box-shadow: 0 6px 0 var(--teal-d); }
+
+/* ---------- 3 map ---------- */
+.map { background: linear-gradient(180deg, #a3e3ff, #d4f4c4 30%, #9ad97a); }
+.map-title { position: absolute; top: 108px; left: 0; right: 0; text-align: center; }
+.map-title h2 { display: inline-block; background: #fff; border-radius: 18px; padding: 2px 22px; font-size: 22px; box-shadow: 0 5px 0 #c7b994; }
+.path { position: absolute; inset: 0; }
+.node { position: absolute; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; font-weight: 900; font-size: 22px; color: #fff; }
+.node.done { background: linear-gradient(180deg, #ffd96b, #f2b200); box-shadow: 0 5px 0 #b98700; }
+.node.done::after { content: "★★★"; position: absolute; top: -18px; font-size: 13px; color: var(--yellow); -webkit-text-stroke: 1px #b98700; letter-spacing: -1px; }
+.node.cur { width: 76px; height: 76px; font-size: 28px; background: linear-gradient(180deg, #5be08a, var(--green)); box-shadow: 0 6px 0 #22924a, 0 0 0 8px rgba(255,255,255,.6); }
+.node.hard { background: linear-gradient(180deg, #ff8fa6, var(--red)); box-shadow: 0 5px 0 #c42537; }
+.node.hard::before { content: "صعبة"; position: absolute; bottom: -24px; font-size: 13px; background: var(--red); padding: 0 8px; border-radius: 8px; }
+.node.lock { background: #c9c3b6; box-shadow: 0 5px 0 #9c9586; color: #8a8375; }
+.avatar { position: absolute; font-size: 46px; }
+.milestone { position: absolute; width: 150px; background: #fff; border-radius: 18px; padding: 8px; text-align: center; box-shadow: 0 6px 0 #c7b994; }
+.milestone .emoji { font-size: 40px; }
+.milestone b { display: block; font-size: 16px; }
+.milestone span { font-size: 12px; color: #7a6f5c; }
+.milestone.locked { filter: grayscale(1); opacity: .85; }
+
+/* ---------- 4 gameplay ---------- */
+.game-hud { position: absolute; top: 48px; left: 14px; right: 14px; display: flex; align-items: center; gap: 10px; }
+.lvl { flex: 1; text-align: center; }
+.lvl b { display: inline-block; background: var(--teal-dd); color: #fff; padding: 2px 18px; border-radius: 14px; font-size: 18px; }
+.stat { background: #fff; border-radius: 16px; padding: 4px 12px; text-align: center; box-shadow: 0 4px 0 #d9c7a5; min-width: 78px; }
+.stat small { display: block; font-size: 11px; color: #8a7a5c; font-weight: 700; }
+.stat strong { font-size: 22px; line-height: 1.1; }
+.goal { position: absolute; top: 112px; left: 30px; right: 30px; background: rgba(255,255,255,.9); border-radius: 16px; padding: 8px 14px; }
+.goal .row { display: flex; justify-content: space-between; font-weight: 800; font-size: 14px; }
+.goal .stars-mini { color: var(--yellow); -webkit-text-stroke: 1px #c99700; letter-spacing: 2px; }
+.board { position: absolute; top: 178px; left: 0; right: 0; display: grid; grid-template-columns: repeat(3, 112px); gap: 26px 12px; justify-content: center; }
+.dragging { position: absolute; z-index: 9; font-size: 52px; transform: rotate(-12deg) scale(1.1); filter: drop-shadow(0 14px 8px rgba(0,0,0,.35)); }
+.hand { position: absolute; z-index: 10; font-size: 46px; }
+.combo { position: absolute; top: 160px; left: 22px; z-index: 8; font-family: "Lalezar"; font-size: 34px; color: var(--yellow);
+  -webkit-text-stroke: 2px var(--orange-d); paint-order: stroke fill; transform: rotate(-10deg); text-shadow: 0 4px 0 var(--orange-d); }
+.boosters { position: absolute; bottom: 30px; left: 20px; right: 20px; display: flex; justify-content: space-around; }
+.booster { text-align: center; position: relative; }
+.booster .ic { width: 78px; height: 78px; border-radius: 24px; background: linear-gradient(180deg, #fff, #f3ead9); display: grid; place-items: center;
+  box-shadow: 0 6px 0 #c9b48c, 0 10px 18px rgba(0,0,0,.18); }
+.booster .ic .emoji { font-size: 38px; }
+.booster b { display: block; margin-top: 8px; font-size: 14px; }
+.booster .cnt { position: absolute; top: -6px; left: -4px; width: 28px; height: 28px; border-radius: 50%; background: var(--purple); color: #fff;
+  font-weight: 900; font-size: 15px; display: grid; place-items: center; border: 3px solid #fff; }
+.booster .cnt.add { background: var(--green); }
+
+/* ---------- overlays ---------- */
+.dim { position: absolute; inset: 0; background: rgba(8,40,50,.35); z-index: 20; }
+.card { position: absolute; left: 24px; right: 24px; z-index: 21; background: var(--cream); border-radius: 30px; padding: 70px 22px 24px;
+  text-align: center; border: 5px solid #fff; box-shadow: 0 10px 0 var(--cream-d), 0 30px 60px rgba(0,0,0,.4); }
+.ribbon { position: absolute; top: -34px; left: -18px; right: -18px; height: 72px; background: linear-gradient(180deg, #ffad6b, var(--orange));
+  border-radius: 18px; display: grid; place-items: center; color: #fff; font-family: "Lalezar"; font-size: 40px;
+  box-shadow: 0 6px 0 var(--orange-d); text-shadow: 0 3px 0 rgba(0,0,0,.2); }
+.ribbon.red { background: linear-gradient(180deg, #ff8fa0, var(--red)); box-shadow: 0 6px 0 #b8202f; }
+.big-stars { position: absolute; top: -130px; left: 0; right: 0; display: flex; justify-content: center; align-items: flex-end; gap: 4px; }
+.big-stars span { font-size: 76px; color: var(--yellow); -webkit-text-stroke: 4px #c99700; paint-order: stroke fill; text-shadow: 0 6px 0 #c99700; line-height: 1; }
+.big-stars span:nth-child(2) { font-size: 100px; }
+.confetti { position: absolute; inset: 0; z-index: 20; pointer-events: none; }
+.confetti i { position: absolute; width: 10px; height: 18px; border-radius: 3px; }
+.rewards { display: flex; gap: 12px; justify-content: center; margin: 14px 0 22px; }
+.reward { background: #fff; border-radius: 18px; width: 96px; padding: 10px 0; box-shadow: 0 4px 0 var(--cream-d); }
+.reward .emoji { font-size: 36px; }
+.reward b { display: block; font-size: 20px; margin-top: 4px; }
+.card h3 { font-size: 20px; }
+.card p { color: #7a6a4c; font-weight: 600; }
+.card .btn { margin-top: 14px; }
+.link { margin-top: 16px; color: #9a8a6c; font-weight: 700; font-size: 16px; text-decoration: underline; }
+.left-items { display: flex; justify-content: center; gap: 8px; margin: 14px 0 6px; }
+.left-items span { background: #fff; border-radius: 14px; padding: 6px 10px; font-weight: 800; box-shadow: 0 3px 0 var(--cream-d); }
+.left-items .emoji { font-size: 26px; vertical-align: middle; }
+.heart-warn { margin-top: 10px; font-size: 14px; color: var(--red); font-weight: 800; }
+
+/* ---------- 7 renovation ---------- */
+.reno { background: linear-gradient(180deg, var(--teal) 0, var(--teal-d) 100%); }
+.reno-head { position: absolute; top: 104px; left: 0; right: 0; text-align: center; color: #fff; }
+.reno-head h2 { font-size: 26px; }
+.reno-head p { opacity: .8; font-size: 15px; }
+.room { position: absolute; top: 180px; left: 20px; right: 20px; height: 200px; border-radius: 24px; overflow: hidden; border: 5px solid #fff;
+  background: linear-gradient(180deg, #ffe0b5 0 62%, #d9a36b 62%); }
+.room .half { position: absolute; top: 0; bottom: 0; left: 0; width: 50%; background: linear-gradient(180deg, #e7e2da 0 62%, #b5aea3 62%); filter: saturate(.3); }
+.room .divider { position: absolute; top: 0; bottom: 0; left: 50%; width: 6px; margin-left: -3px; background: #fff; z-index: 3; }
+.room .divider::after { content: "⟷"; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 40px; height: 40px;
+  border-radius: 50%; background: #fff; display: grid; place-items: center; font-size: 22px; font-weight: 900; color: var(--teal-d); }
+.room .lbl { position: absolute; top: 10px; background: rgba(0,0,0,.45); color: #fff; font-size: 12px; border-radius: 8px; padding: 0 8px; z-index: 2; }
+.room .shelf-row { position: absolute; top: 46px; display: flex; gap: 4px; }
+.room .emoji { font-size: 28px; }
+.tasks { position: absolute; top: 398px; left: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; }
+.task { background: #fff; border-radius: 18px; padding: 7px 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 0 rgba(0,0,0,.15); }
+.task .ti { width: 42px; height: 42px; border-radius: 14px; background: var(--cream); display: grid; place-items: center; }
+.task .ti .emoji { font-size: 28px; }
+.task b { flex: 1; font-size: 16px; }
+.task .do { background: var(--green); color: #fff; font-weight: 900; border-radius: 14px; padding: 6px 14px; box-shadow: 0 4px 0 #22924a; }
+.task .done-ic { color: var(--green); font-size: 26px; font-weight: 900; }
+.task.done { opacity: .6; }
+.task.locked { opacity: .55; }
+.task .cost { font-weight: 900; color: #7a6a4c; }
+.reno-foot { position: absolute; bottom: 26px; left: 20px; right: 20px; background: rgba(0,0,0,.25); border-radius: 18px; padding: 10px 14px; color: #fff; }
+.reno-foot .row { display: flex; justify-content: space-between; font-weight: 800; }
+
+/* ---------- 8 shop ---------- */
+.shop { background: linear-gradient(180deg, #2f2357, #1e1640); color: #fff; }
+.shop-head { position: absolute; top: 104px; left: 0; right: 0; text-align: center; }
+.shop-head h2 { font-family: "Lalezar"; font-weight: 400; font-size: 38px; color: var(--yellow); }
+.trust { position: absolute; top: 160px; left: 20px; right: 20px; background: rgba(60,196,107,.18); border: 2px solid var(--green); border-radius: 14px;
+  padding: 6px 12px; font-size: 14px; font-weight: 700; text-align: center; }
+.offer { position: absolute; left: 20px; right: 20px; border-radius: 22px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+.offer .emoji { font-size: 44px; }
+.offer .txt { flex: 1; }
+.offer .txt b { display: block; font-size: 18px; }
+.offer .txt span { font-size: 13px; opacity: .9; }
+.price { background: var(--green); color: #fff; font-weight: 900; border-radius: 14px; padding: 8px 14px; box-shadow: 0 4px 0 #22924a; font-size: 17px; direction: ltr; white-space: nowrap; }
+.o1 { top: 214px; background: linear-gradient(135deg, var(--orange), #ff5f6d); box-shadow: 0 6px 0 #b8402a; }
+.o2 { top: 318px; background: linear-gradient(135deg, var(--purple), #b06bff); box-shadow: 0 6px 0 #4b2fc2; }
+.coins { position: absolute; top: 432px; left: 20px; right: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.coin-pack { background: #fff; color: var(--ink); border-radius: 20px; padding: 10px; text-align: center; box-shadow: 0 5px 0 #b6aed0; position: relative; }
+.coin-pack .emoji { font-size: 40px; }
+.coin-pack b { display: block; font-size: 20px; }
+.coin-pack .price { display: block; margin-top: 6px; }
+.coin-pack .tag { position: absolute; top: -10px; right: -6px; background: var(--red); color: #fff; font-size: 12px; font-weight: 900; padding: 1px 8px; border-radius: 8px; }
+.free { position: absolute; bottom: 30px; left: 20px; right: 20px; }
+</style>
+</head>
+<body>
+
+<header class="page-head">
+  <h1>رتّب المتجر · Shelf Sort</h1>
+  <p>تصاميم مبدئية لشاشات اللعبة — لعبة ألغاز فرز عائلية خالية من المحرمات</p>
+</header>
+
+<main class="grid">
+
+<!-- ================= 1. SPLASH ================= -->
+<figure class="cell">
+<div class="phone bg-shop splash" id="s1">
+  <div class="sun"></div>
+  <div class="logo">رتّب<br>المتجر</div>
+  <div class="logo-en">SHELF SORT</div>
+  <div class="hero-shelf">
+    <div class="shelf" style="width:220px;height:110px">
+      <div class="front"><i class="emoji" style="font-size:44px">🍓</i><i class="emoji" style="font-size:44px">🍓</i><i class="emoji" style="font-size:44px">🍓</i><i class="emoji" style="font-size:44px">🧁</i></div>
+    </div>
+  </div>
+  <div class="tagline">رتّب · جدّد · استمتع</div>
+  <div class="loader"><i></i></div>
+  <div class="ver">v1.0 · لكل العائلة</div>
+</div>
+<figcaption>1. شاشة البداية<span>الشعار والتحميل</span></figcaption>
+</figure>
+
+<!-- ================= 2. HOME ================= -->
+<figure class="cell">
+<div class="phone home" id="s2">
+  <div class="cloud" style="top:116px;left:110px;width:96px;height:30px"></div>
+  <div class="cloud" style="top:138px;left:200px;width:70px;height:24px"></div>
+  <div class="hud">
+    <div class="pill"><i class="emoji">❤️</i>5<span class="plus">+</span></div>
+    <div class="pill"><i class="emoji">🪙</i>1,250<span class="plus">+</span></div>
+    <div class="spacer"></div>
+    <div class="icon-btn"><i class="emoji">⚙️</i></div>
+  </div>
+
+  <div class="side-widgets r">
+    <div class="widget"><div class="ic"><i class="emoji">🎁</i><span class="dot">1</span></div><b>هدية اليوم</b></div>
+    <div class="widget"><div class="ic"><i class="emoji">📅</i></div><b>تحدي اليوم</b></div>
+  </div>
+  <div class="side-widgets l">
+    <div class="widget"><div class="ic"><i class="emoji">🎟️</i><span class="dot">!</span></div><b>تذكرة الموسم</b></div>
+    <div class="widget"><div class="ic"><i class="emoji">🏆</i></div><b>الترتيب</b></div>
+  </div>
+
+  <div class="store-front">
+    <div class="store-roof"></div>
+    <div class="awning"></div>
+    <div class="store-body">
+      <div class="store-sign">بقالة الحي</div>
+      <div class="win-r"><i class="emoji">🍎</i><i class="emoji">🍋</i><i class="emoji">🥖</i><i class="emoji">🧃</i></div>
+      <div class="win-l"><i class="emoji">🥛</i><i class="emoji">🧀</i><i class="emoji">🍪</i><i class="emoji">🥕</i></div>
+      <div class="door"></div>
+    </div>
+  </div>
+  <div class="scaffold emoji">🪜</div>
+
+  <div class="reno-badge">
+    <div class="row"><span>🔨 تجديد البقالة</span><span>6 / 10</span></div>
+    <div class="bar"><i style="width:60%"></i></div>
+  </div>
+
+  <div class="play-wrap">
+    <div class="btn btn-green"><div>العب<small>المرحلة 12</small></div></div>
+  </div>
+
+  <nav class="nav">
+    <a><i class="emoji">🛒</i>المتجر</a>
+    <a><i class="emoji">🔨</i>التجديد</a>
+    <a class="on"><i class="emoji">🏠</i>الرئيسية</a>
+    <a><i class="emoji">🗺️</i>الخريطة</a>
+    <a><i class="emoji">👥</i>الأصدقاء</a>
+  </nav>
+</div>
+<figcaption>2. الرئيسية<span>المتجر قيد التجديد + زر اللعب</span></figcaption>
+</figure>
+
+<!-- ================= 3. MAP ================= -->
+<figure class="cell">
+<div class="phone map" id="s3">
+  <div class="hud">
+    <div class="pill"><i class="emoji">❤️</i>5<span class="plus">+</span></div>
+    <div class="pill"><i class="emoji">⭐</i>3</div>
+    <div class="spacer"></div>
+    <div class="icon-btn"><i class="emoji">✖️</i></div>
+  </div>
+  <div class="map-title"><h2>رحلة المتاجر</h2></div>
+
+  <svg class="path" viewBox="0 0 390 844">
+    <path d="M195 800 C 330 760, 320 690, 210 660 S 60 580, 120 520 S 320 450, 280 380 S 90 300, 160 230"
+      fill="none" stroke="#fff6e5" stroke-width="22" stroke-linecap="round" stroke-dasharray="2 30"/>
+  </svg>
+
+  <div class="milestone locked" style="top:168px;left:210px"><i class="emoji">🧁</i><b>المخبز</b><span>🔒 بعد المرحلة 20</span></div>
+  <div class="milestone" style="top:600px;left:16px;width:130px"><i class="emoji">🏪</i><b>بقالة الحي</b><span>60% مجدَّدة</span></div>
+
+  <div class="node lock" style="top:205px;left:100px">16</div>
+  <div class="node hard lock" style="top:296px;left:200px;background:#c9c3b6;box-shadow:0 5px 0 #9c9586">15</div>
+  <div class="node lock" style="top:370px;left:268px">14</div>
+  <div class="node lock" style="top:438px;left:170px">13</div>
+  <div class="node cur" style="top:478px;left:70px">12</div>
+  <div class="avatar emoji" style="top:420px;left:84px">🧕</div>
+  <div class="node done" style="top:604px;left:214px">11</div>
+  <div class="node hard" style="top:672px;left:290px;background:linear-gradient(180deg,#ffd96b,#f2b200);box-shadow:0 5px 0 #b98700">10</div>
+  <div class="node done" style="top:756px;left:190px">9</div>
+</div>
+<figcaption>3. خريطة المراحل<span>التقدم وفتح متاجر جديدة</span></figcaption>
+</figure>
+
+<!-- ================= 4. GAMEPLAY ================= -->
+<figure class="cell">
+<div class="phone bg-wall" id="s4">
+  <div class="game-hud">
+    <div class="icon-btn"><i class="emoji">⏸️</i></div>
+    <div class="stat"><small>الوقت</small><strong>1:45</strong></div>
+    <div class="lvl"><b>المرحلة 12</b></div>
+    <div class="stat"><small>كومبو</small><strong>×3</strong></div>
+  </div>
+  <div class="goal">
+    <div class="row"><span>رُتّب 9 من 18</span><span class="stars-mini">★★☆</span></div>
+    <div class="bar"><i style="width:50%"></i></div>
+  </div>
+
+
+  <div class="board">
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🥛</i><i class="emoji">🍋</i></div></div>
+    <div class="shelf glow"><span class="pop">+3 ✨</span>
+      <div class="front"><i class="emoji">🍎</i><i class="emoji">🍎</i><i class="emoji">🍎</i></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍪</i><i class="emoji">🍩</i></div>
+      <div class="front"><i class="emoji">🧃</i><span class="slot-empty"></span><i class="emoji">🍩</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧃</i></div>
+      <div class="front"><i class="emoji">🥕</i><i class="emoji">🍇</i><i class="emoji">🥛</i></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🍩</i><i class="emoji">🥕</i></div>
+      <div class="front"><i class="emoji">🧀</i><i class="emoji">🍪</i><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🍩</i><i class="emoji">🧃</i><i class="emoji">🍪</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🥛</i><i class="emoji">🍪</i></div>
+      <div class="front"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><span class="slot-empty"></span><span class="slot-empty"></span><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🥛</i><i class="emoji">🧀</i><i class="emoji">🍇</i></div></div>
+
+    <div class="shelf"><div class="front"><i class="emoji">🍪</i><i class="emoji">🥕</i><i class="emoji">🍩</i></div></div>
+    <div class="shelf"><div class="lock"><i class="emoji">🔒</i><b>رتّب 3 رفوف</b></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🍋</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><i class="emoji">🍇</i><span class="slot-empty"></span><i class="emoji">🥛</i></div></div>
+  </div>
+
+  <div class="dragging emoji" style="top:520px;left:186px">🧀</div>
+  <div class="hand emoji" style="top:552px;left:200px">👆</div>
+
+  <div class="boosters">
+    <div class="booster"><div class="ic"><i class="emoji">↩️</i></div><span class="cnt">2</span><b>تراجع</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🔀</i></div><span class="cnt">1</span><b>خلط</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🗄️</i></div><span class="cnt add">+</span><b>رف إضافي</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">❄️</i></div><span class="cnt">3</span><b>تجميد الوقت</b></div>
+  </div>
+</div>
+<figcaption>4. اللعب<span>اسحب البضائع واجمع 3 متشابهة على رف</span></figcaption>
+</figure>
+
+<!-- ================= 5. WIN ================= -->
+<figure class="cell">
+<div class="phone bg-shop" id="s5">
+  <div class="sun"></div>
+  <div class="dim"></div>
+  <div class="confetti">
+    <i style="top:120px;left:40px;background:#ffd23f;transform:rotate(20deg)"></i>
+    <i style="top:90px;left:120px;background:#ff6b8b;transform:rotate(-30deg)"></i>
+    <i style="top:140px;left:300px;background:#3cc46b;transform:rotate(50deg)"></i>
+    <i style="top:70px;left:240px;background:#7b5cff;transform:rotate(10deg)"></i>
+    <i style="top:200px;left:340px;background:#ffd23f;transform:rotate(-60deg)"></i>
+    <i style="top:220px;left:20px;background:#13a89e;transform:rotate(70deg)"></i>
+    <i style="top:740px;left:60px;background:#ff8a3d;transform:rotate(-20deg)"></i>
+    <i style="top:770px;left:300px;background:#ff6b8b;transform:rotate(40deg)"></i>
+    <i style="top:700px;left:180px;background:#ffd23f;transform:rotate(80deg)"></i>
+  </div>
+  <div class="card" style="top:300px">
+    <div class="big-stars"><span>★</span><span>★</span><span>★</span></div>
+    <div class="ribbon">ممتاز!</div>
+    <h3>أكملت المرحلة 12</h3>
+    <p>رتّبت 18 رفّاً في 1:12 دقيقة</p>
+    <div class="rewards">
+      <div class="reward"><i class="emoji">🪙</i><b>+50</b></div>
+      <div class="reward"><i class="emoji">⭐</i><b>+1</b></div>
+      <div class="reward"><i class="emoji">🎟️</i><b>+20</b></div>
+    </div>
+    <div class="btn btn-purple">ضاعف المكافأة ×2 <span class="ad-tag">▶ إعلان</span></div>
+    <div class="btn btn-green">التالي</div>
+  </div>
+</div>
+<figcaption>5. الفوز<span>نجوم ومكافآت + مضاعفة اختيارية</span></figcaption>
+</figure>
+
+<!-- ================= 6. FAIL ================= -->
+<figure class="cell">
+<div class="phone bg-shop" id="s6" style="filter:none;background:radial-gradient(circle at 50% 0%,#8f86b8,#4a3f78 60%,#2b2350)">
+  <div class="dim"></div>
+  <div class="card" style="top:250px">
+    <div class="ribbon red">انتهى الوقت!</div>
+    <div class="emoji" style="font-size:80px;margin-top:-10px">⏰</div>
+    <h3>بقي القليل فقط!</h3>
+    <div class="left-items">
+      <span><i class="emoji">🍇</i> ×2</span>
+      <span><i class="emoji">🧀</i> ×1</span>
+      <span><i class="emoji">🍩</i> ×3</span>
+    </div>
+    <p>أكمل المرحلة واحتفظ بتقدمك</p>
+    <div class="btn btn-green">+30 ثانية <small>🪙 900</small></div>
+    <div class="btn btn-purple">+15 ثانية مجاناً <span class="ad-tag">▶ إعلان</span></div>
+    <div class="link">لا شكراً</div>
+    <div class="heart-warn">❤️ ستخسر قلباً واحداً</div>
+  </div>
+</div>
+<figcaption>6. الخسارة<span>فرصة ثانية بالعملات أو إعلان اختياري</span></figcaption>
+</figure>
+
+<!-- ================= 7. RENOVATION ================= -->
+<figure class="cell">
+<div class="phone reno" id="s7">
+  <div class="hud">
+    <div class="icon-btn"><i class="emoji">⬅️</i></div>
+    <div class="spacer"></div>
+    <div class="pill"><i class="emoji">⭐</i>3</div>
+  </div>
+  <div class="reno-head"><h2>تجديد بقالة الحي</h2><p>استخدم النجوم لتجديد المتجر</p></div>
+
+  <div class="room">
+    <div class="half"></div>
+    <span class="lbl" style="left:10px">قبل</span>
+    <span class="lbl" style="right:10px">بعد</span>
+    <div class="shelf-row" style="left:20px;opacity:.7"><i class="emoji">📦</i><i class="emoji">🕸️</i><i class="emoji">📦</i></div>
+    <div class="shelf-row" style="right:20px"><i class="emoji">🍎</i><i class="emoji">🥖</i><i class="emoji">🪴</i></div>
+    <div class="shelf-row" style="top:150px;left:30px;opacity:.7"><i class="emoji">🪣</i></div>
+    <div class="shelf-row" style="top:150px;right:30px"><i class="emoji">🛒</i><i class="emoji">💡</i></div>
+    <div class="divider"></div>
+  </div>
+
+  <div class="tasks">
+    <div class="task done"><div class="ti"><i class="emoji">🧹</i></div><b>تنظيف الأرضية</b><span class="done-ic">✓</span></div>
+    <div class="task done"><div class="ti"><i class="emoji">🎨</i></div><b>دهان الجدران</b><span class="done-ic">✓</span></div>
+    <div class="task"><div class="ti"><i class="emoji">🪵</i></div><b>رفوف خشبية جديدة</b><span class="do">⭐ 2 جدّد</span></div>
+    <div class="task locked"><div class="ti"><i class="emoji">🪧</i></div><b>لوحة المحل</b><span class="cost">⭐ 3</span></div>
+    <div class="task locked"><div class="ti"><i class="emoji">💡</i></div><b>إضاءة دافئة</b><span class="cost">⭐ 3</span></div>
+  </div>
+
+  <div class="reno-foot">
+    <div class="row"><span>اكتمل 6 / 10</span><span>المكافأة: 🧁 فتح المخبز</span></div>
+    <div class="bar" style="background:rgba(255,255,255,.2)"><i style="width:60%"></i></div>
+  </div>
+</div>
+<figcaption>7. التجديد<span>النجوم تحوّل المتجر القديم إلى جديد</span></figcaption>
+</figure>
+
+<!-- ================= 8. SHOP ================= -->
+<figure class="cell">
+<div class="phone shop" id="s8">
+  <div class="hud">
+    <div class="icon-btn"><i class="emoji">⬅️</i></div>
+    <div class="spacer"></div>
+    <div class="pill"><i class="emoji">🪙</i>1,250</div>
+  </div>
+  <div class="shop-head"><h2>المتجر</h2></div>
+  <div class="trust">✅ لا صناديق حظ — ترى بالضبط ما تشتريه</div>
+
+  <div class="offer o1"><i class="emoji">🎒</i>
+    <div class="txt"><b>حزمة البداية</b><span>🪙 1000 + ↩️ 3 + 🔀 3 + 🗄️ 2</span></div>
+    <span class="price">$1.99</span></div>
+  <div class="offer o2"><i class="emoji">🚫</i>
+    <div class="txt"><b>إزالة الإعلانات</b><span>للأبد + 🪙 500 هدية</span></div>
+    <span class="price">$3.99</span></div>
+
+  <div class="coins">
+    <div class="coin-pack"><i class="emoji">🪙</i><b>500</b><span class="price">$0.99</span></div>
+    <div class="coin-pack"><span class="tag">الأكثر شراءً</span><i class="emoji">💰</i><b>1,200</b><span class="price">$1.99</span></div>
+    <div class="coin-pack"><i class="emoji">💰</i><b>3,000</b><span class="price">$4.99</span></div>
+    <div class="coin-pack"><span class="tag">أفضل قيمة</span><i class="emoji">🏦</i><b>8,000</b><span class="price">$9.99</span></div>
+  </div>
+
+  <div class="free"><div class="btn btn-purple">🪙 50 مجاناً <span class="ad-tag">▶ إعلان</span></div></div>
+</div>
+<figcaption>8. المتجر<span>أسعار واضحة بلا صناديق حظ</span></figcaption>
+</figure>
+
+</main>
+</body>
+</html>
