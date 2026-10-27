@@ -148,15 +148,30 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
 
 /* ---------- 4 gameplay ---------- */
 .game-hud { position: absolute; top: 48px; left: 14px; right: 14px; display: flex; align-items: center; gap: 10px; }
+.timer { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); z-index: 7; text-align: center; }
+.timer .ring { width: 112px; height: 112px; border-radius: 50%; display: grid; place-items: center;
+  background: conic-gradient(from 0deg, #ff4d5e 0 20%, #f1dcc0 20% 100%);
+  box-shadow: 0 0 0 5px #fff, 0 7px 0 5px #e8b48e, 0 0 34px 12px rgba(255,77,94,.55); }
+.timer .inner { width: 86px; height: 86px; border-radius: 50%; background: radial-gradient(circle at 50% 30%, #fff, #ffeaea);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.timer .inner .emoji { font-size: 22px; transform: rotate(-12deg); }
+.timer .inner strong { font-size: 34px; font-weight: 900; color: var(--red); line-height: 1; direction: ltr; text-shadow: 0 2px 0 #ffc2c8; }
+.timer .hurry { display: inline-block; margin-top: -12px; position: relative; background: linear-gradient(180deg, #ff8fa0, var(--red)); color: #fff;
+  font-weight: 900; font-size: 17px; padding: 2px 16px; border-radius: 14px; box-shadow: 0 4px 0 #b8202f; transform: rotate(-4deg); white-space: nowrap; }
+.timer .tick { position: absolute; top: 4px; font-size: 18px; font-weight: 900; color: var(--red); }
+.timer .tick.a { left: -12px; transform: rotate(-25deg); } .timer .tick.b { right: -12px; transform: rotate(25deg); }
+.urgent { position: absolute; inset: 0; pointer-events: none; z-index: 4; box-shadow: inset 0 0 70px 14px rgba(255,77,94,.45); border-radius: 44px; }
+.goal .lose { color: var(--red); font-size: 13px; }
+.goal .lose b { direction: ltr; display: inline-block; }
 .lvl { flex: 1; text-align: center; }
 .lvl b { display: inline-block; background: var(--teal-dd); color: #fff; padding: 2px 18px; border-radius: 14px; font-size: 18px; }
 .stat { background: #fff; border-radius: 16px; padding: 4px 12px; text-align: center; box-shadow: 0 4px 0 #d9c7a5; min-width: 78px; }
 .stat small { display: block; font-size: 11px; color: #8a7a5c; font-weight: 700; }
 .stat strong { font-size: 22px; line-height: 1.1; }
-.goal { position: absolute; top: 112px; left: 30px; right: 30px; background: rgba(255,255,255,.9); border-radius: 16px; padding: 8px 14px; }
+.goal { position: absolute; top: 174px; left: 30px; right: 30px; background: rgba(255,255,255,.9); border-radius: 16px; padding: 8px 14px; }
 .goal .row { display: flex; justify-content: space-between; font-weight: 800; font-size: 14px; }
 .goal .stars-mini { color: var(--yellow); -webkit-text-stroke: 1px #c99700; letter-spacing: 2px; }
-.board { position: absolute; top: 178px; left: 0; right: 0; display: grid; grid-template-columns: repeat(3, 112px); gap: 26px 12px; justify-content: center; }
+.board { position: absolute; top: 240px; left: 0; right: 0; display: grid; grid-template-columns: repeat(3, 112px); gap: 18px 12px; justify-content: center; }
 .dragging { position: absolute; z-index: 9; font-size: 52px; transform: rotate(-12deg) scale(1.1); filter: drop-shadow(0 14px 8px rgba(0,0,0,.35)); }
 .hand { position: absolute; z-index: 10; font-size: 46px; }
 .combo { position: absolute; top: 160px; left: 22px; z-index: 8; font-family: "Lalezar"; font-size: 34px; color: var(--yellow);
@@ -369,12 +384,18 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
 <div class="phone bg-wall" id="s4">
   <div class="game-hud">
     <div class="icon-btn"><i class="emoji">⏸️</i></div>
-    <div class="stat"><small>الوقت</small><strong>1:45</strong></div>
-    <div class="lvl"><b>المرحلة 12</b></div>
-    <div class="stat"><small>كومبو</small><strong>×3</strong></div>
+    <div class="stat" style="min-width:64px"><small>كومبو</small><strong>×3</strong></div>
+    <div class="spacer"></div>
+    <div class="stat"><small>المرحلة</small><strong>12</strong></div>
+  </div>
+  <div class="urgent"></div>
+  <div class="timer">
+    <span class="tick a">!</span><span class="tick b">!</span>
+    <div class="ring"><div class="inner"><i class="emoji">⏰</i><strong>0:18</strong></div></div>
+    <div class="hurry">⚡ أسرع!</div>
   </div>
   <div class="goal">
-    <div class="row"><span>رُتّب 9 من 18</span><span class="stars-mini">★★☆</span></div>
+    <div class="row"><span>رُتّب 9 من 18 <span class="stars-mini">★★★</span></span><span class="lose">النجمة الثالثة تضيع بعد <b>0:06</b></span></div>
     <div class="bar"><i style="width:50%"></i></div>
   </div>
 
@@ -382,7 +403,7 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
   <div class="board">
     <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧀</i></div>
       <div class="front"><i class="emoji">🍋</i><i class="emoji">🥛</i><i class="emoji">🍋</i></div></div>
-    <div class="shelf glow"><span class="pop">+3 ✨</span>
+    <div class="shelf glow"><span class="pop">⏱ +2 ث</span>
       <div class="front"><i class="emoji">🍎</i><i class="emoji">🍎</i><i class="emoji">🍎</i></div></div>
     <div class="shelf"><div class="back"><i class="emoji">🍪</i><i class="emoji">🍩</i></div>
       <div class="front"><i class="emoji">🧃</i><span class="slot-empty"></span><i class="emoji">🍩</i></div></div>
@@ -406,8 +427,8 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
     <div class="shelf"><div class="front"><i class="emoji">🍇</i><span class="slot-empty"></span><i class="emoji">🥛</i></div></div>
   </div>
 
-  <div class="dragging emoji" style="top:520px;left:186px">🧀</div>
-  <div class="hand emoji" style="top:552px;left:200px">👆</div>
+  <div class="dragging emoji" style="top:572px;left:186px">🧀</div>
+  <div class="hand emoji" style="top:604px;left:200px">👆</div>
 
   <div class="boosters">
     <div class="booster"><div class="ic"><i class="emoji">↩️</i></div><span class="cnt">2</span><b>تراجع</b></div>
