@@ -6,6 +6,9 @@
 <style>
 @font-face { font-family: "Cairo"; src: url("fonts/Cairo.ttf"); font-weight: 200 1000; }
 @font-face { font-family: "Lalezar"; src: url("fonts/Lalezar-Regular.ttf"); }
+@font-face { font-family: "Noto Sans Devanagari"; src: url("fonts/NotoSansDevanagari.ttf"); font-weight: 100 900; }
+@font-face { font-family: "Noto Sans Bengali"; src: url("fonts/NotoSansBengali.ttf"); font-weight: 100 900; }
+@font-face { font-family: "Noto Sans Telugu"; src: url("fonts/NotoSansTelugu.ttf"); font-weight: 100 900; }
 
 :root {
   --teal: #13a89e; --teal-d: #0b6e69; --teal-dd: #08403e;
@@ -282,6 +285,50 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
 .bonus { direction: ltr; unicode-bidi: isolate; display: inline-block; background: var(--yellow); color: var(--ink); font-size: 11px; font-weight: 900; border-radius: 8px; padding: 0 6px; margin-right: 4px; vertical-align: middle; }
 .coin-pack .tag { position: absolute; top: -10px; right: -6px; background: var(--red); color: #fff; font-size: 12px; font-weight: 900; padding: 1px 8px; border-radius: 8px; }
 .free { position: absolute; bottom: 30px; left: 20px; right: 20px; }
+
+/* ---------- 9 settings ---------- */
+.settings { background: linear-gradient(180deg, var(--teal) 0, var(--teal-d) 100%); }
+.set-title { position: absolute; top: 104px; left: 0; right: 0; text-align: center; color: #fff; font-family: "Lalezar"; font-weight: 400; font-size: 36px; text-shadow: 0 3px 0 var(--teal-dd); }
+.set-body { position: absolute; top: 162px; left: 18px; right: 18px; display: flex; flex-direction: column; gap: 12px; }
+.set-group h4 { color: rgba(255,255,255,.85); font-size: 13px; margin: 0 6px 6px; }
+.set-card { background: #fff; border-radius: 20px; box-shadow: 0 5px 0 rgba(0,0,0,.18); overflow: hidden; }
+.set-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid #f0e6d4; }
+.set-row:last-child { border-bottom: 0; }
+.set-row .ri { width: 36px; height: 36px; border-radius: 11px; background: var(--cream); display: grid; place-items: center; }
+.set-row .ri .emoji { font-size: 20px; }
+.set-row b { flex: 1; font-size: 15px; }
+.set-row .val { color: #8a7a5c; font-weight: 700; font-size: 14px; }
+.set-row .chev { color: #b9ab90; font-weight: 900; font-size: 18px; }
+.set-row.lang { background: linear-gradient(90deg, #fff, #eafaf8); }
+.set-row.lang .val { color: var(--teal-d); }
+.tg { width: 50px; height: 28px; border-radius: 20px; background: #d6cdbb; position: relative; }
+.tg::after { content: ""; position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 2px 3px rgba(0,0,0,.2); }
+.tg.on { background: var(--green); } .tg.on::after { right: 25px; }
+.set-ver { text-align: center; color: rgba(255,255,255,.65); font-size: 12px; margin-top: 2px; }
+
+/* ---------- 10 language ---------- */
+.langs { background: linear-gradient(180deg, var(--teal) 0, var(--teal-d) 100%); }
+.lang-search { position: absolute; top: 160px; left: 18px; right: 18px; height: 44px; background: #fff; border-radius: 16px; display: flex; align-items: center; gap: 8px;
+  padding: 0 14px; color: #a99c82; font-weight: 700; font-size: 14px; box-shadow: 0 4px 0 rgba(0,0,0,.15); }
+.lang-auto { position: absolute; top: 216px; left: 18px; right: 18px; background: #fff; border-radius: 18px; padding: 9px 14px; display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 0 0 3px var(--yellow), 0 5px 0 3px #c99700; }
+.lang-auto .emoji { font-size: 26px; }
+.lang-auto .t { flex: 1; }
+.lang-auto .t b { display: block; font-size: 15px; }
+.lang-auto .t span { font-size: 12px; color: #8a7a5c; }
+.radio { width: 24px; height: 24px; border-radius: 50%; border: 3px solid #cfc4ae; flex-shrink: 0; }
+.radio.on { border-color: var(--green); background: radial-gradient(circle, var(--green) 0 5px, #fff 6px); }
+.lang-sub { position: absolute; top: 290px; left: 24px; right: 24px; display: flex; justify-content: space-between; color: rgba(255,255,255,.9); font-size: 13px; font-weight: 800; }
+.lang-grid { position: absolute; top: 314px; left: 18px; right: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px 6px; }
+.lg { background: rgba(255,255,255,.95); border-radius: 13px; padding: 2px 10px; display: flex; align-items: center; gap: 6px; height: 38px; position: relative; }
+.lg .n { flex: 1; min-width: 0; }
+.lg .n b { display: block; font-size: 13.5px; line-height: 19px; height: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-family: "Cairo", "Noto Sans Devanagari", "Noto Sans Bengali", "Noto Sans Telugu", "WenQuanYi Zen Hei", "IPAGothic", "Inter", sans-serif; }
+.lg .n > span { display: block; font-size: 10.5px; color: #8a7a5c; line-height: 14px; white-space: nowrap; }
+.lg.sel { background: #fff; box-shadow: 0 0 0 3px var(--green); }
+.lg.sel::after { content: "✓"; position: absolute; top: -7px; left: -5px; width: 20px; height: 20px; border-radius: 50%; background: var(--green); color: #fff; font-size: 12px; font-weight: 900; display: grid; place-items: center; border: 2px solid #fff; }
+.lg .dir { display: inline-block; margin-right: 4px; line-height: 13px; font-size: 9px; font-weight: 900; color: var(--purple); background: #efeaff; border-radius: 6px; padding: 0 4px; }
+.lang-note { position: absolute; bottom: 22px; left: 18px; right: 18px; text-align: center; color: rgba(255,255,255,.75); font-size: 11.5px; }
 </style>
 </head>
 <body>
@@ -579,6 +626,79 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
   <div class="free"><div class="btn btn-purple">🪙 50 مجاناً <span class="ad-tag">▶ إعلان</span></div></div>
 </div>
 <figcaption>8. المتجر<span>أسعار واضحة بلا صناديق حظ</span></figcaption>
+</figure>
+
+
+<!-- ================= 9. SETTINGS ================= -->
+<figure class="cell">
+<div class="phone settings" id="s9">
+  <div class="hud">
+    <div class="icon-btn"><i class="emoji">⬅️</i></div>
+    <div class="spacer"></div>
+  </div>
+  <h2 class="set-title">الإعدادات</h2>
+  <div class="set-body">
+    <div class="set-group"><h4>اللغة</h4>
+      <div class="set-card">
+        <div class="set-row lang"><div class="ri"><i class="emoji">🌐</i></div><b>لغة اللعبة</b><span class="val">العربية · تلقائي</span><span class="chev">‹</span></div>
+      </div></div>
+    <div class="set-group"><h4>الصوت والتنبيهات</h4>
+      <div class="set-card">
+        <div class="set-row"><div class="ri"><i class="emoji">🔊</i></div><b>المؤثرات الصوتية</b><span class="tg on"></span></div>
+        <div class="set-row"><div class="ri"><i class="emoji">📳</i></div><b>الاهتزاز</b><span class="tg on"></span></div>
+        <div class="set-row"><div class="ri"><i class="emoji">🔔</i></div><b>تذكير عند امتلاء القلوب</b><span class="tg"></span></div>
+      </div></div>
+    <div class="set-group"><h4>الحساب والتقدم</h4>
+      <div class="set-card">
+        <div class="set-row"><div class="ri"><i class="emoji">☁️</i></div><b>حفظ التقدم سحابياً</b><span class="val">متصل</span><span class="chev">‹</span></div>
+        <div class="set-row"><div class="ri"><i class="emoji">🧾</i></div><b>استعادة المشتريات</b><span class="chev">‹</span></div>
+      </div></div>
+    <div class="set-group"><h4>المساعدة</h4>
+      <div class="set-card">
+        <div class="set-row"><div class="ri"><i class="emoji">❓</i></div><b>كيف تلعب</b><span class="chev">‹</span></div>
+        <div class="set-row"><div class="ri"><i class="emoji">🔒</i></div><b>سياسة الخصوصية</b><span class="chev">‹</span></div>
+      </div></div>
+    <div class="set-ver">الإصدار 1.0</div>
+  </div>
+</div>
+<figcaption>9. الإعدادات<span>اللغة أولاً، ثم الصوت والحساب والمساعدة</span></figcaption>
+</figure>
+
+<!-- ================= 10. LANGUAGE ================= -->
+<figure class="cell">
+<div class="phone langs" id="s10">
+  <div class="hud">
+    <div class="icon-btn"><i class="emoji">⬅️</i></div>
+    <div class="spacer"></div>
+  </div>
+  <h2 class="set-title">اللغة · Language</h2>
+  <div class="lang-search"><i class="emoji">🔍</i>ابحث عن لغتك… Search</div>
+  <div class="lang-auto"><i class="emoji">📱</i><div class="t"><b>تلقائي — لغة الجهاز</b><span>تم اكتشاف: العربية</span></div><span class="radio on"></span></div>
+  <div class="lang-sub"><span>كل اللغات</span><span>19</span></div>
+  <div class="lang-grid">
+    <div class="lg sel"><div class="n"><b dir="rtl">العربية</b><span>Arabic <span class="dir">RTL</span></span></div></div>
+    <div class="lg"><div class="n"><b dir="ltr">English</b><span>الإنجليزية</span></div></div>
+    <div class="lg"><div class="n"><b dir="ltr">中文 (简体)</b><span>الصينية</span></div></div>
+    <div class="lg"><div class="n"><b dir="ltr">हिन्दी</b><span>الهندية</span></div></div>
+    <div class="lg"><div class="n"><b dir="ltr">Español</b><span>الإسبانية</span></div></div>
+    <div class="lg"><div class="n"><b dir="ltr">Français</b><span>الفرنسية</span></div></div>
+    <div class="lg"><div class="n"><b dir="ltr">বাংলা</b><span>البنغالية</span></div></div>
+    <div class="lg"><div class="n"><b dir="ltr">Português</b><span>البرتغالية</span></div></div>
+    <div class="lg"><div class="n"><b dir="ltr">Русский</b><span>الروسية</span></div></div>
+    <div class="lg"><div class="n"><b dir="ltr">Bahasa Indonesia</b><span>الإندونيسية</span></div></div>
+    <div class="lg"><div class="n"><b dir="rtl">اردو</b><span>الأردية <span class="dir">RTL</span></span></div></div>
+    <div class="lg"><div class="n"><b dir="ltr">Deutsch</b><span>الألمانية</span></div></div>
+    <div class="lg"><div class="n"><b dir="ltr">日本語</b><span>اليابانية</span></div></div>
+    <div class="lg"><div class="n"><b dir="ltr">Naijá</b><span>البيجين النيجيرية</span></div></div>
+    <div class="lg"><div class="n"><b dir="ltr">मराठी</b><span>المراثية</span></div></div>
+    <div class="lg"><div class="n"><b dir="ltr">Tiếng Việt</b><span>الفيتنامية</span></div></div>
+    <div class="lg"><div class="n"><b dir="ltr">తెలుగు</b><span>التيلوغو</span></div></div>
+    <div class="lg"><div class="n"><b dir="ltr">Hausa</b><span>الهوسا</span></div></div>
+    <div class="lg"><div class="n"><b dir="ltr">Türkçe</b><span>التركية</span></div></div>
+  </div>
+  <div class="lang-note">↔ الاتجاه يتبدّل تلقائياً للعربية والأردية · التغيير فوري</div>
+</div>
+<figcaption>10. اختيار اللغة<span>19 لغة باسمها الأصلي + تلقائي حسب الجهاز</span></figcaption>
 </figure>
 
 </main>
