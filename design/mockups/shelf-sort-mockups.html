@@ -68,6 +68,7 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
   padding: 4px 22px; border-radius: 30px; font-size: 20px; box-shadow: 0 5px 0 var(--orange-d); direction: ltr; }
 .hero-shelf { position: relative; margin-top: 70px; }
 .splash .tagline { position: relative; color: #fff; font-weight: 700; font-size: 20px; margin-top: 60px; }
+.splash .loader { margin-top: 26px; }
 .loader { position: relative; width: 250px; height: 22px; border-radius: 20px; background: rgba(0,0,0,.25); margin-top: 18px; padding: 4px; }
 .loader i { display: block; width: 68%; height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--yellow), var(--orange)); }
 .splash .ver { position: absolute; bottom: 26px; color: rgba(255,255,255,.6); font-size: 14px; }
@@ -329,13 +330,35 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
 .lg.sel::after { content: "✓"; position: absolute; top: -7px; left: -5px; width: 20px; height: 20px; border-radius: 50%; background: var(--green); color: #fff; font-size: 12px; font-weight: 900; display: grid; place-items: center; border: 2px solid #fff; }
 .lg .dir { display: inline-block; margin-right: 4px; line-height: 13px; font-size: 9px; font-weight: 900; color: var(--purple); background: #efeaff; border-radius: 6px; padding: 0 4px; }
 .lang-note { position: absolute; bottom: 22px; left: 18px; right: 18px; text-align: center; color: rgba(255,255,255,.75); font-size: 11.5px; }
+
+/* ---------- brand ---------- */
+.wm { position: relative; font-family: "Lalezar"; line-height: 1; direction: ltr; white-space: nowrap; transform: rotate(-2deg);
+  -webkit-text-stroke: 4px var(--teal-dd); paint-order: stroke fill; text-shadow: 0 7px 0 var(--teal-dd), 0 16px 30px rgba(0,0,0,.35); }
+.wm .tri { color: var(--orange); }
+.wm .rest { color: var(--yellow); }
+.calm { position: relative; display: block; margin: 10px auto 0; }
+.slogan-en { position: relative; color: #fff; font-weight: 800; font-size: 15px; letter-spacing: 1px; direction: ltr; opacity: .95; }
+.slogan-ar { position: relative; color: var(--yellow); font-weight: 800; font-size: 19px; margin-top: 4px; }
+.shelf.hero-match { box-shadow: inset 0 0 0 3px #4a2b10, 0 0 0 4px var(--yellow), 0 0 34px 10px rgba(255,210,63,.7); }
+.spark { position: absolute; font-size: 22px; z-index: 3; }
+.app-icon { width: 120px; height: 120px; border-radius: 28px; margin: 0 auto 18px; position: relative; overflow: hidden;
+  background: radial-gradient(circle at 50% 10%, #4fd6c9, var(--teal) 50%, var(--teal-d)); box-shadow: 0 0 0 4px rgba(255,255,255,.15), 0 14px 30px rgba(0,0,0,.45); }
+.app-icon .ish { position: absolute; left: 14px; right: 14px; top: 34px; height: 54px; border-radius: 10px; background: linear-gradient(180deg,#7a4a22,#5e3816);
+  box-shadow: inset 0 0 0 3px #4a2b10, 0 0 0 3px var(--yellow), 0 0 18px 4px rgba(255,210,63,.7); display: flex; justify-content: space-around; align-items: flex-end; padding-bottom: 8px; }
+.app-icon .ish::after { content: ""; position: absolute; left: -3px; right: -3px; bottom: -5px; height: 10px; border-radius: 4px; background: linear-gradient(180deg, var(--wood-l), var(--wood)); }
+.app-icon .ish .emoji { font-size: 22px; position: relative; z-index: 2; }
+.app-icon .st { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); font-size: 16px; color: var(--yellow); letter-spacing: 2px; -webkit-text-stroke: 1px #c99700; }
+.page-head .wm { font-size: 76px; display: inline-block; }
+.page-head .slogan-en { font-size: 18px; margin-top: 16px; }
 </style>
 </head>
 <body>
 
 <header class="page-head">
-  <h1>Trivanquil</h1>
-  <p>تصاميم مبدئية لشاشات اللعبة — لعبة ألغاز فرز عائلية خالية من المحرمات</p>
+  <div class="app-icon" id="icon"><span class="st">★★★</span><div class="ish"><i class="emoji">🍓</i><i class="emoji">🍓</i><i class="emoji">🍓</i></div></div>
+  <div class="wm"><span class="tri">Tri</span><span class="rest">vanquil</span></div>
+  <div class="slogan-en">Three in a row · Calm in the soul — ثلاثة على الرف… وهدوء في النفس</div>
+  <p style="margin-top:6px">تصاميم شاشات اللعبة — لعبة ألغاز فرز عائلية خالية من المحرمات</p>
 </header>
 
 <main class="grid">
@@ -344,14 +367,20 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
 <figure class="cell">
 <div class="phone bg-shop splash" id="s1">
   <div class="sun"></div>
-  <div class="logo" style="font-size:68px;margin-top:46px">Trivanquil</div>
-  <div class="logo-en" style="letter-spacing:3px;font-size:16px;margin-top:22px">GOODS SORT PUZZLE</div>
-  <div class="hero-shelf">
-    <div class="shelf" style="width:220px;height:110px">
-      <div class="front"><i class="emoji" style="font-size:44px">🍓</i><i class="emoji" style="font-size:44px">🍓</i><i class="emoji" style="font-size:44px">🍓</i><i class="emoji" style="font-size:44px">🧁</i></div>
+  <div class="wm" style="font-size:72px;margin-top:30px"><span class="tri">Tri</span><span class="rest">vanquil</span></div>
+  <svg class="calm" width="240" height="24" viewBox="0 0 240 24">
+    <path d="M6 12 C 30 3, 54 3, 78 12" fill="none" stroke="#fff6e5" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+    <circle cx="100" cy="12" r="6" fill="#ffd23f" stroke="#08403e" stroke-width="2"/><circle cx="120" cy="12" r="6" fill="#ffd23f" stroke="#08403e" stroke-width="2"/><circle cx="140" cy="12" r="6" fill="#ffd23f" stroke="#08403e" stroke-width="2"/>
+    <path d="M162 12 C 186 21, 210 21, 234 12" fill="none" stroke="#fff6e5" stroke-width="3" stroke-linecap="round" opacity=".8"/></svg>
+  <div class="logo-en" style="letter-spacing:3px;font-size:15px;margin-top:14px">GOODS SORT PUZZLE</div>
+  <div class="hero-shelf" style="margin-top:56px">
+    <span class="spark emoji" style="top:-22px;left:-14px">✨</span><span class="spark emoji" style="top:-30px;right:-10px">✨</span>
+    <div class="shelf hero-match" style="width:220px;height:110px">
+      <div class="front"><i class="emoji" style="font-size:48px">🍓</i><i class="emoji" style="font-size:48px">🍓</i><i class="emoji" style="font-size:48px">🍓</i></div>
     </div>
   </div>
-  <div class="tagline">رتّب · جدّد · استمتع</div>
+  <div class="slogan-en" style="margin-top:52px">Three in a row · Calm in the soul</div>
+  <div class="slogan-ar">ثلاثة على الرف… وهدوء في النفس</div>
   <div class="loader"><i></i></div>
   <div class="ver">v1.0 · لكل العائلة</div>
 </div>
@@ -651,7 +680,7 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
       <div class="set-card">
         <div class="set-row"><div class="ri"><i class="emoji">🔒</i></div><b>سياسة الخصوصية</b><span class="chev">‹</span></div>
       </div></div>
-    <div class="set-ver">الإصدار 1.0</div>
+    <div class="set-ver"><b style="font-family:Lalezar;font-weight:400;font-size:15px;color:#ffd23f">Trivanquil</b> · الإصدار 1.0</div>
   </div>
 </div>
 <figcaption>9. الإعدادات<span>اللغة أولاً، ثم الصوت والحساب والمساعدة</span></figcaption>
