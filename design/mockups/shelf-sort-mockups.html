@@ -150,12 +150,12 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
 .game-hud { position: absolute; top: 48px; left: 14px; right: 14px; display: flex; align-items: center; gap: 10px; }
 .timer { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); z-index: 7; text-align: center; }
 .timer .ring { width: 112px; height: 112px; border-radius: 50%; display: grid; place-items: center;
-  background: conic-gradient(from 0deg, #ff4d5e 0 20%, #f1dcc0 20% 100%);
+  background: conic-gradient(from 0deg, #ff4d5e 0 20%, #ffd0d5 20% 100%);
   box-shadow: 0 0 0 5px #fff, 0 7px 0 5px #e8b48e, 0 0 34px 12px rgba(255,77,94,.55); }
-.timer .inner { width: 86px; height: 86px; border-radius: 50%; background: radial-gradient(circle at 50% 30%, #fff, #ffeaea);
+.timer .inner { width: 86px; height: 86px; border-radius: 50%; background: radial-gradient(circle at 50% 30%, #ff7a86, #e8283a); box-shadow: inset 0 -5px 0 rgba(0,0,0,.18);
   display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .timer .inner .emoji { font-size: 22px; transform: rotate(-12deg); }
-.timer .inner strong { font-size: 34px; font-weight: 900; color: var(--red); line-height: 1; direction: ltr; text-shadow: 0 2px 0 #ffc2c8; }
+.timer .inner strong { font-size: 34px; font-weight: 900; color: #fff; line-height: 1; direction: ltr; text-shadow: 0 3px 0 #a3121f; }
 .timer .hurry { display: inline-block; margin-top: -12px; position: relative; background: linear-gradient(180deg, #ff8fa0, var(--red)); color: #fff;
   font-weight: 900; font-size: 17px; padding: 2px 16px; border-radius: 14px; box-shadow: 0 4px 0 #b8202f; transform: rotate(-4deg); white-space: nowrap; }
 .timer .tick { position: absolute; top: 4px; font-size: 18px; font-weight: 900; color: var(--red); }
@@ -405,7 +405,6 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
     <div class="spacer"></div>
     <div class="stat"><small>المرحلة</small><strong>12</strong></div>
   </div>
-  <div class="urgent"></div>
   <div class="timer">
     <span class="tick a">!</span><span class="tick b">!</span>
     <div class="star-mark" style="left:83px;top:-3px">★<small>0:12</small></div>
