@@ -160,6 +160,23 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
   font-weight: 900; font-size: 17px; padding: 2px 16px; border-radius: 14px; box-shadow: 0 4px 0 #b8202f; transform: rotate(-4deg); white-space: nowrap; }
 .timer .tick { position: absolute; top: 4px; font-size: 18px; font-weight: 900; color: var(--red); }
 .timer .tick.a { left: -12px; transform: rotate(-25deg); } .timer .tick.b { right: -12px; transform: rotate(25deg); }
+.shelf.drop { box-shadow: inset 0 0 0 3px #4a2b10, 0 0 0 4px #5be08a, 0 0 24px 8px rgba(91,224,138,.75); }
+.shelf.drop .front { justify-content: space-around; }
+.shelf.drop .ghost-slot { width: 30px; height: 34px; border: 3px dashed rgba(255,255,255,.8); border-radius: 10px; }
+.shelf.drop .ghost-slot.hl { background: rgba(91,224,138,.35); border-color: #fff; transform: scale(1.15); }
+.drop-chip { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 4; background: #fff; color: var(--green); font-weight: 900;
+  font-size: 13px; border-radius: 12px; padding: 0 10px; box-shadow: 0 3px 0 #22924a; white-space: nowrap; }
+.guide { position: absolute; inset: 0; z-index: 8; pointer-events: none; }
+.trail { position: absolute; z-index: 8; font-size: 12px; color: #fff; }
+.timer .star-mark { position: absolute; z-index: 2; width: 30px; height: 30px; border-radius: 50%; background: var(--yellow); display: grid; place-items: center;
+  font-size: 18px; color: #fff; -webkit-text-stroke: 1px #c99700; box-shadow: 0 0 0 3px #fff, 0 3px 0 3px #c99700; }
+.timer .star-mark small { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 900; color: var(--red);
+  -webkit-text-stroke: 0; background: #fff; border-radius: 8px; padding: 0 5px; white-space: nowrap; direction: ltr; }
+.combo-bonus { display: block; font-size: 11px; font-weight: 900; color: var(--green); margin-top: -2px; }
+.booster.suggest .ic { box-shadow: 0 6px 0 #6fb6e8, 0 0 0 4px #9fdcff, 0 0 26px 8px rgba(120,200,255,.9); background: linear-gradient(180deg, #fff, #e3f4ff); }
+.booster .hint { position: absolute; top: -34px; left: 50%; transform: translateX(-50%); background: #2f8fd8; color: #fff; font-size: 12px; font-weight: 900;
+  border-radius: 10px; padding: 1px 8px; white-space: nowrap; box-shadow: 0 3px 0 #1d6aa6; }
+.booster .hint::after { content: ""; position: absolute; bottom: -6px; left: 50%; margin-left: -6px; border: 6px solid transparent; border-bottom: 0; border-top-color: #2f8fd8; }
 .urgent { position: absolute; inset: 0; pointer-events: none; z-index: 4; box-shadow: inset 0 0 70px 14px rgba(255,77,94,.45); border-radius: 44px; }
 .goal .lose { color: var(--red); font-size: 13px; }
 .goal .lose b { direction: ltr; display: inline-block; }
@@ -384,13 +401,14 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
 <div class="phone bg-wall" id="s4">
   <div class="game-hud">
     <div class="icon-btn"><i class="emoji">⏸️</i></div>
-    <div class="stat" style="min-width:64px"><small>كومبو</small><strong>×3</strong></div>
+    <div class="stat" style="min-width:64px"><small>كومبو 🔥</small><strong>×3</strong><span class="combo-bonus"><span class="ltr">+3</span> ث</span></div>
     <div class="spacer"></div>
     <div class="stat"><small>المرحلة</small><strong>12</strong></div>
   </div>
   <div class="urgent"></div>
   <div class="timer">
     <span class="tick a">!</span><span class="tick b">!</span>
+    <div class="star-mark" style="left:83px;top:-3px">★<small>0:12</small></div>
     <div class="ring"><div class="inner"><i class="emoji">⏰</i><strong>0:18</strong></div></div>
     <div class="hurry">⚡ أسرع!</div>
   </div>
@@ -403,7 +421,7 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
   <div class="board">
     <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧀</i></div>
       <div class="front"><i class="emoji">🍋</i><i class="emoji">🥛</i><i class="emoji">🍋</i></div></div>
-    <div class="shelf glow"><span class="pop">⏱ +2 ث</span>
+    <div class="shelf glow"><span class="pop">⏱ <span class="ltr">+2</span> ث</span>
       <div class="front"><i class="emoji">🍎</i><i class="emoji">🍎</i><i class="emoji">🍎</i></div></div>
     <div class="shelf"><div class="back"><i class="emoji">🍪</i><i class="emoji">🍩</i></div>
       <div class="front"><i class="emoji">🧃</i><span class="slot-empty"></span><i class="emoji">🍩</i></div></div>
@@ -417,7 +435,7 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
 
     <div class="shelf"><div class="back"><i class="emoji">🥛</i><i class="emoji">🍪</i></div>
       <div class="front"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧃</i></div></div>
-    <div class="shelf"><div class="front"><span class="slot-empty"></span><span class="slot-empty"></span><span class="slot-empty"></span></div></div>
+    <div class="shelf drop"><span class="drop-chip">ضعها هنا 🎯</span><div class="front"><span class="ghost-slot"></span><span class="ghost-slot hl"></span><span class="ghost-slot"></span></div></div>
     <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧀</i></div>
       <div class="front"><i class="emoji">🥛</i><i class="emoji">🧀</i><i class="emoji">🍇</i></div></div>
 
@@ -427,14 +445,19 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
     <div class="shelf"><div class="front"><i class="emoji">🍇</i><span class="slot-empty"></span><i class="emoji">🥛</i></div></div>
   </div>
 
-  <div class="dragging emoji" style="top:572px;left:186px">🧀</div>
-  <div class="hand emoji" style="top:604px;left:200px">👆</div>
+  <svg class="guide" viewBox="0 0 390 844">
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#3cc46b" stroke="#fff" stroke-width="1.5"/></marker></defs>
+    <path d="M300 600 C 300 545, 260 528, 214 540" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round"/>
+    <path d="M300 600 C 300 545, 260 528, 214 540" fill="none" stroke="#3cc46b" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 12" marker-end="url(#ah)"/>
+  </svg>
+  <div class="dragging emoji" style="top:592px;left:276px">🧀</div>
 
   <div class="boosters">
     <div class="booster"><div class="ic"><i class="emoji">↩️</i></div><span class="cnt">2</span><b>تراجع</b></div>
     <div class="booster"><div class="ic"><i class="emoji">🔀</i></div><span class="cnt">1</span><b>خلط</b></div>
     <div class="booster"><div class="ic"><i class="emoji">🗄️</i></div><span class="cnt add">+</span><b>رف إضافي</b></div>
-    <div class="booster"><div class="ic"><i class="emoji">❄️</i></div><span class="cnt">3</span><b>تجميد الوقت</b></div>
+    <div class="booster suggest"><span class="hint">جمّد الوقت <span class="ltr">+10</span> ث!</span><div class="ic"><i class="emoji">❄️</i></div><span class="cnt">3</span><b>تجميد الوقت</b></div>
   </div>
 </div>
 <figcaption>4. اللعب<span>اسحب البضائع واجمع 3 متشابهة على رف</span></figcaption>
