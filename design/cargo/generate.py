@@ -57,6 +57,8 @@ body { font-family: "Cairo", sans-serif; background: #0b1626; color: var(--ink);
 .btn-green { background: linear-gradient(180deg, #5be08a, var(--green)); box-shadow: 0 6px 0 var(--green-d), 0 12px 20px rgba(0,0,0,.25); }
 .btn-orange { background: linear-gradient(180deg, #ffad6b, var(--orange)); box-shadow: 0 6px 0 var(--orange-d), 0 12px 20px rgba(0,0,0,.25); }
 .btn-blue { background: linear-gradient(180deg, #6fb6ff, #2f7fe0); box-shadow: 0 6px 0 #1d58a6, 0 12px 20px rgba(0,0,0,.25); }
+.btn-purple { background: linear-gradient(180deg, #9c86ff, var(--purple)); box-shadow: 0 6px 0 #5134d4, 0 12px 20px rgba(0,0,0,.25); }
+.adtag { background: rgba(255,255,255,.25); border-radius: 8px; padding: 0 8px; font-size: 13px; }
 .btn-gray { background: linear-gradient(180deg, #c7d0dc, #9aa8ba); box-shadow: 0 6px 0 #77869a; }
 .btn small { font-size: 14px; font-weight: 700; }
 .title { position: absolute; top: 104px; left: 0; right: 0; text-align: center; color: #fff; font-family: "Lalezar"; font-weight: 400; font-size: 36px; text-shadow: 0 3px 0 rgba(0,0,0,.25); z-index: 5; }
@@ -266,6 +268,7 @@ add(7,'الإبحار الناجح','نجوم ومكافآت', f'''
     <h3>المرحلة 27 مكتملة</h3>
     <p>12 حركة · الحل الأمثل!</p>
     <div class="rewards"><div class="reward">{E('🪙')}<b>+25</b></div><div class="reward">{E('⭐')}<b>+3</b></div></div>
+    <div class="btn btn-purple">ضاعف العملات ×2 <span class="adtag">▶ إعلان</span></div>
     <div class="btn btn-green">التالي</div>
   </div>
 ''')
@@ -280,6 +283,7 @@ add(8,'السفينة مالت','تعرض مكان المشكلة وتعيد ا�
     <h3>الميل وصل إلى <span class="ltr">+11°</span> والحد <span class="ltr">8°</span></h3>
     <p>الجانب الأيمن أثقل بـ<span class="ltr">7</span> أطنان. جرّب نقل الحاويات الثقيلة إلى الوسط.</p>
     <div class="btn btn-orange">أعد المحاولة</div>
+    <div class="btn btn-purple">تلميح مجاني <span class="adtag">▶ إعلان</span></div>
     <div class="link">تراجع خطوة ثم أكمل</div>
   </div>
 ''')
@@ -339,29 +343,30 @@ add(11,'تطوير الميناء','النجوم تطوّر ميناءك', f'''
 ''','harbor')
 
 # 12 shop
-add(12,'المتجر','مشتريات واضحة، دون إعلانات ودون صناديق حظ', f'''
+add(12,'المتجر','مشتريات واضحة وعملات مجانية بإعلان اختياري', f'''
   <style>.shop-t{{position:absolute;top:100px;left:0;right:0;text-align:center;font-family:Lalezar;font-size:38px;color:var(--yellow)}}
-  .trust{{position:absolute;top:156px;left:20px;right:20px;background:rgba(60,196,107,.18);border:2px solid var(--green);border-radius:14px;padding:5px 10px;font-size:13px;font-weight:700;text-align:center;color:#fff}}
+  .trust{{position:absolute;top:150px;left:20px;right:20px;background:rgba(60,196,107,.18);border:2px solid var(--green);border-radius:14px;padding:5px 10px;font-size:13px;font-weight:700;text-align:center;color:#fff}}
   .offer{{position:absolute;left:20px;right:20px;border-radius:20px;padding:12px 14px;display:flex;align-items:center;gap:12px;color:#fff}}
   .offer .tx{{flex:1}} .offer .tx b{{display:block;font-size:17px}} .offer .tx span{{font-size:12.5px;opacity:.95}}
   .price{{background:var(--green);color:#fff;font-weight:900;border-radius:12px;padding:7px 12px;box-shadow:0 4px 0 var(--green-d);font-size:16px;direction:ltr;white-space:nowrap}}
-  .coins{{position:absolute;top:446px;left:20px;right:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px}}
-  .cp{{background:#fff;border-radius:18px;padding:8px;text-align:center;box-shadow:0 5px 0 #9fb2c9;position:relative}}
+  .coins{{position:absolute;top:408px;left:20px;right:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px}}
+  .cp{{background:#fff;border-radius:18px;padding:6px 8px;text-align:center;box-shadow:0 5px 0 #9fb2c9;position:relative}}
   .cp b{{display:block;font-size:19px}} .cp .price{{display:block;margin-top:6px}}
   .cp .tag{{position:absolute;top:-10px;right:-6px;background:var(--red);color:#fff;font-size:11px;font-weight:900;padding:1px 8px;border-radius:8px}}
   .bonus{{direction:ltr;unicode-bidi:isolate;display:inline-block;background:var(--yellow);color:var(--ink);font-size:11px;font-weight:900;border-radius:8px;padding:0 6px}}</style>
   <div class="hud"><div class="icon-btn">{E('⬅️')}</div><div class="spacer"></div><div class="pill">{E('🪙')}1,250</div></div>
   <div class="shop-t">المتجر</div>
-  <div class="trust">✅ لا إعلانات · لا صناديق حظ · ترى ما تشتريه</div>
-  <div class="offer" style="top:204px;background:linear-gradient(135deg,var(--orange),#ff5f6d);box-shadow:0 6px 0 #b8402a">{E('🎒','font-size:40px')}<div class="tx"><b>حزمة البداية · مرة واحدة</b><span>1000 🪙 + 3 ↩️ + 3 🏗️ + 2 ⚓</span></div><span class="price">$0.99</span></div>
-  <div class="offer" style="top:318px;background:linear-gradient(135deg,#2f7fe0,#6a5cff);box-shadow:0 6px 0 #1d4fa6">{E('🗺️','font-size:40px')}<div class="tx"><b>افتح الحملة كاملة</b><span>كل المستويات العشرة + 500 🪙</span></div><span class="price">$2.99</span></div>
+  <div class="trust">✅ لا صناديق حظ · ترى ما تشتريه · الإعلانات اختيارية</div>
+  <div class="offer" style="top:196px;background:linear-gradient(135deg,var(--orange),#ff5f6d);box-shadow:0 6px 0 #b8402a">{E('🎒','font-size:40px')}<div class="tx"><b>حزمة البداية · مرة واحدة</b><span>1000 🪙 + 3 ↩️ + 3 🏗️ + 2 ⚓</span></div><span class="price">$0.99</span></div>
+  <div class="offer" style="top:300px;background:linear-gradient(135deg,#2f7fe0,#6a5cff);box-shadow:0 6px 0 #1d4fa6">{E('🗺️','font-size:40px')}<div class="tx"><b>افتح الحملة كاملة</b><span>كل المستويات العشرة + 500 🪙</span></div><span class="price">$2.99</span></div>
   <div class="coins">
     <div class="cp">{E('🪙','font-size:36px')}<b>500</b><span class="price">$0.49</span></div>
     <div class="cp"><span class="tag">الأكثر شراءً</span>{E('💰','font-size:36px')}<b>1,200</b><span class="price">$0.99</span></div>
     <div class="cp">{E('💰','font-size:36px')}<b>3,500 <span class="bonus">+15%</span></b><span class="price">$2.99</span></div>
     <div class="cp"><span class="tag">أفضل قيمة</span>{E('🏦','font-size:36px')}<b>10,000 <span class="bonus">+40%</span></b><span class="price">$5.99</span></div>
   </div>
-  <div style="position:absolute;bottom:34px;left:20px;right:20px;background:rgba(255,255,255,.12);border-radius:16px;padding:10px;color:#fff;text-align:center;font-weight:800">{E('🎨')} أشكال السفن والموانئ · من <span class="ltr">$0.99</span></div>
+  <div style="position:absolute;bottom:22px;left:20px;right:20px"><div class="btn btn-purple" style="height:56px">{E('🪙')} 50 مجاناً <span class="adtag">▶ إعلان</span></div></div>
+  <div style="position:absolute;bottom:96px;left:20px;right:20px;background:rgba(255,255,255,.12);border-radius:16px;padding:8px;color:#fff;text-align:center;font-weight:800">{E('🎨')} أشكال السفن والموانئ · من <span class="ltr">$0.99</span></div>
 ''','deep')
 
 # 13 daily
@@ -457,7 +462,7 @@ add(17,'اختيار اللغة','19 لغة + تلقائي حسب الجهاز',
 ''','deep')
 
 html=f'''<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>لعبة شحن السفينة — التصاميم</title><style>{css}</style></head><body>
-<header class="page-head"><h1>لغز شحن السفينة</h1><p>تصاميم كل شاشات اللعبة — محايدة، دون كائنات حية، ودون إعلانات</p></header>
+<header class="page-head"><h1>لغز شحن السفينة</h1><p>تصاميم كل شاشات اللعبة — محايدة، ودون كائنات حية، وإعلاناتها اختيارية</p></header>
 <main class="grid">
 {''.join(f'<figure class="cell">{h}<figcaption>{i}. {t}<span>{s}</span></figcaption></figure>' for i,t,s,h in screens)}
 </main></body></html>'''
