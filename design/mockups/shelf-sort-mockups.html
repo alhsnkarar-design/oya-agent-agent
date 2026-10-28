@@ -369,7 +369,7 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
 .ice .emoji { font-size: 26px !important; opacity: .75; filter: none !important; }
 .ice.big { width: 70px; height: 78px; border-radius: 14px; } .ice.big .emoji { font-size: 48px !important; }
 .ob-demo { display: flex; align-items: center; justify-content: center; gap: 16px; margin: -6px 0 10px; }
-.ob-demo .arrow { font-size: 30px; color: var(--teal-d); font-weight: 900; }
+.ob-demo .arrow { font-size: 30px; color: var(--teal-d); font-weight: 900; display: inline-block; transform: scaleX(-1); }
 .ob-demo .melt .emoji { font-size: 52px; }
 /* ---------- 13 daily ---------- */
 .daily-sub { position: absolute; top: 152px; left: 0; right: 0; text-align: center; color: rgba(255,255,255,.9); font-weight: 700; font-size: 14px; }
@@ -384,6 +384,52 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
 .d-rank b { color: var(--teal-d); }
 .d-next { position: absolute; bottom: 40px; left: 0; right: 0; text-align: center; color: #fff; font-weight: 800; font-size: 16px; }
 .d-next b { background: rgba(0,0,0,.25); border-radius: 10px; padding: 2px 10px; display: inline-block; }
+
+/* ---------- obstacles ---------- */
+.mshelf { display: inline-flex; gap: 2px; align-items: flex-end; padding: 6px 6px 8px; border-radius: 8px; background: linear-gradient(180deg,#7a4a22,#5e3816);
+  box-shadow: inset 0 0 0 2px #4a2b10, 0 4px 0 var(--wood); }
+.mshelf .emoji { font-size: 26px; }
+.mshelf.okk { box-shadow: inset 0 0 0 2px #4a2b10, 0 4px 0 var(--wood), 0 0 0 3px var(--yellow), 0 0 14px 3px rgba(255,210,63,.7); }
+.mshelf.spin { box-shadow: inset 0 0 0 2px #4a2b10, 0 4px 0 var(--wood), 0 0 0 3px #7b5cff; }
+.carton { position: relative; width: 70px; height: 70px; border-radius: 8px; background: linear-gradient(180deg,#d9a86a,#b98545); box-shadow: inset 0 0 0 3px #9a6a32;
+  display: grid; place-items: center; }
+.carton::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 10px; margin-left: -5px; background: #e8cf9e; opacity: .8; }
+.carton .peek { position: relative; z-index: 1; font-size: 30px; background: rgba(255,255,255,.85); border-radius: 50%; padding: 4px; }
+.wrap { position: relative; display: grid; place-items: center; width: 70px; height: 78px; border-radius: 14px;
+  background: radial-gradient(circle, rgba(255,255,255,.75) 3px, transparent 4px) 0 0/12px 12px, linear-gradient(160deg, rgba(240,240,255,.85), rgba(200,205,230,.8));
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.9), 0 2px 4px rgba(0,0,0,.2); }
+.wrap .emoji { font-size: 44px; opacity: .7; }
+.wrap b { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; border-radius: 50%; background: var(--purple); color: #fff; font-size: 13px; display: grid; place-items: center; border: 2px solid #fff; }
+.perish { position: relative; display: grid; place-items: center; width: 64px; height: 70px; }
+.perish .emoji { font-size: 50px; }
+.perish b { position: absolute; top: -6px; right: -12px; background: var(--red); color: #fff; font-size: 12px; border-radius: 8px; padding: 0 6px; border: 2px solid #fff; }
+.chain { font-size: 28px; }
+.dbl { display: inline-flex; flex-direction: column; gap: 8px; }
+.dbl .top { opacity: .55; filter: grayscale(.4); }
+.bigorder { display: inline-flex; flex-direction: column; gap: 4px; background: #fffdf7; border-top: 4px solid var(--orange); border-radius: 6px; padding: 6px 10px; box-shadow: 0 4px 10px rgba(0,0,0,.15); }
+.bigorder b { font-size: 13px; } .bigorder span { font-weight: 900; font-size: 14px; direction: ltr; } .bigorder .emoji { font-size: 20px; }
+/* ---------- zen ---------- */
+.bg-zen { background: repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 26px, transparent 26px 52px), linear-gradient(180deg, #e3f6ee 0%, #cdeee1 100%); }
+.zen-badge { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); z-index: 7; width: 170px; height: 120px; border-radius: 26px; background: #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 0 5px #bfe8d5, 0 7px 0 5px #9fd4bc; text-align: center; }
+.zen-badge .emoji { font-size: 34px; } .zen-badge b { font-size: 18px; color: #1d7a52; } .zen-badge span { font-size: 11px; color: #5c8f78; font-weight: 700; }
+/* ---------- weekly ---------- */
+.wk-steps { position: absolute; top: 196px; left: 30px; right: 30px; display: flex; align-items: center; }
+.wk-steps i { flex: 1; height: 6px; background: rgba(255,255,255,.35); border-radius: 3px; }
+.wk-steps .st { width: 46px; height: 46px; border-radius: 50%; background: #c9c3b6; color: #8a8375; display: grid; place-items: center; font-weight: 900; font-size: 20px; box-shadow: 0 4px 0 #9c9586; }
+.wk-steps .st.done { background: linear-gradient(180deg,#ffd96b,#f2b200); color: #fff; box-shadow: 0 4px 0 #b98700; }
+.wk-steps .st.cur { width: 58px; height: 58px; background: linear-gradient(180deg,#5be08a,var(--green)); color: #fff; box-shadow: 0 5px 0 #22924a, 0 0 0 6px rgba(255,255,255,.5); }
+.wk-board { position: absolute; top: 282px; left: 22px; right: 22px; background: var(--cream); border-radius: 24px; padding: 12px 12px 8px; border: 4px solid #fff; box-shadow: 0 8px 0 var(--cream-d); }
+.wk-board h4 { text-align: center; margin-bottom: 8px; }
+.lb { display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 14px; padding: 7px 10px; margin-bottom: 6px; box-shadow: 0 3px 0 var(--cream-d); }
+.lb .pos { width: 26px; font-weight: 900; text-align: center; color: #8a7a5c; }
+.lb .av { width: 34px; height: 34px; border-radius: 50%; background: var(--teal); color: #fff; font-weight: 900; display: grid; place-items: center; }
+.lb b { flex: 1; } .lb .t { font-weight: 900; color: var(--teal-d); }
+.lb.gold .pos { color: #c99700; } .lb.gold .av { background: linear-gradient(180deg,#ffd96b,#f2b200); }
+.lb.me { box-shadow: 0 0 0 3px var(--green); } .lb.me .av { background: var(--green); }
+.wk-reward { position: absolute; top: 590px; left: 22px; right: 22px; background: rgba(0,0,0,.22); color: #fff; border-radius: 16px; padding: 8px 12px; text-align: center; font-size: 14px; }
+.wk-reward b { display: block; font-size: 17px; direction: ltr; } .wk-reward .emoji { font-size: 16px; }
+.wk-play { position: absolute; bottom: 40px; left: 30px; right: 30px; }
 </style>
 </head>
 <body>
@@ -907,6 +953,590 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
   <div class="d-next">لغز جديد بعد <b class="ltr">08:12:45</b></div>
 </div>
 <figcaption>13. لغز اليوم<span>مرحلة واحدة للجميع، وشارك نتيجتك</span></figcaption>
+</figure>
+
+
+<!-- ================= 14. OBSTACLE 30 ================= -->
+<figure class="cell">
+<div class="phone bg-wall" id="s14">
+  <div class="game-hud">
+    <div class="icon-btn"><i class="emoji">⏸️</i></div>
+    <div class="stat" style="min-width:64px"><small>كومبو 🔥</small><strong>×3</strong><span class="combo-bonus"><span class="ltr">+3</span> ث</span></div>
+    <div class="spacer"></div>
+    <div class="stat"><small>المرحلة</small><strong>30</strong></div>
+  </div>
+  <div class="timer">
+    <div class="ring" style="background:conic-gradient(from 0deg,#3cc46b 0 62%,#f1dcc0 62% 100%);box-shadow:0 0 0 5px #fff,0 7px 0 5px #e8b48e"><div class="inner"><i class="emoji">⏰</i><strong style="color:#22924a;text-shadow:none">0:52</strong></div></div>
+  </div>
+  <div class="goal">
+    <div class="row"><span>رُتّب 4 من 18</span><span class="stars-mini">★★★</span></div>
+    <div class="bar"><i style="width:22%"></i></div>
+  </div>
+
+
+  <div class="board">
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🥛</i><i class="emoji">🍋</i></div></div>
+    <div class="shelf glow">
+      <div class="front"><i class="emoji">🍎</i><i class="emoji">🍎</i><i class="emoji">🍎</i></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍪</i><i class="emoji">🍩</i></div>
+      <div class="front"><i class="emoji">🧃</i><span class="slot-empty"></span><i class="emoji">🍩</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧃</i></div>
+      <div class="front"><span class="ice"><i class="emoji">🥕</i></span><i class="emoji">🍇</i><span class="ice"><i class="emoji">🥛</i></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🍩</i><i class="emoji">🥕</i></div>
+      <div class="front"><i class="emoji">🧀</i><i class="emoji">🍪</i><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🧀</i></div>
+      <div class="front"><span class="ice"><i class="emoji">🍩</i></span><i class="emoji">🧃</i><i class="emoji">🍪</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🥛</i><i class="emoji">🍪</i></div>
+      <div class="front"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><span class="slot-empty"></span><span class="slot-empty"></span><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🥛</i><i class="emoji">🧀</i><i class="emoji">🍇</i></div></div>
+
+    <div class="shelf"><div class="front"><i class="emoji">🍪</i><i class="emoji">🥕</i><i class="emoji">🍩</i></div></div>
+    <div class="shelf"><div class="lock"><i class="emoji">🔒</i><b>رتّب 3 رفوف</b></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🍋</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><i class="emoji">🍇</i><span class="slot-empty"></span><i class="emoji">🥛</i></div></div>
+  </div>
+
+
+  <div class="boosters">
+    <div class="booster"><div class="ic"><i class="emoji">↩️</i></div><span class="cnt">2</span><b>تراجع</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🔀</i></div><span class="cnt">1</span><b>خلط</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🗄️</i></div><span class="cnt add">+</span><b>رف إضافي</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">❄️</i></div><span class="cnt">3</span><b>تجميد الوقت</b></div>
+  </div>
+  <div class="dim" style="background:rgba(15,10,35,.6)"></div>
+  <div class="card" style="top:250px">
+    <div class="ribbon" style="background:linear-gradient(180deg,#8fd8ff,#3aa8e8);box-shadow:0 6px 0 #1d6aa6">عقبة جديدة!</div>
+    <div class="ob-demo"><span class="carton"><i class="emoji peek">🍪</i></span><span class="arrow">➜</span><span class="melt"><i class="emoji">🍪</i></span></div>
+    <h3>الكرتونة المغلقة</h3>
+    <p>فيها قطعة تراها على الكرتونة.<br>رتّب رفاً بجانبها فتُفتح وتخرج القطعة.</p>
+    <div class="btn btn-green">فهمت!</div>
+  </div>
+</div>
+<figcaption>14. عقبة المرحلة 30<span>الكرتونة المغلقة</span></figcaption>
+</figure>
+<!-- ================= 15. OBSTACLE 40 ================= -->
+<figure class="cell">
+<div class="phone bg-wall" id="s15">
+  <div class="game-hud">
+    <div class="icon-btn"><i class="emoji">⏸️</i></div>
+    <div class="stat" style="min-width:64px"><small>كومبو 🔥</small><strong>×3</strong><span class="combo-bonus"><span class="ltr">+3</span> ث</span></div>
+    <div class="spacer"></div>
+    <div class="stat"><small>المرحلة</small><strong>40</strong></div>
+  </div>
+  <div class="timer">
+    <div class="ring" style="background:conic-gradient(from 0deg,#3cc46b 0 62%,#f1dcc0 62% 100%);box-shadow:0 0 0 5px #fff,0 7px 0 5px #e8b48e"><div class="inner"><i class="emoji">⏰</i><strong style="color:#22924a;text-shadow:none">0:52</strong></div></div>
+  </div>
+  <div class="goal">
+    <div class="row"><span>رُتّب 4 من 18</span><span class="stars-mini">★★★</span></div>
+    <div class="bar"><i style="width:22%"></i></div>
+  </div>
+
+
+  <div class="board">
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🥛</i><i class="emoji">🍋</i></div></div>
+    <div class="shelf glow">
+      <div class="front"><i class="emoji">🍎</i><i class="emoji">🍎</i><i class="emoji">🍎</i></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍪</i><i class="emoji">🍩</i></div>
+      <div class="front"><i class="emoji">🧃</i><span class="slot-empty"></span><i class="emoji">🍩</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧃</i></div>
+      <div class="front"><span class="ice"><i class="emoji">🥕</i></span><i class="emoji">🍇</i><span class="ice"><i class="emoji">🥛</i></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🍩</i><i class="emoji">🥕</i></div>
+      <div class="front"><i class="emoji">🧀</i><i class="emoji">🍪</i><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🧀</i></div>
+      <div class="front"><span class="ice"><i class="emoji">🍩</i></span><i class="emoji">🧃</i><i class="emoji">🍪</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🥛</i><i class="emoji">🍪</i></div>
+      <div class="front"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><span class="slot-empty"></span><span class="slot-empty"></span><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🥛</i><i class="emoji">🧀</i><i class="emoji">🍇</i></div></div>
+
+    <div class="shelf"><div class="front"><i class="emoji">🍪</i><i class="emoji">🥕</i><i class="emoji">🍩</i></div></div>
+    <div class="shelf"><div class="lock"><i class="emoji">🔒</i><b>رتّب 3 رفوف</b></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🍋</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><i class="emoji">🍇</i><span class="slot-empty"></span><i class="emoji">🥛</i></div></div>
+  </div>
+
+
+  <div class="boosters">
+    <div class="booster"><div class="ic"><i class="emoji">↩️</i></div><span class="cnt">2</span><b>تراجع</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🔀</i></div><span class="cnt">1</span><b>خلط</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🗄️</i></div><span class="cnt add">+</span><b>رف إضافي</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">❄️</i></div><span class="cnt">3</span><b>تجميد الوقت</b></div>
+  </div>
+  <div class="dim" style="background:rgba(15,10,35,.6)"></div>
+  <div class="card" style="top:250px">
+    <div class="ribbon" style="background:linear-gradient(180deg,#8fd8ff,#3aa8e8);box-shadow:0 6px 0 #1d6aa6">عقبة جديدة!</div>
+    <div class="ob-demo"><span class="mshelf spin"><i class="emoji">🍋</i><i class="emoji">🧀</i><i class="emoji">🍇</i></span><span class="arrow">↻</span><span class="mshelf "><i class="emoji">🍇</i><i class="emoji">🍋</i><i class="emoji">🧀</i></span></div>
+    <h3>الرف الدوّار</h3>
+    <p>يدوّر بضائعه خطوة كل 3 حركات.<br>احسب توقيتك قبل أن تضع القطعة.</p>
+    <div class="btn btn-green">فهمت!</div>
+  </div>
+</div>
+<figcaption>15. عقبة المرحلة 40<span>الرف الدوّار</span></figcaption>
+</figure>
+<!-- ================= 16. OBSTACLE 50 ================= -->
+<figure class="cell">
+<div class="phone bg-wall" id="s16">
+  <div class="game-hud">
+    <div class="icon-btn"><i class="emoji">⏸️</i></div>
+    <div class="stat" style="min-width:64px"><small>كومبو 🔥</small><strong>×3</strong><span class="combo-bonus"><span class="ltr">+3</span> ث</span></div>
+    <div class="spacer"></div>
+    <div class="stat"><small>المرحلة</small><strong>50</strong></div>
+  </div>
+  <div class="timer">
+    <div class="ring" style="background:conic-gradient(from 0deg,#3cc46b 0 62%,#f1dcc0 62% 100%);box-shadow:0 0 0 5px #fff,0 7px 0 5px #e8b48e"><div class="inner"><i class="emoji">⏰</i><strong style="color:#22924a;text-shadow:none">0:52</strong></div></div>
+  </div>
+  <div class="goal">
+    <div class="row"><span>رُتّب 4 من 18</span><span class="stars-mini">★★★</span></div>
+    <div class="bar"><i style="width:22%"></i></div>
+  </div>
+
+
+  <div class="board">
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🥛</i><i class="emoji">🍋</i></div></div>
+    <div class="shelf glow">
+      <div class="front"><i class="emoji">🍎</i><i class="emoji">🍎</i><i class="emoji">🍎</i></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍪</i><i class="emoji">🍩</i></div>
+      <div class="front"><i class="emoji">🧃</i><span class="slot-empty"></span><i class="emoji">🍩</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧃</i></div>
+      <div class="front"><span class="ice"><i class="emoji">🥕</i></span><i class="emoji">🍇</i><span class="ice"><i class="emoji">🥛</i></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🍩</i><i class="emoji">🥕</i></div>
+      <div class="front"><i class="emoji">🧀</i><i class="emoji">🍪</i><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🧀</i></div>
+      <div class="front"><span class="ice"><i class="emoji">🍩</i></span><i class="emoji">🧃</i><i class="emoji">🍪</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🥛</i><i class="emoji">🍪</i></div>
+      <div class="front"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><span class="slot-empty"></span><span class="slot-empty"></span><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🥛</i><i class="emoji">🧀</i><i class="emoji">🍇</i></div></div>
+
+    <div class="shelf"><div class="front"><i class="emoji">🍪</i><i class="emoji">🥕</i><i class="emoji">🍩</i></div></div>
+    <div class="shelf"><div class="lock"><i class="emoji">🔒</i><b>رتّب 3 رفوف</b></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🍋</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><i class="emoji">🍇</i><span class="slot-empty"></span><i class="emoji">🥛</i></div></div>
+  </div>
+
+
+  <div class="boosters">
+    <div class="booster"><div class="ic"><i class="emoji">↩️</i></div><span class="cnt">2</span><b>تراجع</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🔀</i></div><span class="cnt">1</span><b>خلط</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🗄️</i></div><span class="cnt add">+</span><b>رف إضافي</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">❄️</i></div><span class="cnt">3</span><b>تجميد الوقت</b></div>
+  </div>
+  <div class="dim" style="background:rgba(15,10,35,.6)"></div>
+  <div class="card" style="top:250px">
+    <div class="ribbon" style="background:linear-gradient(180deg,#8fd8ff,#3aa8e8);box-shadow:0 6px 0 #1d6aa6">عقبة جديدة!</div>
+    <div class="ob-demo"><span class="mshelf "><i class="emoji">🔑</i><i class="emoji">🔑</i><i class="emoji">🔑</i></span><span class="arrow">➜</span><span class="melt"><i class="emoji">🔓</i></span></div>
+    <h3>المفتاح والقفل</h3>
+    <p>اجمع 3 مفاتيح على رف واحد<br>فيُفتح الرف الكبير المقفل.</p>
+    <div class="btn btn-green">فهمت!</div>
+  </div>
+</div>
+<figcaption>16. عقبة المرحلة 50<span>المفتاح والقفل</span></figcaption>
+</figure>
+<!-- ================= 17. OBSTACLE 60 ================= -->
+<figure class="cell">
+<div class="phone bg-wall" id="s17">
+  <div class="game-hud">
+    <div class="icon-btn"><i class="emoji">⏸️</i></div>
+    <div class="stat" style="min-width:64px"><small>كومبو 🔥</small><strong>×3</strong><span class="combo-bonus"><span class="ltr">+3</span> ث</span></div>
+    <div class="spacer"></div>
+    <div class="stat"><small>المرحلة</small><strong>60</strong></div>
+  </div>
+  <div class="timer">
+    <div class="ring" style="background:conic-gradient(from 0deg,#3cc46b 0 62%,#f1dcc0 62% 100%);box-shadow:0 0 0 5px #fff,0 7px 0 5px #e8b48e"><div class="inner"><i class="emoji">⏰</i><strong style="color:#22924a;text-shadow:none">0:52</strong></div></div>
+  </div>
+  <div class="goal">
+    <div class="row"><span>رُتّب 4 من 18</span><span class="stars-mini">★★★</span></div>
+    <div class="bar"><i style="width:22%"></i></div>
+  </div>
+
+
+  <div class="board">
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🥛</i><i class="emoji">🍋</i></div></div>
+    <div class="shelf glow">
+      <div class="front"><i class="emoji">🍎</i><i class="emoji">🍎</i><i class="emoji">🍎</i></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍪</i><i class="emoji">🍩</i></div>
+      <div class="front"><i class="emoji">🧃</i><span class="slot-empty"></span><i class="emoji">🍩</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧃</i></div>
+      <div class="front"><span class="ice"><i class="emoji">🥕</i></span><i class="emoji">🍇</i><span class="ice"><i class="emoji">🥛</i></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🍩</i><i class="emoji">🥕</i></div>
+      <div class="front"><i class="emoji">🧀</i><i class="emoji">🍪</i><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🧀</i></div>
+      <div class="front"><span class="ice"><i class="emoji">🍩</i></span><i class="emoji">🧃</i><i class="emoji">🍪</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🥛</i><i class="emoji">🍪</i></div>
+      <div class="front"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><span class="slot-empty"></span><span class="slot-empty"></span><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🥛</i><i class="emoji">🧀</i><i class="emoji">🍇</i></div></div>
+
+    <div class="shelf"><div class="front"><i class="emoji">🍪</i><i class="emoji">🥕</i><i class="emoji">🍩</i></div></div>
+    <div class="shelf"><div class="lock"><i class="emoji">🔒</i><b>رتّب 3 رفوف</b></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🍋</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><i class="emoji">🍇</i><span class="slot-empty"></span><i class="emoji">🥛</i></div></div>
+  </div>
+
+
+  <div class="boosters">
+    <div class="booster"><div class="ic"><i class="emoji">↩️</i></div><span class="cnt">2</span><b>تراجع</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🔀</i></div><span class="cnt">1</span><b>خلط</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🗄️</i></div><span class="cnt add">+</span><b>رف إضافي</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">❄️</i></div><span class="cnt">3</span><b>تجميد الوقت</b></div>
+  </div>
+  <div class="dim" style="background:rgba(15,10,35,.6)"></div>
+  <div class="card" style="top:250px">
+    <div class="ribbon" style="background:linear-gradient(180deg,#8fd8ff,#3aa8e8);box-shadow:0 6px 0 #1d6aa6">عقبة جديدة!</div>
+    <div class="ob-demo"><span class="wrap big"><i class="emoji">🍩</i><b>2</b></span><span class="arrow">➜</span><span class="melt"><i class="emoji">🍩</i></span></div>
+    <h3>التغليف</h3>
+    <p>قطعة مغلّفة لا تتحرك.<br>رتّب رفّين بجانبها لفكّ التغليف.</p>
+    <div class="btn btn-green">فهمت!</div>
+  </div>
+</div>
+<figcaption>17. عقبة المرحلة 60<span>التغليف</span></figcaption>
+</figure>
+<!-- ================= 18. OBSTACLE 70 ================= -->
+<figure class="cell">
+<div class="phone bg-wall" id="s18">
+  <div class="game-hud">
+    <div class="icon-btn"><i class="emoji">⏸️</i></div>
+    <div class="stat" style="min-width:64px"><small>كومبو 🔥</small><strong>×3</strong><span class="combo-bonus"><span class="ltr">+3</span> ث</span></div>
+    <div class="spacer"></div>
+    <div class="stat"><small>المرحلة</small><strong>70</strong></div>
+  </div>
+  <div class="timer">
+    <div class="ring" style="background:conic-gradient(from 0deg,#3cc46b 0 62%,#f1dcc0 62% 100%);box-shadow:0 0 0 5px #fff,0 7px 0 5px #e8b48e"><div class="inner"><i class="emoji">⏰</i><strong style="color:#22924a;text-shadow:none">0:52</strong></div></div>
+  </div>
+  <div class="goal">
+    <div class="row"><span>رُتّب 4 من 18</span><span class="stars-mini">★★★</span></div>
+    <div class="bar"><i style="width:22%"></i></div>
+  </div>
+
+
+  <div class="board">
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🥛</i><i class="emoji">🍋</i></div></div>
+    <div class="shelf glow">
+      <div class="front"><i class="emoji">🍎</i><i class="emoji">🍎</i><i class="emoji">🍎</i></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍪</i><i class="emoji">🍩</i></div>
+      <div class="front"><i class="emoji">🧃</i><span class="slot-empty"></span><i class="emoji">🍩</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧃</i></div>
+      <div class="front"><span class="ice"><i class="emoji">🥕</i></span><i class="emoji">🍇</i><span class="ice"><i class="emoji">🥛</i></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🍩</i><i class="emoji">🥕</i></div>
+      <div class="front"><i class="emoji">🧀</i><i class="emoji">🍪</i><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🧀</i></div>
+      <div class="front"><span class="ice"><i class="emoji">🍩</i></span><i class="emoji">🧃</i><i class="emoji">🍪</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🥛</i><i class="emoji">🍪</i></div>
+      <div class="front"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><span class="slot-empty"></span><span class="slot-empty"></span><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🥛</i><i class="emoji">🧀</i><i class="emoji">🍇</i></div></div>
+
+    <div class="shelf"><div class="front"><i class="emoji">🍪</i><i class="emoji">🥕</i><i class="emoji">🍩</i></div></div>
+    <div class="shelf"><div class="lock"><i class="emoji">🔒</i><b>رتّب 3 رفوف</b></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🍋</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><i class="emoji">🍇</i><span class="slot-empty"></span><i class="emoji">🥛</i></div></div>
+  </div>
+
+
+  <div class="boosters">
+    <div class="booster"><div class="ic"><i class="emoji">↩️</i></div><span class="cnt">2</span><b>تراجع</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🔀</i></div><span class="cnt">1</span><b>خلط</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🗄️</i></div><span class="cnt add">+</span><b>رف إضافي</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">❄️</i></div><span class="cnt">3</span><b>تجميد الوقت</b></div>
+  </div>
+  <div class="dim" style="background:rgba(15,10,35,.6)"></div>
+  <div class="card" style="top:250px">
+    <div class="ribbon" style="background:linear-gradient(180deg,#8fd8ff,#3aa8e8);box-shadow:0 6px 0 #1d6aa6">عقبة جديدة!</div>
+    <div class="ob-demo"><span class="perish"><i class="emoji">🥛</i><b class="ltr">0:08</b></span><span class="arrow">➜</span><span class="mshelf okk"><i class="emoji">🥛</i><i class="emoji">🥛</i><i class="emoji">🥛</i></span></div>
+    <h3>منتج قابل للتلف</h3>
+    <p>عليه عدّاد خاص به.<br>رتّبه قبل أن ينتهي عدّاده!</p>
+    <div class="btn btn-green">فهمت!</div>
+  </div>
+</div>
+<figcaption>18. عقبة المرحلة 70<span>منتج قابل للتلف</span></figcaption>
+</figure>
+<!-- ================= 19. OBSTACLE 80 ================= -->
+<figure class="cell">
+<div class="phone bg-wall" id="s19">
+  <div class="game-hud">
+    <div class="icon-btn"><i class="emoji">⏸️</i></div>
+    <div class="stat" style="min-width:64px"><small>كومبو 🔥</small><strong>×3</strong><span class="combo-bonus"><span class="ltr">+3</span> ث</span></div>
+    <div class="spacer"></div>
+    <div class="stat"><small>المرحلة</small><strong>80</strong></div>
+  </div>
+  <div class="timer">
+    <div class="ring" style="background:conic-gradient(from 0deg,#3cc46b 0 62%,#f1dcc0 62% 100%);box-shadow:0 0 0 5px #fff,0 7px 0 5px #e8b48e"><div class="inner"><i class="emoji">⏰</i><strong style="color:#22924a;text-shadow:none">0:52</strong></div></div>
+  </div>
+  <div class="goal">
+    <div class="row"><span>رُتّب 4 من 18</span><span class="stars-mini">★★★</span></div>
+    <div class="bar"><i style="width:22%"></i></div>
+  </div>
+
+
+  <div class="board">
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🥛</i><i class="emoji">🍋</i></div></div>
+    <div class="shelf glow">
+      <div class="front"><i class="emoji">🍎</i><i class="emoji">🍎</i><i class="emoji">🍎</i></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍪</i><i class="emoji">🍩</i></div>
+      <div class="front"><i class="emoji">🧃</i><span class="slot-empty"></span><i class="emoji">🍩</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧃</i></div>
+      <div class="front"><span class="ice"><i class="emoji">🥕</i></span><i class="emoji">🍇</i><span class="ice"><i class="emoji">🥛</i></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🍩</i><i class="emoji">🥕</i></div>
+      <div class="front"><i class="emoji">🧀</i><i class="emoji">🍪</i><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🧀</i></div>
+      <div class="front"><span class="ice"><i class="emoji">🍩</i></span><i class="emoji">🧃</i><i class="emoji">🍪</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🥛</i><i class="emoji">🍪</i></div>
+      <div class="front"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><span class="slot-empty"></span><span class="slot-empty"></span><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🥛</i><i class="emoji">🧀</i><i class="emoji">🍇</i></div></div>
+
+    <div class="shelf"><div class="front"><i class="emoji">🍪</i><i class="emoji">🥕</i><i class="emoji">🍩</i></div></div>
+    <div class="shelf"><div class="lock"><i class="emoji">🔒</i><b>رتّب 3 رفوف</b></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🍋</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><i class="emoji">🍇</i><span class="slot-empty"></span><i class="emoji">🥛</i></div></div>
+  </div>
+
+
+  <div class="boosters">
+    <div class="booster"><div class="ic"><i class="emoji">↩️</i></div><span class="cnt">2</span><b>تراجع</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🔀</i></div><span class="cnt">1</span><b>خلط</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🗄️</i></div><span class="cnt add">+</span><b>رف إضافي</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">❄️</i></div><span class="cnt">3</span><b>تجميد الوقت</b></div>
+  </div>
+  <div class="dim" style="background:rgba(15,10,35,.6)"></div>
+  <div class="card" style="top:250px">
+    <div class="ribbon" style="background:linear-gradient(180deg,#8fd8ff,#3aa8e8);box-shadow:0 6px 0 #1d6aa6">عقبة جديدة!</div>
+    <div class="ob-demo"><span class="mshelf okk"><i class="emoji">🍎</i><i class="emoji">🍎</i><i class="emoji">🍎</i></span><span class="chain">🔗</span><span class="mshelf "><i class="emoji">🥕</i><i class="emoji">🧃</i><i class="emoji">🍪</i></span></div>
+    <h3>الرفوف المترابطة</h3>
+    <p>رفّان مربوطان بسلسلة.<br>رتّب أحدهما فيُفرَغ الآخر تلقائياً.</p>
+    <div class="btn btn-green">فهمت!</div>
+  </div>
+</div>
+<figcaption>19. عقبة المرحلة 80<span>الرفوف المترابطة</span></figcaption>
+</figure>
+<!-- ================= 20. OBSTACLE 90 ================= -->
+<figure class="cell">
+<div class="phone bg-wall" id="s20">
+  <div class="game-hud">
+    <div class="icon-btn"><i class="emoji">⏸️</i></div>
+    <div class="stat" style="min-width:64px"><small>كومبو 🔥</small><strong>×3</strong><span class="combo-bonus"><span class="ltr">+3</span> ث</span></div>
+    <div class="spacer"></div>
+    <div class="stat"><small>المرحلة</small><strong>90</strong></div>
+  </div>
+  <div class="timer">
+    <div class="ring" style="background:conic-gradient(from 0deg,#3cc46b 0 62%,#f1dcc0 62% 100%);box-shadow:0 0 0 5px #fff,0 7px 0 5px #e8b48e"><div class="inner"><i class="emoji">⏰</i><strong style="color:#22924a;text-shadow:none">0:52</strong></div></div>
+  </div>
+  <div class="goal">
+    <div class="row"><span>رُتّب 4 من 18</span><span class="stars-mini">★★★</span></div>
+    <div class="bar"><i style="width:22%"></i></div>
+  </div>
+
+
+  <div class="board">
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🥛</i><i class="emoji">🍋</i></div></div>
+    <div class="shelf glow">
+      <div class="front"><i class="emoji">🍎</i><i class="emoji">🍎</i><i class="emoji">🍎</i></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍪</i><i class="emoji">🍩</i></div>
+      <div class="front"><i class="emoji">🧃</i><span class="slot-empty"></span><i class="emoji">🍩</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧃</i></div>
+      <div class="front"><span class="ice"><i class="emoji">🥕</i></span><i class="emoji">🍇</i><span class="ice"><i class="emoji">🥛</i></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🍩</i><i class="emoji">🥕</i></div>
+      <div class="front"><i class="emoji">🧀</i><i class="emoji">🍪</i><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🧀</i></div>
+      <div class="front"><span class="ice"><i class="emoji">🍩</i></span><i class="emoji">🧃</i><i class="emoji">🍪</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🥛</i><i class="emoji">🍪</i></div>
+      <div class="front"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><span class="slot-empty"></span><span class="slot-empty"></span><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🥛</i><i class="emoji">🧀</i><i class="emoji">🍇</i></div></div>
+
+    <div class="shelf"><div class="front"><i class="emoji">🍪</i><i class="emoji">🥕</i><i class="emoji">🍩</i></div></div>
+    <div class="shelf"><div class="lock"><i class="emoji">🔒</i><b>رتّب 3 رفوف</b></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🍋</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><i class="emoji">🍇</i><span class="slot-empty"></span><i class="emoji">🥛</i></div></div>
+  </div>
+
+
+  <div class="boosters">
+    <div class="booster"><div class="ic"><i class="emoji">↩️</i></div><span class="cnt">2</span><b>تراجع</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🔀</i></div><span class="cnt">1</span><b>خلط</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🗄️</i></div><span class="cnt add">+</span><b>رف إضافي</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">❄️</i></div><span class="cnt">3</span><b>تجميد الوقت</b></div>
+  </div>
+  <div class="dim" style="background:rgba(15,10,35,.6)"></div>
+  <div class="card" style="top:250px">
+    <div class="ribbon" style="background:linear-gradient(180deg,#8fd8ff,#3aa8e8);box-shadow:0 6px 0 #1d6aa6">عقبة جديدة!</div>
+    <div class="ob-demo"><span class="dbl"><span class="mshelf top"><i class="emoji">🍇</i><i class="emoji">🍋</i><i class="emoji">🧀</i></span><span class="mshelf "><i class="emoji">🍪</i><i class="emoji">🧃</i><i class="emoji">🍩</i></span></span></div>
+    <h3>الرف المزدوج</h3>
+    <p>رف بطابقين.<br>الطابق العلوي يُفتح بعد إفراغ السفلي.</p>
+    <div class="btn btn-green">فهمت!</div>
+  </div>
+</div>
+<figcaption>20. عقبة المرحلة 90<span>الرف المزدوج</span></figcaption>
+</figure>
+<!-- ================= 21. OBSTACLE 100 ================= -->
+<figure class="cell">
+<div class="phone bg-wall" id="s21">
+  <div class="game-hud">
+    <div class="icon-btn"><i class="emoji">⏸️</i></div>
+    <div class="stat" style="min-width:64px"><small>كومبو 🔥</small><strong>×3</strong><span class="combo-bonus"><span class="ltr">+3</span> ث</span></div>
+    <div class="spacer"></div>
+    <div class="stat"><small>المرحلة</small><strong>100</strong></div>
+  </div>
+  <div class="timer">
+    <div class="ring" style="background:conic-gradient(from 0deg,#3cc46b 0 62%,#f1dcc0 62% 100%);box-shadow:0 0 0 5px #fff,0 7px 0 5px #e8b48e"><div class="inner"><i class="emoji">⏰</i><strong style="color:#22924a;text-shadow:none">0:52</strong></div></div>
+  </div>
+  <div class="goal">
+    <div class="row"><span>رُتّب 4 من 18</span><span class="stars-mini">★★★</span></div>
+    <div class="bar"><i style="width:22%"></i></div>
+  </div>
+
+
+  <div class="board">
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🥛</i><i class="emoji">🍋</i></div></div>
+    <div class="shelf glow">
+      <div class="front"><i class="emoji">🍎</i><i class="emoji">🍎</i><i class="emoji">🍎</i></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍪</i><i class="emoji">🍩</i></div>
+      <div class="front"><i class="emoji">🧃</i><span class="slot-empty"></span><i class="emoji">🍩</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧃</i></div>
+      <div class="front"><span class="ice"><i class="emoji">🥕</i></span><i class="emoji">🍇</i><span class="ice"><i class="emoji">🥛</i></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🍩</i><i class="emoji">🥕</i></div>
+      <div class="front"><i class="emoji">🧀</i><i class="emoji">🍪</i><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🧀</i></div>
+      <div class="front"><span class="ice"><i class="emoji">🍩</i></span><i class="emoji">🧃</i><i class="emoji">🍪</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🥛</i><i class="emoji">🍪</i></div>
+      <div class="front"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><span class="slot-empty"></span><span class="slot-empty"></span><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🥛</i><i class="emoji">🧀</i><i class="emoji">🍇</i></div></div>
+
+    <div class="shelf"><div class="front"><i class="emoji">🍪</i><i class="emoji">🥕</i><i class="emoji">🍩</i></div></div>
+    <div class="shelf"><div class="lock"><i class="emoji">🔒</i><b>رتّب 3 رفوف</b></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🍋</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><i class="emoji">🍇</i><span class="slot-empty"></span><i class="emoji">🥛</i></div></div>
+  </div>
+
+
+  <div class="boosters">
+    <div class="booster"><div class="ic"><i class="emoji">↩️</i></div><span class="cnt">2</span><b>تراجع</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🔀</i></div><span class="cnt">1</span><b>خلط</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🗄️</i></div><span class="cnt add">+</span><b>رف إضافي</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">❄️</i></div><span class="cnt">3</span><b>تجميد الوقت</b></div>
+  </div>
+  <div class="dim" style="background:rgba(15,10,35,.6)"></div>
+  <div class="card" style="top:250px">
+    <div class="ribbon" style="background:linear-gradient(180deg,#8fd8ff,#3aa8e8);box-shadow:0 6px 0 #1d6aa6">عقبة جديدة!</div>
+    <div class="ob-demo"><span class="bigorder"><b>🧾 الطلب الكبير</b><span><i class="emoji">🍎</i>×9 <i class="emoji">🥛</i>×6 <i class="emoji">🍪</i>×6</span></span><span class="melt"><i class="emoji">🏆</i></span></div>
+    <h3>الطلب الكبير</h3>
+    <p>مرحلة خاصة في نهاية كل متجر،<br>تجمع كل العقبات السابقة. بمكافأة كبيرة!</p>
+    <div class="btn btn-green">فهمت!</div>
+  </div>
+</div>
+<figcaption>21. عقبة المرحلة 100<span>الطلب الكبير</span></figcaption>
+</figure>
+<!-- ================= 22. ZEN ================= -->
+<figure class="cell">
+<div class="phone bg-zen" id="s22">
+  <div class="game-hud">
+    <div class="icon-btn"><i class="emoji">⏸️</i></div>
+    
+    <div class="spacer"></div>
+    <div class="stat"><small>هادئة</small><strong>7</strong></div>
+  </div>
+  <div class="zen-badge"><i class="emoji">🍃</i><b>وضع الهدوء</b><span>بلا وقت · العب على مهلك</span></div>
+  <div class="goal">
+    <div class="row"><span>رُتّب 6 من 18</span><span style="color:#22924a">بلا خسارة</span></div>
+    <div class="bar"><i style="width:33%;background:linear-gradient(90deg,#9be7b0,#3cc46b)"></i></div>
+  </div>
+
+
+  <div class="board">
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🥛</i><i class="emoji">🍋</i></div></div>
+    <div class="shelf glow"><span class="pop">✨</span>
+      <div class="front"><i class="emoji">🍎</i><i class="emoji">🍎</i><i class="emoji">🍎</i></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍪</i><i class="emoji">🍩</i></div>
+      <div class="front"><i class="emoji">🧃</i><span class="slot-empty"></span><i class="emoji">🍩</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧃</i></div>
+      <div class="front"><i class="emoji">🥕</i><i class="emoji">🍇</i><i class="emoji">🥛</i></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🍩</i><i class="emoji">🥕</i></div>
+      <div class="front"><i class="emoji">🧀</i><i class="emoji">🍪</i><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🍩</i><i class="emoji">🧃</i><i class="emoji">🍪</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🥛</i><i class="emoji">🍪</i></div>
+      <div class="front"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><span class="slot-empty"></span><span class="slot-empty"></span><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🥛</i><i class="emoji">🧀</i><i class="emoji">🍇</i></div></div>
+
+    <div class="shelf"><div class="front"><i class="emoji">🍪</i><i class="emoji">🥕</i><i class="emoji">🍩</i></div></div>
+    <div class="shelf"><div class="lock"><i class="emoji">🔒</i><b>رتّب 3 رفوف</b></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🍋</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><i class="emoji">🍇</i><span class="slot-empty"></span><i class="emoji">🥛</i></div></div>
+  </div>
+
+
+  <div class="boosters">
+    <div class="booster"><div class="ic"><i class="emoji">↩️</i></div><span class="cnt">2</span><b>تراجع</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🔀</i></div><span class="cnt">1</span><b>خلط</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🗄️</i></div><span class="cnt add">+</span><b>رف إضافي</b></div>
+  </div>
+</div>
+<figcaption>22. وضع الهدوء<span>مراحل دون عدّاد وقت ودون خسارة</span></figcaption>
+</figure>
+<!-- ================= 23. WEEKLY ================= -->
+<figure class="cell">
+<div class="phone bg-shop" id="s23">
+  <div class="sun"></div>
+  <div class="hud">
+    <div class="icon-btn"><i class="emoji">⬅️</i></div>
+    <div class="spacer"></div>
+    <div class="pill"><i class="emoji">⏳</i>3 أيام 4 س</div>
+  </div>
+  <h2 class="set-title" style="top:100px">تحدي الأسبوع</h2>
+  <div class="daily-sub">5 مراحل متتالية · أقل وقت يفوز</div>
+  <div class="wk-steps">
+    <span class="st done">1</span><i></i><span class="st done">2</span><i></i><span class="st cur">3</span><i></i><span class="st">4</span><i></i><span class="st">5</span>
+  </div>
+  <div class="wk-board">
+    <h4>ترتيب الأصدقاء</h4>
+    <div class="lb gold"><span class="pos">1</span><span class="av">S</span><b>Shelf_Pro</b><span class="t ltr">2:31</span></div>
+    <div class="lb me"><span class="pos">2</span><span class="av">أ</span><b>أنت</b><span class="t ltr">2:40</span></div>
+    <div class="lb"><span class="pos">3</span><span class="av">N</span><b>Neat_Ninety</b><span class="t ltr">3:05</span></div>
+    <div class="lb"><span class="pos">4</span><span class="av">ر</span><b>رتّاب_سريع</b><span class="t ltr">3:22</span></div>
+  </div>
+  <div class="wk-reward"><span>🏆 جائزة المركز الأول:</span><b>500 <i class="emoji">🪙</i> + 3 <i class="emoji">🔀</i> + 3 <i class="emoji">↩️</i></b></div>
+  <div class="wk-play"><div class="btn btn-green">العب المرحلة 3</div></div>
+</div>
+<figcaption>23. تحدي الأسبوع<span>5 مراحل وترتيب بين الأصدقاء</span></figcaption>
 </figure>
 
 </main>
