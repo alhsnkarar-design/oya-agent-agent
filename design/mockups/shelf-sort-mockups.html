@@ -350,6 +350,40 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
 .app-icon .st { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); font-size: 16px; color: var(--yellow); letter-spacing: 2px; -webkit-text-stroke: 1px #c99700; }
 .page-head .wm { font-size: 76px; display: inline-block; }
 .page-head .slogan-en { font-size: 18px; margin-top: 16px; }
+
+/* ---------- 11 orders ---------- */
+.order { position: absolute; top: 166px; left: 26px; right: 26px; background: #fffdf7; border-radius: 6px 6px 0 0; padding: 6px 12px 10px; z-index: 6;
+  box-shadow: 0 6px 12px rgba(0,0,0,.15); border-top: 4px solid var(--orange);
+  -webkit-mask: linear-gradient(#000 0 0) top/100% calc(100% - 6px) no-repeat, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom/12px 6px repeat-x; }
+.order .o-head { display: flex; justify-content: space-between; font-weight: 900; font-size: 14px; }
+.order .o-rew { background: var(--yellow); border-radius: 10px; padding: 0 8px; font-size: 13px; direction: ltr; }
+.order .o-rew .emoji { font-size: 13px; }
+.order .o-items { display: flex; justify-content: space-around; margin-top: 4px; }
+.order .oi { display: flex; align-items: center; gap: 2px; font-weight: 900; font-size: 15px; direction: ltr; border: 2px dashed #e8d9bb; border-radius: 10px; padding: 0 8px; }
+.order .oi .emoji { font-size: 22px; }
+.order .oi.done { border-color: var(--green); background: #eafbef; }
+.order .oi b { color: var(--green); margin-left: 3px; }
+/* ---------- 12 obstacle ---------- */
+.ice { position: relative; display: inline-grid; place-items: center; width: 34px; height: 40px; border-radius: 8px;
+  background: linear-gradient(160deg, rgba(220,245,255,.85), rgba(140,205,240,.75)); box-shadow: inset 0 0 0 2px rgba(255,255,255,.9), 0 2px 4px rgba(0,0,0,.2); }
+.ice .emoji { font-size: 26px !important; opacity: .75; filter: none !important; }
+.ice.big { width: 70px; height: 78px; border-radius: 14px; } .ice.big .emoji { font-size: 48px !important; }
+.ob-demo { display: flex; align-items: center; justify-content: center; gap: 16px; margin: -6px 0 10px; }
+.ob-demo .arrow { font-size: 30px; color: var(--teal-d); font-weight: 900; }
+.ob-demo .melt .emoji { font-size: 52px; }
+/* ---------- 13 daily ---------- */
+.daily-sub { position: absolute; top: 152px; left: 0; right: 0; text-align: center; color: rgba(255,255,255,.9); font-weight: 700; font-size: 14px; }
+.daily-card { position: absolute; top: 200px; left: 26px; right: 26px; background: var(--cream); border-radius: 28px; padding: 22px 20px 20px; text-align: center;
+  border: 5px solid #fff; box-shadow: 0 10px 0 var(--cream-d), 0 24px 40px rgba(0,0,0,.3); }
+.d-done { display: inline-block; background: var(--green); color: #fff; font-weight: 900; border-radius: 14px; padding: 2px 16px; box-shadow: 0 4px 0 #22924a; }
+.d-time { margin-top: 12px; font-size: 40px; font-weight: 900; direction: ltr; }
+.d-time .emoji { font-size: 30px; }
+.d-stars { font-size: 40px; color: var(--yellow); -webkit-text-stroke: 2px #c99700; letter-spacing: 4px; line-height: 1.1; }
+.d-grid { display: flex; flex-direction: column; gap: 4px; margin: 14px 0; font-family: "Noto Color Emoji"; font-size: 30px; line-height: 1; direction: ltr; }
+.d-rank { font-weight: 800; color: #7a6a4c; margin-bottom: 6px; }
+.d-rank b { color: var(--teal-d); }
+.d-next { position: absolute; bottom: 40px; left: 0; right: 0; text-align: center; color: #fff; font-weight: 800; font-size: 16px; }
+.d-next b { background: rgba(0,0,0,.25); border-radius: 10px; padding: 2px 10px; display: inline-block; }
 </style>
 </head>
 <body>
@@ -720,6 +754,159 @@ body { font-family: "Cairo", sans-serif; background: #1d1630; color: var(--ink);
   <div class="lang-note">↔ الاتجاه يتبدّل تلقائياً للعربية والأردية · التغيير فوري</div>
 </div>
 <figcaption>10. اختيار اللغة<span>19 لغة باسمها الأصلي + تلقائي حسب الجهاز</span></figcaption>
+</figure>
+
+
+<!-- ================= 11. ORDERS ================= -->
+<figure class="cell">
+<div class="phone bg-wall" id="s11">
+  <div class="game-hud">
+    <div class="icon-btn"><i class="emoji">⏸️</i></div>
+    <div class="stat" style="min-width:64px"><small>كومبو 🔥</small><strong>×3</strong><span class="combo-bonus"><span class="ltr">+3</span> ث</span></div>
+    <div class="spacer"></div>
+    <div class="stat"><small>المرحلة</small><strong>15</strong></div>
+  </div>
+  <div class="timer">
+    <div class="ring" style="background:conic-gradient(from 0deg,#3cc46b 0 62%,#f1dcc0 62% 100%);box-shadow:0 0 0 5px #fff,0 7px 0 5px #e8b48e"><div class="inner"><i class="emoji">⏰</i><strong style="color:#22924a;text-shadow:none">0:52</strong></div></div>
+  </div>
+  <div class="order">
+    <div class="o-head"><span>🧾 طلب زبون</span><span class="o-rew">+100 <i class="emoji">🪙</i></span></div>
+    <div class="o-items">
+      <span class="oi done"><i class="emoji">🍎</i>×3<b>✓</b></span>
+      <span class="oi"><i class="emoji">🥛</i>×3</span>
+      <span class="oi"><i class="emoji">🍪</i>×3</span>
+    </div>
+  </div>
+
+
+  <div class="board">
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🥛</i><i class="emoji">🍋</i></div></div>
+    <div class="shelf glow"><span class="pop">🧾 ✓</span>
+      <div class="front"><i class="emoji">🍎</i><i class="emoji">🍎</i><i class="emoji">🍎</i></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍪</i><i class="emoji">🍩</i></div>
+      <div class="front"><i class="emoji">🧃</i><span class="slot-empty"></span><i class="emoji">🍩</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧃</i></div>
+      <div class="front"><i class="emoji">🥕</i><i class="emoji">🍇</i><i class="emoji">🥛</i></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🍩</i><i class="emoji">🥕</i></div>
+      <div class="front"><i class="emoji">🧀</i><i class="emoji">🍪</i><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🍩</i><i class="emoji">🧃</i><i class="emoji">🍪</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🥛</i><i class="emoji">🍪</i></div>
+      <div class="front"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><span class="slot-empty"></span><span class="slot-empty"></span><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🥛</i><i class="emoji">🧀</i><i class="emoji">🍇</i></div></div>
+
+    <div class="shelf"><div class="front"><i class="emoji">🍪</i><i class="emoji">🥕</i><i class="emoji">🍩</i></div></div>
+    <div class="shelf"><div class="lock"><i class="emoji">🔒</i><b>رتّب 3 رفوف</b></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🍋</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><i class="emoji">🍇</i><span class="slot-empty"></span><i class="emoji">🥛</i></div></div>
+  </div>
+
+
+  <div class="boosters">
+    <div class="booster"><div class="ic"><i class="emoji">↩️</i></div><span class="cnt">2</span><b>تراجع</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🔀</i></div><span class="cnt">1</span><b>خلط</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🗄️</i></div><span class="cnt add">+</span><b>رف إضافي</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">❄️</i></div><span class="cnt">3</span><b>تجميد الوقت</b></div>
+  </div>
+</div>
+<figcaption>11. طلبات الزبائن<span>رتّب البضائع المطلوبة أولاً واربح مكافأة</span></figcaption>
+</figure>
+
+<!-- ================= 12. NEW OBSTACLE ================= -->
+<figure class="cell">
+<div class="phone bg-wall" id="s12">
+  <div class="game-hud">
+    <div class="icon-btn"><i class="emoji">⏸️</i></div>
+    <div class="stat" style="min-width:64px"><small>كومبو 🔥</small><strong>×3</strong><span class="combo-bonus"><span class="ltr">+3</span> ث</span></div>
+    <div class="spacer"></div>
+    <div class="stat"><small>المرحلة</small><strong>20</strong></div>
+  </div>
+  <div class="timer">
+    <div class="ring" style="background:conic-gradient(from 0deg,#3cc46b 0 62%,#f1dcc0 62% 100%);box-shadow:0 0 0 5px #fff,0 7px 0 5px #e8b48e"><div class="inner"><i class="emoji">⏰</i><strong style="color:#22924a;text-shadow:none">0:52</strong></div></div>
+  </div>
+  <div class="goal">
+    <div class="row"><span>رُتّب 4 من 18</span><span class="stars-mini">★★★</span></div>
+    <div class="bar"><i style="width:22%"></i></div>
+  </div>
+
+
+  <div class="board">
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🥛</i><i class="emoji">🍋</i></div></div>
+    <div class="shelf glow">
+      <div class="front"><i class="emoji">🍎</i><i class="emoji">🍎</i><i class="emoji">🍎</i></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍪</i><i class="emoji">🍩</i></div>
+      <div class="front"><i class="emoji">🧃</i><span class="slot-empty"></span><i class="emoji">🍩</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧃</i></div>
+      <div class="front"><span class="ice"><i class="emoji">🥕</i></span><i class="emoji">🍇</i><span class="ice"><i class="emoji">🥛</i></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍇</i><i class="emoji">🍩</i><i class="emoji">🥕</i></div>
+      <div class="front"><i class="emoji">🧀</i><i class="emoji">🍪</i><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🧀</i></div>
+      <div class="front"><span class="ice"><i class="emoji">🍩</i></span><i class="emoji">🧃</i><i class="emoji">🍪</i></div></div>
+
+    <div class="shelf"><div class="back"><i class="emoji">🥛</i><i class="emoji">🍪</i></div>
+      <div class="front"><i class="emoji">🍇</i><i class="emoji">🥕</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><span class="slot-empty"></span><span class="slot-empty"></span><span class="slot-empty"></span></div></div>
+    <div class="shelf"><div class="back"><i class="emoji">🍋</i><i class="emoji">🧀</i></div>
+      <div class="front"><i class="emoji">🥛</i><i class="emoji">🧀</i><i class="emoji">🍇</i></div></div>
+
+    <div class="shelf"><div class="front"><i class="emoji">🍪</i><i class="emoji">🥕</i><i class="emoji">🍩</i></div></div>
+    <div class="shelf"><div class="lock"><i class="emoji">🔒</i><b>رتّب 3 رفوف</b></div>
+      <div class="front"><i class="emoji">🍋</i><i class="emoji">🍋</i><i class="emoji">🧃</i></div></div>
+    <div class="shelf"><div class="front"><i class="emoji">🍇</i><span class="slot-empty"></span><i class="emoji">🥛</i></div></div>
+  </div>
+
+
+  <div class="boosters">
+    <div class="booster"><div class="ic"><i class="emoji">↩️</i></div><span class="cnt">2</span><b>تراجع</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🔀</i></div><span class="cnt">1</span><b>خلط</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">🗄️</i></div><span class="cnt add">+</span><b>رف إضافي</b></div>
+    <div class="booster"><div class="ic"><i class="emoji">❄️</i></div><span class="cnt">3</span><b>تجميد الوقت</b></div>
+  </div>
+  <div class="dim" style="background:rgba(15,10,35,.6)"></div>
+  <div class="card" style="top:250px">
+    <div class="ribbon" style="background:linear-gradient(180deg,#8fd8ff,#3aa8e8);box-shadow:0 6px 0 #1d6aa6">عقبة جديدة!</div>
+    <div class="ob-demo"><span class="ice big"><i class="emoji">🥛</i></span><span class="arrow">➜</span><span class="melt"><i class="emoji">🥛</i></span></div>
+    <h3>البضائع المجمّدة</h3>
+    <p>لا يمكن تحريكها حتى تذوب.<br>رتّب رفاً بجانبها فيذوب الثلج.</p>
+    <div class="btn btn-green">فهمت!</div>
+  </div>
+</div>
+<figcaption>12. عقبة جديدة<span>كل 10 مراحل عقبة جديدة، مثل البضائع المجمّدة</span></figcaption>
+</figure>
+
+<!-- ================= 13. DAILY ================= -->
+<figure class="cell">
+<div class="phone bg-shop" id="s13">
+  <div class="sun"></div>
+  <div class="hud">
+    <div class="icon-btn"><i class="emoji">⬅️</i></div>
+    <div class="spacer"></div>
+    <div class="pill"><i class="emoji">🔥</i>5 أيام</div>
+  </div>
+  <h2 class="set-title" style="top:100px">لغز اليوم</h2>
+  <div class="daily-sub">نفس المرحلة لكل اللاعبين اليوم</div>
+  <div class="daily-card">
+    <div class="d-done">✓ أنهيته!</div>
+    <div class="d-time"><i class="emoji">⏱</i> <b>0:48</b></div>
+    <div class="d-stars">★★★</div>
+    <div class="d-grid">
+      <span>🟩🟩🟩🟨🟩</span>
+      <span>🟩🟨🟩🟩🟩</span>
+      <span>🟩🟩🟩🟩🟩</span>
+    </div>
+    <div class="d-rank">أسرع من <b class="ltr">82%</b> من اللاعبين</div>
+    <div class="btn btn-green">شارك النتيجة <i class="emoji">📤</i></div>
+  </div>
+  <div class="d-next">لغز جديد بعد <b class="ltr">08:12:45</b></div>
+</div>
+<figcaption>13. لغز اليوم<span>مرحلة واحدة للجميع، وشارك نتيجتك</span></figcaption>
 </figure>
 
 </main>
