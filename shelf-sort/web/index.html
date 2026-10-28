@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>رتّب المتجر</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- Splash -->
+  <section class="screen bg-shop" id="splash">
+    <div class="sun"></div>
+    <div class="splash-inner">
+      <div class="logo">رتّب<br>المتجر</div>
+      <div class="logo-en">SHELF SORT</div>
+      <div class="hero-shelf"><div class="shelf big"><div class="front">
+        <i class="e">🧁</i><i class="e">🍓</i><i class="e">🍓</i><i class="e">🍓</i></div></div></div>
+      <div class="tagline">رتّب · جدّد · استمتع</div>
+      <div class="loader"><i></i></div>
+    </div>
+  </section>
+
+  <!-- Home -->
+  <section class="screen home" id="home">
+    <div class="hud">
+      <div class="pill" data-go="shop"><i class="e">❤️</i><span class="v-hearts">5</span><span class="sub v-heart-timer"></span><span class="plus">+</span></div>
+      <div class="pill" data-go="shop"><i class="e">🪙</i><span class="v-coins">0</span><span class="plus">+</span></div>
+      <div class="spacer"></div>
+      <button class="icon-btn" id="btn-settings"><i class="e">⚙️</i></button>
+    </div>
+    <div class="cloud c1"></div><div class="cloud c2"></div>
+    <div class="side-widgets r">
+      <button class="widget" id="btn-gift"><div class="ic"><i class="e">🎁</i><span class="dot" id="gift-dot">1</span></div><b>هدية اليوم</b></button>
+    </div>
+    <div class="side-widgets l">
+      <button class="widget" data-go="reno"><div class="ic"><i class="e">⭐</i><span class="dot v-stars-dot"></span></div><b>التجديد</b></button>
+    </div>
+    <div class="home-store" id="home-store"></div>
+    <div class="reno-badge" data-go="reno">
+      <div class="row"><span id="home-store-name">🔨 تجديد البقالة</span><span id="home-store-prog">0 / 8</span></div>
+      <div class="bar"><i id="home-store-bar"></i></div>
+    </div>
+    <div class="play-wrap">
+      <button class="btn btn-green btn-play" id="btn-play"><div>العب<small id="play-level">المرحلة 1</small></div></button>
+    </div>
+    <nav class="nav">
+      <button data-go="shop"><i class="e">🛒</i>المتجر</button>
+      <button data-go="reno"><i class="e">🔨</i>التجديد</button>
+      <button class="on"><i class="e">🏠</i>الرئيسية</button>
+      <button data-go="map"><i class="e">🗺️</i>الخريطة</button>
+    </nav>
+  </section>
+
+  <!-- Map -->
+  <section class="screen map" id="map">
+    <div class="hud">
+      <button class="icon-btn" data-go="home"><i class="e">➡️</i></button>
+      <div class="spacer"></div>
+      <div class="pill"><i class="e">⭐</i><span class="v-stars">0</span></div>
+      <div class="pill"><i class="e">❤️</i><span class="v-hearts">5</span></div>
+    </div>
+    <div class="screen-title"><h2>رحلة المتاجر</h2></div>
+    <div class="map-scroll" id="map-scroll"><div class="map-path" id="map-path"></div></div>
+  </section>
+
+  <!-- Game -->
+  <section class="screen bg-wall" id="game">
+    <div class="game-hud">
+      <button class="icon-btn" id="btn-pause"><i class="e">⏸️</i></button>
+      <div class="stat"><small>الوقت</small><strong id="g-time">0:00</strong></div>
+      <div class="lvl"><b id="g-level">المرحلة 1</b></div>
+      <div class="stat"><small>كومبو</small><strong id="g-combo">×1</strong></div>
+    </div>
+    <div class="goal">
+      <div class="row"><span id="g-goal">رُتّب 0 من 0</span><span class="stars-mini" id="g-stars">★★★</span></div>
+      <div class="bar"><i id="g-bar"></i></div>
+    </div>
+    <div class="board-wrap"><div class="board" id="board"></div></div>
+    <div class="freeze-fx" id="freeze-fx"></div>
+    <div class="boosters">
+      <button class="booster" data-b="undo"><div class="ic"><i class="e">↩️</i></div><span class="cnt"></span><b>تراجع</b></button>
+      <button class="booster" data-b="shuffle"><div class="ic"><i class="e">🔀</i></div><span class="cnt"></span><b>خلط</b></button>
+      <button class="booster" data-b="extra"><div class="ic"><i class="e">🗄️</i></div><span class="cnt"></span><b>رف إضافي</b></button>
+      <button class="booster" data-b="freeze"><div class="ic"><i class="e">❄️</i></div><span class="cnt"></span><b>تجميد</b></button>
+    </div>
+  </section>
+
+  <!-- Renovation -->
+  <section class="screen reno" id="reno">
+    <div class="hud">
+      <button class="icon-btn" data-go="home"><i class="e">➡️</i></button>
+      <div class="spacer"></div>
+      <div class="pill"><i class="e">⭐</i><span class="v-stars">0</span></div>
+    </div>
+    <div class="reno-head"><h2 id="reno-title">تجديد</h2><p>اكسب النجوم من المراحل واستخدمها للتجديد</p></div>
+    <div class="store-tabs" id="store-tabs"></div>
+    <div class="reno-scene" id="reno-scene"></div>
+    <div class="tasks" id="tasks"></div>
+  </section>
+
+  <!-- Shop -->
+  <section class="screen shop" id="shop">
+    <div class="hud">
+      <button class="icon-btn" data-go="home"><i class="e">➡️</i></button>
+      <div class="spacer"></div>
+      <div class="pill"><i class="e">🪙</i><span class="v-coins">0</span></div>
+    </div>
+    <div class="shop-scroll">
+      <h2 class="shop-title">المتجر</h2>
+      <div class="trust">✅ لا صناديق حظ — ترى بالضبط ما تشتريه</div>
+      <h3 class="shop-sub">المساعدات (بالعملات)</h3>
+      <div class="shop-grid" id="shop-boosters"></div>
+      <h3 class="shop-sub">العملات</h3>
+      <div class="shop-grid" id="shop-coins"></div>
+    </div>
+  </section>
+
+  <!-- Modal + toast -->
+  <div class="modal-layer" id="modal-layer"><div class="card" id="modal"></div></div>
+  <div class="toast" id="toast"></div>
+  <div class="ghost e" id="ghost"></div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
