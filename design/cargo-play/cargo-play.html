@@ -1,0 +1,477 @@
+<title>نموذج لعبة الشحن</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800;900&family=Lalezar&display=swap">
+<style>
+/* Layout: one phone-shaped game column, centered on wide screens; sky → sea → wooden quay → booster bar. */
+:root {
+  color-scheme: light;
+  --sky1: #5fb8ea; --sky2: #cfe8f3; --sea1: #2f86ba; --sea2: #0d4473;
+  --navy: #0f3368; --blue: #1f6fe0; --green: #22c25a; --gold: #ffc72c;
+  --paper: #fffaf0; --paper2: #ffeec4; --edge: #d99a3a; --ink: #3d2400; --red: #ff3b30;
+  --font-display: "Lalezar", "Cairo", system-ui, sans-serif;
+  --font-body: "Cairo", system-ui, sans-serif;
+}
+html, body { height: 100%; }
+body { background: #0b1a30; font-family: var(--font-body); color: #fff; overflow: hidden;
+  padding-left: max(0px, env(safe-area-inset-left, 0px)); padding-right: max(0px, env(safe-area-inset-right, 0px)); }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+#app { position: relative; height: 100%; max-width: 440px; margin: 0 auto; overflow: hidden; direction: rtl;
+  background: linear-gradient(180deg, var(--sky1) 0%, #8fcdf0 26%, var(--sky2) 44%, #efeee6 50%); }
+.view { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.view[hidden] { display: none !important; }
+.sea { position: absolute; left: 0; right: 0; bottom: 0; top: 50%; background: linear-gradient(180deg, #5aa9cf 0%, var(--sea1) 22%, #1a6599 60%, var(--sea2)); }
+.sea::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(180deg, rgba(255,255,255,.05) 0 2px, transparent 2px 9px); }
+.sea::after { content: ""; position: absolute; left: -20px; right: -20px; top: -10px; height: 22px; opacity: .55;
+  background: radial-gradient(ellipse 26px 12px at 26px 0, transparent 11px, rgba(255,255,255,.8) 12px 14px, transparent 15px) 0 0/52px 22px repeat-x; animation: waves 6s linear infinite; }
+@keyframes waves { to { background-position: 52px 0; } }
+.cloud { position: absolute; background: radial-gradient(ellipse at 50% 30%, #fff, #eef5fa 70%); border-radius: 50px; opacity: .85; filter: blur(1px); }
+/* buttons */
+.big { position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; height: 64px; border-radius: 22px;
+  font-family: var(--font-display); font-size: 30px; color: #fff; text-shadow: 0 3px 0 rgba(0,0,0,.25); overflow: hidden;
+  background: linear-gradient(180deg, #8dff8a 0%, #35d14f 45%, #1aa83a 100%); border: 3px solid #0b7a2a;
+  box-shadow: inset 0 4px 0 rgba(255,255,255,.55), 0 6px 0 #0a5f20, 0 12px 20px rgba(0,60,20,.3); }
+.big::after { content: ""; position: absolute; top: 4px; left: 12px; right: 12px; height: 22px; border-radius: 16px; background: linear-gradient(180deg, rgba(255,255,255,.4), transparent); pointer-events: none; }
+.big:active { transform: translateY(3px); }
+.big small { font-family: var(--font-body); font-size: 14px; font-weight: 800; }
+.big.blue { background: linear-gradient(180deg, #7cc8ff, #3c97ff 45%, #1f6fe0); border-color: #0e4fa3; box-shadow: inset 0 4px 0 rgba(255,255,255,.5), 0 6px 0 #0b3f82, 0 12px 20px rgba(0,30,80,.3); }
+.big.orange { background: linear-gradient(180deg, #ffc27a, #ff8a2a 45%, #f06a0c); border-color: #a94400; box-shadow: inset 0 4px 0 rgba(255,255,255,.5), 0 6px 0 #8a3800, 0 12px 20px rgba(80,30,0,.3); }
+.big.purple { background: linear-gradient(180deg, #c7a6ff, #8c5cff 45%, #6a3be6); border-color: #4a1fb0; box-shadow: inset 0 4px 0 rgba(255,255,255,.5), 0 6px 0 #3a1690, 0 12px 20px rgba(40,10,100,.3); font-size: 24px; }
+.big.gray { filter: grayscale(.85) brightness(1.05); opacity: .8; }
+.tag { font-family: var(--font-body); font-size: 12px; font-weight: 800; background: rgba(255,255,255,.28); border-radius: 10px; padding: 1px 8px; }
+.round { width: 46px; height: 46px; border-radius: 15px; display: grid; place-items: center; color: #fff; flex-shrink: 0;
+  background: linear-gradient(180deg, #4fb7ff, #1f7fe0); border: 2.5px solid #0e4fa3; box-shadow: inset 0 3px 0 rgba(255,255,255,.4), 0 4px 0 #0b3f82; }
+.round:active { transform: translateY(2px); }
+/* home */
+.home-top { position: relative; z-index: 3; display: flex; justify-content: space-between; align-items: center; padding: 16px 16px 0; }
+.res { height: 38px; display: flex; align-items: center; gap: 6px; padding: 0 14px; border-radius: 20px; font-weight: 900;
+  background: linear-gradient(180deg, #1c4f8f, var(--navy)); border: 2.5px solid #0a2550; box-shadow: inset 0 2px 0 rgba(255,255,255,.25); }
+.brand { position: relative; z-index: 3; text-align: center; margin-top: 6vh; }
+.brand h1 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(38px, 11vw, 52px); line-height: 1.1;
+  text-shadow: 0 4px 0 #0b3f82, 0 0 18px rgba(0,60,140,.35); text-wrap: balance; }
+.brand p { margin: 4px 0 0; font-weight: 800; color: #0b3f82; font-size: 15px; }
+.badge-test { display: inline-block; margin-top: 8px; background: #ff8a2a; color: #fff; font-weight: 900; font-size: 12px; border-radius: 10px; padding: 2px 10px; }
+.home-ship { position: relative; z-index: 2; flex: 1; display: flex; align-items: flex-end; justify-content: center; padding: 0 8px; min-height: 0; }
+.home-ship svg { width: 100%; max-height: 100%; }
+.home-actions { position: relative; z-index: 3; display: flex; flex-direction: column; gap: 14px; padding: 18px 26px 28px; }
+/* levels */
+.lv-head { position: relative; z-index: 3; display: flex; align-items: center; gap: 10px; padding: 16px 16px 6px; }
+.lv-head h2 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 30px; flex: 1; text-shadow: 0 3px 0 #0b3f82; }
+.lv-grid { position: relative; z-index: 3; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 10px 16px 24px; overflow-y: auto; }
+.lv { position: relative; text-align: right; border-radius: 20px; padding: 12px 14px; color: var(--ink);
+  background: linear-gradient(180deg, var(--paper), var(--paper2)); border: 3px solid var(--edge); box-shadow: inset 0 3px 0 #fff, 0 5px 0 #a8701e; }
+.lv:active { transform: translateY(3px); }
+.lv .n { font-family: var(--font-display); font-size: 30px; line-height: 1; color: #b86b00; }
+.lv b { display: block; font-size: 15px; margin-top: 2px; }
+.lv span { font-size: 12px; color: #8a5a1a; font-weight: 700; }
+.lv .st { position: absolute; top: 10px; left: 12px; font-size: 16px; letter-spacing: 1px; color: #ffc72c; -webkit-text-stroke: 1px #b86b00; }
+.lv.locked { filter: grayscale(.9); opacity: .6; }
+/* game */
+.hud { position: relative; z-index: 6; display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; gap: 8px; padding: 12px 12px 0; }
+.moves { width: 108px; border-radius: 22px; text-align: center; padding: 6px 0 4px;
+  background: linear-gradient(180deg, #4fb7ff, #1f6fe0); border: 3px solid #0e4fa3; box-shadow: inset 0 4px 0 rgba(255,255,255,.4), 0 5px 0 #0b3f82; }
+.moves small { display: block; font-weight: 900; font-size: 12px; color: #d6ecff; }
+.moves b { display: block; font-family: var(--font-display); font-weight: 400; font-size: 40px; line-height: 1; }
+.moves i { display: block; font-style: normal; font-size: 11px; font-weight: 800; color: #d6ecff; }
+.goalbox { justify-self: end; border-radius: 18px; padding: 6px 10px; color: var(--ink); text-align: center;
+  background: linear-gradient(180deg, var(--paper), var(--paper2)); border: 3px solid var(--edge); box-shadow: inset 0 3px 0 #fff, 0 4px 0 #a8701e; }
+.goalbox small { display: block; font-size: 11px; font-weight: 900; }
+.ports { display: flex; gap: 4px; margin-top: 3px; }
+.pt { position: relative; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font-size: 12px; font-weight: 900; color: #fff; border: 2px solid rgba(0,0,0,.25); box-shadow: inset 0 2px 0 rgba(255,255,255,.4); }
+.pt sup { position: absolute; top: -8px; right: -6px; background: #fff; color: var(--ink); font-size: 9px; border-radius: 6px; padding: 0 3px; line-height: 13px; }
+.lvname { justify-self: start; display: flex; gap: 8px; align-items: center; }
+.tilt { position: relative; z-index: 6; margin: 10px auto 0; width: min(270px, 72%); border-radius: 22px; padding: 6px 12px 4px; color: var(--ink);
+  background: linear-gradient(180deg, var(--paper), var(--paper2)); border: 3px solid var(--edge); box-shadow: inset 0 3px 0 #fff, 0 4px 0 #a8701e; }
+.tube { position: relative; height: 22px; border-radius: 11px; background: linear-gradient(180deg, #d8ffb0, #8fe05a); border: 2px solid #4e9a1f; box-shadow: inset 0 3px 4px rgba(0,0,0,.18); }
+.tube::before { content: ""; position: absolute; inset: 0; border-radius: 11px; background: linear-gradient(90deg, #ff6b5a 0 12%, transparent 12% 88%, #ff6b5a 88%); opacity: .85; }
+.tube .m { position: absolute; top: 3px; bottom: 3px; width: 2px; background: rgba(40,80,10,.6); }
+.tube .b { position: absolute; top: 2px; width: 30px; height: 14px; margin-left: -15px; border-radius: 8px; background: radial-gradient(ellipse at 35% 30%, #fff, #f2ffe0 60%, #c8f09a); box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: left .35s cubic-bezier(.3,1.4,.5,1); }
+.tilt-txt { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; margin-top: 2px; }
+.tilt-txt b { font-size: 12px; }
+.tilt.warn .tilt-txt b { color: var(--red); }
+.scene { position: relative; z-index: 4; flex: 1; min-height: 0; display: flex; align-items: flex-end; justify-content: center; padding: 0 6px; }
+.scene svg { width: 100%; height: 100%; }
+.hit { cursor: pointer; }
+.tray { position: relative; z-index: 6; }
+.pier { position: relative; height: 92px; margin: 0 -10px; padding: 0 10px;
+  background: repeating-linear-gradient(90deg, transparent 0 46px, rgba(70,40,15,.35) 46px 48px), linear-gradient(180deg, #b98552, #a06d3e);
+  border-top: 6px solid #e8b783; box-shadow: inset 0 -10px 0 #8f5a2c, 0 -4px 10px rgba(0,0,0,.2); }
+.pier::before { content: ""; position: absolute; left: 0; right: 0; top: 8px; height: 6px; background: repeating-linear-gradient(90deg, #ffd21f 0 22px, #2b2b2b 22px 44px); opacity: .9; }
+.dock { position: absolute; top: 22px; left: 10px; right: 10px; bottom: 14px; display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap; }
+.dock .lbl { position: absolute; top: -6px; right: 4px; font-size: 11px; font-weight: 900; background: rgba(0,0,0,.3); border-radius: 8px; padding: 0 8px; }
+.dock .empty { font-weight: 800; font-size: 14px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.dct { transition: transform .15s; }
+.dct.sel { transform: translateY(-10px) scale(1.12); filter: drop-shadow(0 8px 6px rgba(0,0,0,.35)); }
+.dock.drop { outline: 3px dashed #fff; outline-offset: -2px; border-radius: 14px; }
+.bar { display: flex; align-items: flex-end; gap: 8px; padding: 12px 12px max(26px, calc(env(safe-area-inset-bottom, 0px) + 18px)); background: linear-gradient(180deg, #164a95, #0e3470); }
+.bst { position: relative; width: 58px; height: 58px; border-radius: 18px; display: grid; place-items: center; color: #1f5fb8; flex-shrink: 0;
+  background: linear-gradient(180deg, #fff, #dbeeff); border: 3px solid #7fb3e8; box-shadow: inset 0 3px 0 #fff, 0 5px 0 #4f86c4; }
+.bst:active { transform: translateY(3px); }
+.bst .n { position: absolute; top: -8px; right: -8px; min-width: 24px; height: 24px; border-radius: 12px; background: linear-gradient(180deg, #ff7a6b, #ff3b2f); border: 2.5px solid #fff; color: #fff; font-weight: 900; font-size: 12px; display: grid; place-items: center; }
+.bst b { position: absolute; bottom: -17px; left: -10px; right: -10px; text-align: center; font-size: 10.5px; font-weight: 900; color: #fff; }
+.bst.off { opacity: .45; }
+.bar .big { height: 58px; font-size: 24px; }
+/* toast & modal */
+.toast { position: absolute; z-index: 30; left: 16px; right: 16px; top: 120px; padding: 10px 14px; border-radius: 16px; background: #fff; color: var(--ink); font-weight: 800; font-size: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25); border-right: 6px solid var(--red); transition: opacity .25s, transform .25s; }
+.toast.ok { border-right-color: var(--green); }
+.toast[hidden] { display: none !important; }
+.modal-wrap { position: absolute; inset: 0; z-index: 40; background: rgba(5,20,45,.6); display: flex; align-items: center; justify-content: center; padding: 70px 18px 20px; }
+.modal-wrap[hidden] { display: none; }
+.panel { position: relative; width: 100%; max-width: 380px; border-radius: 28px; padding: 64px 18px 20px; text-align: center; color: var(--ink);
+  background: linear-gradient(180deg, var(--paper), var(--paper2)); border: 4px solid #e2a443; box-shadow: inset 0 4px 0 #fff, 0 8px 0 #a8701e, 0 30px 60px rgba(0,0,0,.4); animation: pop .35s cubic-bezier(.2,1.5,.4,1); }
+@keyframes pop { from { transform: scale(.7); opacity: 0; } }
+.ribbon { position: absolute; top: -28px; left: -14px; right: -14px; height: 62px; border-radius: 16px; display: grid; place-items: center;
+  font-family: var(--font-display); font-size: 34px; color: #fff; text-shadow: 0 3px 0 rgba(0,0,0,.25); }
+.rb-green { background: linear-gradient(180deg, #8dff8a, #1aa83a); border: 3px solid #0b7a2a; box-shadow: inset 0 4px 0 rgba(255,255,255,.4), 0 5px 0 #0a5f20; }
+.rb-red { background: linear-gradient(180deg, #ff8a5c, #ff4b2e); border: 3px solid #b02a12; box-shadow: inset 0 4px 0 rgba(255,255,255,.4), 0 5px 0 #8a1f0c; }
+.rb-blue { background: linear-gradient(180deg, #7cc8ff, #1f6fe0); border: 3px solid #0e4fa3; box-shadow: inset 0 4px 0 rgba(255,255,255,.4), 0 5px 0 #0b3f82; }
+.panel h3 { margin: 0; font-size: 20px; font-weight: 900; }
+.panel p { margin: 6px 0 0; font-weight: 700; color: #7a4a10; font-size: 15px; line-height: 1.6; text-wrap: balance; }
+.panel .big { margin-top: 12px; height: 58px; font-size: 26px; }
+.stars { position: absolute; top: -120px; left: 0; right: 0; display: flex; justify-content: center; align-items: flex-end; }
+.stars svg { filter: drop-shadow(0 5px 0 #a35c00); }
+.stars .off { filter: grayscale(1) opacity(.45); }
+.rew { display: flex; gap: 10px; justify-content: center; margin: 12px 0 4px; }
+.rw { min-width: 86px; border-radius: 16px; padding: 6px 10px; background: #fff; border: 3px solid #f0cf8f; box-shadow: 0 3px 0 #d9a85a; font-weight: 900; font-size: 20px; }
+.demo { display: flex; justify-content: center; gap: 12px; align-items: center; margin: -4px 0 8px; }
+.howto { text-align: right; margin: 8px 0 0; padding: 0 6px; display: grid; gap: 8px; font-weight: 700; font-size: 14.5px; color: #5a3608; }
+.howto div { display: flex; gap: 8px; align-items: flex-start; }
+.howto em { font-style: normal; flex-shrink: 0; width: 24px; height: 24px; border-radius: 8px; display: grid; place-items: center; background: #1f6fe0; color: #fff; font-size: 13px; font-weight: 900; }
+.link { margin-top: 12px; font-weight: 800; color: #8a5a1a; text-decoration: underline; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+
+<div id="app">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="defs"></defs></svg>
+  <div class="cloud" style="top:12%;left:-20px;width:120px;height:32px"></div>
+  <div class="cloud" style="top:10%;left:50px;width:70px;height:38px"></div>
+  <div class="cloud" style="top:20%;right:-30px;width:140px;height:34px"></div>
+  <div class="sea"></div>
+
+  <!-- HOME -->
+  <section class="view" id="v-home">
+    <div class="home-top">
+      <div class="res"><span id="h-coins" class="ltr">0</span> عملة</div>
+      <div class="res">★ <span id="h-stars">0</span></div>
+    </div>
+    <div class="brand"><h1>لغز شحن السفينة</h1><p>حمّل · وازن · أبحر</p><span class="badge-test">نسخة تجريبية للاختبار فقط</span></div>
+    <div class="home-ship" id="home-ship"></div>
+    <div class="home-actions">
+      <button class="big" id="btn-play">العب <small id="h-next">المرحلة 1</small></button>
+      <button class="big blue" id="btn-levels">المراحل</button>
+    </div>
+  </section>
+
+  <!-- LEVELS -->
+  <section class="view" id="v-levels" hidden>
+    <div class="lv-head"><button class="round" id="lv-back" aria-label="رجوع"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button><h2>المراحل</h2></div>
+    <div class="lv-grid" id="lv-grid"></div>
+  </section>
+
+  <!-- GAME -->
+  <section class="view" id="v-game" hidden>
+    <div class="hud">
+      <div class="lvname"><button class="round" id="g-back" aria-label="القائمة"><svg width="22" height="22" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1.5" fill="currentColor"/><rect x="14" y="4" width="4" height="16" rx="1.5" fill="currentColor"/></svg></button></div>
+      <div class="moves"><small>الحركات</small><b id="g-moves" class="ltr">0</b><i id="g-par">الهدف ≤ 4</i></div>
+      <div class="goalbox"><small id="g-lvl">المرحلة 1</small><div class="ports" id="g-ports"></div></div>
+    </div>
+    <div class="tilt" id="g-tilt"><div class="tube"><i class="m" style="left:calc(50% - 18px)"></i><i class="m" style="left:calc(50% + 16px)"></i><i class="b" id="g-bub" style="left:50%"></i></div>
+      <div class="tilt-txt"><span>يسار</span><b id="g-tilt-t">متوازنة</b><span>يمين</span></div></div>
+    <div class="scene" id="g-scene"></div>
+    <div class="tray">
+      <div class="pier"><div class="dock" id="g-dock"></div></div>
+      <div class="bar">
+        <button class="bst" id="b-undo"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg><span class="n" id="n-undo">5</span><b>تراجع</b></button>
+        <button class="bst" id="b-weight"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg><span class="n" id="n-weight">1</span><b>ثقل موازن</b></button>
+        <button class="bst" id="b-preview"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span class="n" id="n-preview">3</span><b>معاينة</b></button>
+        <button class="big" id="b-sail">أبحر</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" hidden></div>
+  <div class="modal-wrap" id="modal" hidden><div class="panel" id="panel"></div></div>
+</div>
+
+<script>
+(function () {
+  const PORT = {
+    1: { c: '#ea4e40', l: '#f79586', d: '#a82c21', s: '●', name: 'الأحمر' },
+    2: { c: '#317ad6', l: '#86b9f0', d: '#1b4f96', s: '▲', name: 'الأزرق' },
+    3: { c: '#f2b11f', l: '#fbd985', d: '#b07608', s: '■', name: 'الأصفر' },
+    4: { c: '#31a865', l: '#8ad8aa', d: '#1c7142', s: '◆', name: 'الأخضر' }
+  };
+  // shared gradients
+  let defs = '';
+  for (const k in PORT) { const p = PORT[k];
+    defs += `<linearGradient id="ct${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${p.l}"/><stop offset=".35" stop-color="${p.c}"/><stop offset="1" stop-color="${p.d}"/></linearGradient>`; }
+  defs += `<linearGradient id="glass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2fbff"/><stop offset="1" stop-color="#9fd6f2"/></linearGradient>
+  <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34506f"/><stop offset=".5" stop-color="#22384f"/><stop offset="1" stop-color="#142336"/></linearGradient>
+  <linearGradient id="hullRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c4463a"/><stop offset="1" stop-color="#7f2219"/></linearGradient>
+  <linearGradient id="bridge" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d7e1ec"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".2" stop-color="#fff" stop-opacity="0"/><stop offset=".8" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".25"/></linearGradient>
+  <linearGradient id="star" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff7b0"/><stop offset=".5" stop-color="#ffd21f"/><stop offset="1" stop-color="#f29a00"/></linearGradient>
+  <filter id="soft" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="2.2" flood-color="#0b2a55" flood-opacity=".35"/></filter>
+  <filter id="blur3"><feGaussianBlur stdDeviation="3"/></filter>`;
+  document.getElementById('defs').innerHTML = defs;
+
+  const W8 = { 1: 'خفيفة', 2: '', 3: '', 4: '', 5: 'ثقيلة' };
+  // ---------- levels ----------
+  const I = (p, w = 1, k) => ({ p, w, k });
+  const LEVELS = [
+    { name: 'تعلّم الأساسيات', cols: 3, H: 2, limit: 1.6, ports: [1, 2], dock: [I(2), I(1), I(2), I(1)], howto: true },
+    { name: 'وازن السفينة', cols: 4, H: 3, limit: 1.6, ports: [1, 2], dock: [I(2), I(2), I(2), I(1), I(1), I(1)] },
+    { name: 'ثلاثة موانئ', cols: 4, H: 3, limit: 1.6, ports: [1, 2, 3], dock: [I(3), I(2), I(1), I(3), I(2), I(1), I(3), I(1)] },
+    { name: 'الأوزان', cols: 4, H: 3, limit: 2.6, ports: [1, 2, 3], weights: true, dock: [I(3, 5), I(3, 2), I(2, 4), I(2, 1), I(1, 3), I(1, 2), I(2, 2)],
+      intro: { title: 'الأوزان', text: 'لكل حاوية وزن مكتوب عليها. الحاوية الثقيلة البعيدة عن المنتصف تُميل السفينة أكثر.', demo: [[3, 5], [1, 1]] } },
+    { name: 'العمود المقفل', cols: 5, H: 3, limit: 3, ports: [1, 2, 3], weights: true, locked: [2], dock: [I(3, 4), I(3, 2), I(2, 3), I(2, 3), I(1, 2), I(1, 4), I(3, 1), I(2, 2)],
+      intro: { title: 'العمود المقفل', text: 'العمود المخطّط في منتصف السفينة لا يمكن وضع حاويات فيه.', demo: [[2, 3]] } },
+    { name: 'القابل للكسر', cols: 4, H: 3, limit: 2.6, ports: [1, 2, 3], weights: true, dock: [I(1, 1, 'glass'), I(3, 3), I(2, 2), I(3, 2), I(2, 3), I(1, 2), I(1, 1, 'glass')],
+      intro: { title: 'الحاوية الزجاجية', text: 'لا يوضع فوقها أي حاوية. ضعها في أعلى العمود دائماً.', demo: [[1, 1, 'glass']] } },
+    { name: 'المبرّدات', cols: 4, H: 3, limit: 2.6, ports: [1, 2, 3], weights: true, sockets: [0, 3], dock: [I(2, 2, 'reefer'), I(3, 3), I(1, 2), I(3, 2), I(1, 1, 'reefer'), I(2, 3), I(1, 2)],
+      intro: { title: 'الحاوية المبرّدة', text: 'يجب أن تكون في عمود فيه مقبس كهرباء ⚡ (العمود الأول والأخير هنا).', demo: [[2, 2, 'reefer']] } },
+    { name: 'المرحلة الكبرى', cols: 5, H: 4, limit: 3.2, ports: [1, 2, 3, 4], weights: true, locked: [1], sockets: [4],
+      dock: [I(4, 4), I(4, 2), I(3, 3), I(3, 1), I(2, 5), I(2, 2), I(1, 1, 'glass'), I(1, 3), I(4, 1, 'reefer'), I(3, 2), I(1, 2)],
+      intro: { title: 'المرحلة الكبرى', text: 'أربعة موانئ، وعمود مقفل، وحاويات زجاجية ومبرّدة معاً. خطّط جيداً!', demo: [[4, 4], [1, 1, 'glass'], [4, 1, 'reefer']] } }
+  ];
+
+  // ---------- storage ----------
+  const store = { get(k, d) { try { const v = localStorage.getItem('cargo_' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+                  set(k, v) { try { localStorage.setItem('cargo_' + k, JSON.stringify(v)); } catch (e) {} } };
+  let save = store.get('save', { coins: 300, stars: {}, seen: {} });
+  const persist = () => store.set('save', save);
+  const totalStars = () => Object.values(save.stars).reduce((a, b) => a + b, 0);
+  const unlocked = (i) => i === 0 || save.stars[i - 1] > 0;
+
+  // ---------- svg helpers ----------
+  function ctSVG(x, y, it, opts = {}) {
+    const w = 52, h = 38; const glass = it.k === 'glass';
+    const p = PORT[it.p]; const d = glass ? '#5a9cc0' : p.d;
+    let ribs = '';
+    if (!glass) for (let i = 0; i < 7; i++) { const rx = x + 6 + i * 6.5;
+      ribs += `<line x1="${rx}" y1="${y + 6}" x2="${rx}" y2="${y + h - 6}" stroke="${p.d}" stroke-opacity=".45" stroke-width="1.4"/><line x1="${rx + 1.4}" y1="${y + 6}" x2="${rx + 1.4}" y2="${y + h - 6}" stroke="#fff" stroke-opacity=".22" stroke-width="1"/>`; }
+    else ribs = `<line x1="${x + 8}" y1="${y + 30}" x2="${x + 20}" y2="${y + 8}" stroke="#fff" stroke-width="3" stroke-opacity=".8"/><line x1="${x + 16}" y1="${y + 32}" x2="${x + 26}" y2="${y + 14}" stroke="#fff" stroke-width="2" stroke-opacity=".6"/>`;
+    const corners = [[x + 1, y + 1], [x + w - 6, y + 1], [x + 1, y + h - 6], [x + w - 6, y + h - 6]].map(([a, b]) => `<rect x="${a}" y="${b}" width="5" height="5" rx="1" fill="${d}"/>`).join('');
+    const em = `<circle cx="${x + w / 2}" cy="${y + h / 2}" r="10" fill="#fff" stroke="${p.d}" stroke-width="1.6"/><text x="${x + w / 2}" y="${y + h / 2 + 4.5}" text-anchor="middle" font-size="12" font-weight="900" fill="${p.d}">${p.s}</text>`;
+    const lab = opts.weights ? `<text x="${x + w - 6}" y="${y + h - 7}" text-anchor="end" font-size="10" font-weight="900" fill="#fff" stroke="${d}" stroke-width="2.4" paint-order="stroke" style="direction:ltr">${it.w}t</text>` : '';
+    const reef = it.k === 'reefer' ? `<rect x="${x + 4}" y="${y + 4}" width="14" height="12" rx="3" fill="#e8f7ff" stroke="${p.d}" stroke-width="1"/><text x="${x + 11}" y="${y + 14}" text-anchor="middle" font-size="10" fill="#2b7fb5">❄</text>` : '';
+    const err = opts.err ? `<rect x="${x - 3}" y="${y - 3}" width="${w + 6}" height="${h + 6}" rx="7" fill="none" stroke="#ff2d55" stroke-width="3.5"/>` : '';
+    const sel = opts.sel ? `<rect x="${x - 4}" y="${y - 4}" width="${w + 8}" height="${h + 8}" rx="8" fill="none" stroke="#fff" stroke-width="3"/>` : '';
+    return `<g filter="url(#soft)" style="${opts.style || ''}">${err}${sel}<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${glass ? 'url(#glass)' : `url(#ct${it.p})`}" stroke="${d}" stroke-width="1.6"/>${ribs}<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="url(#metal)"/><rect x="${x + 2}" y="${y + 2}" width="${w - 4}" height="3" rx="1.5" fill="#fff" fill-opacity=".3"/>${corners}${em}${reef}${lab}</g>`;
+  }
+  function shipSVG(L, cols, o = {}) {
+    const n = L.cols, H = L.H, cw = 52, gap = 6, total = n * cw + (n - 1) * gap;
+    const head = 60, deck = head + H * 41 + 18;
+    const x0 = 86, Wd = x0 + total + 64, Ht = deck + 78;
+    const ang = o.angle || 0; const s = [];
+    s.push(`<g transform="rotate(${ang} ${x0 + total / 2} ${deck + 30})" style="transition:transform .4s">`);
+    const bx = x0 - 72;
+    s.push(`<rect x="${bx + 14}" y="${deck - 128}" width="10" height="34" rx="2" fill="#c9473b" stroke="#7f2219" stroke-width="1.5"/><rect x="${bx + 12}" y="${deck - 132}" width="14" height="8" rx="2" fill="#14264a"/>`);
+    s.push(`<rect x="${bx}" y="${deck - 96}" width="62" height="96" rx="6" fill="url(#bridge)" stroke="#8ea3b8" stroke-width="1.6"/>`);
+    for (let r = 0; r < 3; r++) s.push(`<rect x="${bx + 7}" y="${deck - 86 + r * 24}" width="48" height="12" rx="3" fill="#2b5d8f"/><rect x="${bx + 9}" y="${deck - 84 + r * 24}" width="16" height="4" rx="2" fill="#9ed2ff" opacity=".8"/>`);
+    s.push(`<line x1="${bx + 46}" y1="${deck - 96}" x2="${bx + 46}" y2="${deck - 126}" stroke="#2f4d78" stroke-width="3"/><circle cx="${bx + 46}" cy="${deck - 128}" r="3" fill="#ff5b4e"/>`);
+    for (let i = 0; i < n; i++) {
+      const cx = x0 + i * (cw + gap); const st = cols[i] || [];
+      const locked = (L.locked || []).includes(i);
+      for (let j = 0; j < H; j++) { const y = deck - 41 - j * 41;
+        if (j >= st.length) s.push(locked
+          ? `<rect x="${cx + 1}" y="${y + 1}" width="${cw - 2}" height="37" rx="5" fill="rgba(20,30,50,.35)"/><path d="M${cx + 4} ${y + 34} L${cx + 30} ${y + 4} M${cx + 22} ${y + 34} L${cx + 48} ${y + 4}" stroke="rgba(255,255,255,.45)" stroke-width="5"/>`
+          : `<rect x="${cx + 1}" y="${y + 1}" width="${cw - 2}" height="36" rx="5" fill="${o.targets && o.targets.includes(i) && j === st.length ? 'rgba(255,255,255,.35)' : 'rgba(255,255,255,.12)'}" stroke="#fff" stroke-opacity="${o.targets && o.targets.includes(i) && j === st.length ? 1 : .5}" stroke-width="${o.targets && o.targets.includes(i) && j === st.length ? 2.5 : 1.3}" stroke-dasharray="5 4"/>`); }
+      st.forEach((it, j) => { if (o.hidden && o.hidden.has(it)) return;
+        const isSel = o.sel && o.sel.from === 'col' && o.sel.i === i && j === st.length - 1;
+        const y = deck - 41 - j * 41 - (isSel ? 22 : 0);
+        s.push(ctSVG(cx, y, it, { weights: L.weights, err: o.errs && o.errs.has(it), sel: isSel })); });
+      if ((L.sockets || []).includes(i)) s.push(`<rect x="${cx + cw / 2 - 11}" y="${deck - 2}" width="22" height="11" rx="3" fill="#ffd21f" stroke="#a87400" stroke-width="1.5"/><text x="${cx + cw / 2}" y="${deck + 7}" text-anchor="middle" font-size="9" fill="#6b4500">⚡</text>`);
+    }
+    const Lh = bx - 6, R = x0 + total + 18;
+    const hull = `M${Lh} ${deck} L${R} ${deck} Q${R + 24} ${deck + 4} ${R + 30} ${deck + 18} L${R + 12} ${deck + 60} L${Lh + 14} ${deck + 60} Z`;
+    s.push(`<path d="M${Lh} ${deck + 120} L${R} ${deck + 120} L${R + 12} ${deck + 60} L${Lh + 14} ${deck + 60} Z" fill="#0b2c52" opacity=".3" filter="url(#blur3)"/>`);
+    s.push(`<path d="${hull}" fill="url(#hull)" stroke="#0c1a33" stroke-width="2"/><path d="${hull}" fill="url(#metal)"/>`);
+    s.push(`<path d="M${Lh + 12} ${deck + 44} L${R + 18} ${deck + 44} L${R + 12} ${deck + 60} L${Lh + 14} ${deck + 60} Z" fill="url(#hullRed)"/>`);
+    s.push(`<rect x="${Lh - 2}" y="${deck - 6}" width="${R - Lh + 22}" height="9" rx="3" fill="#f5f7fa" stroke="#8ea3b8" stroke-width="1.2"/>`);
+    const ports = Math.max(4, Math.floor((R - Lh) / 44));
+    for (let k = 0; k < ports; k++) s.push(`<circle cx="${Lh + 34 + k * 42}" cy="${deck + 24}" r="4.5" fill="#9ed2ff" stroke="#0c1a33" stroke-width="1.5"/>`);
+    if (o.counter) { const side = o.counter > 0 ? R - 10 : Lh + 30; s.push(`<g transform="translate(${side} ${deck + 6})"><circle r="11" fill="#ffd21f" stroke="#a87400" stroke-width="2"/><text y="4" text-anchor="middle" font-size="12" font-weight="900" fill="#6b4500">⚓</text></g>`); }
+    s.push('</g>');
+    // hit areas
+    if (o.hits) for (let i = 0; i < n; i++) { const cx = x0 + i * (cw + gap); s.push(`<rect class="hit" data-col="${i}" x="${cx - 3}" y="0" width="${cw + 6}" height="${deck + 10}" fill="transparent"/>`); }
+    return `<svg viewBox="0 0 ${Wd} ${Ht}" preserveAspectRatio="xMidYMax meet" role="img" aria-label="السفينة">${s.join('')}</svg>`;
+  }
+  const starSVG = (sz, on = true) => `<svg class="${on ? '' : 'off'}" width="${sz}" height="${sz}" viewBox="0 0 24 24"><polygon points="12 1.5 15.2 8.3 22.5 9.2 17.1 14.2 18.6 21.6 12 17.9 5.4 21.6 6.9 14.2 1.5 9.2 8.8 8.3" fill="url(#star)" stroke="#b86b00" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 8.6 L12 3.8 L13.6 7.6" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+  const miniCt = (it, weights) => `<svg width="56" height="42" viewBox="-2 -2 56 42" style="overflow:visible">${ctSVG(0, 0, it, { weights })}</svg>`;
+
+  // ---------- views ----------
+  const $ = (id) => document.getElementById(id);
+  const show = (v) => { for (const id of ['v-home', 'v-levels', 'v-game']) $(id).hidden = id !== v; };
+  function renderHome() {
+    $('h-coins').textContent = save.coins.toLocaleString('en'); $('h-stars').textContent = totalStars();
+    let next = LEVELS.findIndex((_, i) => !save.stars[i]); if (next < 0) next = LEVELS.length - 1;
+    $('h-next').textContent = 'المرحلة ' + (next + 1);
+    $('home-ship').innerHTML = shipSVG({ cols: 4, H: 3 }, [[I(3), I(2), I(1)], [I(3), I(1), I(1)], [I(2), I(2)], [I(3)]]);
+    show('v-home');
+  }
+  function renderLevels() {
+    $('lv-grid').innerHTML = LEVELS.map((L, i) => { const st = save.stars[i] || 0; const ok = unlocked(i);
+      return `<button class="lv${ok ? '' : ' locked'}" data-lv="${i}" ${ok ? '' : 'aria-disabled="true"'}><span class="st">${'★'.repeat(st)}${'☆'.repeat(3 - st)}</span><div class="n">${i + 1}</div><b>${L.name}</b><span>${ok ? (L.ports.length + ' موانئ · ' + L.dock.length + ' حاويات') : '🔒 أكمل المرحلة السابقة'}</span></button>`; }).join('');
+    show('v-levels');
+  }
+
+  // ---------- game state ----------
+  let G = null;
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  function startLevel(i) {
+    const L = LEVELS[i];
+    G = { i, L, cols: Array.from({ length: L.cols }, () => []), dock: L.dock.map((d) => ({ ...d })), sel: null, moves: 0, hist: [],
+          counter: 0, boost: { undo: 5, weight: 1, preview: 3 }, errs: null, busy: false };
+    show('v-game'); render();
+    if (L.howto && !save.seen.howto) { save.seen.howto = 1; persist(); howTo(); }
+    else if (L.intro && !save.seen['i' + i]) { save.seen['i' + i] = 1; persist(); intro(L.intro, L.weights); }
+  }
+  const off = (i) => i - (G.L.cols - 1) / 2;
+  const torque = () => G.cols.reduce((a, st, i) => a + st.reduce((b, it) => b + it.w * off(i), 0), 0) + G.counter;
+  function targets() {
+    if (!G.sel) return [];
+    return G.cols.map((st, i) => i).filter((i) => !(G.L.locked || []).includes(i) && G.cols[i].length < G.L.H && !(G.sel.from === 'col' && G.sel.i === i));
+  }
+  function render() {
+    const L = G.L;
+    $('g-lvl').textContent = 'المرحلة ' + (G.i + 1);
+    $('g-ports').innerHTML = L.ports.map((p, k) => `<span class="pt" style="background:linear-gradient(180deg,${PORT[p].l},${PORT[p].c})">${PORT[p].s}<sup>${k + 1}</sup></span>`).join('');
+    $('g-moves').textContent = G.moves; $('g-par').textContent = 'الهدف ≤ ' + L.dock.length;
+    const t = torque(); const r = Math.max(-1.25, Math.min(1.25, t / L.limit));
+    $('g-bub').style.left = `calc(50% + ${r * 38}%)`;
+    const over = Math.abs(t) > L.limit;
+    $('g-tilt').classList.toggle('warn', over);
+    $('g-tilt-t').textContent = Math.abs(t) < 0.05 ? 'متوازنة' : over ? (t > 0 ? 'تميل لليمين أكثر من المسموح' : 'تميل لليسار أكثر من المسموح') : (t > 0 ? 'تميل قليلاً لليمين' : 'تميل قليلاً لليسار');
+    const ang = Math.max(-9, Math.min(9, (t / L.limit) * 3.5));
+    $('g-scene').innerHTML = shipSVG(L, G.cols, { angle: ang, hits: true, sel: G.sel, targets: targets(), errs: G.errs, counter: G.counter, hidden: G.hidden });
+    const dock = $('g-dock');
+    dock.classList.toggle('drop', !!(G.sel && G.sel.from === 'col'));
+    dock.innerHTML = '<span class="lbl">الرصيف</span>' + (G.dock.length ? G.dock.map((it, k) => `<button class="dct${G.sel && G.sel.from === 'dock' && G.sel.k === k ? ' sel' : ''}" data-dk="${k}" aria-label="حاوية ميناء ${PORT[it.p].name}">${miniCt(it, L.weights)}</button>`).join('')
+      : `<span class="empty">${G.sel ? 'اضغط هنا لإرجاع الحاوية' : 'كل الحاويات على السفينة. اضغط «أبحر»'}</span>`);
+    $('n-undo').textContent = G.boost.undo; $('n-weight').textContent = G.boost.weight; $('n-preview').textContent = G.boost.preview;
+    $('b-undo').classList.toggle('off', !G.boost.undo || !G.hist.length);
+    $('b-weight').classList.toggle('off', !G.boost.weight);
+    $('b-preview').classList.toggle('off', !G.boost.preview);
+    $('b-sail').classList.toggle('gray', G.dock.length > 0);
+    $('b-sail').innerHTML = G.dock.length ? `أبحر <small>بقي ${G.dock.length}</small>` : 'أبحر';
+  }
+  const snap = () => G.hist.push(clone({ cols: G.cols, dock: G.dock, moves: G.moves, counter: G.counter }));
+  function pickDock(k) { if (G.busy) return; G.errs = null; G.sel = (G.sel && G.sel.from === 'dock' && G.sel.k === k) ? null : { from: 'dock', k }; render(); }
+  function tapCol(i) {
+    if (G.busy) return; G.errs = null; const L = G.L;
+    if (G.sel) {
+      if (G.sel.from === 'col' && G.sel.i === i) { G.sel = null; render(); return; }
+      if ((L.locked || []).includes(i)) { toast('هذا العمود مقفل. ضع الحاوية في عمود آخر'); return; }
+      if (G.cols[i].length >= L.H) { toast('هذا العمود ممتلئ'); return; }
+      snap();
+      const it = G.sel.from === 'dock' ? G.dock.splice(G.sel.k, 1)[0] : G.cols[G.sel.i].pop();
+      const under = G.cols[i][G.cols[i].length - 1];
+      G.cols[i].push(it); G.moves++; G.sel = null; render();
+      if (under && under.k === 'glass') toast('انتبه: وضعت حاوية فوق حاوية زجاجية');
+      return;
+    }
+    if (G.cols[i].length) { G.sel = { from: 'col', i }; render(); }
+  }
+  function returnToDock() { if (!G.sel || G.sel.from !== 'col') return; snap(); G.dock.push(G.cols[G.sel.i].pop()); G.moves++; G.sel = null; render(); }
+  function check() {
+    const L = G.L, errs = new Set(), why = [];
+    G.cols.forEach((st, i) => st.forEach((it, j) => {
+      const above = st[j + 1];
+      if (above && L.ports.indexOf(above.p) > L.ports.indexOf(it.p)) { errs.add(it); if (!why.includes('order')) why.push('order'); }
+      if (above && it.k === 'glass') { errs.add(above); if (!why.includes('glass')) why.push('glass'); }
+      if (it.k === 'reefer' && !(L.sockets || []).includes(i)) { errs.add(it); if (!why.includes('reefer')) why.push('reefer'); }
+    }));
+    const t = torque(); if (Math.abs(t) > L.limit) why.unshift('tilt');
+    return { errs, why, t };
+  }
+  const WHY = { tilt: (t) => `السفينة تميل ${t > 0 ? 'لليمين' : 'لليسار'} أكثر من المسموح. انقل الحاويات الثقيلة نحو المنتصف أو إلى الجهة الأخرى.`,
+                order: () => 'حاوية ميناء متأخر فوق حاوية ميناء أبكر. حاويات الميناء الأول يجب أن تكون في الأعلى.',
+                glass: () => 'توجد حاوية فوق حاوية زجاجية.', reefer: () => 'حاوية مبرّدة ليست في عمود فيه مقبس كهرباء ⚡.' };
+  function preview() {
+    if (!G.boost.preview || G.busy) return; G.boost.preview--;
+    const r = check(); G.errs = r.errs; render();
+    toast(r.why.length ? r.why.map((w) => WHY[w](r.t)).join(' ') : 'كل شيء صحيح حتى الآن ✓', !r.why.length);
+  }
+  function undo() { if (!G.boost.undo || !G.hist.length || G.busy) return; const h = G.hist.pop(); Object.assign(G, h); G.boost.undo--; G.sel = null; G.errs = null; render(); }
+  function counterweight() {
+    if (!G.boost.weight || G.busy) return; const t = torque();
+    if (Math.abs(t) < 0.05) { toast('السفينة متوازنة الآن. استخدم الثقل الموازن حين تميل', true); return; }
+    G.boost.weight--; snap(); G.counter += -Math.sign(t) * Math.min(Math.abs(t), 1.2); render(); toast('أضفت ثقلاً موازناً للجهة الأخف ⚓', true);
+  }
+  function sail() {
+    if (G.busy) return;
+    if (G.dock.length) { toast(`حمّل كل الحاويات أولاً (بقي ${G.dock.length})`); return; }
+    G.sel = null; const r = check();
+    if (r.why.length) { G.errs = r.errs; render(); fail(r); return; }
+    G.busy = true; G.hidden = new Set(); render();
+    const order = G.L.ports.slice(); let k = 0;
+    (function nextPort() {
+      if (k >= order.length) { G.busy = false; G.hidden = null; win(); return; }
+      const p = order[k++]; toast(`وصلت إلى الميناء ${k}: تفريغ حاويات ${PORT[p].name}`, true);
+      G.cols.forEach((st) => st.forEach((it) => { if (it.p === p) G.hidden.add(it); }));
+      setTimeout(() => { render(); setTimeout(nextPort, 650); }, 450);
+    })();
+  }
+  // ---------- modals ----------
+  function modal(html) { $('toast').hidden = true; $('panel').innerHTML = html; $('modal').hidden = false; }
+  const closeModal = () => { $('modal').hidden = true; };
+  function win() {
+    const par = G.L.dock.length, st = G.moves <= par ? 3 : G.moves <= par + 3 ? 2 : 1;
+    const coins = 10 + st * 5; save.coins += coins; save.stars[G.i] = Math.max(save.stars[G.i] || 0, st); persist();
+    const last = G.i === LEVELS.length - 1;
+    modal(`<div class="stars">${starSVG(84, st >= 1)}<span style="margin-bottom:18px">${starSVG(108, st >= 2)}</span>${starSVG(84, st >= 3)}</div>
+      <div class="ribbon rb-green">رحلة موفقة!</div><h3>المرحلة ${G.i + 1} مكتملة</h3><p>${G.moves} حركة ${st === 3 ? '· الحل الأمثل' : `· الهدف ${par} للنجوم الثلاث`}</p>
+      <div class="rew"><div class="rw">+${coins} عملة</div><div class="rw">+${st} ★</div></div>
+      <button class="big purple" data-act="double">ضاعف العملات <span class="tag">إعلان تجريبي</span></button>
+      <button class="big" data-act="${last ? 'home' : 'next'}">${last ? 'الرئيسية' : 'التالي'}</button>
+      <button class="link" data-act="retry">أعد المرحلة</button>`);
+    G.lastCoins = coins;
+  }
+  function fail(r) {
+    const tilt = r.why[0] === 'tilt';
+    modal(`<div class="ribbon rb-red">${tilt ? 'السفينة مالت!' : 'الشحنة غير صحيحة'}</div><h3>لا يمكن الإبحار الآن</h3>
+      <p>${r.why.map((w) => WHY[w](r.t)).join('<br>')}</p>
+      <button class="big orange" data-act="fix">عدّل الشحنة</button>
+      <button class="big purple" data-act="hint">تلميح <span class="tag">إعلان تجريبي</span></button>
+      <button class="link" data-act="retry">ابدأ المرحلة من جديد</button>`);
+  }
+  function intro(it, weights) {
+    modal(`<div class="ribbon rb-blue">عنصر جديد!</div><div class="demo">${it.demo.map(([p, w, k]) => miniCt({ p, w, k }, weights)).join('')}</div>
+      <h3>${it.title}</h3><p>${it.text}</p><button class="big" data-act="close">فهمت</button>`);
+  }
+  function howTo() {
+    modal(`<div class="ribbon rb-blue">كيف تلعب</div>
+      <div class="howto"><div><em>1</em><span>اضغط حاوية على الرصيف، ثم اضغط العمود الذي تريد وضعها فيه.</span></div>
+      <div><em>2</em><span>راقب ميزان الفقاعة في الأعلى: أبقِ الفقاعة في المنطقة الخضراء.</span></div>
+      <div><em>3</em><span>السفينة تمر بالموانئ بالترتيب المرقّم. حاويات الميناء الأول يجب أن تكون في الأعلى.</span></div>
+      <div><em>4</em><span>تستطيع نقل الحاوية العليا من أي عمود إلى عمود آخر، أو إرجاعها للرصيف.</span></div>
+      <div><em>5</em><span>حين تُحمّل كل الحاويات اضغط «أبحر».</span></div></div>
+      <button class="big" data-act="close">ابدأ</button>`);
+  }
+  let toastT; function toast(msg, ok) { const t = $('toast'); t.textContent = msg; t.classList.toggle('ok', !!ok); t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 3200); }
+
+  // ---------- events ----------
+  $('btn-play').onclick = () => { let n = LEVELS.findIndex((_, i) => !save.stars[i]); if (n < 0) n = 0; startLevel(n); };
+  $('btn-levels').onclick = renderLevels;
+  $('lv-back').onclick = renderHome;
+  $('g-back').onclick = () => { closeModal(); renderLevels(); };
+  $('lv-grid').onclick = (e) => { const b = e.target.closest('[data-lv]'); if (!b) return; const i = +b.dataset.lv; if (!unlocked(i)) { toast('أكمل المرحلة السابقة أولاً'); return; } startLevel(i); };
+  $('g-scene').onclick = (e) => { const h = e.target.closest('[data-col]'); if (h) tapCol(+h.dataset.col); };
+  $('g-dock').onclick = (e) => { const b = e.target.closest('[data-dk]'); if (b) pickDock(+b.dataset.dk); else returnToDock(); };
+  $('b-undo').onclick = undo; $('b-preview').onclick = preview; $('b-weight').onclick = counterweight; $('b-sail').onclick = sail;
+  $('panel').onclick = (e) => { const a = e.target.closest('[data-act]'); if (!a) return; const act = a.dataset.act;
+    if (act === 'close' || act === 'fix') { closeModal(); render(); }
+    else if (act === 'next') { closeModal(); startLevel(G.i + 1); }
+    else if (act === 'retry') { closeModal(); startLevel(G.i); }
+    else if (act === 'home') { closeModal(); renderHome(); }
+    else if (act === 'double') { save.coins += G.lastCoins; persist(); a.disabled = true; a.textContent = 'تمت المضاعفة'; toast('في النسخة الحقيقية يُعرض هنا إعلان قصير اختياري', true); }
+    else if (act === 'hint') { closeModal(); render(); toast('تلميح: ضع حاويات الميناء الأخير في الأسفل، والثقيلة في الأعمدة القريبة من المنتصف، ووزّع الباقي على الجهتين بالتساوي.', true); } };
+  renderHome();
+})();
+</script>
