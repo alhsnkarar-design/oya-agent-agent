@@ -302,7 +302,7 @@ add(9,'عنصر جديد','كل مستوى يبدأ بعنصر جديد يُشر
 
 # 10 fleet
 fleet=[('قارب صغير','3 أعمدة','✓ مملوك',1),('سفينة متوسطة','حتى 5 أعمدة','✓ مملوكة',1),('سفينة كبيرة','حتى 6 أعمدة ومقابس كهرباء','🔒 المرحلة 101',0),('سفينة عملاقة','حتى 7 أعمدة وصهاريج','🔒 المرحلة 161',0)]
-fr=''.join(f'<div class="fl{" lock" if not o else ""}"><div class="fl-img" style="transform:scale({.42+i*.06})">{ship([col([ct(1+(j%3))],1) for j in range(3+i)])}</div><div class="fl-t"><b>{n}</b><span>{d}</span></div><span class="fl-s">{s}</span></div>' for i,(n,d,s,o) in enumerate(fleet))
+fr=''.join(f'<div class="fl{" lock" if not o else ""}"><div class="fl-img" style="transform:scale({.42-i*.03})">{ship([col([ct(1+(j%3))],1) for j in range(3+i)])}</div><div class="fl-t"><b>{n}</b><span>{d}</span></div><span class="fl-s">{s}</span></div>' for i,(n,d,s,o) in enumerate(fleet))
 add(10,'الأسطول','سفن أكبر تُفتح مع التقدم', f'''
   <style>.fleet{{position:absolute;top:170px;left:18px;right:18px;display:flex;flex-direction:column;gap:12px}}
   .fl{{background:#fff;border-radius:20px;height:132px;position:relative;overflow:hidden;box-shadow:0 5px 0 rgba(0,0,0,.2);background:linear-gradient(180deg,#e6f5ff 0 55%,#9fd3f7 55%)}}
