@@ -2,6 +2,10 @@
 SRC = '/home/user/oya-agent-agent/design/house-game/house-mockups.html'
 OUT = '/home/user/oya-agent-agent/design/house-game-en1/house-mockups-en.html'
 T = [
+    ('السباكة · المرايا · 20 مهمة', 'Plumbing · Mirrors · 20 tasks'),
+    ('الأقمشة · ورق الجدران · 20 مهمة', 'Fabrics · Wallpaper · 20 tasks'),
+    ('غرفة النوم', 'Bedroom'),
+    ('الحمّام', 'Bathroom'),
     ('<div class="lg1">البيت</div>', '<div class="lg1">The Abandoned</div>'),
     ('<div class="lg2">المهجور</div>', '<div class="lg2">House</div>'),
     ('ابدأ بالقطعة الأكبر، ثم وزّع الأرجل حول العقدة.', 'Cut the biggest piece first, then fit the legs around the knot.'),
