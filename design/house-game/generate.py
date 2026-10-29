@@ -367,6 +367,46 @@ def bot(x, y, s=.42, **kw):
     return '<svg class="bot" style="left:%dpx;top:%dpx" width="%d" height="%d" viewBox="0 0 220 220">%s</svg>' % (x, y, 220 * s * 1.25, 220 * s * 1.25, robot(110, 150, 1.0, **kw))
 
 
+# ---------- tools are the main companion; the robot is an optional extra ----------
+TB = {'classic': ('#c0392b', '#8e2a1f', '#d9a46d'), 'brass': ('#c9a24a', '#8a6a22', '#3b2a1d'), 'teal': ('#14a39b', '#0b7570', '#f2c46a')}
+
+
+def toolbox_svg(skin='classic', w=120):
+    c1, c2, c3 = TB[skin]
+    inner = ('<ellipse cx="60" cy="96" rx="54" ry="8" fill="#000" opacity=".25"/>'
+             '<g transform="translate(30 6) rotate(-18)"><rect x="-3" y="0" width="6" height="40" rx="2" fill="#c08a55"/><rect x="-12" y="-4" width="24" height="10" rx="3" fill="#7d8b98"/></g>'
+             '<g transform="translate(58 2) rotate(8)"><rect x="-4" y="0" width="8" height="16" rx="3" fill="#ff7a59"/><rect x="-1.5" y="15" width="3" height="26" fill="#a9b6c2"/></g>'
+             '<g transform="translate(86 10) rotate(20)"><rect x="-3" y="0" width="6" height="30" rx="2" fill="#c08a55"/><rect x="-8" y="26" width="16" height="7" rx="2" fill="#3b4a5a"/>'
+             + ''.join('<line x1="%d" y1="33" x2="%d" y2="42" stroke="#e7c27a" stroke-width="2"/>' % (i, i) for i in range(-6, 8, 3)) + '</g>'
+             '<path d="M34 40 v-12 a6 6 0 0 1 6 -6 h40 a6 6 0 0 1 6 6 v12" fill="none" stroke="%s" stroke-width="6"/>'
+             '<rect x="8" y="38" width="104" height="56" rx="8" fill="%s"/><rect x="8" y="38" width="104" height="14" rx="6" fill="%s"/>'
+             '<rect x="8" y="64" width="104" height="5" fill="%s" opacity=".6"/><rect x="50" y="56" width="20" height="12" rx="3" fill="%s"/>'
+             '<rect x="14" y="42" width="40" height="4" rx="2" fill="#fff" opacity=".35"/>') % (c2, c1, mix(c1, '#ffffff', .2), c2, c3)
+    return '<svg width="%d" height="%d" viewBox="0 0 120 104">%s</svg>' % (w, w * 104 / 120, inner)
+
+
+def toolbox(x, y, w=110, skin='classic'):
+    return '<div class="bot" style="left:%dpx;top:%dpx">%s</div>' % (x, y, toolbox_svg(skin, w))
+
+
+def tool_cursor(x, y, name, s=2.2, label=None):
+    lab = '<span class="tlab">%s</span>' % label if label else ''
+    return '<div class="tcur" style="left:%dpx;top:%dpx"><svg width="%d" height="%d" viewBox="-30 -30 60 60">%s</svg>%s</div>' % (x, y, 60 * s / 1.6, 60 * s / 1.6, tool(name, 0, 0, s / 1.6), lab)
+
+
+def saw_svg():
+    return ('<svg width="84" height="50" viewBox="0 0 84 50"><path d="M4 30 L60 12 L64 26 L8 44z" fill="#cfd8df" stroke="#7d8b98" stroke-width="1.5"/>'
+            + ''.join('<path d="M%d %d l3 6 l3 -7" fill="none" stroke="#7d8b98" stroke-width="1.2"/>' % (8 + i * 6, 43 - i * 2) for i in range(9)) +
+            '<path d="M58 8 h16 a6 6 0 0 1 6 6 v14 a6 6 0 0 1 -6 6 h-10z" fill="#c0392b"/><rect x="66" y="16" width="8" height="10" rx="3" fill="#7a1f16"/></svg>')
+
+
+def can_svg():
+    return ('<svg width="80" height="62" viewBox="0 0 80 62"><path d="M20 18 h30 l4 38 h-38z" fill="#3fa36a"/><path d="M20 18 h30 l1 8 h-32z" fill="#5fc488"/>'
+            '<path d="M50 30 L74 12 l4 4 L54 38z" fill="#3fa36a"/><ellipse cx="76" cy="13" rx="4" ry="6" fill="#2f8a56" transform="rotate(40 76 13)"/>'
+            '<path d="M22 18 q14 -22 28 0" fill="none" stroke="#2f8a56" stroke-width="4"/>'
+            '<circle cx="74" cy="26" r="1.8" fill="#9fdcff"/><circle cx="78" cy="32" r="1.5" fill="#9fdcff"/><circle cx="70" cy="34" r="1.4" fill="#9fdcff"/></svg>')
+
+
 def nav(on):
     items = [('cart', 'المتجر'), ('book', 'الدفتر'), ('home', 'البيت'), ('map', 'المناطق')]
     return '<nav class="nav">%s</nav>' % ''.join('<button class="%s">%s<span>%s</span></button>' % ('on' if t == on else '', ICON[k], t) for k, t in items)
@@ -421,7 +461,7 @@ def house_ext():
 
 home = ('<svg class="bg" viewBox="0 0 390 844">%s%s<rect width="390" height="844" fill="url(#vign)" opacity=".35"/></svg>' % (DEFS, house_ext()) + topbar()
         + '<div class="logo"><div class="lg1">البيت</div><div class="lg2">المهجور</div><div class="lgs">اسم مؤقت · رمّم · اكتشف · أضِئ</div></div>'
-        + bot(196, 452, .36, ring='#3fe0d0', ic='house', ic_col='#14a39b')
+        + toolbox(196, 472, 96)
         + '<div class="prog"><div class="pr-t"><b>البيت</b><span class="ltr">34%</span></div><div class="bar"><i style="width:34%"></i></div></div>'
         + '<div class="homeact"><button class="big">%s تابع <small>الصالة · المهمة 4</small></button></div>' % ICON['play'] + nav('البيت'))
 
@@ -432,8 +472,8 @@ before = ('<svg class="bg" viewBox="-0 0 390 844"><svg x="0" y="60" width="390" 
              marker(244, 250, '🔨', 2), marker(F(.52, .5)[0], F(.52, .5)[1] - 90, '🪡', 3), marker(138, 330, '🔧', 4), marker(*LW(.3, .9), '🖌️', 5))
           + '<div class="hud"><button class="rbtn">%s</button><div class="ttl"><small>المنطقة 2</small><b>الصالة</b></div><div class="res">%s<b>2,450</b></div></div>' % (ICON['back'], coin())
           + '<div class="beforetag">قبل</div>'
-          + bot(10, 578, .38, ring='#ffd23f', ic='bulb', ic_col='#f2a800')
-          + '<div class="speech"><b>المهمة التالية</b>السجادة مغطاة بالطين والبقع… اضغط عليها للبدء</div>'
+          + toolbox(8, 628, 100)
+          + '<div class="speech"><b>📒 من دفتر البيت</b>السجادة مغطاة بالطين والبقع… اضغط عليها للبدء</div>'
           + '<div class="tasks"><div class="tk on"><span>🧽</span><b>اغسل السجادة</b><em>⭐ 1</em></div><div class="tk"><span>🔨</span><b>افتح النافذة</b><em>⭐ 1</em></div><div class="tk"><span>🪡</span><b>رمّم الأريكة</b><em>⭐ 2</em></div><div class="tk lock"><span>🔧</span><b>أصلح المدفأة</b><em>%s</em></div></div>' % ICON['lock'])
 
 # =============== 3. ROOM AFTER ===============
@@ -441,7 +481,7 @@ after = ('<svg class="bg" viewBox="0 0 390 844"><svg x="0" y="60" width="390" he
          '<rect x="-80" y="0" width="550" height="844" fill="url(#vign)" opacity=".55"/></svg></svg>' % (DEFS, room('after'))
          + '<div class="hud"><button class="rbtn">%s</button><div class="ttl"><small>المنطقة 2</small><b>الصالة</b></div><div class="res">%s<b>3,180</b></div></div>' % (ICON['back'], coin())
          + '<div class="aftertag">بعد ✨</div>'
-         + bot(10, 560, .38, mode='rainbow', ic='star', ic_col='#f2a800', hop=10)
+         + toolbox(8, 604, 96, 'teal')
          + '<div class="done"><div class="dn-t"><b>اكتملت الصالة!</b><span>انفتح سر جديد في المكتبة 🔑</span></div>'
            '<div class="styles"><span>الطراز:</span><i class="on" style="--c:#2f8f8a">ساحلي</i><i style="--c:#a8693a">كلاسيكي</i><i style="--c:#555">عصري</i></div>'
            '<div class="dn-b"><button class="big blue small2">%s صوّر قبل/بعد</button><button class="big small2">المنطقة التالية</button></div></div>' % ICON['camera'])
@@ -489,7 +529,7 @@ rug_scr = ('<div class="pz-bg"></div><svg class="bg" viewBox="0 0 390 844">%s<re
            '<g opacity=".9">%s</g></svg>' % (DEFS, rug_top(52, 188, 286, 356, .42), ''.join('<circle cx="%d" cy="%d" r="%d" fill="#e9f8ff" stroke="#a7d8ef" stroke-width="1.2"/>' % (x, y, r) for x, y, r in [(236, 318, 7), (262, 336, 5), (248, 346, 4), (272, 316, 4), (228, 340, 3)]))
            + '<div class="hud"><button class="rbtn">%s</button><div class="ttl"><small>الصالة · غسيل السجادة</small><b>كيمياء البقع</b></div><div class="goal"><small>النظافة</small><b class="ltr">58%%</b><div class="mini"><i style="width:58%%"></i></div></div></div>' % ICON['pause']
            + '<div class="steps"><i class="ok">كنس ✓</i><i class="on">بقع</i><i>غسل</i><i>شطف</i><i>تجفيف</i></div>'
-           + bot(286, 254, .36, ring='#4dc3ff', mode='seg', arm='spray')
+           + tool_cursor(276, 262, 'spray', 2.6, 'منظّف الحبر')
            + '<div class="hint">💡 الحبر لا يُزال بالماء وحده… جرّب منظّفاً آخر</div>'
            + '<div class="tray"><div class="btls">%s%s%s%s%s</div><div class="actrow"><button class="sq">%s</button><button class="sq">%s</button><div class="stars3">%s%s%s</div></div></div>'
            % (bottle('#4dc3ff', 'ماء دافئ', 9), bottle('#ffb84d', 'صابون لطيف', 3), bottle('#9b7bff', 'منظّف الحبر', 2, True), bottle('#5fe08a', 'بيكربونات', 2), bottle('#ff7a59', 'مزيل الصدأ', 1),
@@ -537,7 +577,7 @@ wood_scr = ('<div class="pz-bg wood"></div><svg class="bg" viewBox="0 0 390 844"
             % (DEFS, board(24, 200, 9, 5, cell, [([(c, r) for c in range(0, 5) for r in range(0, 2)], '#b8743a', 'السطح'), (leg, '#8a5a32', 'رجل'), ([(1, 2), (1, 3), (1, 4)], '#8a5a32', 'رجل')],
                            ghost=([(6, 0), (7, 0), (8, 0), (6, 1), (7, 1), (8, 1)], 'رف'), waste_cells=[(5, 2)]))
             + '<div class="hud"><button class="rbtn">%s</button><div class="ttl"><small>الورشة · النجارة</small><b>خطّط القصّ</b></div><div class="goal"><small>الهدر</small><b class="ltr">7%%</b><div class="mini green"><i style="width:22%%"></i></div></div></div>' % ICON['pause']
-            + bot(292, 372, .3, ring='#ffd23f', ic='bulb', ic_col='#f2a800')
+            + '<div class="bot" style="left:290px;top:396px">%s</div>' % saw_svg()
             + '<div class="tray"><div class="pieces">%s%s%s%s</div><div class="actrow"><button class="sq">%s</button><button class="sq">%s</button><button class="big push">قصّ 🪚</button></div></div>'
             % (piece_svg([(0, 0), (1, 0), (2, 0), (0, 1), (1, 1), (2, 1)], '#c88a52', 'رف ×1'), piece_svg([(0, 0), (0, 1), (0, 2)], '#a8693a', 'رجل ×2'),
                piece_svg([(0, 0), (1, 0), (2, 0), (3, 0)], '#d9a46d', 'إطار ×1'), piece_svg([(0, 0), (1, 0), (1, 1)], '#b8743a', 'زاوية ×1'), ICON['rotate'], ICON['undo']))
@@ -581,7 +621,7 @@ garden_scr = ('<div class="pz-bg garden"></div><svg class="bg" viewBox="0 0 390 
               % (DEFS, gx0 - 8, gy0 - 8, G * gcell + 16, G * gcell + 16, ''.join(garden))
               + '<div class="hud"><button class="rbtn">%s</button><div class="ttl"><small>الحديقة · التخطيط</small><b>ازرع بالقواعد</b></div><div class="goal"><small>القواعد</small><b class="ltr">2 / 3</b></div></div>' % ICON['pause']
               + '<div class="rules"><i class="ok">☀️ نباتات الشمس في الشمس ✓</i><i class="bad">🌿 نبات ظل في الشمس ✗</i><i class="ok">💧 كل نبتة يصلها الماء ✓</i></div>'
-              + bot(12, 494, .3, ring='#ff9a3d', mode='half', ic='bang', ic_col='#ff7a1a')
+              + '<div class="bot" style="left:16px;top:500px">%s</div>' % can_svg()
               + '<div class="tray"><div class="seeds"><div class="sd"><svg width="54" height="48" viewBox="0 0 54 48">%s</svg><b>زهرة شمس</b><span class="cnt">×2</span></div><div class="sd sel"><svg width="54" height="48" viewBox="0 0 54 48">%s</svg><b>سرخس ظل</b><span class="cnt">×1</span></div><div class="sd"><svg width="54" height="48" viewBox="0 0 54 48">%s</svg><b>شجيرة</b><span class="cnt">×1</span></div><div class="sd"><svg width="54" height="48" viewBox="0 0 54 48"><rect x="10" y="10" width="34" height="28" rx="10" fill="#d9c49a" stroke="#b8a070"/></svg><b>حجر ممر</b><span class="cnt">×3</span></div></div><div class="actrow"><button class="sq">%s</button><button class="sq">%s</button><button class="big push">ازرع 🌱</button></div></div>'
               % (plant(27, 26, 'sun'), plant(27, 30, 'shade'), plant(27, 24, 'bush'), ICON['undo'], ICON['bulb']))
 
@@ -613,7 +653,7 @@ def mini_bot(skin, ring='#3fe0d0'):
 
 shop = ('<div class="pz-bg map"></div>' + '<div class="phead"><button class="rbtn">%s</button><h2>المتجر</h2><div class="res">%s<b>2,450</b></div></div>' % (ICON['back'], coin())
         + '<div class="shop"><div class="starter"><div class="stl"><span class="stag">مرة واحدة فقط</span><b>حزمة البداية</b><small>1,000 عملة · 5 تلميحات · شكل نحاسي</small></div><button class="price big2">$0.99</button></div>'
-        + '<h4>أشكال الروبوت</h4><div class="skins">%s</div>' % ''.join('<div class="sk">%s<b>%s</b>%s</div>' % (mini_bot(k, '#ffd23f' if k == 'navy' else '#3fe0d0'), SKINS[k]['name'], '<span class="own">مُستخدم ✓</span>' if k == 'classic' else '<button class="price">%s</button>' % p) for k, p in [('classic', ''), ('coral', '$0.99'), ('brass', '$1.49')])
+        + '<h4>أشكال الأدوات</h4><div class="skins"><div class="sk">%s<b>الكلاسيكية</b><span class="own">مُستخدمة ✓</span></div><div class="sk">%s<b>النحاسية</b><button class="price">$0.99</button></div><div class="sk opt"><span class="opttag">اختياري</span>%s<b>الروبوت المساعد</b><button class="price tog">تفعيل</button></div></div>' % (toolbox_svg('classic', 84), toolbox_svg('brass', 84), mini_bot('classic'))
         + '<h4>طُرز الديكور</h4><div class="decos"><div class="dc" style="--c:#2f8f8a"><i></i><b>ساحلي</b><span class="own">مجاني</span></div><div class="dc" style="--c:#a8693a"><i></i><b>كلاسيكي</b><button class="price">$1.49</button></div><div class="dc" style="--c:#4a4f57"><i></i><b>عصري</b><button class="price">$1.49</button></div></div>'
         + '<h4>العملات</h4><div class="coins">%s</div>' % ''.join('<div class="cpk">%s<b>%s</b>%s<button class="price">%s</button></div>' % (coin(28 + i * 4), a, ('<span class="bonus">%s</span>' % bo) if bo else '', pr) for i, (a, bo, pr) in enumerate([('500', '', '$0.49'), ('1,200', '', '$0.99'), ('3,500', '+15%', '$2.99'), ('10,000', '+40%', '$5.99')]))
         + '<div class="row2"><div class="noads"><b>إزالة الإعلانات</b><small>للأبد · تبقى المكافآت الاختيارية</small><button class="price">$2.99</button></div><div class="free"><b>50 عملة مجاناً</b><small>شاهد إعلاناً قصيراً</small><button class="price pur">%s مشاهدة</button></div></div>' % ICON['film']
