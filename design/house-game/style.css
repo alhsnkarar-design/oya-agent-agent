@@ -174,3 +174,31 @@ button{font:inherit;color:inherit;border:0;background:none}
 .alist{top:196px;justify-content:flex-start}
 .secret{height:70px}
 .secret{top:104px}
+/* --- world-class polish pass --- */
+.res{background:linear-gradient(180deg,#fffaf0,#f1e2c6);color:#3b2a14;border:2.5px solid #d8b07a;box-shadow:inset 0 2px 0 #fff,0 3px 0 #a8743a;height:36px;padding:0 10px 0 4px}
+.res svg{filter:drop-shadow(0 2px 0 rgba(0,0,0,.2))}
+.res i{background:linear-gradient(180deg,#5fe08a,#22b14c);border:2px solid #fff;box-shadow:0 2px 0 #0f7a32}
+.ttl b,.phead h2{text-shadow:0 2px 0 #0a4a46,2px 0 0 #0a4a46,-2px 0 0 #0a4a46,0 -2px 0 #0a4a46,0 5px 0 rgba(0,0,0,.25)}
+.ttl small{display:inline-block;background:rgba(10,40,44,.55);padding:1px 10px;border-radius:8px;text-shadow:none}
+.lg1{text-shadow:0 3px 0 #0d6a64,3px 0 0 #0d6a64,-3px 0 0 #0d6a64,0 -3px 0 #0d6a64,0 8px 0 rgba(0,40,60,.35)}
+.lgs{background:linear-gradient(180deg,#14a39b,#0d7a74);border:2px solid #fff;box-shadow:0 3px 0 #075e59;color:#fff}
+.rpanel,.done,.panel,.goal,.tray,.area,.sk,.dc,.cpk,.noads,.free,.tk{box-shadow:inset 0 0 0 2px #fffaf0,inset 0 3px 0 #fff,0 5px 0 #a8743a,0 12px 24px rgba(0,0,0,.25)}
+.tray{border-top:3px solid #d8b07a}
+.tray::before{content:"";position:absolute;left:24px;right:24px;top:6px;border-top:2px dashed #e4cfa6}
+.nav button span{margin-top:2px}
+.nav button svg{padding:6px;border-radius:14px;background:linear-gradient(180deg,#fff,#efe0c4);box-shadow:0 3px 0 #d8b07a;width:38px;height:38px;color:#8a5a2a}
+.nav button.on svg{background:none;box-shadow:none;color:#fff;padding:0;width:28px;height:28px}
+.widgets{position:absolute;left:12px;top:112px;z-index:4;display:flex;flex-direction:column;gap:12px}
+.wd{position:relative;width:62px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.wd span{width:56px;height:56px;border-radius:18px;display:grid;place-items:center;color:#fff;background:linear-gradient(180deg,#ffb36b,#ef5a1f);border:3px solid #fff;box-shadow:0 4px 0 #a8380c,0 8px 14px rgba(0,0,0,.25)}
+.wd:nth-child(2) span{background:linear-gradient(180deg,#c7a6ff,#6a3be6);box-shadow:0 4px 0 #3a1690,0 8px 14px rgba(0,0,0,.25)}
+.wd b{font-size:11px;font-weight:900;color:#fff;text-shadow:0 1px 0 #0a4a46,1px 0 0 #0a4a46,-1px 0 0 #0a4a46,0 -1px 0 #0a4a46}
+.wd i{position:absolute;top:-6px;right:-2px;width:22px;height:22px;border-radius:50%;background:#ff3b30;border:2px solid #fff;color:#fff;font-style:normal;font-size:11px;font-weight:900;display:grid;place-items:center}
+.logo{left:70px}
+.steps i{box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.hint,.hintbar{box-shadow:0 4px 0 #d9a85a,0 10px 20px rgba(0,0,0,.2)}
+.rules i{box-shadow:0 3px 0 rgba(0,0,0,.15)}
+.secret{box-shadow:inset 0 0 0 2px rgba(255,255,255,.15),0 4px 0 #1a1230,0 12px 24px rgba(0,0,0,.3)}
+.shop h4,.phead h2{letter-spacing:.2px}
+.shop h4{display:inline-block;align-self:flex-start;background:rgba(10,40,44,.6);padding:2px 12px;border-radius:10px;text-shadow:none}
+.ttl{display:flex;flex-direction:column;align-items:center;gap:2px}.ttl b{white-space:nowrap}

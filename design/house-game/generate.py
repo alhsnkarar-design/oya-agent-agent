@@ -83,6 +83,10 @@ DEFS = '''<defs>
 <linearGradient id="skyHome" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5fb4e6"/><stop offset=".55" stop-color="#bfe3f3"/><stop offset="1" stop-color="#f7e3c4"/></linearGradient>
 <linearGradient id="seaHome" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a9cc4"/><stop offset="1" stop-color="#14567a"/></linearGradient>
 <linearGradient id="cliff" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fbf6a"/><stop offset=".12" stop-color="#6e9f4c"/><stop offset=".14" stop-color="#b48a5e"/><stop offset="1" stop-color="#7a5636"/></linearGradient>
+<pattern id="peg" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="9" cy="9" r="2.2" fill="#3a2414" opacity=".55"/></pattern>
+<pattern id="grassP" width="16" height="12" patternUnits="userSpaceOnUse"><path d="M3 10 l1 -6 M8 11 l1 -7 M13 9 l1 -5" stroke="#9fd06c" stroke-width="1.3" opacity=".55"/></pattern>
+<filter id="blur8" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="8"/></filter>
+<radialGradient id="spot" cx=".5" cy=".42" r=".7"><stop offset="0" stop-color="#fff3d6" stop-opacity=".35"/><stop offset="1" stop-color="#fff3d6" stop-opacity="0"/></radialGradient>
 </defs>'''
 
 
@@ -407,6 +411,39 @@ def can_svg():
             '<circle cx="74" cy="26" r="1.8" fill="#9fdcff"/><circle cx="78" cy="32" r="1.5" fill="#9fdcff"/><circle cx="70" cy="34" r="1.4" fill="#9fdcff"/></svg>')
 
 
+def floor_bg():
+    o = ['<rect width="390" height="844" fill="#a06d3e"/>']
+    for i in range(0, 8):
+        x = i * 52
+        o.append('<rect x="%d" y="0" width="52" height="844" fill="%s"/>' % (x, ['#a06d3e', '#9a673a', '#a57242', '#96633a'][i % 4]))
+        o.append('<line x1="%d" y1="0" x2="%d" y2="844" stroke="#5a3418" stroke-width="2" opacity=".5"/>' % (x, x))
+        for y in range((i * 170) % 300, 844, 300):
+            o.append('<line x1="%d" y1="%d" x2="%d" y2="%d" stroke="#5a3418" stroke-width="2" opacity=".45"/>' % (x, y, x + 52, y))
+    o.append('<rect width="390" height="844" fill="url(#woodtex)" opacity=".35"/><rect width="390" height="844" fill="#000" filter="url(#grain)"/>')
+    o.append('<rect width="390" height="844" fill="url(#spot)"/><rect width="390" height="844" fill="url(#vign)" opacity=".8"/>')
+    return ''.join(o)
+
+
+def bench_bg():
+    return ('<rect width="390" height="200" fill="#6b4a32"/><rect width="390" height="200" fill="url(#peg)"/>'
+            '<g opacity=".55"><rect x="40" y="120" width="8" height="46" rx="3" fill="#3a2414"/><rect x="30" y="112" width="28" height="12" rx="3" fill="#3a2414"/>'
+            '<path d="M300 110 l40 0 l-8 40 l-24 0z" fill="#3a2414"/><circle cx="200" cy="140" r="16" fill="none" stroke="#3a2414" stroke-width="5"/></g>'
+            '<rect y="196" width="390" height="648" fill="#b98352"/>' + ''.join('<line x1="0" y1="%d" x2="390" y2="%d" stroke="#6a4020" stroke-width="2" opacity=".45"/>' % (y, y) for y in range(250, 844, 64))
+            + '<rect y="196" width="390" height="648" fill="url(#woodtex)" opacity=".4"/><rect y="190" width="390" height="10" fill="#4a2c16" opacity=".6"/>'
+            '<rect width="390" height="844" fill="url(#spot)"/><rect width="390" height="844" fill="url(#vign)" opacity=".75"/>')
+
+
+def grass_bg():
+    return ('<rect width="390" height="844" fill="#6fa64c"/><rect width="390" height="844" fill="url(#grassP)"/>'
+            + ''.join('<circle cx="%d" cy="%d" r="%d" fill="#5f9440" opacity=".5"/>' % (x, y, r) for x, y, r in [(30, 120, 40), (360, 160, 50), (60, 700, 60), (340, 640, 44), (200, 90, 30)])
+            + ''.join('<rect x="%d" y="150" width="10" height="36" rx="3" fill="#efe6d6"/>' % x for x in range(8, 390, 28)) + '<rect y="160" width="390" height="6" fill="#efe6d6"/>'
+            '<rect width="390" height="844" fill="url(#spot)"/><rect width="390" height="844" fill="url(#vign)" opacity=".7"/>')
+
+
+def house_blur():
+    return '<svg class="bg" viewBox="0 0 390 844"><g filter="url(#blur8)">%s</g><rect width="390" height="844" fill="#0d3b40" opacity=".55"/><rect width="390" height="844" fill="url(#vign)"/></svg>' % house_ext()
+
+
 def nav(on):
     items = [('cart', 'المتجر'), ('book', 'الدفتر'), ('home', 'البيت'), ('map', 'المناطق')]
     return '<nav class="nav">%s</nav>' % ''.join('<button class="%s">%s<span>%s</span></button>' % ('on' if t == on else '', ICON[k], t) for k, t in items)
@@ -462,6 +499,7 @@ def house_ext():
 home = ('<svg class="bg" viewBox="0 0 390 844">%s%s<rect width="390" height="844" fill="url(#vign)" opacity=".35"/></svg>' % (DEFS, house_ext()) + topbar()
         + '<div class="logo"><div class="lg1">البيت</div><div class="lg2">المهجور</div><div class="lgs">اسم مؤقت · رمّم · اكتشف · أضِئ</div></div>'
         + toolbox(196, 472, 96)
+        + '<div class="widgets"><div class="wd"><span>%s</span><b>مهمة اليوم</b><i>1</i></div><div class="wd"><span>%s</span><b>الدفتر</b></div></div>' % (ICON['bulb'], ICON['book'])
         + '<div class="prog"><div class="pr-t"><b>البيت</b><span class="ltr">34%</span></div><div class="bar"><i style="width:34%"></i></div></div>'
         + '<div class="homeact"><button class="big">%s تابع <small>الصالة · المهمة 4</small></button></div>' % ICON['play'] + nav('البيت'))
 
@@ -522,9 +560,9 @@ def bottle(col, label, cnt, sel=False, emo=''):
             % (' sel' if sel else '', col, emo, label, cnt))
 
 
-rug_scr = ('<div class="pz-bg"></div><svg class="bg" viewBox="0 0 390 844">%s<rect x="20" y="160" width="350" height="412" rx="18" fill="#7a5434"/><rect x="20" y="160" width="350" height="412" rx="18" fill="url(#planks)"/>%s'
+rug_scr = ('<svg class="bg" viewBox="0 0 390 844">%s%s'
            '<g transform="translate(250 330)"><circle r="30" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="5 4"/></g>'
-           '<g opacity=".9">%s</g></svg>' % (DEFS, rug_top(52, 188, 286, 356, .42), ''.join('<circle cx="%d" cy="%d" r="%d" fill="#e9f8ff" stroke="#a7d8ef" stroke-width="1.2"/>' % (x, y, r) for x, y, r in [(236, 318, 7), (262, 336, 5), (248, 346, 4), (272, 316, 4), (228, 340, 3)]))
+           '<g opacity=".9">%s</g></svg>' % (DEFS + floor_bg() + '<rect x="58" y="198" width="286" height="356" rx="6" fill="#000" opacity=".4" filter="url(#blur8)"/>', rug_top(52, 188, 286, 356, .42), ''.join('<circle cx="%d" cy="%d" r="%d" fill="#e9f8ff" stroke="#a7d8ef" stroke-width="1.2"/>' % (x, y, r) for x, y, r in [(236, 318, 7), (262, 336, 5), (248, 346, 4), (272, 316, 4), (228, 340, 3)]))
            + '<div class="hud"><button class="rbtn">%s</button><div class="ttl"><small>الصالة · غسيل السجادة</small><b>كيمياء البقع</b></div><div class="goal"><small>النظافة</small><b class="ltr">58%%</b><div class="mini"><i style="width:58%%"></i></div></div></div>' % ICON['pause']
            + '<div class="steps"><i class="ok">كنس ✓</i><i class="on">بقع</i><i>غسل</i><i>شطف</i><i>تجفيف</i></div>'
            + tool_cursor(276, 262, 'spray', 2.6, 'منظّف الحبر')
@@ -566,13 +604,13 @@ def piece_svg(shape, col, lab, cell=13):
 
 cell = 38
 leg = [(0, 0), (0, 1), (0, 2)]
-wood_scr = ('<div class="pz-bg wood"></div><svg class="bg" viewBox="0 0 390 844">%s'
+wood_scr = ('<svg class="bg" viewBox="0 0 390 844">%s'
             '<text x="195" y="186" text-anchor="middle" font-family="Cairo" font-weight="900" font-size="14" fill="#fff" opacity=".9">لوح الجوز · 9 × 5</text>%s'
             '<g transform="translate(18 408)"><rect width="354" height="96" rx="16" fill="#fffaf0" opacity=".95"/>'
             '<text x="336" y="24" text-anchor="start" font-family="Cairo" font-weight="900" font-size="13" fill="#5a3a18">الهدف: طاولة قهوة</text>'
             '<g transform="translate(40 18)"><polygon points="20,30 140,30 160,46 40,46" fill="#c88a52"/><polygon points="40,46 160,46 160,52 40,52" fill="#8a5a32"/><rect x="46" y="52" width="7" height="30" fill="#8a5a32"/><rect x="148" y="52" width="7" height="30" fill="#8a5a32"/><rect x="28" y="36" width="6" height="34" fill="#a8693a"/><rect x="132" y="36" width="6" height="34" fill="#a8693a"/></g>'
             '<text x="336" y="50" text-anchor="start" font-family="Cairo" font-weight="700" font-size="12" fill="#8a5a1a">سطح + 4 أرجل + رف</text><text x="336" y="72" text-anchor="start" font-family="Cairo" font-weight="700" font-size="12" fill="#c44d3a">تجنّب العقدة في الخشب ●</text></g></svg>'
-            % (DEFS, board(24, 200, 9, 5, cell, [([(c, r) for c in range(0, 5) for r in range(0, 2)], '#b8743a', 'السطح'), (leg, '#8a5a32', 'رجل'), ([(1, 2), (1, 3), (1, 4)], '#8a5a32', 'رجل')],
+            % (DEFS + bench_bg() + '<rect x="28" y="206" width="342" height="190" rx="6" fill="#000" opacity=".45" filter="url(#blur8)"/>', board(24, 200, 9, 5, cell, [([(c, r) for c in range(0, 5) for r in range(0, 2)], '#b8743a', 'السطح'), (leg, '#8a5a32', 'رجل'), ([(1, 2), (1, 3), (1, 4)], '#8a5a32', 'رجل')],
                            ghost=([(6, 0), (7, 0), (8, 0), (6, 1), (7, 1), (8, 1)], 'رف'), waste_cells=[(5, 2)]))
             + '<div class="hud"><button class="rbtn">%s</button><div class="ttl"><small>الورشة · النجارة</small><b>خطّط القصّ</b></div><div class="goal"><small>الهدر</small><b class="ltr">7%%</b><div class="mini green"><i style="width:22%%"></i></div></div></div>' % ICON['pause']
             + '<div class="hintbar">💡 ابدأ بالقطعة الأكبر، ثم وزّع الأرجل حول العقدة.</div>'
@@ -615,8 +653,8 @@ for c, r, k in [(4, 1, 'shade'), (5, 2, 'shade'), (0, 4, 'sun'), (3, 4, 'sun'), 
 garden.append('<rect x="%d" y="%d" width="%d" height="%d" fill="#ff5a3c" opacity=".3" stroke="#ff5a3c" stroke-width="2"/>' % (gx0 + 1 * gcell, gy0 + 4 * gcell, gcell, gcell))
 garden.append(plant(gx0 + 1 * gcell + gcell // 2, gy0 + 4 * gcell + gcell // 2 - 4, 'shade'))
 garden.append('<g transform="translate(%d %d)"><circle r="11" fill="#ff5a3c" stroke="#fff" stroke-width="2"/><text y="5" text-anchor="middle" font-size="13" font-weight="900" fill="#fff" font-family="Cairo">!</text></g>' % (gx0 + 2 * gcell - 6, gy0 + 4 * gcell + 6))
-garden_scr = ('<div class="pz-bg garden"></div><svg class="bg" viewBox="0 0 390 844">%s<rect x="%d" y="%d" width="%d" height="%d" rx="14" fill="#6b4a2a"/>%s</svg>'
-              % (DEFS, gx0 - 8, gy0 - 8, G * gcell + 16, G * gcell + 16, ''.join(garden))
+garden_scr = ('<svg class="bg" viewBox="0 0 390 844">%s<rect x="%d" y="%d" width="%d" height="%d" rx="14" fill="#6b4a2a"/>%s</svg>'
+              % (DEFS + grass_bg(), gx0 - 8, gy0 - 8, G * gcell + 16, G * gcell + 16, ''.join(garden))
               + '<div class="hud"><button class="rbtn">%s</button><div class="ttl"><small>الحديقة · التخطيط</small><b>ازرع بالقواعد</b></div><div class="goal"><small>القواعد</small><b class="ltr">2 / 3</b></div></div>' % ICON['pause']
               + '<div class="rules"><i class="ok">☀️ نباتات الشمس في الشمس ✓</i><i class="bad">🌿 نبات ظل في الشمس ✗</i><i class="ok">💧 كل نبتة يصلها الماء ✓</i></div>'
               + '<div class="tray"><div class="seeds"><div class="sd"><svg width="54" height="48" viewBox="0 0 54 48">%s</svg><b>زهرة شمس</b><span class="cnt">×2</span></div><div class="sd sel"><svg width="54" height="48" viewBox="0 0 54 48">%s</svg><b>سرخس ظل</b><span class="cnt">×1</span></div><div class="sd"><svg width="54" height="48" viewBox="0 0 54 48">%s</svg><b>شجيرة</b><span class="cnt">×1</span></div><div class="sd"><svg width="54" height="48" viewBox="0 0 54 48"><rect x="10" y="10" width="34" height="28" rx="10" fill="#d9c49a" stroke="#b8a070"/></svg><b>حجر ممر</b><span class="cnt">×3</span></div></div><div class="actrow"><button class="sq">%s</button><button class="sq">%s</button><button class="big push">ازرع 🌱</button></div></div>'
@@ -639,7 +677,7 @@ cards = ''.join('<div class="area %s"><div class="ai">%s</div><div class="at"><b
     'fin' if st == 'done' else st, emo, n, sub,
     '<div class="mini"><i style="width:%d%%"></i></div>' % p if st in ('done', 'cur') else ('<span class="lk">%s أكمل المنطقة السابقة</span>' % ICON['lock'] if st == 'lock' else '<span class="lk soon">تحديث قادم</span>'),
     '<span class="ok">✓</span>' if st == 'done' else ('<button class="go">%s</button>' % ICON['play'] if st == 'cur' else '')) for n, emo, sub, p, st in AREAS)
-areas = ('<div class="pz-bg map"></div>' + '<div class="phead"><button class="rbtn">%s</button><h2>مناطق البيت</h2><div class="res">%s<b>38</b></div></div>' % (ICON['back'], star(18))
+areas = (house_blur() + '<div class="phead"><button class="rbtn">%s</button><h2>مناطق البيت</h2><div class="res">%s<b>38</b></div></div>' % (ICON['back'], star(18))
          + '<div class="secret"><span>🔐</span><div><b>أسرار البيت</b><small>قطعة 1 من 6 من المخطط الأصلي</small></div><div class="pieces6"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div></div>'
          + '<div class="alist">%s</div>' % cards + nav('المناطق'))
 
@@ -648,7 +686,7 @@ def mini_bot(skin, ring='#3fe0d0'):
     return '<svg width="96" height="80" viewBox="20 40 180 150">%s</svg>' % robot(110, 120, 1.0, skin, ring)
 
 
-shop = ('<div class="pz-bg map"></div>' + '<div class="phead"><button class="rbtn">%s</button><h2>المتجر</h2><div class="res">%s<b>2,450</b></div></div>' % (ICON['back'], coin())
+shop = (house_blur() + '<div class="phead"><button class="rbtn">%s</button><h2>المتجر</h2><div class="res">%s<b>2,450</b></div></div>' % (ICON['back'], coin())
         + '<div class="shop"><div class="starter"><div class="stl"><span class="stag">مرة واحدة فقط</span><b>حزمة البداية</b><small>1,000 عملة · 5 تلميحات · شكل نحاسي</small></div><button class="price big2">$0.99</button></div>'
         + '<h4>أشكال الأدوات</h4><div class="skins"><div class="sk">%s<b>الكلاسيكية</b><span class="own">مُستخدمة ✓</span></div><div class="sk">%s<b>النحاسية</b><button class="price">$0.99</button></div><div class="sk opt"><span class="opttag">اختياري</span>%s<b>الروبوت المساعد</b><button class="price tog">تفعيل</button></div></div>' % (toolbox_svg('classic', 84), toolbox_svg('brass', 84), mini_bot('classic'))
         + '<h4>طُرز الديكور</h4><div class="decos"><div class="dc" style="--c:#2f8f8a"><i></i><b>ساحلي</b><span class="own">مجاني</span></div><div class="dc" style="--c:#a8693a"><i></i><b>كلاسيكي</b><button class="price">$1.49</button></div><div class="dc" style="--c:#4a4f57"><i></i><b>عصري</b><button class="price">$1.49</button></div></div>'
