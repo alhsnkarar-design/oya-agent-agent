@@ -202,3 +202,56 @@ button{font:inherit;color:inherit;border:0;background:none}
 .shop h4,.phead h2{letter-spacing:.2px}
 .shop h4{display:inline-block;align-self:flex-start;background:rgba(10,40,44,.6);padding:2px 12px;border-radius:10px;text-shadow:none}
 .ttl{display:flex;flex-direction:column;align-items:center;gap:2px}.ttl b{white-space:nowrap}
+/* --- compact pass: leave the play area free --- */
+.hud,.top,.phead{padding-top:46px}
+.rbtn,.sq{width:40px;height:40px;border-radius:13px}
+.rbtn svg,.sq svg{width:20px;height:20px}
+.ttl b{font-size:21px}
+.ttl small{font-size:9.5px;padding:0 8px}
+.goal{min-width:66px;padding:2px 8px 4px;border-radius:14px}
+.goal small{font-size:9.5px}.goal b{font-size:17px}
+.res{height:32px;font-size:14px}
+.steps{top:96px}.steps i{font-size:10.5px;padding:2px 8px}
+.beforetag,.aftertag{top:98px;font-size:12px;padding:1px 10px}
+.fab{position:absolute;left:12px;bottom:132px;z-index:6;display:flex;gap:8px}
+.tray2{position:absolute;left:8px;right:8px;bottom:12px;z-index:6;border-radius:22px;padding:7px 8px 9px;background:linear-gradient(180deg,#fffaf0,#f1e2c6);border:3px solid #d8b07a;box-shadow:inset 0 0 0 2px #fffaf0,0 5px 0 #a8743a,0 12px 24px rgba(0,0,0,.3)}
+.tip{font-size:11.5px;font-weight:800;color:#6a4a10;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px}
+.row2{display:flex;gap:5px;align-items:stretch}
+.row2 .btl,.row2 .pc,.row2 .sd{min-height:66px;padding:4px 2px;border-radius:14px;flex:1}
+.row2 svg{max-height:36px;width:auto}
+.row2 b{font-size:9.5px !important;line-height:1.15}
+.row2 .cnt{min-width:24px;height:18px;font-size:10px;top:-6px}
+.go-btn{flex:0 0 70px;border-radius:16px;font-family:Lalezar;font-size:19px;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.25);background:linear-gradient(180deg,#ffb36b,#ff7a3d 45%,#ef5a1f);border:3px solid #a8380c;box-shadow:inset 0 3px 0 rgba(255,255,255,.45),0 4px 0 #8a2c08}
+.go-btn.wide{flex:1;height:40px;font-size:18px}
+.goalchip{position:absolute;left:12px;right:12px;top:356px;z-index:5;display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:16px;background:rgba(255,250,240,.95);border:2px solid #d8b07a;box-shadow:0 4px 0 #a8743a}
+.goalchip b{display:block;font-size:12.5px;font-weight:900;color:#5a3a18}
+.goalchip span{display:inline-block;font-size:11px;font-weight:700;color:#8a5a1a;margin-left:8px}
+.goalchip span.warn{color:#c44d3a}
+.rulechips{position:absolute;left:0;right:0;top:106px;z-index:5;display:flex;justify-content:center;gap:6px}
+.rulechips i{font-style:normal;font-size:11.5px;font-weight:900;padding:3px 10px;border-radius:12px;background:rgba(255,255,255,.95);color:#2b4a2e;box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.rulechips i.bad{background:#ffe1d9;color:#b8301a}
+.note1{position:absolute;left:12px;right:12px;bottom:102px;z-index:5;padding:6px 12px;border-radius:14px;background:rgba(255,250,240,.95);font-size:12px;font-weight:800;color:#5a3a12;text-align:center;box-shadow:0 3px 0 #d9a85a}
+.taskbar{position:absolute;left:8px;right:8px;bottom:14px;z-index:5;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.tk2{display:flex;flex-direction:column;align-items:center;justify-content:center;height:78px;border-radius:16px;background:linear-gradient(180deg,#fffaf0,#f1e2c6);border:2.5px solid #d8b07a;box-shadow:0 4px 0 #a8743a;color:#3b2a14}
+.tk2 span{font-size:20px;line-height:1.1}.tk2 b{font-size:10.5px;font-weight:900;line-height:1.2;text-align:center}.tk2 em{font-style:normal;font-size:10px;font-weight:800;color:#a8743a}
+.tk2.on{border-color:#14a39b;box-shadow:0 4px 0 #0d7a74,0 0 0 3px rgba(20,163,155,.35)}
+.tk2.lock{filter:grayscale(.8);opacity:.75}
+.donebar{position:absolute;left:8px;right:8px;bottom:14px;z-index:5;border-radius:20px;padding:8px 10px 10px;background:linear-gradient(180deg,#fffaf0,#f1e2c6);border:3px solid #d8b07a;box-shadow:inset 0 0 0 2px #fffaf0,0 5px 0 #a8743a,0 12px 24px rgba(0,0,0,.3);color:#3b2a14}
+.db-t{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.db-t b{font-family:Lalezar;font-weight:400;font-size:22px;color:#0d8a83}
+.db-t span{font-size:11.5px;font-weight:800;color:#8a5a1a}
+.db-r{display:flex;align-items:center;gap:6px}
+.stylechips{display:flex;gap:4px;flex:1}
+.stylechips i{font-style:normal;font-size:11px;font-weight:900;padding:4px 8px;border-radius:10px;border:2px solid var(--c);color:var(--c);background:#fff}
+.stylechips i.on{background:var(--c);color:#fff}
+.cam{flex:0 0 40px}
+.widgets{top:100px;gap:8px}.wd span{width:46px;height:46px;border-radius:15px}.wd span svg{width:22px;height:22px}.wd b{font-size:10px}
+.prog{bottom:166px;padding:6px 12px}
+.homeact{bottom:94px}.homeact .big{height:56px;font-size:26px}
+.nav{height:66px;bottom:14px}.nav button svg{width:32px;height:32px;padding:5px}
+.tcur{transform:scale(.85);transform-origin:top left}
+.row2 .btl,.row2 .pc,.row2 .sd{height:70px;min-height:0;justify-content:center;gap:2px}
+.row2 svg{height:32px !important;width:auto !important;max-height:none}
+.row2 .go-btn{height:70px}
+.tray2{color:#3b2a14}
+.rulechips i{white-space:nowrap}
