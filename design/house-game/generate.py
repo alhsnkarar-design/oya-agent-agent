@@ -466,22 +466,20 @@ home = ('<svg class="bg" viewBox="0 0 390 844">%s%s<rect width="390" height="844
         + '<div class="homeact"><button class="big">%s تابع <small>الصالة · المهمة 4</small></button></div>' % ICON['play'] + nav('البيت'))
 
 # =============== 2. ROOM BEFORE ===============
-before = ('<svg class="bg" viewBox="-0 0 390 844"><svg x="0" y="60" width="390" height="640" viewBox="-40 120 470 600" preserveAspectRatio="xMidYMid slice">%s%s'
+before = ('<svg class="bg" viewBox="-0 0 390 844"><rect width="390" height="844" fill="#22343c"/><svg x="0" y="70" width="390" height="560" viewBox="-40 140 470 675" preserveAspectRatio="xMidYMid slice">%s%s'
           '<rect x="-80" y="0" width="550" height="844" fill="url(#vign)"/>%s%s%s%s%s</svg></svg>'
           % (DEFS, room('before'), marker(*F(.52, .74), '🧽', 1)[0:0] + marker(F(.52, .74)[0], F(.52, .74)[1] - 30, '🧽', 1),
              marker(244, 250, '🔨', 2), marker(F(.52, .5)[0], F(.52, .5)[1] - 90, '🪡', 3), marker(138, 330, '🔧', 4), marker(*LW(.3, .9), '🖌️', 5))
           + '<div class="hud"><button class="rbtn">%s</button><div class="ttl"><small>المنطقة 2</small><b>الصالة</b></div><div class="res">%s<b>2,450</b></div></div>' % (ICON['back'], coin())
           + '<div class="beforetag">قبل</div>'
-          + toolbox(8, 628, 100)
-          + '<div class="speech"><b>📒 من دفتر البيت</b>السجادة مغطاة بالطين والبقع… اضغط عليها للبدء</div>'
-          + '<div class="tasks"><div class="tk on"><span>🧽</span><b>اغسل السجادة</b><em>⭐ 1</em></div><div class="tk"><span>🔨</span><b>افتح النافذة</b><em>⭐ 1</em></div><div class="tk"><span>🪡</span><b>رمّم الأريكة</b><em>⭐ 2</em></div><div class="tk lock"><span>🔧</span><b>أصلح المدفأة</b><em>%s</em></div></div>' % ICON['lock'])
+          + '<div class="rpanel"><div class="jr"><span class="jb">%s</span><p><b>من دفتر البيت</b>السجادة مغطاة بالطين والبقع… ابدأ بها.</p></div><div class="tasks">' % toolbox_svg('classic', 46)
+          + '<div class="tk on"><span>🧽</span><b>اغسل السجادة</b><em>⭐ 1</em></div><div class="tk"><span>🔨</span><b>افتح النافذة</b><em>⭐ 1</em></div><div class="tk"><span>🪡</span><b>رمّم الأريكة</b><em>⭐ 2</em></div><div class="tk lock"><span>🔧</span><b>أصلح المدفأة</b><em>%s</em></div></div></div>' % ICON['lock'])
 
 # =============== 3. ROOM AFTER ===============
-after = ('<svg class="bg" viewBox="0 0 390 844"><svg x="0" y="60" width="390" height="640" viewBox="-40 120 470 600" preserveAspectRatio="xMidYMid slice">%s%s'
+after = ('<svg class="bg" viewBox="0 0 390 844"><rect width="390" height="844" fill="#22343c"/><svg x="0" y="70" width="390" height="560" viewBox="-40 140 470 675" preserveAspectRatio="xMidYMid slice">%s%s'
          '<rect x="-80" y="0" width="550" height="844" fill="url(#vign)" opacity=".55"/></svg></svg>' % (DEFS, room('after'))
          + '<div class="hud"><button class="rbtn">%s</button><div class="ttl"><small>المنطقة 2</small><b>الصالة</b></div><div class="res">%s<b>3,180</b></div></div>' % (ICON['back'], coin())
          + '<div class="aftertag">بعد ✨</div>'
-         + toolbox(8, 604, 96, 'teal')
          + '<div class="done"><div class="dn-t"><b>اكتملت الصالة!</b><span>انفتح سر جديد في المكتبة 🔑</span></div>'
            '<div class="styles"><span>الطراز:</span><i class="on" style="--c:#2f8f8a">ساحلي</i><i style="--c:#a8693a">كلاسيكي</i><i style="--c:#555">عصري</i></div>'
            '<div class="dn-b"><button class="big blue small2">%s صوّر قبل/بعد</button><button class="big small2">المنطقة التالية</button></div></div>' % ICON['camera'])
@@ -570,14 +568,14 @@ cell = 38
 leg = [(0, 0), (0, 1), (0, 2)]
 wood_scr = ('<div class="pz-bg wood"></div><svg class="bg" viewBox="0 0 390 844">%s'
             '<text x="195" y="186" text-anchor="middle" font-family="Cairo" font-weight="900" font-size="14" fill="#fff" opacity=".9">لوح الجوز · 9 × 5</text>%s'
-            '<g transform="translate(18 470)"><rect width="354" height="96" rx="16" fill="#fffaf0" opacity=".95"/>'
+            '<g transform="translate(18 408)"><rect width="354" height="96" rx="16" fill="#fffaf0" opacity=".95"/>'
             '<text x="336" y="24" text-anchor="start" font-family="Cairo" font-weight="900" font-size="13" fill="#5a3a18">الهدف: طاولة قهوة</text>'
             '<g transform="translate(40 18)"><polygon points="20,30 140,30 160,46 40,46" fill="#c88a52"/><polygon points="40,46 160,46 160,52 40,52" fill="#8a5a32"/><rect x="46" y="52" width="7" height="30" fill="#8a5a32"/><rect x="148" y="52" width="7" height="30" fill="#8a5a32"/><rect x="28" y="36" width="6" height="34" fill="#a8693a"/><rect x="132" y="36" width="6" height="34" fill="#a8693a"/></g>'
             '<text x="336" y="50" text-anchor="start" font-family="Cairo" font-weight="700" font-size="12" fill="#8a5a1a">سطح + 4 أرجل + رف</text><text x="336" y="72" text-anchor="start" font-family="Cairo" font-weight="700" font-size="12" fill="#c44d3a">تجنّب العقدة في الخشب ●</text></g></svg>'
             % (DEFS, board(24, 200, 9, 5, cell, [([(c, r) for c in range(0, 5) for r in range(0, 2)], '#b8743a', 'السطح'), (leg, '#8a5a32', 'رجل'), ([(1, 2), (1, 3), (1, 4)], '#8a5a32', 'رجل')],
                            ghost=([(6, 0), (7, 0), (8, 0), (6, 1), (7, 1), (8, 1)], 'رف'), waste_cells=[(5, 2)]))
             + '<div class="hud"><button class="rbtn">%s</button><div class="ttl"><small>الورشة · النجارة</small><b>خطّط القصّ</b></div><div class="goal"><small>الهدر</small><b class="ltr">7%%</b><div class="mini green"><i style="width:22%%"></i></div></div></div>' % ICON['pause']
-            + '<div class="bot" style="left:290px;top:396px">%s</div>' % saw_svg()
+            + '<div class="hintbar">💡 ابدأ بالقطعة الأكبر، ثم وزّع الأرجل حول العقدة.</div>'
             + '<div class="tray"><div class="pieces">%s%s%s%s</div><div class="actrow"><button class="sq">%s</button><button class="sq">%s</button><button class="big push">قصّ 🪚</button></div></div>'
             % (piece_svg([(0, 0), (1, 0), (2, 0), (0, 1), (1, 1), (2, 1)], '#c88a52', 'رف ×1'), piece_svg([(0, 0), (0, 1), (0, 2)], '#a8693a', 'رجل ×2'),
                piece_svg([(0, 0), (1, 0), (2, 0), (3, 0)], '#d9a46d', 'إطار ×1'), piece_svg([(0, 0), (1, 0), (1, 1)], '#b8743a', 'زاوية ×1'), ICON['rotate'], ICON['undo']))
@@ -621,12 +619,11 @@ garden_scr = ('<div class="pz-bg garden"></div><svg class="bg" viewBox="0 0 390 
               % (DEFS, gx0 - 8, gy0 - 8, G * gcell + 16, G * gcell + 16, ''.join(garden))
               + '<div class="hud"><button class="rbtn">%s</button><div class="ttl"><small>الحديقة · التخطيط</small><b>ازرع بالقواعد</b></div><div class="goal"><small>القواعد</small><b class="ltr">2 / 3</b></div></div>' % ICON['pause']
               + '<div class="rules"><i class="ok">☀️ نباتات الشمس في الشمس ✓</i><i class="bad">🌿 نبات ظل في الشمس ✗</i><i class="ok">💧 كل نبتة يصلها الماء ✓</i></div>'
-              + '<div class="bot" style="left:16px;top:500px">%s</div>' % can_svg()
               + '<div class="tray"><div class="seeds"><div class="sd"><svg width="54" height="48" viewBox="0 0 54 48">%s</svg><b>زهرة شمس</b><span class="cnt">×2</span></div><div class="sd sel"><svg width="54" height="48" viewBox="0 0 54 48">%s</svg><b>سرخس ظل</b><span class="cnt">×1</span></div><div class="sd"><svg width="54" height="48" viewBox="0 0 54 48">%s</svg><b>شجيرة</b><span class="cnt">×1</span></div><div class="sd"><svg width="54" height="48" viewBox="0 0 54 48"><rect x="10" y="10" width="34" height="28" rx="10" fill="#d9c49a" stroke="#b8a070"/></svg><b>حجر ممر</b><span class="cnt">×3</span></div></div><div class="actrow"><button class="sq">%s</button><button class="sq">%s</button><button class="big push">ازرع 🌱</button></div></div>'
               % (plant(27, 26, 'sun'), plant(27, 30, 'shade'), plant(27, 24, 'bush'), ICON['undo'], ICON['bulb']))
 
 # =============== 7. WIN ===============
-win = ('<svg class="bg" viewBox="0 0 390 844"><svg x="0" y="60" width="390" height="640" viewBox="-40 120 470 600" preserveAspectRatio="xMidYMid slice">%s%s</svg></svg>' % (DEFS, room('after'))
+win = ('<svg class="bg" viewBox="0 0 390 844"><rect width="390" height="844" fill="#22343c"/><svg x="0" y="70" width="390" height="560" viewBox="-40 140 470 675" preserveAspectRatio="xMidYMid slice">%s%s</svg></svg>' % (DEFS, room('after'))
        + '<div class="dim"></div><div class="panel"><div class="stars">%s<span class="mid">%s</span>%s</div><div class="ribbon">رائع!</div>'
          '<h3>السجادة عادت كالجديدة</h3><div class="ba"><div class="bai b"><span>قبل</span></div><div class="bai a"><span>بعد</span></div></div>'
          '<div class="chips"><div class="chip">🧪 منظّف واحد متبقٍ</div><div class="chip">✨ بلا سيلان ألوان</div></div>'
@@ -639,7 +636,7 @@ AREAS = [('المدخل', '🚪', 'الأساسيات', 100, 'done'), ('الصا
          ('المكتبة', '📚', 'الكتب · أول سر', 0, 'lock'), ('الورشة', '🪚', 'النجارة · التروس', 0, 'lock'), ('الحديقة', '🌿', 'التخطيط · القصّ', 0, 'lock'),
          ('الفناء الخلفي', '🏊', 'المسبح', 0, 'soon'), ('الجراج', '🚗', 'السيارة القديمة', 0, 'soon')]
 cards = ''.join('<div class="area %s"><div class="ai">%s</div><div class="at"><b>%s</b><small>%s · 20 مهمة</small>%s</div>%s</div>' % (
-    st, emo, n, sub,
+    'fin' if st == 'done' else st, emo, n, sub,
     '<div class="mini"><i style="width:%d%%"></i></div>' % p if st in ('done', 'cur') else ('<span class="lk">%s أكمل المنطقة السابقة</span>' % ICON['lock'] if st == 'lock' else '<span class="lk soon">تحديث قادم</span>'),
     '<span class="ok">✓</span>' if st == 'done' else ('<button class="go">%s</button>' % ICON['play'] if st == 'cur' else '')) for n, emo, sub, p, st in AREAS)
 areas = ('<div class="pz-bg map"></div>' + '<div class="phead"><button class="rbtn">%s</button><h2>مناطق البيت</h2><div class="res">%s<b>38</b></div></div>' % (ICON['back'], star(18))
