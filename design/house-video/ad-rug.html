@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="ar"><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Cairo;src:url(Cairo.ttf)}
+@font-face{font-family:Lalezar;src:url(Lalezar-Regular.ttf)}
+html,body{margin:0;background:#000}
+canvas{display:block}
+</style></head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+// 15 s vertical ad: a mud-covered rug is dusted, de-stained and scrubbed back to life. render(t) draws frame at time t (s).
+const W = 1080, H = 1920, C = document.getElementById('c'), X = C.getContext('2d');
+const RW = 820, RH = 1180, RX = (W - RW) / 2, RY = 330;          // rug rect on the floor
+function rnd(i) { const s = Math.sin(i * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); }
+function mk(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+const ease = (x) => x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x);
+const seg = (t, a, b) => ease((t - a) / (b - a));
+
+// ---------- wooden floor ----------
+const floorC = mk(W, H); (() => {
+  const g = floorC.getContext('2d');
+  const pw = 180;
+  for (let i = 0; i * pw < W + pw; i++) {
+    const base = [[150, 98, 58], [138, 88, 52], [160, 106, 64], [144, 94, 56]][i % 4];
+    g.fillStyle = `rgb(${base})`; g.fillRect(i * pw, 0, pw, H);
+    for (let k = 0; k < 70; k++) {                                   // grain lines
+      const x = i * pw + rnd(i * 97 + k) * pw, a = .05 + rnd(k * 3 + i) * .08;
+      g.strokeStyle = `rgba(60,30,10,${a})`; g.lineWidth = 1 + rnd(k + i * 7) * 2;
+      g.beginPath(); g.moveTo(x, 0);
+      for (let y = 0; y <= H; y += 120) g.lineTo(x + Math.sin(y / 260 + k) * 6, y);
+      g.stroke();
+    }
+    g.fillStyle = 'rgba(40,20,5,.55)'; g.fillRect(i * pw, 0, 3, H);
+    const off = (i * 613) % 900;
+    for (let y = off; y < H; y += 900) { g.fillStyle = 'rgba(40,20,5,.5)'; g.fillRect(i * pw, y, pw, 3); }
+    for (let k = 0; k < 2; k++) {                                    // knots
+      const kx = i * pw + 40 + rnd(i + k * 11) * 100, ky = rnd(i * 5 + k) * H;
+      const rg = g.createRadialGradient(kx, ky, 2, kx, ky, 22);
+      rg.addColorStop(0, 'rgba(70,35,12,.7)'); rg.addColorStop(1, 'rgba(70,35,12,0)');
+      g.fillStyle = rg; g.beginPath(); g.ellipse(kx, ky, 14, 26, 0, 0, 7); g.fill();
+    }
+  }
+  const lg = g.createLinearGradient(0, 0, W, H);
+  lg.addColorStop(0, 'rgba(255,230,180,.22)'); lg.addColorStop(.5, 'rgba(255,230,180,0)'); lg.addColorStop(1, 'rgba(0,0,0,.25)');
+  g.fillStyle = lg; g.fillRect(0, 0, W, H);
+})();
+
+// ---------- clean rug (geometric, neutral) ----------
+const COL = { red: '#9e2f27', red2: '#c2463a', cream: '#efe0c0', navy: '#1f3b5a', teal: '#2c7c80', gold: '#d9a23c', ink: '#3a2418' };
+const rugC = mk(RW, RH); (() => {
+  const g = rugC.getContext('2d');
+  const dia = (cx, cy, rx, ry, f) => { g.fillStyle = f; g.beginPath(); g.moveTo(cx, cy - ry); g.lineTo(cx + rx, cy); g.lineTo(cx, cy + ry); g.lineTo(cx - rx, cy); g.closePath(); g.fill(); };
+  g.fillStyle = COL.red; g.fillRect(0, 0, RW, RH);
+  // outer border band with diamond chain
+  const b = 70;
+  g.fillStyle = COL.navy; g.fillRect(14, 14, RW - 28, RH - 28);
+  g.fillStyle = COL.red; g.fillRect(14 + b, 14 + b, RW - 28 - 2 * b, RH - 28 - 2 * b);
+  for (let x = 14 + 35; x < RW - 14; x += 70) { dia(x, 14 + b / 2, 26, 26, COL.gold); dia(x, 14 + b / 2, 13, 13, COL.red2); dia(x, RH - 14 - b / 2, 26, 26, COL.gold); dia(x, RH - 14 - b / 2, 13, 13, COL.red2); }
+  for (let y = 14 + 35 + 70; y < RH - 14 - 70; y += 70) { dia(14 + b / 2, y, 26, 26, COL.gold); dia(14 + b / 2, y, 13, 13, COL.red2); dia(RW - 14 - b / 2, y, 26, 26, COL.gold); dia(RW - 14 - b / 2, y, 13, 13, COL.red2); }
+  // thin guard stripes
+  [[14 + b + 6, COL.cream], [14 + b + 16, COL.teal]].forEach(([o, c]) => { g.strokeStyle = c; g.lineWidth = 6; g.strokeRect(o, o, RW - 2 * o, RH - 2 * o); });
+  // field
+  const fx = 14 + b + 26, fy = fx, fw = RW - 2 * fx, fh = RH - 2 * fy;
+  g.fillStyle = COL.cream; g.fillRect(fx, fy, fw, fh);
+  for (let y = fy + 40; y < fy + fh; y += 80) for (let x = fx + 40 + ((y - fy) / 80 % 2) * 40; x < fx + fw; x += 80) { dia(x, y, 12, 12, COL.teal); dia(x, y, 5, 5, COL.gold); }
+  // central medallion
+  const cx = RW / 2, cy = RH / 2;
+  [[300, 420, COL.navy], [270, 380, COL.gold], [240, 340, COL.red], [190, 270, COL.cream], [150, 210, COL.teal], [104, 146, COL.gold], [70, 98, COL.red2], [36, 50, COL.cream]].forEach(([rx, ry, c]) => dia(cx, cy, rx, ry, c));
+  for (const [dx, dy] of [[0, -300], [0, 300], [-210, 0], [210, 0]]) { dia(cx + dx * 1.0, cy + dy * 1.0, 26, 36, COL.navy); dia(cx + dx, cy + dy, 12, 18, COL.gold); }
+  // corner quarter medallions
+  for (const [qx, qy] of [[fx, fy], [fx + fw, fy], [fx, fy + fh], [fx + fw, fy + fh]]) {
+    g.save(); g.beginPath(); g.rect(fx, fy, fw, fh); g.clip();
+    [[150, 150, COL.navy], [116, 116, COL.gold], [84, 84, COL.red], [46, 46, COL.cream]].forEach(([rx, ry, c]) => dia(qx, qy, rx, ry, c));
+    g.restore();
+  }
+  // weave texture
+  const id = g.getImageData(0, 0, RW, RH), d = id.data;
+  for (let y = 0; y < RH; y++) for (let x = 0; x < RW; x++) {
+    const i = (y * RW + x) * 4, n = (rnd(x * 1.3 + y * 7.1) - .5) * 26 + ((y % 4 < 2) ? 6 : -6) + ((x % 6 < 3) ? 3 : -3);
+    d[i] = Math.max(0, Math.min(255, d[i] + n)); d[i + 1] = Math.max(0, Math.min(255, d[i + 1] + n)); d[i + 2] = Math.max(0, Math.min(255, d[i + 2] + n));
+  }
+  g.putImageData(id, 0, 0);
+  const sh = g.createLinearGradient(0, 0, RW, RH); sh.addColorStop(0, 'rgba(255,255,255,.10)'); sh.addColorStop(1, 'rgba(0,0,0,.12)');
+  g.fillStyle = sh; g.fillRect(0, 0, RW, RH);
+})();
+
+// ---------- dirt layers ----------
+function blob(g, x, y, r, col, seed, n = 14) {
+  g.fillStyle = col; g.beginPath();
+  for (let k = 0; k <= n; k++) { const a = k / n * Math.PI * 2, rr = r * (.72 + rnd(seed + k) * .5); const px = x + Math.cos(a) * rr, py = y + Math.sin(a) * rr * .86; k ? g.lineTo(px, py) : g.moveTo(px, py); }
+  g.closePath(); g.fill();
+}
+const mudC = mk(RW, RH); (() => {
+  const g = mudC.getContext('2d');
+  g.fillStyle = 'rgba(92,64,38,.80)'; g.fillRect(0, 0, RW, RH);
+  for (let k = 0; k < 160; k++) { const x = rnd(k) * RW, y = rnd(k + 500) * RH, r = 30 + rnd(k + 900) * 120;
+    const rg = g.createRadialGradient(x, y, 0, x, y, r); const dark = rnd(k + 77) > .5;
+    rg.addColorStop(0, dark ? 'rgba(52,34,18,.55)' : 'rgba(140,110,72,.35)'); rg.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = rg; g.fillRect(x - r, y - r, 2 * r, 2 * r); }
+  const id = g.getImageData(0, 0, RW, RH), d = id.data;
+  for (let i = 0; i < d.length; i += 4) { const n = (rnd(i * .37) - .5) * 40; d[i] += n; d[i + 1] += n; d[i + 2] += n * .7; }
+  g.putImageData(id, 0, 0);
+  for (let k = 0; k < 40; k++) blob(g, rnd(k + 33) * RW, rnd(k + 66) * RH, 14 + rnd(k + 99) * 30, 'rgba(48,30,14,.5)', k * 13);
+})();
+const dustC = mk(RW, RH); (() => {
+  const g = dustC.getContext('2d');
+  g.fillStyle = 'rgba(178,170,155,.55)'; g.fillRect(0, 0, RW, RH);
+  for (let k = 0; k < 900; k++) { g.fillStyle = `rgba(${200 + rnd(k) * 40},${195 + rnd(k + 1) * 40},${180 + rnd(k + 2) * 40},${.15 + rnd(k + 3) * .3})`; g.fillRect(rnd(k + 4) * RW, rnd(k + 5) * RH, 2 + rnd(k + 6) * 5, 2 + rnd(k + 7) * 5); }
+  for (let k = 0; k < 18; k++) { g.strokeStyle = 'rgba(220,214,200,.35)'; g.lineWidth = 1; g.beginPath(); const x = rnd(k + 200) * RW, y = rnd(k + 300) * RH; g.moveTo(x, y); g.lineTo(x + 60 - rnd(k) * 120, y + 60 - rnd(k + 1) * 120); g.stroke(); }
+})();
+const STAINS = [
+  { name: 'حبر', x: 250, y: 330, r: 70, col: 'rgba(28,36,92,.9)', seed: 1, cleaner: 'منظّف الحبر', bc: '#8c5cff', t0: 2.7 },
+  { name: 'قهوة', x: 590, y: 820, r: 85, col: 'rgba(70,36,14,.85)', seed: 7, cleaner: 'صابون لطيف', bc: '#ffb84d', t0: 3.9 },
+];
+function stainLayer(s) {
+  const c = mk(RW, RH), g = c.getContext('2d');
+  blob(g, s.x, s.y, s.r, s.col, s.seed, 18);
+  for (let k = 0; k < 9; k++) { const a = rnd(s.seed * 9 + k) * 6.28, d = s.r * (1.1 + rnd(k + s.seed) * .7); blob(g, s.x + Math.cos(a) * d, s.y + Math.sin(a) * d, 6 + rnd(k * 3 + s.seed) * 16, s.col, k + s.seed * 31, 8); }
+  if (s.name === 'قهوة') { g.strokeStyle = 'rgba(50,24,8,.9)'; g.lineWidth = 9; g.beginPath(); g.ellipse(s.x, s.y, s.r * .92, s.r * .8, .2, 0, 7); g.stroke(); }
+  return c;
+}
+STAINS.forEach(s => s.c = stainLayer(s));
+
+// ---------- scrub path (zig-zag rows over the rug) ----------
+const PATH = []; (() => {
+  const rows = 9, m = 40;
+  for (let r = 0; r < rows; r++) {
+    const y = m + (RH - 2 * m) * (r + .5) / rows, lr = r % 2 === 0;
+    const xs = lr ? [m, RW - m] : [RW - m, m];
+    for (let k = 0; k <= 30; k++) { const x = xs[0] + (xs[1] - xs[0]) * k / 30; PATH.push([x, y + Math.sin(k * .9) * 34]); }
+  }
+})();
+const DUSTPATH = []; for (let k = 0; k <= 60; k++) { const a = k / 60; DUSTPATH.push([RW * (.1 + .8 * a), RH * (.15 + .7 * ((k % 12) / 12))]); }
+function strokeUpTo(g, path, p, w) {
+  const n = Math.floor(p * (path.length - 1)); if (n < 1) return;
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  for (const [lw, a] of [[w * 1.25, .25], [w * 1.1, .45], [w, 1]]) {
+    g.globalAlpha = a; g.lineWidth = lw; g.beginPath(); g.moveTo(...path[0]);
+    for (let i = 1; i <= n; i++) g.lineTo(...path[i]);
+    g.stroke();
+  }
+  g.globalAlpha = 1;
+}
+function pointAt(path, p) { const f = p * (path.length - 1), i = Math.min(path.length - 2, Math.floor(f)), u = f - i; return [path[i][0] + (path[i + 1][0] - path[i][0]) * u, path[i][1] + (path[i + 1][1] - path[i][1]) * u]; }
+
+// ---------- timeline ----------
+const T = { dust: [1.0, 2.5], scrub: [5.2, 10.0], rinse: [10.0, 11.0], split: [11.4, 13.2], end: [13.2, 15] };
+const work = mk(RW, RH), wg = work.getContext('2d');
+function dirtyComposite(t, full) {
+  wg.globalCompositeOperation = 'source-over'; wg.clearRect(0, 0, RW, RH);
+  wg.drawImage(mudC, 0, 0);
+  STAINS.forEach(s => { const a = full ? 1 : 1 - seg(t, s.t0 + .5, s.t0 + 1.1); if (a > 0) { wg.globalAlpha = a; wg.drawImage(s.c, 0, 0); wg.globalAlpha = 1; } });
+  if (!full) { wg.globalCompositeOperation = 'destination-out'; wg.strokeStyle = '#000'; strokeUpTo(wg, PATH, seg(t, ...T.scrub), 150); }
+  // dust on top, brushed away first
+  wg.globalCompositeOperation = 'source-over';
+  const dustA = full ? 1 : 1 - seg(t, T.dust[0], T.dust[1]);
+  if (dustA > 0) { wg.globalAlpha = dustA; wg.drawImage(dustC, 0, 0); wg.globalAlpha = 1; }
+}
+
+// ---------- props ----------
+function sponge(x, y, rot) {
+  X.save(); X.translate(x, y); X.rotate(rot);
+  X.shadowColor = 'rgba(0,0,0,.4)'; X.shadowBlur = 30; X.shadowOffsetY = 18;
+  rr(-95, -60, 190, 90, 26, '#ffd23f'); X.shadowColor = 'transparent';
+  rr(-95, 20, 190, 34, 16, '#2f9b6a');
+  X.fillStyle = 'rgba(200,140,0,.55)'; for (let k = 0; k < 16; k++) { X.beginPath(); X.arc(-80 + rnd(k) * 160, -48 + rnd(k + 9) * 60, 3 + rnd(k + 3) * 5, 0, 7); X.fill(); }
+  X.fillStyle = 'rgba(255,255,255,.45)'; rr(-80, -52, 90, 14, 7);
+  X.restore();
+}
+function rr(x, y, w, h, r, f) { if (f) X.fillStyle = f; X.beginPath(); X.roundRect(x, y, w, h, r); X.fill(); }
+function bottle(x, y, col, label, sel, s = 1, tilt = 0) {
+  X.save(); X.translate(x, y); X.rotate(tilt); X.scale(s, s);
+  X.shadowColor = 'rgba(0,0,0,.35)'; X.shadowBlur = 20; X.shadowOffsetY = 10;
+  rr(-34, -40, 68, 120, 22, col); X.shadowColor = 'transparent';
+  rr(-14, -70, 28, 32, 6, '#33414f'); rr(-6, -86, 40, 18, 5, '#33414f');
+  rr(-24, -6, 48, 46, 10, 'rgba(255,255,255,.92)');
+  X.fillStyle = 'rgba(255,255,255,.35)'; rr(-28, -30, 12, 90, 6);
+  X.restore();
+  if (label) { X.save(); X.font = '900 30px Cairo'; X.textAlign = 'center'; X.fillStyle = sel ? '#fff' : '#3b2a14'; X.direction = 'rtl'; X.fillText(label, x, y + 130 * s); X.restore(); }
+}
+function brush(x, y, rot) {
+  X.save(); X.translate(x, y); X.rotate(rot);
+  X.shadowColor = 'rgba(0,0,0,.4)'; X.shadowBlur = 24; X.shadowOffsetY = 14;
+  rr(-110, -34, 220, 52, 18, '#8a5a32'); X.shadowColor = 'transparent';
+  X.fillStyle = '#e7c27a'; for (let k = -100; k <= 100; k += 8) X.fillRect(k, 16, 5, 34);
+  rr(-30, -110, 60, 80, 18, '#c0392b'); X.fillStyle = 'rgba(255,255,255,.3)'; rr(-90, -28, 120, 10, 5);
+  X.restore();
+}
+function bubbles(cx, cy, t, n, spread, seed) {
+  for (let k = 0; k < n; k++) {
+    const life = (t * 1.6 + rnd(seed + k)) % 1, r = (8 + rnd(seed + k * 3) * 22) * (0.6 + life * .6);
+    const x = cx + (rnd(seed + k * 7) - .5) * spread, y = cy + (rnd(seed + k * 11) - .5) * spread * .7 - life * 30;
+    X.globalAlpha = (1 - life) * .9;
+    X.fillStyle = 'rgba(245,252,255,.75)'; X.beginPath(); X.arc(x, y, r, 0, 7); X.fill();
+    X.strokeStyle = 'rgba(160,210,235,.9)'; X.lineWidth = 2; X.stroke();
+    X.fillStyle = '#fff'; X.beginPath(); X.arc(x - r * .35, y - r * .35, r * .25, 0, 7); X.fill();
+  }
+  X.globalAlpha = 1;
+}
+function sparkle(x, y, s, a) {
+  X.save(); X.translate(x, y); X.globalAlpha = a; X.fillStyle = '#fff';
+  X.shadowColor = '#fff6c0'; X.shadowBlur = 30;
+  X.beginPath(); X.moveTo(0, -s); X.quadraticCurveTo(s * .12, -s * .12, s, 0); X.quadraticCurveTo(s * .12, s * .12, 0, s); X.quadraticCurveTo(-s * .12, s * .12, -s, 0); X.quadraticCurveTo(-s * .12, -s * .12, 0, -s); X.fill();
+  X.restore();
+}
+
+// ---------- text helpers ----------
+function pill(text, y, a, size = 64, bg = 'rgba(14,28,34,.82)', fg = '#fff', font = 'Lalezar') {
+  if (a <= 0) return;
+  X.save(); X.globalAlpha = a; X.font = `${size}px ${font}`; X.direction = 'rtl'; X.textAlign = 'center';
+  const w = X.measureText(text).width + 90, h = size * 1.55;
+  const yy = y + (1 - a) * 30;
+  X.shadowColor = 'rgba(0,0,0,.35)'; X.shadowBlur = 30; X.shadowOffsetY = 10;
+  rr(W / 2 - w / 2, yy - h / 2, w, h, h / 2, bg); X.shadowColor = 'transparent';
+  X.fillStyle = fg; X.textBaseline = 'middle'; X.fillText(text, W / 2, yy + size * .06);
+  X.restore();
+}
+
+// ---------- main render ----------
+function render(t) {
+  X.setTransform(1, 0, 0, 1, 0, 0); X.globalAlpha = 1; X.globalCompositeOperation = 'source-over';
+  const endA = seg(t, T.end[0], T.end[0] + .5);
+  // camera: slow push-in, then settle
+  const z = 1.10 - .10 * seg(t, 0, 2.2) + .03 * seg(t, T.rinse[0], T.rinse[1]) - .03 * seg(t, T.split[0], T.split[0] + .5);
+  X.save(); X.translate(W / 2, H / 2 + 40); X.scale(z, z); X.translate(-W / 2, -H / 2 - 40);
+  X.drawImage(floorC, 0, 0);
+  // rug shadow & fringes
+  X.save(); X.shadowColor = 'rgba(30,12,2,.55)'; X.shadowBlur = 50; X.shadowOffsetY = 26; X.fillStyle = '#000'; X.fillRect(RX, RY, RW, RH); X.restore();
+  const clean = seg(t, T.scrub[0], T.scrub[1]);
+  const fr = (yy) => { for (let x = RX + 8; x < RX + RW - 8; x += 9) { X.strokeStyle = clean > .95 || t > T.split[0] ? '#efe0c0' : '#8a7458'; X.lineWidth = 4; X.beginPath(); X.moveTo(x, yy); X.lineTo(x + Math.sin(x) * 3, yy + (yy < RY ? -34 : 34)); X.stroke(); } };
+  fr(RY); fr(RY + RH);
+
+  if (t < T.split[0]) {
+    X.drawImage(rugC, RX, RY);
+    dirtyComposite(t, false); X.drawImage(work, RX, RY);
+  } else {
+    // before / after split
+    const sx = RX + RW * (1 - .5 * seg(t, T.split[0], T.split[0] + .7) - .25 * Math.sin(seg(t, T.split[0] + .7, T.split[1]) * Math.PI));
+    X.drawImage(rugC, RX, RY);
+    dirtyComposite(t, true);
+    X.save(); X.beginPath(); X.rect(RX - 10, RY - 60, sx - RX + 10, RH + 120); X.clip(); X.drawImage(work, RX, RY); X.restore();
+    X.fillStyle = '#fff'; X.fillRect(sx - 4, RY - 40, 8, RH + 80);
+    X.beginPath(); X.arc(sx, RY + RH / 2, 46, 0, 7); X.fill();
+    X.fillStyle = '#0d8a83'; X.font = '900 40px Cairo'; X.textAlign = 'center'; X.textBaseline = 'middle'; X.fillText('⇆', sx, RY + RH / 2 + 2);
+  }
+
+  // dust brush
+  if (t > T.dust[0] - .3 && t < T.dust[1] + .3) {
+    const p = seg(t, T.dust[0], T.dust[1]); const [px, py] = pointAt(DUSTPATH, p);
+    X.globalAlpha = Math.min(seg(t, T.dust[0] - .3, T.dust[0]), 1 - seg(t, T.dust[1], T.dust[1] + .3));
+    for (let k = 0; k < 26; k++) { const a = rnd(k + Math.floor(t * 30)); X.fillStyle = `rgba(210,204,190,${.5 * (1 - a)})`; X.beginPath(); X.arc(RX + px + (rnd(k * 3 + t) - .5) * 220, RY + py - 60 - a * 120, 4 + a * 10, 0, 7); X.fill(); }
+    X.globalAlpha = 1; brush(RX + px, RY + py, Math.sin(t * 9) * .12);
+  }
+  // stain treatment: spray + foam + dissolve
+  STAINS.forEach((s, i) => {
+    const a = Math.min(seg(t, s.t0 - .2, s.t0), 1 - seg(t, s.t0 + 1.1, s.t0 + 1.3));
+    if (a <= 0) return;
+    const bx = RX + s.x + 170, by = RY + s.y - 160;
+    X.globalAlpha = a;
+    const sp = seg(t, s.t0 + .1, s.t0 + .6);
+    for (let k = 0; k < 40; k++) { const u = (rnd(k) + t * 2) % 1; X.fillStyle = `rgba(200,235,255,${(1 - u) * .8 * (sp > 0 && sp < 1 ? 1 : .2)})`; X.beginPath(); X.arc(bx - 60 - u * 120 + (rnd(k + 5) - .5) * 40 * u, by + 40 + u * 120 + (rnd(k + 9) - .5) * 60 * u, 3 + rnd(k + 2) * 4, 0, 7); X.fill(); }
+    bottle(bx, by, s.bc, null, true, 1.15, -0.5);
+    bubbles(RX + s.x, RY + s.y, t, 26, s.r * 2.2, i * 50 + 3);
+    X.globalAlpha = 1;
+  });
+  // scrub sponge + foam trail
+  if (t > T.scrub[0] - .3 && t < T.scrub[1] + .2) {
+    const p = seg(t, T.scrub[0], T.scrub[1]), [px, py] = pointAt(PATH, p);
+    for (let j = 1; j <= 6; j++) { const [qx, qy] = pointAt(PATH, Math.max(0, p - j * .012)); bubbles(RX + qx, RY + qy, t + j * .17, 6, 150, j * 17); }
+    X.globalAlpha = Math.min(1, seg(t, T.scrub[0] - .3, T.scrub[0]) * 1, 1 - seg(t, T.scrub[1], T.scrub[1] + .2));
+    sponge(RX + px, RY + py, Math.sin(t * 14) * .22); X.globalAlpha = 1;
+  }
+  // rinse sheen + sparkles
+  if (t > T.rinse[0] && t < T.split[0] + .2) {
+    const p = seg(t, T.rinse[0], T.rinse[0] + .8), sy = RY - 200 + p * (RH + 400);
+    const lg = X.createLinearGradient(0, sy - 200, 0, sy + 200);
+    lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(.5, 'rgba(255,255,255,.55)'); lg.addColorStop(1, 'rgba(255,255,255,0)');
+    X.save(); X.beginPath(); X.rect(RX, RY, RW, RH); X.clip(); X.fillStyle = lg; X.fillRect(RX, sy - 200, RW, 400); X.restore();
+    for (let k = 0; k < 14; k++) { const ph = seg(t, T.rinse[0] + .3 + k * .04, T.rinse[0] + .7 + k * .04); sparkle(RX + rnd(k + 40) * RW, RY + rnd(k + 80) * RH, 26 + rnd(k) * 30, Math.sin(ph * Math.PI)); }
+  }
+  X.restore();
+
+  // ---------- overlays ----------
+  pill('سجادة مهجورة منذ سنوات…', 190, Math.min(seg(t, .15, .6), 1 - seg(t, 2.3, 2.6)), 66);
+  pill('هل تعرف المنظّف الصحيح؟ 🧪', 190, Math.min(seg(t, 2.6, 2.9), 1 - seg(t, 5.0, 5.3)), 62);
+  pill('افرك… واكتشف ألوانها ✨', 190, Math.min(seg(t, 5.3, 5.6), 1 - seg(t, 10.0, 10.3)), 62);
+  pill('عادت كالجديدة!', 190, Math.min(seg(t, 10.3, 10.6), 1 - seg(t, T.split[1] - .2, T.split[1])), 76, '#14a39b', '#fff');
+  // cleaner tray during stain phase
+  const tray = Math.min(seg(t, 2.6, 2.9), 1 - seg(t, 5.0, 5.3));
+  if (tray > 0) {
+    X.save(); X.globalAlpha = tray; X.translate(0, (1 - tray) * 200);
+    X.shadowColor = 'rgba(0,0,0,.4)'; X.shadowBlur = 40; rr(40, 1560, W - 80, 300, 48, 'rgba(255,250,240,.96)'); X.shadowColor = 'transparent';
+    const B = [['#4dc3ff', 'ماء دافئ'], ['#ffb84d', 'صابون لطيف'], ['#8c5cff', 'منظّف الحبر'], ['#5fe08a', 'بيكربونات']];
+    const active = t < 3.9 ? 2 : 1;
+    B.forEach(([c, l], i) => { const x = W - 170 - i * 245; if (i === active) { X.fillStyle = 'rgba(20,163,155,.18)'; rr(x - 105, 1585, 210, 250, 30); X.strokeStyle = '#14a39b'; X.lineWidth = 6; X.beginPath(); X.roundRect(x - 105, 1585, 210, 250, 30); X.stroke(); } bottle(x, 1680, c, l, false, 1, 0); });
+    X.restore();
+  }
+  // progress bar during scrub
+  const pa = Math.min(seg(t, 5.3, 5.6), 1 - seg(t, 10.6, 10.9));
+  if (pa > 0) {
+    const pct = Math.round(100 * seg(t, T.scrub[0], T.scrub[1]));
+    X.save(); X.globalAlpha = pa; rr(140, 1700, W - 280, 90, 45, 'rgba(14,28,34,.82)');
+    const g = X.createLinearGradient(160, 0, W - 160, 0); g.addColorStop(0, '#3fe0d0'); g.addColorStop(1, '#14a39b');
+    rr(160, 1720, (W - 320) * pct / 100 + 1, 50, 25, g);
+    X.font = '900 40px Cairo'; X.fillStyle = '#fff'; X.textAlign = 'center'; X.textBaseline = 'middle'; X.fillText(pct + '%', W / 2, 1747);
+    X.restore();
+  }
+  // before/after labels
+  const la = Math.min(seg(t, T.split[0] + .3, T.split[0] + .6), 1 - seg(t, T.split[1] - .2, T.split[1]));
+  if (la > 0) { X.save(); X.globalAlpha = la; X.font = '64px Lalezar'; X.textBaseline = 'middle'; X.textAlign = 'center';
+    rr(120, 1640, 300, 110, 55, 'rgba(14,28,34,.85)'); X.fillStyle = '#fff'; X.fillText('قبل', 270, 1700);
+    rr(W - 420, 1640, 300, 110, 55, '#14a39b'); X.fillStyle = '#fff'; X.fillText('بعد', W - 270, 1700); X.restore(); }
+
+  // ---------- end card ----------
+  if (endA > 0) {
+    X.save(); X.globalAlpha = endA;
+    const bg = X.createRadialGradient(W / 2, 760, 50, W / 2, 900, 1300); bg.addColorStop(0, '#1f6f78'); bg.addColorStop(1, '#0b2a33');
+    X.fillStyle = bg; X.fillRect(0, 0, W, H);
+    for (let k = 0; k < 40; k++) { X.fillStyle = `rgba(255,236,170,${.08 + rnd(k) * .2})`; X.beginPath(); X.arc(rnd(k + 1) * W, rnd(k + 2) * H, 2 + rnd(k + 3) * 5, 0, 7); X.fill(); }
+    const s = .42 + .03 * seg(t, T.end[0], T.end[1]);
+    X.save(); X.translate(W / 2, 640); X.rotate(-.06); X.shadowColor = 'rgba(0,0,0,.5)'; X.shadowBlur = 50; X.shadowOffsetY = 24; X.drawImage(rugC, -RW * s / 2, -RH * s / 2, RW * s, RH * s); X.restore();
+    X.textAlign = 'center'; X.direction = 'rtl'; X.textBaseline = 'alphabetic';
+    X.font = '150px Lalezar'; X.fillStyle = '#ffffff'; X.shadowColor = 'rgba(0,0,0,.4)'; X.shadowBlur = 20; X.shadowOffsetY = 8; X.fillText('البيت', W / 2, 1110);
+    const tg = X.createLinearGradient(0, 1120, 0, 1300); tg.addColorStop(0, '#fff6c9'); tg.addColorStop(.55, '#ffc72c'); tg.addColorStop(1, '#f29a00');
+    X.font = '190px Lalezar'; X.fillStyle = tg; X.fillText('المهجور', W / 2, 1290);
+    X.shadowColor = 'transparent';
+    X.font = '800 50px Cairo'; X.fillStyle = '#d8f1ec'; X.fillText('رمّم · اكتشف · أضِئ', W / 2, 1400);
+    rr(W / 2 - 330, 1520, 660, 130, 65, '#ef5a1f'); X.font = '64px Lalezar'; X.fillStyle = '#fff'; X.textBaseline = 'middle'; X.fillText('قريباً على Google Play', W / 2, 1588);
+    X.font = '700 30px Cairo'; X.fillStyle = 'rgba(216,241,236,.7)'; X.fillText('اسم مؤقت · لقطات من اللعبة', W / 2, 1760);
+    X.restore();
+  }
+}
+window.render = render;
+window.ready = Promise.all([document.fonts.load('64px Lalezar'), document.fonts.load('900 30px Cairo'), document.fonts.load('800 50px Cairo'), document.fonts.load('700 30px Cairo')]).then(() => { render(0); return true; });
+</script>
+</body></html>
