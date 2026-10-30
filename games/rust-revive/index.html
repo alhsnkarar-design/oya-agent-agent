@@ -149,6 +149,66 @@ function carBody(c, opts = {}) {
 }
 function exteriorArt(c, opts) { garage(c); c.fillStyle = 'rgba(0,0,0,0.45)'; c.beginPath(); c.ellipse(270, 452, 262, 16, 0, 0, 7); c.fill(); inCar(c, () => carBody(c, opts)); }
 
+// ===== material textures, generated once and tiled as patterns =====
+const TEXC = {};
+function tex(key) {
+  if (TEXC[key]) return TEXC[key];
+  const S = 128, c = mk(S, S), x = c.getContext('2d'), img = x.createImageData(S, S), d = img.data;
+  const [kind, base, alt] = key.split('|');
+  const b = hex(base), a2 = alt ? hex(alt) : b;
+  for (let y = 0; y < S; y++) for (let xx = 0; xx < S; xx++) {
+    const i = (y * S + xx) * 4; let k = 1, mix = 0;
+    if (kind === 'leather') { k = 0.9 + 0.16 * fbm(xx / 7, y / 7, 3, 3) + (vnoise(xx / 1.6, y / 1.6, 9) > 0.85 ? -0.03 : 0); }
+    else if (kind === 'fabric') { k = 0.9 + ((xx % 4 < 2) ^ (y % 4 < 2) ? 0.08 : -0.04) + 0.06 * vnoise(xx / 3, y / 3, 5); }
+    else if (kind === 'wood') { const gr = Math.sin(y / 1.8 + fbm(xx / 50, y / 14, 7, 3) * 3.5); k = 0.9 + 0.09 * gr + 0.05 * vnoise(xx / 2, y / 1.2, 8); }
+    else if (kind === 'brushed') { k = 0.9 + 0.12 * vnoise(xx / 60, y / 0.9, 11) + 0.04 * vnoise(xx, y, 12); }
+    else if (kind === 'carpet') { k = 0.82 + 0.3 * vnoise(xx / 1.3, y / 1.3, 13) * vnoise(xx / 5, y / 5, 14); }
+    else if (kind === 'plate') { const cx = (xx % 32) - 16, cy = (y % 32) - 16, u = (cx + cy) / 1.41, v = (cx - cy) / 1.41, cx2 = ((xx + 16) % 32) - 16, cy2 = ((y + 16) % 32) - 16, u2 = (cx2 - cy2) / 1.41, v2 = (cx2 + cy2) / 1.41; const bump = (u * u / 60 + v * v / 4 < 1) || (u2 * u2 / 60 + v2 * v2 / 4 < 1); k = bump ? 1.18 : 0.92 + 0.05 * vnoise(xx / 3, y / 3, 15); }
+    else if (kind === 'granite') { const n = vnoise(xx / 1.5, y / 1.5, 16); k = n > 0.86 ? 0.55 : n < 0.12 ? 1.25 : 0.95 + 0.1 * fbm(xx / 10, y / 10, 17, 2); }
+    else if (kind === 'tile') { const tx = xx % 32, ty = y % 16; if (tx < 2 || ty < 2) mix = 1; k = 0.96 + 0.06 * fbm(xx / 20, y / 10, 18, 2) + (ty < 5 ? 0.05 : 0); }
+    else if (kind === 'hex') { const gx = xx % 16, gy = y % 16; if (gx < 1 || gy < 1 || Math.abs(gx - gy) < 1) mix = 1; k = 0.95 + 0.05 * vnoise(xx / 4, y / 4, 19); }
+    else if (kind === 'paint') { k = 0.96 + 0.06 * fbm(xx / 18, y / 18, 20, 3); }
+    else if (kind === 'rubber') { k = 0.85 + 0.2 * vnoise(xx / 2, y / 2, 21); }
+    const col = mix ? a2 : b;
+    d[i] = Math.min(255, col[0] * k); d[i + 1] = Math.min(255, col[1] * k); d[i + 2] = Math.min(255, col[2] * k); d[i + 3] = 255;
+  }
+  x.putImageData(img, 0, 0); TEXC[key] = c; return c;
+}
+const P = (c, key) => c.createPattern(tex(key), 'repeat');
+// a filled shape with material, soft top light and a dark lower edge so it reads as a solid object
+function solid(c, path, key, light = 0.22, dark = 0.3) {
+  c.save(); c.fillStyle = P(c, key); c.fill(path); c.clip(path);
+  const bb = path.__bb || [0, -400, 0, 400];
+  const gr = c.createLinearGradient(0, bb[1], 0, bb[3]); gr.addColorStop(0, `rgba(255,255,255,${light})`); gr.addColorStop(0.45, 'rgba(255,255,255,0)'); gr.addColorStop(1, `rgba(0,0,0,${dark})`);
+  c.fillStyle = gr; c.fill(path); c.restore();
+}
+function rrp(x, y, w, h, r) { const p = rectP(x, y, w, h, r); p.__bb = [x, y, x + w, y + h]; return p; }
+function cp(x, y, r) { const p = circ(x, y, r); p.__bb = [x - r, y - r, x + r, y + r]; return p; }
+function chromeGrad(c, x0, y0, x1, y1) { const g2 = c.createLinearGradient(x0, y0, x1, y1); g2.addColorStop(0, '#f6f8fa'); g2.addColorStop(0.35, '#aeb8c1'); g2.addColorStop(0.55, '#eef2f5'); g2.addColorStop(1, '#6b7680'); return g2; }
+function bolt(c, x, y, r = 3) { c.fillStyle = chromeGrad(c, x - r, y - r, x + r, y + r); c.beginPath(); c.arc(x, y, r, 0, 7); c.fill(); c.strokeStyle = 'rgba(0,0,0,0.35)'; c.lineWidth = 0.8; c.stroke(); c.beginPath(); c.moveTo(x - r * 0.6, y); c.lineTo(x + r * 0.6, y); c.stroke(); }
+function gaugeFace(c, x, y, r, kind = 'needle', ang = -0.6) {
+  c.fillStyle = '#111316'; c.beginPath(); c.arc(x, y, r + 2, 0, 7); c.fill();
+  c.strokeStyle = chromeGrad(c, x - r, y - r, x + r, y + r); c.lineWidth = 2; c.beginPath(); c.arc(x, y, r + 1.5, 0, 7); c.stroke();
+  if (kind === 'attitude') { c.save(); c.beginPath(); c.arc(x, y, r, 0, 7); c.clip(); c.fillStyle = '#3f86d8'; c.fillRect(x - r, y - r, 2 * r, r + 2); c.fillStyle = '#8a5a30'; c.fillRect(x - r, y + 2, 2 * r, r); c.strokeStyle = '#fff'; c.lineWidth = 1; c.beginPath(); c.moveTo(x - r, y + 2); c.lineTo(x + r, y + 2); c.stroke(); c.restore(); c.strokeStyle = '#f2b233'; c.lineWidth = 2; c.beginPath(); c.moveTo(x - r * 0.6, y); c.lineTo(x - r * 0.2, y); c.moveTo(x + r * 0.2, y); c.lineTo(x + r * 0.6, y); c.stroke(); return; }
+  if (kind === 'arc') { c.lineWidth = 2.5; [['#46d6b4', 2.5, 4.2], ['#f2b233', 4.2, 5.0], ['#ff5a4e', 5.0, 5.3]].forEach(([col, a0, a1]) => { c.strokeStyle = col; c.beginPath(); c.arc(x, y, r * 0.8, a0, a1); c.stroke(); }); }
+  c.strokeStyle = 'rgba(255,255,255,0.75)'; c.lineWidth = 1; for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2; c.beginPath(); c.moveTo(x + Math.cos(a) * r * 0.82, y + Math.sin(a) * r * 0.82); c.lineTo(x + Math.cos(a) * r * 0.95, y + Math.sin(a) * r * 0.95); c.stroke(); }
+  c.strokeStyle = '#fff'; c.lineWidth = 1.6; c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(ang) * r * 0.75, y + Math.sin(ang) * r * 0.75); c.stroke();
+  if (kind === 'double') { c.strokeStyle = '#f2b233'; c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(ang + 2) * r * 0.5, y + Math.sin(ang + 2) * r * 0.5); c.stroke(); }
+  c.fillStyle = '#c9d1d8'; c.beginPath(); c.arc(x, y, 1.6, 0, 7); c.fill();
+  c.fillStyle = 'rgba(255,255,255,0.12)'; c.beginPath(); c.ellipse(x - r * 0.3, y - r * 0.4, r * 0.5, r * 0.25, -0.5, 0, 7); c.fill();
+}
+function seatSide(c, backX, baseX, baseW, top = -74, col = '#efe3c8', alt = '#c9b48e') {
+  // backrest and cushion seen from the side: piped edges, tuck-and-roll pleats, stitching, chrome trim
+  const back = rrp(backX, top, 26, 86, 12), cush = rrp(baseX, -8, baseW, 24, 9);
+  c.fillStyle = 'rgba(0,0,0,0.35)'; c.beginPath(); c.ellipse(baseX + baseW / 2, 18, baseW / 2 + 6, 4, 0, 0, 7); c.fill();
+  solid(c, back, `leather|${col}`, 0.25, 0.32); solid(c, cush, `leather|${col}`, 0.3, 0.35);
+  c.save(); c.clip(back); c.strokeStyle = 'rgba(110,80,40,0.45)'; c.lineWidth = 1; for (let y = top + 10; y < top + 86; y += 9) { c.beginPath(); c.moveTo(backX, y); c.lineTo(backX + 26, y + 1); c.stroke(); } c.restore();
+  c.save(); c.clip(cush); c.strokeStyle = 'rgba(110,80,40,0.45)'; c.lineWidth = 1; for (let xx = baseX + 10; xx < baseX + baseW; xx += 10) { c.beginPath(); c.moveTo(xx, -8); c.lineTo(xx + 1, 16); c.stroke(); } c.setLineDash([1.5, 2]); c.strokeStyle = 'rgba(80,55,25,0.6)'; c.beginPath(); c.moveTo(baseX + 4, -4); c.lineTo(baseX + baseW - 4, -4); c.stroke(); c.setLineDash([]); c.restore();
+  c.strokeStyle = alt; c.lineWidth = 2; c.stroke(back); c.stroke(cush);
+  c.fillStyle = chromeGrad(c, baseX, 12, baseX, 18); c.fillRect(baseX + 6, 13, baseW - 12, 3);
+}
+
+
 // interior: roof lifted off, near side panel cut away like a dollhouse
 const IN_Y = 430;
 function interiorArt(c) {
@@ -156,21 +216,41 @@ function interiorArt(c) {
   inCar(c, () => {
     const body = bodyPath();
     c.save(); c.clip(body); c.beginPath(); c.rect(-240, -44, 480, 100); c.clip();
-    c.fillStyle = '#1d4f4b'; c.fillRect(-240, -44, 480, 100);
-    c.fillStyle = '#6a5a48'; c.fillRect(-170, -30, 330, 46);              // far door panels
-    c.fillStyle = 'rgba(0,0,0,0.18)'; for (let x = -160; x < 160; x += 22) c.fillRect(x, -30, 2, 46);
+    c.fillStyle = '#163f3c'; c.fillRect(-240, -44, 480, 100);
+    // far door cards: two-tone vinyl, pleats, chrome strip, armrest, crank and handle
+    for (const [x0, w] of [[-172, 166], [2, 140]]) {
+      const card = rrp(x0, -34, w, 50, 6); solid(c, card, 'leather|#2f8a84', 0.15, 0.3);
+      c.save(); c.clip(card); c.fillStyle = P(c, 'leather|#e9dcc0'); c.fillRect(x0, -22, w, 20); c.strokeStyle = 'rgba(0,0,0,0.18)'; c.lineWidth = 1; for (let xx = x0 + 8; xx < x0 + w; xx += 8) { c.beginPath(); c.moveTo(xx, -22); c.lineTo(xx, -2); c.stroke(); } c.restore();
+      c.fillStyle = chromeGrad(c, 0, -24, 0, -20); c.fillRect(x0 + 4, -25, w - 8, 3);
+      solid(c, rrp(x0 + w - 66, -4, 54, 8, 4), 'leather|#5a3a22', 0.3, 0.3);
+      c.strokeStyle = chromeGrad(c, x0 + 20, -16, x0 + 34, -6); c.lineWidth = 2.2; c.beginPath(); c.arc(x0 + 26, -12, 6, 0, 7); c.stroke(); c.beginPath(); c.moveTo(x0 + 26, -12); c.lineTo(x0 + 36, -18); c.stroke(); c.fillStyle = '#1b1b1b'; c.beginPath(); c.arc(x0 + 37, -19, 2.4, 0, 7); c.fill();
+      c.fillStyle = chromeGrad(c, x0 + 44, -16, x0 + 60, -12); rr(c, x0 + 44, -16, 16, 4, 2); c.fill();
+    }
     c.restore();
-    c.fillStyle = '#35302b'; c.fillRect(-170, 12, 352, 18);                // carpet
-    const seat = (x, w, backX) => {
-      const sg = c.createLinearGradient(0, -70, 0, 20); sg.addColorStop(0, '#f2e6cc'); sg.addColorStop(1, '#cdb894');
-      c.fillStyle = sg; rr(c, backX, -74, 26, 86, 12); c.fill(); rr(c, x, -8, w, 24, 9); c.fill();
-      c.strokeStyle = 'rgba(120,90,50,0.35)'; c.lineWidth = 1.2; for (let k = 1; k < 4; k++) { c.beginPath(); c.moveTo(backX + 4, -74 + k * 20); c.lineTo(backX + 22, -74 + k * 20); c.stroke(); c.beginPath(); c.moveTo(x + k * w / 4, -6); c.lineTo(x + k * w / 4, 14); c.stroke(); }
-    };
-    seat(-142, 96, -156); seat(-14, 86, -30);
-    c.fillStyle = '#7a4a2a'; rr(c, 112, -46, 64, 42, 8); c.fill();         // wooden dashboard
-    c.fillStyle = '#1b1b1b'; for (const gx of [128, 150]) { c.beginPath(); c.arc(gx, -26, 8, 0, 7); c.fill(); c.strokeStyle = '#dfe5ea'; c.lineWidth = 1.5; c.stroke(); }
-    c.strokeStyle = '#1c1c1c'; c.lineWidth = 5; c.beginPath(); c.ellipse(96, -46, 7, 30, 0.2, 0, 7); c.stroke(); c.beginPath(); c.moveTo(100, -40); c.lineTo(118, -24); c.stroke();
-    c.save(); c.clip(body); c.beginPath(); c.rect(-240, 22, 480, 40); c.clip();   // near sill stays
+    const carpet = rrp(-170, 10, 352, 22, 4); c.fillStyle = P(c, 'carpet|#3a332d'); c.fill(carpet);
+    c.fillStyle = 'rgba(0,0,0,0.3)'; c.fillRect(-170, 10, 352, 3);
+    // pedals and floor mat
+    c.fillStyle = P(c, 'rubber|#1d1d1f'); rr(c, 60, 14, 50, 10, 3); c.fill();
+    c.strokeStyle = '#2a2a2a'; c.lineWidth = 3; c.beginPath(); c.moveTo(128, -6); c.lineTo(122, 16); c.moveTo(140, -6); c.lineTo(138, 14); c.stroke();
+    c.fillStyle = '#18191b'; rr(c, 116, 13, 12, 6, 2); c.fill(); rr(c, 132, 11, 14, 6, 2); c.fill();
+    seatSide(c, -156, -142, 96); seatSide(c, -30, -14, 86);
+    c.fillStyle = chromeGrad(c, -10, 10, 0, 16); rr(c, -6, 8, 10, 5, 2); c.fill();     // belt buckle
+    // dashboard: walnut, chrome trim, two gauges, radio with push buttons
+    const dash = rrp(112, -46, 64, 42, 8); solid(c, dash, 'wood|#7a4a2a', 0.25, 0.35);
+    c.fillStyle = chromeGrad(c, 112, -47, 112, -43); rr(c, 112, -47, 64, 4, 2); c.fill();
+    gaugeFace(c, 128, -30, 8, 'needle', -0.4); gaugeFace(c, 151, -30, 8, 'double', 0.6);
+    c.fillStyle = '#1b1b1b'; rr(c, 120, -16, 46, 9, 2); c.fill(); c.fillStyle = '#e3c27a'; c.fillRect(124, -14, 26, 3);
+    for (let i = 0; i < 4; i++) { c.fillStyle = chromeGrad(c, 0, -10, 0, -7); c.fillRect(124 + i * 7, -10, 5, 2.5); }
+    bolt(c, 160, -12, 3);
+    // steering wheel: thin bakelite rim, chrome horn ring, column and column shifter
+    c.strokeStyle = '#141414'; c.lineWidth = 3; c.beginPath(); c.moveTo(102, -38); c.lineTo(120, -22); c.stroke();
+    c.strokeStyle = chromeGrad(c, 104, -40, 118, -30); c.lineWidth = 1.6; c.beginPath(); c.moveTo(106, -36); c.lineTo(122, -44); c.stroke(); c.fillStyle = '#efe6d2'; c.beginPath(); c.arc(123, -45, 2.4, 0, 7); c.fill();
+    c.strokeStyle = '#efe6d2'; c.lineWidth = 3.5; c.beginPath(); c.ellipse(96, -46, 7, 30, 0.2, 0, 7); c.stroke();
+    c.strokeStyle = 'rgba(0,0,0,0.25)'; c.lineWidth = 1; c.beginPath(); c.ellipse(96, -46, 5.5, 28, 0.2, 0, 7); c.stroke();
+    c.strokeStyle = chromeGrad(c, 92, -60, 100, -30); c.lineWidth = 1.5; c.beginPath(); c.ellipse(96, -46, 4, 17, 0.2, 0, 7); c.stroke();
+    c.fillStyle = '#c3352b'; c.beginPath(); c.arc(97, -46, 2.2, 0, 7); c.fill();
+    // near sill and outside trim stay in front of the cabin
+    c.save(); c.clip(body); c.beginPath(); c.rect(-240, 22, 480, 40); c.clip();
     const bg = c.createLinearGradient(0, 20, 0, 40); bg.addColorStop(0, '#2a9a92'); bg.addColorStop(1, '#14514c'); c.fillStyle = bg; c.fillRect(-240, 22, 480, 40);
     c.restore();
     c.strokeStyle = '#dfe5ea'; c.lineWidth = 3; c.beginPath(); c.moveTo(-205, 22); c.lineTo(208, 22); c.stroke();
@@ -197,41 +277,75 @@ function inEngine(c, fn) { c.save(); c.translate(EN.x, EN.y); fn(); c.restore();
 function engineArt(c) {
   const bgr = c.createRadialGradient(270, 380, 40, 270, 380, 420); bgr.addColorStop(0, '#2c343a'); bgr.addColorStop(1, '#0d1215'); c.fillStyle = bgr; c.fillRect(0, 0, LW, LH);
   inEngine(c, () => {
-    c.fillStyle = '#2a9a92'; rr(c, -270, -330, 40, 640, 14); c.fill(); rr(c, 230, -330, 40, 640, 14); c.fill();
-    c.fillStyle = '#20282d'; rr(c, -228, -320, 456, 620, 22); c.fill();
-    c.fillStyle = '#3a4248'; rr(c, -200, -300, 400, 80, 10); c.fill();                       // radiator
-    c.strokeStyle = '#8e99a3'; c.lineWidth = 1.5; for (let x = -192; x < 196; x += 8) { c.beginPath(); c.moveTo(x, -294); c.lineTo(x, -226); c.stroke(); }
-    c.fillStyle = '#c9d1d8'; c.beginPath(); c.arc(150, -260, 12, 0, 7); c.fill();
-    c.strokeStyle = '#111'; c.lineWidth = 14; c.lineCap = 'round'; c.beginPath(); c.moveTo(-120, -222); c.bezierCurveTo(-120, -190, -60, -200, -60, -160); c.stroke(); c.beginPath(); c.moveTo(130, -222); c.bezierCurveTo(130, -180, 80, -190, 70, -150); c.stroke();
-    c.fillStyle = '#5a636a'; rr(c, -96, -170, 192, 240, 20); c.fill();                        // intake
-    const vc = (x) => { const vg = c.createLinearGradient(x, 0, x + 70, 0); vg.addColorStop(0, '#8a2219'); vg.addColorStop(0.5, '#d4402f'); vg.addColorStop(1, '#8a2219'); c.fillStyle = vg; rr(c, x, -180, 70, 260, 26); c.fill(); c.strokeStyle = 'rgba(255,255,255,0.25)'; c.lineWidth = 2; for (let y = -150; y < 60; y += 30) { c.beginPath(); c.moveTo(x + 14, y); c.lineTo(x + 56, y); c.stroke(); } c.fillStyle = '#c9d1d8'; for (const y of [-160, 60]) { c.beginPath(); c.arc(x + 35, y, 5, 0, 7); c.fill(); } };
+    solid(c, rrp(-270, -330, 40, 640, 14), 'paint|#2a9a92', 0.3, 0.3); solid(c, rrp(230, -330, 40, 640, 14), 'paint|#2a9a92', 0.3, 0.3);
+    c.fillStyle = P(c, 'paint|#1d2429'); rr(c, -228, -320, 456, 620, 22); c.fill();
+    c.fillStyle = P(c, 'paint|#151b1f'); rr(c, -228, 230, 456, 70, 12); c.fill();                       // firewall
+    // radiator core, tanks and cap
+    solid(c, rrp(-200, -300, 400, 80, 10), 'brushed|#3a4248', 0.15, 0.3);
+    c.strokeStyle = 'rgba(160,170,178,0.8)'; c.lineWidth = 1; for (let x = -194; x < 196; x += 4) { c.beginPath(); c.moveTo(x, -292); c.lineTo(x, -228); c.stroke(); }
+    c.strokeStyle = 'rgba(0,0,0,0.35)'; for (let y = -288; y < -228; y += 8) { c.beginPath(); c.moveTo(-196, y); c.lineTo(196, y); c.stroke(); }
+    c.fillStyle = '#22272b'; rr(c, -204, -304, 408, 10, 4); c.fill();
+    c.fillStyle = chromeGrad(c, 138, -272, 162, -248); c.beginPath(); c.arc(150, -260, 12, 0, 7); c.fill(); c.strokeStyle = '#6d7880'; c.lineWidth = 2; c.beginPath(); c.arc(150, -260, 7, 0, 7); c.stroke();
+    // fan behind the radiator
+    c.save(); c.translate(0, -196); for (let i = 0; i < 6; i++) { c.rotate(Math.PI / 3); c.fillStyle = '#4a5258'; c.beginPath(); c.ellipse(0, -22, 9, 22, 0.3, 0, 7); c.fill(); } c.fillStyle = '#2a3036'; c.beginPath(); c.arc(0, 0, 9, 0, 7); c.fill(); c.restore();
+    // hoses with clamps
+    const hose = (pts) => { c.strokeStyle = '#121314'; c.lineWidth = 14; c.lineCap = 'round'; c.beginPath(); c.moveTo(...pts[0]); c.bezierCurveTo(...pts[1], ...pts[2], ...pts[3]); c.stroke(); c.strokeStyle = 'rgba(255,255,255,0.12)'; c.lineWidth = 3; c.stroke(); };
+    hose([[-120, -222], [-120, -190], [-60, -200], [-60, -160]]); hose([[130, -222], [130, -180], [80, -190], [70, -150]]);
+    for (const [x, y] of [[-120, -214], [130, -214]]) { c.fillStyle = chromeGrad(c, x - 9, y, x + 9, y + 5); c.fillRect(x - 9, y, 18, 5); }
+    // intake manifold: cast aluminium with runners
+    solid(c, rrp(-96, -170, 192, 240, 20), 'brushed|#8a949c', 0.25, 0.35);
+    c.strokeStyle = 'rgba(0,0,0,0.25)'; c.lineWidth = 2; for (let i = 0; i < 4; i++) { c.beginPath(); c.moveTo(-90, -120 + i * 50); c.quadraticCurveTo(-40, -110 + i * 50, -20, -90 + i * 40); c.moveTo(90, -120 + i * 50); c.quadraticCurveTo(40, -110 + i * 50, 20, -90 + i * 40); c.stroke(); }
+    // valve covers: finned red paint, chrome bolts, oil cap and breather
+    const vc = (x) => {
+      const p = rrp(x, -180, 70, 260, 26); solid(c, p, 'paint|#c23a2b', 0.35, 0.4);
+      c.save(); c.clip(p); for (let y = -160; y < 70; y += 14) { c.fillStyle = 'rgba(255,255,255,0.18)'; c.fillRect(x + 12, y, 46, 3); c.fillStyle = 'rgba(0,0,0,0.25)'; c.fillRect(x + 12, y + 3, 46, 2); } c.restore();
+      for (let i = 0; i < 5; i++) { bolt(c, x + 6, -160 + i * 54, 3.2); bolt(c, x + 64, -160 + i * 54, 3.2); }
+    };
     vc(-176); vc(106);
-    const ag = c.createRadialGradient(-20, -70, 10, 0, -50, 80); ag.addColorStop(0, '#ffffff'); ag.addColorStop(0.5, '#c9d1d8'); ag.addColorStop(1, '#6d7880');
-    c.fillStyle = ag; c.beginPath(); c.arc(0, -50, 78, 0, 7); c.fill(); c.strokeStyle = '#4a545c'; c.lineWidth = 3; c.stroke();   // air cleaner
-    c.fillStyle = '#4a545c'; c.beginPath(); c.arc(0, -50, 14, 0, 7); c.fill(); c.fillStyle = '#c9d1d8'; c.fillRect(-22, -54, 44, 8);
-    c.fillStyle = '#18191b'; rr(c, -215, 120, 130, 96, 10); c.fill(); c.fillStyle = '#2a2c30'; rr(c, -215, 120, 130, 16, 6); c.fill();   // battery
-    c.fillStyle = '#c3352b'; c.beginPath(); c.arc(-190, 118, 11, 0, 7); c.fill(); c.fillStyle = '#9aa0a6'; c.beginPath(); c.arc(-110, 118, 11, 0, 7); c.fill();
-    c.fillStyle = '#c9d1d8'; c.beginPath(); c.arc(160, 160, 34, 0, 7); c.fill(); c.fillStyle = '#6d7880'; c.beginPath(); c.arc(160, 160, 12, 0, 7); c.fill();   // alternator
-    c.strokeStyle = '#111'; c.lineWidth = 6; c.beginPath(); c.moveTo(130, 150); c.lineTo(40, 112); c.moveTo(150, 194); c.lineTo(30, 140); c.stroke();
-    c.fillStyle = '#3a3f45'; c.beginPath(); c.arc(30, 126, 20, 0, 7); c.fill();
+    c.fillStyle = '#18191b'; c.beginPath(); c.arc(-141, 40, 13, 0, 7); c.fill(); c.strokeStyle = '#3a3f45'; c.lineWidth = 2; c.stroke();
+    c.fillStyle = chromeGrad(c, 130, 28, 152, 52); rr(c, 129, 26, 24, 26, 6); c.fill();
+    // distributor with plug leads to each bank
+    c.fillStyle = '#18191b'; c.beginPath(); c.arc(0, 120, 20, 0, 7); c.fill();
+    for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2, px = Math.cos(a) * 15, py = 120 + Math.sin(a) * 15; c.fillStyle = '#2a2c30'; c.beginPath(); c.arc(px, py, 3.5, 0, 7); c.fill(); const tx = i < 4 ? -176 : 176, ty = -150 + (i % 4) * 54; c.strokeStyle = i % 2 ? '#1c1c1c' : '#222'; c.lineWidth = 3; c.beginPath(); c.moveTo(px, py); c.bezierCurveTo(px * 3, py - 20, tx * 0.9, ty + 30, tx, ty); c.stroke(); c.fillStyle = '#b8322a'; c.beginPath(); c.arc(tx, ty, 4, 0, 7); c.fill(); }
+    // air cleaner: chrome lid, paper element band, wing nut
+    c.fillStyle = '#c66a2a'; c.beginPath(); c.arc(0, -50, 82, 0, 7); c.fill();
+    c.strokeStyle = 'rgba(80,30,10,0.5)'; c.lineWidth = 1; for (let i = 0; i < 90; i++) { const a = i / 90 * Math.PI * 2; c.beginPath(); c.moveTo(Math.cos(a) * 76, -50 + Math.sin(a) * 76); c.lineTo(Math.cos(a) * 82, -50 + Math.sin(a) * 82); c.stroke(); }
+    const ag = c.createRadialGradient(-24, -78, 6, 0, -50, 76); ag.addColorStop(0, '#ffffff'); ag.addColorStop(0.45, '#c9d1d8'); ag.addColorStop(0.8, '#8a949c'); ag.addColorStop(1, '#5a636a');
+    c.fillStyle = ag; c.beginPath(); c.arc(0, -50, 74, 0, 7); c.fill();
+    c.strokeStyle = 'rgba(255,255,255,0.5)'; c.lineWidth = 2; c.beginPath(); c.arc(0, -50, 56, 3.6, 5.2); c.stroke();
+    c.fillStyle = chromeGrad(c, -18, -60, 18, -40); c.beginPath(); c.moveTo(-22, -54); c.quadraticCurveTo(0, -66, 22, -54); c.quadraticCurveTo(0, -42, -22, -54); c.fill(); c.fillStyle = '#4a545c'; c.beginPath(); c.arc(0, -52, 6, 0, 7); c.fill();
+    // battery: case, six cell caps, cables
+    solid(c, rrp(-215, 120, 130, 96, 10), 'rubber|#1a1b1e', 0.15, 0.35);
+    c.fillStyle = '#2a2c30'; rr(c, -215, 120, 130, 16, 6); c.fill();
+    for (let i = 0; i < 6; i++) { c.fillStyle = '#3a3d42'; c.beginPath(); c.arc(-200 + i * 20, 128, 4.5, 0, 7); c.fill(); }
+    c.fillStyle = '#e2b04a'; c.fillRect(-200, 160, 100, 14); c.fillStyle = '#1a1b1e'; c.font = '700 9px Manrope, sans-serif'; c.textAlign = 'center'; c.fillText('12 VOLT', -150, 170);
+    c.fillStyle = '#c3352b'; c.beginPath(); c.arc(-190, 118, 11, 0, 7); c.fill(); c.fillStyle = chromeGrad(c, -120, 110, -100, 126); c.beginPath(); c.arc(-110, 118, 11, 0, 7); c.fill();
+    c.strokeStyle = '#b8322a'; c.lineWidth = 6; c.beginPath(); c.moveTo(-190, 108); c.bezierCurveTo(-190, 70, -150, 80, -120, 60); c.stroke(); c.strokeStyle = '#111'; c.beginPath(); c.moveTo(-110, 108); c.bezierCurveTo(-100, 80, -80, 90, -70, 100); c.stroke();
+    // alternator, pulleys and belt
+    c.fillStyle = chromeGrad(c, 126, 126, 194, 194); c.beginPath(); c.arc(160, 160, 34, 0, 7); c.fill();
+    c.strokeStyle = 'rgba(0,0,0,0.3)'; c.lineWidth = 2; for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2; c.beginPath(); c.moveTo(160 + Math.cos(a) * 16, 160 + Math.sin(a) * 16); c.lineTo(160 + Math.cos(a) * 30, 160 + Math.sin(a) * 30); c.stroke(); }
+    c.fillStyle = '#3a3f45'; c.beginPath(); c.arc(160, 160, 12, 0, 7); c.fill(); c.beginPath(); c.arc(30, 126, 20, 0, 7); c.fill();
+    c.strokeStyle = '#111'; c.lineWidth = 6; c.beginPath(); c.moveTo(150, 128); c.lineTo(36, 106); c.moveTo(154, 192); c.lineTo(26, 146); c.stroke();
+    // brake master cylinder and washer bottle on the firewall
+    solid(c, rrp(-200, 246, 70, 34, 8), 'brushed|#8a949c', 0.3, 0.3); bolt(c, -186, 262, 4); bolt(c, -146, 262, 4);
+    c.fillStyle = 'rgba(120,190,240,0.55)'; rr(c, 140, 240, 60, 44, 10); c.fill(); c.fillStyle = 'rgba(70,150,220,0.7)'; c.fillRect(140, 262, 60, 22); c.fillStyle = '#1b1b1b'; c.beginPath(); c.arc(170, 238, 7, 0, 7); c.fill();
   });
 }
-
 // ===== scenes =====
 const TOOLS = {
   washer: { name: 'WASHER', r: 22, k: 0.26 }, brush: { name: 'WIRE BRUSH', r: 15, k: 0.34 }, cloth: { name: 'CLOTH', r: 22, k: 0.2 },
   foam: { name: 'FOAM BRUSH', r: 20, k: 0.26 }, vacuum: { name: 'VACUUM', r: 24, k: 0.3 }, degreaser: { name: 'DEGREASER', r: 26, k: 0 },
 };
 const EFF = {
-  washer: { dust: 1, mud: 1, moss: 1, grime: 0.3, grease: 0.08, rust: 0.04, stain: 0.12, leaves: 1 },
-  brush: { rust: 1, mud: 0.5, moss: 0.8, grease: 0.35, dust: 0.45, grime: 0.25, stain: 0.25 },
-  cloth: { grime: 1, dust: 0.85, stain: 0.25, mud: 0.2, grease: 0.15 },
-  foam: { stain: 1, dust: 0.5, grime: 0.45 },
+  washer: { dust: 1, mud: 1, moss: 1, scale: 0.4, mold: 0.5, grime: 0.3, grease: 0.08, rust: 0.04, stain: 0.12, leaves: 1 },
+  brush: { rust: 1, scale: 1, mold: 0.6, mud: 0.5, moss: 0.8, grease: 0.35, dust: 0.45, grime: 0.25, stain: 0.25 },
+  cloth: { grime: 1, scale: 0.3, dust: 0.85, stain: 0.25, mud: 0.2, grease: 0.15 },
+  foam: { stain: 1, mold: 1, dust: 0.5, grime: 0.45 },
   vacuum: { dust: 1, leaves: 1 },
   degreaser: {},
 };
-const BEST = { moss: 'washer', dust: 'washer', mud: 'washer', grime: 'cloth', grease: 'degreaser', rust: 'brush', stain: 'foam', leaves: 'vacuum' };
-const DIRT_NAME = { moss: 'moss', dust: 'dust', mud: 'mud', grime: 'window grime', grease: 'grease', rust: 'rust', stain: 'a stain', leaves: 'leaves' };
+const BEST = { moss: 'washer', dust: 'washer', mud: 'washer', grime: 'cloth', grease: 'degreaser', rust: 'brush', stain: 'foam', leaves: 'vacuum', scale: 'brush', mold: 'foam' };
+const DIRT_NAME = { moss: 'moss', dust: 'dust', mud: 'mud', grime: 'window grime', grease: 'grease', rust: 'rust', stain: 'a stain', leaves: 'leaves', scale: 'limescale', mold: 'mold' };
 const ICON = {
   washer: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 26l9-9"/><rect x="13" y="9" width="10" height="7" rx="2" transform="rotate(-45 18 12.5)"/><path d="M22 8l3-3M24 11l4-1M21 6l1-4"/></svg>',
   brush: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="5"/><path d="M16 3v6M16 23v6M3 16h6M23 16h6M7 7l4 4M21 21l4 4M25 7l-4 4M11 21l-4 4"/></svg>',
@@ -422,18 +536,40 @@ function sceneDigger() {
 }
 function cabArt(c) {
   studio(c, '#2a2f33', '#15191c');
-  c.fillStyle = '#c88a12'; rr(c, 30, 160, 480, 470, 26); c.fill();                  // cab frame cut open
-  c.fillStyle = '#9fc6d6'; rr(c, 56, 186, 428, 200, 14); c.fill();                    // back glass
-  c.fillStyle = 'rgba(255,255,255,0.3)'; c.beginPath(); c.moveTo(120, 186); c.lineTo(160, 186); c.lineTo(110, 386); c.lineTo(70, 386); c.fill();
-  c.fillStyle = '#3a3f45'; rr(c, 56, 400, 428, 210, 12); c.fill();                    // inner walls
-  c.fillStyle = '#5a636a'; rr(c, 70, 540, 400, 60, 8); c.fill();                      // floor plate
-  c.strokeStyle = 'rgba(0,0,0,0.3)'; c.lineWidth = 2; for (let x = 80; x < 470; x += 16) { c.beginPath(); c.moveTo(x, 545); c.lineTo(x + 8, 595); c.stroke(); }
-  c.fillStyle = '#2a2c30'; rr(c, 200, 300, 140, 150, 20); c.fill(); rr(c, 180, 440, 180, 46, 14); c.fill();   // seat
-  c.fillStyle = '#3a3d42'; rr(c, 214, 314, 112, 120, 14); c.fill();
-  for (const x of [150, 390]) { c.strokeStyle = '#18191c'; c.lineWidth = 8; c.beginPath(); c.moveTo(x, 520); c.lineTo(x, 440); c.stroke(); c.fillStyle = '#c3352b'; c.beginPath(); c.arc(x, 432, 14, 0, 7); c.fill(); c.fillStyle = '#4a4f55'; rr(c, x - 30, 505, 60, 30, 8); c.fill(); }
-  c.fillStyle = '#20252a'; rr(c, 400, 410, 76, 100, 10); c.fill();
-  [['#46d6b4', 420, 432], ['#e2b04a', 448, 432], ['#c3352b', 420, 460], ['#5fb8ff', 448, 460]].forEach(([col, x, y]) => { c.fillStyle = col; c.beginPath(); c.arc(x, y, 8, 0, 7); c.fill(); });
-  c.fillStyle = '#9aa5ae'; rr(c, 412, 482, 52, 16, 4); c.fill();
+  solid(c, rrp(30, 160, 480, 470, 26), 'paint|#d39a1c', 0.25, 0.25);
+  const sky = c.createLinearGradient(0, 186, 0, 386); sky.addColorStop(0, '#7fb6dc'); sky.addColorStop(1, '#d6e8ef'); c.fillStyle = sky; rr(c, 56, 186, 428, 200, 14); c.fill();
+  c.fillStyle = '#8a7a5a'; c.beginPath(); c.moveTo(56, 360); c.lineTo(200, 330); c.lineTo(484, 352); c.lineTo(484, 386); c.lineTo(56, 386); c.fill();
+  c.fillStyle = 'rgba(255,255,255,0.28)'; c.beginPath(); c.moveTo(120, 186); c.lineTo(160, 186); c.lineTo(110, 386); c.lineTo(70, 386); c.fill();
+  c.strokeStyle = '#20252a'; c.lineWidth = 3; c.beginPath(); c.moveTo(270, 190); c.lineTo(330, 300); c.stroke();                      // wiper
+  c.fillStyle = '#20252a'; rr(c, 262, 182, 16, 208, 4); c.fill();                                                                 // pillar
+  solid(c, rrp(56, 400, 428, 210, 12), 'paint|#3a3f45', 0.12, 0.3);
+  c.fillStyle = P(c, 'plate|#7b838b'); rr(c, 70, 540, 400, 60, 8); c.fill();
+  c.fillStyle = P(c, 'rubber|#1d1f22'); rr(c, 180, 548, 180, 44, 6); c.fill();
+  // fire extinguisher
+  solid(c, rrp(76, 410, 30, 90, 12), 'paint|#c3352b', 0.4, 0.3); c.fillStyle = '#1b1b1b'; rr(c, 82, 398, 18, 14, 4); c.fill(); c.strokeStyle = '#1b1b1b'; c.lineWidth = 3; c.beginPath(); c.moveTo(100, 404); c.quadraticCurveTo(120, 410, 112, 440); c.stroke();
+  // seat on a suspension base
+  c.fillStyle = '#2a2c30'; rr(c, 220, 486, 100, 40, 6); c.fill(); c.strokeStyle = '#18191b'; c.lineWidth = 2; for (let y = 492; y < 524; y += 6) { c.beginPath(); c.moveTo(226, y); c.lineTo(314, y); c.stroke(); }
+  solid(c, rrp(214, 278, 112, 28, 10), 'fabric|#2c2f34', 0.2, 0.3);                       // headrest
+  solid(c, rrp(200, 300, 140, 150, 20), 'fabric|#2c2f34', 0.2, 0.35);
+  solid(c, rrp(180, 440, 180, 46, 14), 'fabric|#2c2f34', 0.25, 0.35);
+  c.save(); c.clip(rectP(200, 300, 140, 150, 20)); c.fillStyle = P(c, 'fabric|#4a5058'); rr(c, 222, 318, 96, 116, 12); c.fill(); c.strokeStyle = 'rgba(0,0,0,0.3)'; c.lineWidth = 1; c.setLineDash([2, 2]); c.strokeRect(226, 322, 88, 108); c.setLineDash([]); c.restore();
+  c.strokeStyle = '#e2b04a'; c.lineWidth = 4; c.beginPath(); c.moveTo(212, 330); c.lineTo(250, 470); c.stroke();                      // seat belt
+  // joysticks with rubber boots and grips on armrest pods
+  for (const x of [150, 390]) {
+    solid(c, rrp(x - 30, 505, 60, 30, 8), 'rubber|#2a2d31', 0.2, 0.3);
+    c.fillStyle = '#18191b'; for (let k = 0; k < 4; k++) { c.beginPath(); c.ellipse(x, 500 - k * 9, 12 - k * 2, 5, 0, 0, 7); c.fill(); }
+    c.strokeStyle = '#2a2c30'; c.lineWidth = 7; c.beginPath(); c.moveTo(x, 470); c.lineTo(x, 445); c.stroke();
+    solid(c, rrp(x - 9, 418, 18, 34, 8), 'rubber|#1b1c1f', 0.3, 0.3);
+    c.fillStyle = '#c3352b'; c.beginPath(); c.arc(x, 420, 4, 0, 7); c.fill(); c.fillStyle = '#e2b04a'; c.beginPath(); c.arc(x + 6, 432, 2.6, 0, 7); c.fill();
+  }
+  // monitor and switch panel
+  solid(c, rrp(400, 410, 76, 100, 10), 'rubber|#202429', 0.15, 0.3);
+  c.fillStyle = '#0d1a14'; rr(c, 408, 418, 60, 40, 4); c.fill();
+  c.strokeStyle = '#46d6b4'; c.lineWidth = 2; c.beginPath(); c.arc(424, 444, 9, Math.PI, Math.PI * 1.8); c.stroke(); c.fillStyle = '#46d6b4'; c.fillRect(440, 426, 22, 4); c.fillRect(440, 434, 16, 4); c.fillStyle = '#e2b04a'; c.fillRect(440, 442, 12, 4);
+  [['#46d6b4', 416], ['#e2b04a', 432], ['#c3352b', 448], ['#5fb8ff', 464]].forEach(([col, x]) => { c.fillStyle = '#111'; rr(c, x - 6, 468, 12, 16, 3); c.fill(); c.fillStyle = col; c.fillRect(x - 3, 471, 6, 5); });
+  c.fillStyle = chromeGrad(c, 412, 488, 464, 500); rr(c, 412, 490, 52, 12, 4); c.fill();
+  // pedals
+  c.fillStyle = P(c, 'rubber|#18191b'); rr(c, 200, 556, 26, 34, 4); c.fill(); rr(c, 314, 556, 26, 34, 4); c.fill();
 }
 function sceneCab() {
   const items = []; const k = ['clod', 'rock', 'clod', 'clod', 'rock', 'clod', 'paper', 'clod', 'rock', 'clod', 'clod'];
@@ -491,16 +627,34 @@ function scenePlane() {
   };
 }
 function cockpitArt(c) {
-  const sky = c.createLinearGradient(0, 120, 0, 330); sky.addColorStop(0, '#5f9dd0'); sky.addColorStop(1, '#d6e8f2'); c.fillStyle = '#1b1f24'; c.fillRect(0, 0, LW, LH);
-  c.fillStyle = sky; rr(c, 50, 120, 440, 210, 30); c.fill(); c.strokeStyle = '#3a3f45'; c.lineWidth = 14; c.beginPath(); c.moveTo(270, 120); c.lineTo(270, 330); c.stroke();
-  c.fillStyle = '#2a2e33'; rr(c, 40, 320, 460, 140, 18); c.fill();
-  const gauge = (x, y) => { c.fillStyle = '#0e1013'; c.beginPath(); c.arc(x, y, 26, 0, 7); c.fill(); c.strokeStyle = '#c9d1d8'; c.lineWidth = 2; c.stroke(); c.strokeStyle = '#f2b233'; c.lineWidth = 3; c.beginPath(); c.moveTo(x, y); c.lineTo(x + 16, y - 10); c.stroke(); };
-  [[100, 370], [170, 370], [370, 370], [440, 370], [130, 425], [410, 425]].forEach(([x, y]) => gauge(x, y));
-  c.fillStyle = '#18191c'; rr(c, 230, 350, 80, 90, 10); c.fill(); c.fillStyle = '#46d6b4'; c.fillRect(240, 362, 60, 30);
-  c.strokeStyle = '#18191c'; c.lineWidth = 12; c.lineCap = 'round'; c.beginPath(); c.moveTo(150, 470); c.quadraticCurveTo(150, 440, 190, 440); c.lineTo(230, 440); c.stroke(); c.beginPath(); c.moveTo(390, 470); c.quadraticCurveTo(390, 440, 350, 440); c.lineTo(310, 440); c.stroke();
-  const seat = (x) => { const sg = c.createLinearGradient(0, 500, 0, 700); sg.addColorStop(0, '#8a5a36'); sg.addColorStop(1, '#5a3a22'); c.fillStyle = sg; rr(c, x, 500, 170, 200, 26); c.fill(); c.strokeStyle = 'rgba(0,0,0,0.25)'; c.lineWidth = 2; for (let k = 1; k < 4; k++) { c.beginPath(); c.moveTo(x + k * 42, 515); c.lineTo(x + k * 42, 690); c.stroke(); } };
-  seat(55); seat(315);
-  c.fillStyle = '#26292e'; c.fillRect(225, 480, 90, 240);
+  c.fillStyle = '#16191d'; c.fillRect(0, 0, LW, LH);
+  c.save(); rr(c, 50, 120, 440, 210, 30); c.clip();
+  const sky = c.createLinearGradient(0, 120, 0, 280); sky.addColorStop(0, '#4f8fc8'); sky.addColorStop(1, '#cfe3ef'); c.fillStyle = sky; c.fillRect(50, 120, 440, 210);
+  for (let i = 0; i < 7; i++) { c.fillStyle = 'rgba(255,255,255,0.75)'; c.beginPath(); c.ellipse(90 + i * 65, 160 + (i % 3) * 18, 34, 10, 0, 0, 7); c.fill(); }
+  c.fillStyle = '#6e8a5a'; c.fillRect(50, 270, 440, 60);
+  c.fillStyle = '#3a3d42'; c.beginPath(); c.moveTo(255, 270); c.lineTo(285, 270); c.lineTo(360, 330); c.lineTo(180, 330); c.fill();
+  c.strokeStyle = '#f4efe6'; c.lineWidth = 2; c.setLineDash([8, 8]); c.beginPath(); c.moveTo(270, 272); c.lineTo(270, 330); c.stroke(); c.setLineDash([]);
+  c.restore();
+  c.strokeStyle = '#2a2e33'; c.lineWidth = 14; c.beginPath(); c.moveTo(270, 120); c.lineTo(270, 330); c.stroke();
+  c.fillStyle = '#3a3f45'; rr(c, 252, 112, 36, 22, 6); c.fill(); c.fillStyle = '#0e1013'; c.beginPath(); c.arc(270, 123, 8, 0, 7); c.fill(); c.fillStyle = '#e9dcc0'; c.fillRect(266, 120, 8, 6);   // compass
+  c.fillStyle = '#1d2024'; rr(c, 30, 306, 480, 26, 12); c.fill();                                                                  // glare shield
+  solid(c, rrp(40, 320, 460, 140, 18), 'rubber|#24272c', 0.12, 0.3);
+  gaugeFace(c, 90, 362, 22, 'arc', 0.8); gaugeFace(c, 150, 362, 22, 'attitude'); gaugeFace(c, 210, 362, 22, 'double', -1.2);
+  gaugeFace(c, 90, 420, 18, 'needle', 2.6); gaugeFace(c, 150, 420, 18, 'needle', -1.6); gaugeFace(c, 210, 420, 18, 'needle', 0.2);
+  c.fillStyle = '#0c0e10'; rr(c, 240, 344, 70, 52, 6); c.fill(); c.fillStyle = '#46d6b4'; c.font = '700 13px "IBM Plex Mono", monospace'; c.textAlign = 'center'; c.fillText('121.50', 275, 366); c.fillStyle = '#e2b04a'; c.fillText('118.30', 275, 386);
+  gaugeFace(c, 370, 372, 20, 'needle', -0.9); gaugeFace(c, 440, 372, 20, 'needle', 0.4);
+  for (let i = 0; i < 8; i++) { const x = 340 + i * 18; c.fillStyle = '#0c0e10'; rr(c, x - 5, 412, 10, 22, 3); c.fill(); c.fillStyle = chromeGrad(c, x - 2, 412, x + 2, 424); c.fillRect(x - 1.5, 412 + (i % 2) * 8, 3, 10); }
+  for (const [x, col] of [[256, '#18191b'], [276, '#c3352b']]) { c.fillStyle = '#5a636a'; c.fillRect(x - 2, 398, 4, 46); c.fillStyle = col; c.beginPath(); c.arc(x, 446, 8, 0, 7); c.fill(); }
+  // yokes with leather grips
+  for (const cx of [150, 390]) { c.strokeStyle = '#18191c'; c.lineWidth = 10; c.lineCap = 'round'; c.beginPath(); c.moveTo(cx, 470); c.lineTo(cx, 455); c.stroke(); c.beginPath(); c.moveTo(cx - 44, 470); c.quadraticCurveTo(cx - 44, 440, cx - 10, 440); c.lineTo(cx + 10, 440); c.quadraticCurveTo(cx + 44, 440, cx + 44, 470); c.stroke(); c.fillStyle = P(c, 'leather|#3a2a1e'); rr(c, cx - 52, 458, 16, 28, 6); c.fill(); rr(c, cx + 36, 458, 16, 28, 6); c.fill(); }
+  // seats: leather, headrests, harness straps
+  for (const x of [55, 315]) {
+    const s = rrp(x, 500, 170, 200, 26); solid(c, s, 'leather|#7a4e2e', 0.28, 0.35);
+    c.save(); c.clip(s); c.strokeStyle = 'rgba(30,15,5,0.35)'; c.lineWidth = 2; for (let k = 1; k < 4; k++) { c.beginPath(); c.moveTo(x + k * 42, 520); c.lineTo(x + k * 42, 700); c.stroke(); } c.restore();
+    solid(c, rrp(x + 40, 476, 90, 30, 12), 'leather|#6a4428', 0.3, 0.3);
+    c.strokeStyle = '#3a5a8a'; c.lineWidth = 7; c.beginPath(); c.moveTo(x + 30, 500); c.lineTo(x + 80, 640); c.moveTo(x + 140, 500); c.lineTo(x + 90, 640); c.stroke(); c.fillStyle = chromeGrad(c, x + 75, 630, x + 95, 650); rr(c, x + 74, 628, 22, 18, 4); c.fill();
+  }
+  c.fillStyle = P(c, 'carpet|#26292e'); c.fillRect(225, 480, 90, 240);
 }
 function sceneCockpit() {
   const items = []; const k = ['paper', 'cup', 'wrapper', 'paper', 'crumb', 'cup', 'paper', 'crumb'];
@@ -553,18 +707,32 @@ function sceneHouse() {
   };
 }
 function kitchenArt(c) {
-  c.fillStyle = '#e9e1d0'; c.fillRect(0, 0, LW, 620);
-  c.fillStyle = '#d8ccb4'; for (let y = 360; y < 430; y += 22) for (let x = (y / 22) % 2 ? 0 : 11; x < LW; x += 22) c.fillRect(x, y, 20, 20);
-  c.fillStyle = '#7a5a3a'; rr(c, 30, 200, 230, 130, 8); c.fill(); rr(c, 290, 200, 220, 130, 8); c.fill();
-  c.strokeStyle = 'rgba(0,0,0,0.25)'; c.lineWidth = 2; c.strokeRect(40, 210, 100, 110); c.strokeRect(150, 210, 100, 110); c.strokeRect(300, 210, 100, 110); c.strokeRect(410, 210, 90, 110);
-  c.fillStyle = '#6a4a2e'; rr(c, 30, 450, 480, 160, 8); c.fill();
-  c.fillStyle = '#efe9dc'; rr(c, 24, 430, 492, 26, 6); c.fill();
-  c.fillStyle = '#c9d1d8'; rr(c, 70, 434, 120, 18, 6); c.fill(); c.strokeStyle = '#9aa5ae'; c.lineWidth = 6; c.beginPath(); c.moveTo(130, 434); c.lineTo(130, 404); c.lineTo(150, 404); c.stroke();
-  c.fillStyle = '#2a2d31'; rr(c, 310, 420, 170, 190, 10); c.fill();
-  c.fillStyle = '#18191c'; for (const x of [345, 445]) { c.beginPath(); c.ellipse(x, 430, 30, 7, 0, 0, 7); c.fill(); }
-  c.fillStyle = '#111'; rr(c, 330, 470, 130, 110, 8); c.fill(); c.fillStyle = 'rgba(255,170,90,0.25)'; rr(c, 340, 480, 110, 90, 6); c.fill();
-  c.fillStyle = '#c9d1d8'; rr(c, 340, 458, 110, 6, 3); c.fill();
-  c.fillStyle = '#b8ad98'; c.fillRect(0, 610, LW, 110); c.strokeStyle = 'rgba(0,0,0,0.12)'; for (let x = 0; x < LW; x += 60) { c.beginPath(); c.moveTo(x, 610); c.lineTo(x, 720); c.stroke(); }
+  c.fillStyle = P(c, 'paint|#ece4d2'); c.fillRect(0, 0, LW, 620);
+  c.fillStyle = P(c, 'tile|#f4f1ea|#cfc8b8'); c.fillRect(0, 336, LW, 96);                                                          // subway backsplash
+  // window over the sink
+  c.fillStyle = '#ffffff'; rr(c, 60, 40, 160, 120, 6); c.fill(); const wv = c.createLinearGradient(0, 48, 0, 152); wv.addColorStop(0, '#8fc4e0'); wv.addColorStop(1, '#d8ecd0'); c.fillStyle = wv; c.fillRect(68, 48, 144, 104); c.fillStyle = '#fff'; c.fillRect(138, 48, 4, 104);
+  // upper shaker cabinets with handles
+  for (const [x, w] of [[30, 230], [290, 220]]) { const p = rrp(x, 200, w, 130, 8); solid(c, p, 'wood|#8a6440', 0.2, 0.3); const n = Math.round(w / 110); for (let i = 0; i < n; i++) { const dx = x + 8 + i * (w - 16) / n, dw = (w - 16) / n - 8; c.strokeStyle = 'rgba(0,0,0,0.3)'; c.lineWidth = 2; c.strokeRect(dx, 210, dw, 110); c.strokeStyle = 'rgba(255,255,255,0.12)'; c.strokeRect(dx + 8, 218, dw - 16, 94); c.fillStyle = chromeGrad(c, 0, 290, 0, 300); rr(c, dx + (i % 2 ? 8 : dw - 14), 270, 6, 30, 3); c.fill(); } }
+  // range hood
+  c.fillStyle = chromeGrad(c, 320, 150, 470, 200); c.beginPath(); c.moveTo(360, 150); c.lineTo(430, 150); c.lineTo(470, 196); c.lineTo(320, 196); c.closePath(); c.fill();
+  // base cabinets, granite counter, sink and faucet
+  solid(c, rrp(30, 450, 480, 160, 8), 'wood|#6a4a2e', 0.15, 0.35);
+  for (let i = 0; i < 3; i++) { c.strokeStyle = 'rgba(0,0,0,0.3)'; c.lineWidth = 2; c.strokeRect(40 + i * 88, 466, 80, 134); c.fillStyle = chromeGrad(c, 0, 0, 0, 10); rr(c, 40 + i * 88 + 30, 476, 20, 5, 2); c.fill(); }
+  const counter = rrp(24, 428, 492, 26, 6); solid(c, counter, 'granite|#5a5650', 0.3, 0.3);
+  c.fillStyle = chromeGrad(c, 70, 434, 190, 452); rr(c, 70, 432, 120, 18, 6); c.fill(); c.fillStyle = 'rgba(0,0,0,0.35)'; rr(c, 78, 436, 104, 10, 4); c.fill();
+  c.strokeStyle = chromeGrad(c, 120, 390, 150, 430); c.lineWidth = 5; c.lineCap = 'round'; c.beginPath(); c.moveTo(130, 432); c.lineTo(130, 396); c.quadraticCurveTo(130, 386, 146, 388); c.lineTo(156, 396); c.stroke();
+  // potted herb and a cutting board
+  c.fillStyle = '#b8653a'; c.beginPath(); c.moveTo(214, 428); c.lineTo(242, 428); c.lineTo(238, 404); c.lineTo(218, 404); c.fill(); c.fillStyle = '#4c8a4f'; for (let i = 0; i < 7; i++) { c.beginPath(); c.ellipse(220 + i * 3, 394 - (i % 3) * 5, 5, 9, i - 3, 0, 7); c.fill(); }
+  c.fillStyle = P(c, 'wood|#c09060'); rr(c, 250, 412, 46, 16, 5); c.fill();
+  // stove: steel body, grates on burners, knobs, glass oven door with rack
+  solid(c, rrp(310, 420, 170, 190, 10), 'brushed|#c9d1d8', 0.3, 0.35);
+  c.fillStyle = '#1b1c1f'; rr(c, 310, 414, 170, 18, 4); c.fill();
+  for (const x of [345, 445]) { c.fillStyle = '#0e0f11'; c.beginPath(); c.ellipse(x, 422, 30, 7, 0, 0, 7); c.fill(); c.strokeStyle = '#2a2c30'; c.lineWidth = 2; c.beginPath(); c.moveTo(x - 26, 422); c.lineTo(x + 26, 422); c.moveTo(x, 416); c.lineTo(x, 428); c.stroke(); }
+  for (let i = 0; i < 4; i++) { c.fillStyle = '#1b1c1f'; c.beginPath(); c.arc(334 + i * 40, 446, 8, 0, 7); c.fill(); c.fillStyle = '#c9d1d8'; c.fillRect(333 + i * 40, 439, 2, 6); }
+  c.fillStyle = '#0e0f11'; rr(c, 330, 470, 130, 110, 8); c.fill(); const og = c.createLinearGradient(0, 480, 0, 570); og.addColorStop(0, 'rgba(255,170,90,0.28)'); og.addColorStop(1, 'rgba(255,120,40,0.12)'); c.fillStyle = og; rr(c, 340, 480, 110, 90, 6); c.fill();
+  c.strokeStyle = 'rgba(200,210,220,0.35)'; c.lineWidth = 1.5; for (let x = 350; x < 445; x += 10) { c.beginPath(); c.moveTo(x, 530); c.lineTo(x, 548); c.stroke(); } c.beginPath(); c.moveTo(346, 530); c.lineTo(446, 530); c.moveTo(346, 548); c.lineTo(446, 548); c.stroke();
+  c.fillStyle = chromeGrad(c, 0, 456, 0, 466); rr(c, 340, 456, 110, 7, 3); c.fill();
+  c.fillStyle = P(c, 'hex|#efe9dc|#b8ad98'); c.fillRect(0, 610, LW, 110); c.fillStyle = 'rgba(0,0,0,0.18)'; c.fillRect(0, 610, LW, 6);
 }
 function sceneKitchen() {
   const items = []; const k = ['crumb', 'peel', 'crumb', 'paper', 'peel', 'crumb', 'crumb', 'peel', 'crumb', 'cap'];
@@ -581,6 +749,102 @@ function sceneKitchen() {
       { name: 'Counter', mask: x => x.fill(rectP(22, 428, 284, 30, 6)) },
       { name: 'Cabinets', mask: x => { x.fill(rectP(28, 198, 234, 134, 8)); x.fill(rectP(288, 198, 224, 134, 8)); } },
       { name: 'Floor', mask: x => x.fillRect(0, 612, LW, 108) },
+    ],
+    debris: items,
+  };
+}
+function bathroomArt(c) {
+  c.fillStyle = P(c, 'tile|#f2f4f2|#c8cdc9'); c.fillRect(0, 0, LW, 610);
+  c.fillStyle = P(c, 'hex|#e8ece9|#9aa3a0'); c.fillRect(0, 610, LW, 110); c.fillStyle = 'rgba(0,0,0,0.15)'; c.fillRect(0, 610, LW, 5);
+  // shower: rod, curtain, head, tiled surround and enamel tub
+  c.fillStyle = P(c, 'tile|#dfeae8|#a9bab6'); c.fillRect(30, 220, 250, 230);
+  c.fillStyle = chromeGrad(c, 0, 186, 0, 192); c.fillRect(24, 186, 262, 5);
+  c.fillStyle = '#7fb8c8'; c.beginPath(); c.moveTo(24, 190); for (let i = 0; i <= 6; i++) c.quadraticCurveTo(30 + i * 8, 300, 34 + i * 9, 190); c.lineTo(84, 440); c.lineTo(24, 440); c.closePath(); c.fill();
+  c.strokeStyle = 'rgba(0,0,0,0.12)'; c.lineWidth = 2; for (let i = 0; i < 7; i++) { c.beginPath(); c.moveTo(30 + i * 8, 194); c.lineTo(28 + i * 8, 438); c.stroke(); }
+  c.strokeStyle = chromeGrad(c, 210, 230, 250, 260); c.lineWidth = 5; c.beginPath(); c.moveTo(250, 300); c.lineTo(250, 250); c.quadraticCurveTo(250, 236, 230, 240); c.stroke(); c.fillStyle = chromeGrad(c, 214, 236, 236, 250); c.beginPath(); c.ellipse(224, 246, 13, 6, -0.3, 0, 7); c.fill();
+  c.fillStyle = chromeGrad(c, 236, 360, 264, 380); c.beginPath(); c.arc(250, 370, 10, 0, 7); c.fill();
+  const tub = rrp(30, 430, 250, 120, 22); const tg = c.createLinearGradient(0, 430, 0, 550); tg.addColorStop(0, '#ffffff'); tg.addColorStop(1, '#cfd6d8'); c.fillStyle = tg; c.fill(tub);
+  c.fillStyle = '#f4f7f8'; rr(c, 24, 424, 262, 14, 7); c.fill(); c.strokeStyle = 'rgba(0,0,0,0.12)'; c.lineWidth = 2; c.stroke(tub);
+  for (const x of [52, 258]) { c.fillStyle = chromeGrad(c, x - 8, 550, x + 8, 566); c.beginPath(); c.ellipse(x, 556, 10, 8, 0, 0, 7); c.fill(); }
+  // toilet
+  solid(c, rrp(318, 380, 74, 70, 8), 'paint|#fbfbfa', 0.1, 0.18); c.fillStyle = chromeGrad(c, 330, 390, 346, 396); rr(c, 330, 390, 18, 6, 3); c.fill();
+  c.fillStyle = '#fbfbfa'; c.beginPath(); c.ellipse(355, 470, 46, 18, 0, 0, 7); c.fill(); c.strokeStyle = 'rgba(0,0,0,0.12)'; c.stroke();
+  c.fillStyle = '#eef1f1'; c.beginPath(); c.moveTo(322, 474); c.quadraticCurveTo(330, 540, 350, 560); c.lineTo(366, 560); c.quadraticCurveTo(384, 540, 390, 474); c.fill();
+  // vanity, basin, faucet, mirror and towel
+  c.fillStyle = '#ffffff'; rr(c, 410, 240, 108, 150, 10); c.fill(); const mg = c.createLinearGradient(418, 248, 510, 382); mg.addColorStop(0, '#dfeef4'); mg.addColorStop(0.5, '#b6cdd6'); mg.addColorStop(1, '#e8f3f6'); c.fillStyle = mg; rr(c, 418, 248, 92, 134, 6); c.fill();
+  c.fillStyle = 'rgba(255,255,255,0.5)'; c.beginPath(); c.moveTo(430, 248); c.lineTo(450, 248); c.lineTo(424, 382); c.lineTo(418, 382); c.lineTo(418, 300); c.fill();
+  solid(c, rrp(410, 450, 110, 150, 8), 'wood|#5a4030', 0.15, 0.35); c.strokeStyle = 'rgba(0,0,0,0.3)'; c.lineWidth = 2; c.strokeRect(418, 470, 94, 120); c.fillStyle = chromeGrad(c, 0, 0, 0, 6); rr(c, 455, 480, 20, 5, 2); c.fill();
+  c.fillStyle = '#f7f8f8'; rr(c, 404, 436, 122, 18, 6); c.fill(); c.fillStyle = '#dfe5e6'; c.beginPath(); c.ellipse(465, 440, 36, 7, 0, 0, 7); c.fill();
+  c.strokeStyle = chromeGrad(c, 456, 410, 476, 436); c.lineWidth = 4.5; c.lineCap = 'round'; c.beginPath(); c.moveTo(465, 436); c.lineTo(465, 414); c.quadraticCurveTo(465, 406, 476, 410); c.stroke();
+  c.fillStyle = chromeGrad(c, 0, 220, 0, 226); c.fillRect(300, 220, 90, 4); c.fillStyle = '#c3352b'; rr(c, 312, 222, 60, 90, 6); c.fill(); c.fillStyle = 'rgba(255,255,255,0.25)'; c.fillRect(312, 290, 60, 6);
+}
+function livingArt(c) {
+  c.fillStyle = P(c, 'paint|#d9c9b0'); c.fillRect(0, 0, LW, 590);
+  c.fillStyle = P(c, 'wood|#9a6e48'); c.fillRect(0, 590, LW, 130); c.fillStyle = 'rgba(0,0,0,0.2)'; c.fillRect(0, 588, LW, 6);
+  // window with curtains and a garden view
+  c.fillStyle = '#ffffff'; rr(c, 40, 120, 190, 220, 6); c.fill(); const v = c.createLinearGradient(0, 128, 0, 332); v.addColorStop(0, '#8fc4e0'); v.addColorStop(0.7, '#d8ecd0'); v.addColorStop(0.7, '#6a9a4a'); v.addColorStop(1, '#4a7a3a'); c.fillStyle = v; c.fillRect(48, 128, 174, 204);
+  c.fillStyle = '#ffffff'; c.fillRect(133, 128, 4, 204); c.fillRect(48, 228, 174, 4);
+  for (const [x, dir] of [[26, 1], [206, -1]]) { c.fillStyle = '#9a3a3a'; c.beginPath(); c.moveTo(x, 104); c.lineTo(x + 38 * dir, 104); c.quadraticCurveTo(x + 22 * dir, 240, x + 30 * dir, 370); c.lineTo(x, 370); c.fill(); c.strokeStyle = 'rgba(0,0,0,0.18)'; c.lineWidth = 2; for (let k = 1; k < 4; k++) { c.beginPath(); c.moveTo(x + k * 9 * dir, 106); c.lineTo(x + k * 8 * dir, 368); c.stroke(); } }
+  c.fillStyle = chromeGrad(c, 0, 100, 0, 106); c.fillRect(20, 100, 230, 5);
+  // bookshelf
+  solid(c, rrp(330, 140, 170, 280, 6), 'wood|#6a4a2e', 0.15, 0.3);
+  for (let s = 0; s < 4; s++) { const y = 150 + s * 68; c.fillStyle = '#3a2a1a'; c.fillRect(340, y, 150, 58); let x = 344; let i = 0; while (x < 478) { const w = 8 + hash(i, s, 41) * 9, h = 36 + hash(i, s, 42) * 18; c.fillStyle = ['#c3352b', '#2f6fb3', '#e2b04a', '#3f8a5a', '#efe6d2', '#7a4a8a'][Math.floor(hash(i, s, 43) * 6)]; c.fillRect(x, y + 58 - h, w, h); c.fillStyle = 'rgba(255,255,255,0.25)'; c.fillRect(x + 2, y + 58 - h + 6, w - 4, 2); x += w + 1.5; i++; } c.fillStyle = '#8a6440'; c.fillRect(334, y + 58, 162, 6); }
+  // floor lamp
+  c.strokeStyle = '#2a2c30'; c.lineWidth = 4; c.beginPath(); c.moveTo(290, 590); c.lineTo(290, 300); c.stroke(); c.fillStyle = '#f2e6c8'; c.beginPath(); c.moveTo(266, 300); c.lineTo(314, 300); c.lineTo(304, 264); c.lineTo(276, 264); c.fill();
+  // sofa: fabric, cushions, arms, piping
+  solid(c, rrp(60, 400, 330, 90, 22), 'fabric|#4a6a8a', 0.2, 0.3);
+  for (let i = 0; i < 3; i++) solid(c, rrp(84 + i * 96, 410, 90, 74, 16), 'fabric|#5a7a9a', 0.28, 0.25);
+  solid(c, rrp(60, 470, 330, 70, 16), 'fabric|#4a6a8a', 0.22, 0.35);
+  for (let i = 0; i < 3; i++) solid(c, rrp(84 + i * 96, 462, 90, 30, 10), 'fabric|#6a8aaa', 0.35, 0.2);
+  solid(c, rrp(44, 440, 40, 100, 16), 'fabric|#3e5a78', 0.2, 0.3); solid(c, rrp(366, 440, 40, 100, 16), 'fabric|#3e5a78', 0.2, 0.3);
+  c.fillStyle = '#e2b04a'; rr(c, 110, 430, 46, 40, 10); c.fill(); c.fillStyle = 'rgba(0,0,0,0.12)'; c.fillRect(110, 448, 46, 3);
+  // rug and coffee table
+  c.fillStyle = P(c, 'carpet|#8a4a3a'); rr(c, 60, 590, 420, 110, 10); c.fill(); c.strokeStyle = '#e2c890'; c.lineWidth = 4; c.strokeRect(74, 602, 392, 86); c.lineWidth = 2; c.strokeRect(86, 612, 368, 66);
+  solid(c, rrp(140, 556, 240, 22, 6), 'wood|#7a5030', 0.3, 0.3); c.fillStyle = '#4a3020'; c.fillRect(156, 578, 10, 40); c.fillRect(354, 578, 10, 40);
+  // plant
+  c.fillStyle = '#c9a070'; c.beginPath(); c.moveTo(452, 590); c.lineTo(500, 590); c.lineTo(494, 540); c.lineTo(458, 540); c.fill(); c.fillStyle = '#3f8a4f'; for (let i = 0; i < 9; i++) { c.beginPath(); c.ellipse(476 + (i - 4) * 7, 510 - Math.abs(i - 4) * -4, 7, 26, (i - 4) * 0.25, 0, 7); c.fill(); }
+}
+function sceneBathroom() {
+  const items = []; const k = ['paper', 'cap', 'paper', 'crumb', 'paper', 'cap', 'paper'];
+  k.forEach((kind, i) => items.push({ kind, x: 60 + i * 66 + hash(i, 1, 131) * 20, y: 636 + hash(i, 2, 131) * 64, a: hash(i, 3, 131) * 6, s: 1.1 + hash(i, 4, 131) * 0.5, state: 0, part: 'Floor' }));
+  const tub = x => x.fill(rectP(24, 424, 262, 130, 20)), basin = x => x.fill(rectP(404, 404, 122, 52, 8));
+  return {
+    key: 'bathroom', tools: ['brush', 'foam', 'cloth', 'vacuum'], art: bathroomArt, hint: 'Brush the limescale · foam the mold and the toilet · wipe the mirror',
+    layers: [
+      { type: 'scale', canvas: noiseDirt(x => { tub(x); basin(x); }, ['#d8d4c4', '#e8e4d4', '#c8c2ae', '#f2efe4'], 14, 141, 0.9, 0.36, (xx, y) => 0.8 + 0.4 * smooth(470, 550, y) + 0.3 * smooth(404, 456, y) * smooth(400, 410, xx)) },
+      { type: 'mold', canvas: noiseDirt(x => x.fillRect(30, 220, 250, 202), ['#1a2a1e', '#2a3a26', '#3a4a30', '#141a14'], 12, 142, 0.9, 0.4, (xx, y) => 0.7 + 0.6 * smooth(260, 420, y) + ((y % 16) < 3 || (xx % 32) < 3 ? 0.25 : 0)) },
+      { type: 'stain', canvas: blotchesAt(x => x.fill(rectP(316, 378, 80, 186, 12)), 143, 12, 316, 380, 80, 180) },
+      { type: 'grime', canvas: noiseDirt(x => x.fill(rectP(418, 248, 92, 134, 6)), ['#8a8e86', '#a4a89e', '#6e7268'], 10, 144, 0.75, 0.34) },
+      { type: 'dust', canvas: noiseDirt(x => x.fill(rectP(410, 458, 110, 142, 8)), ['#8a8070', '#a09682', '#b8ad98'], 18, 145, 0.7, 0.36) },
+    ],
+    parts: [
+      { name: 'Shower tiles', mask: x => x.fillRect(30, 220, 250, 202) },
+      { name: 'Bathtub', mask: tub },
+      { name: 'Toilet', mask: x => x.fill(rectP(316, 378, 80, 186, 12)) },
+      { name: 'Vanity & mirror', mask: x => { x.fill(rectP(418, 248, 92, 134, 6)); basin(x); x.fill(rectP(410, 458, 110, 142, 8)); } },
+      { name: 'Floor', mask: x => x.fillRect(0, 612, LW, 108) },
+    ],
+    debris: items,
+  };
+}
+function sceneLiving() {
+  const items = []; const k = ['crumb', 'wrapper', 'paper', 'crumb', 'cup', 'crumb', 'wrapper', 'paper', 'crumb'];
+  k.forEach((kind, i) => items.push({ kind, x: 90 + i * 44 + hash(i, 1, 151) * 16, y: 630 + hash(i, 2, 151) * 56, a: hash(i, 3, 151) * 6, s: 1.1 + hash(i, 4, 151) * 0.5, state: 0, part: 'Rug' }));
+  const sofa = x => { x.fill(rectP(60, 400, 330, 140, 22)); x.fill(rectP(44, 440, 40, 100, 16)); x.fill(rectP(366, 440, 40, 100, 16)); };
+  return {
+    key: 'living', tools: ['vacuum', 'foam', 'cloth'], art: livingArt, hint: 'Foam the sofa stains · dust the shelf · vacuum the rug',
+    layers: [
+      { type: 'grime', canvas: noiseDirt(x => x.fillRect(48, 128, 174, 204), ['#6a6e60', '#82867a', '#565a4e'], 14, 161, 0.8, 0.34) },
+      { type: 'dust', canvas: noiseDirt(x => { x.fill(rectP(330, 140, 170, 280, 6)); x.fill(rectP(140, 556, 240, 22, 6)); x.fill(rectP(60, 590, 420, 110, 10)); }, ['#8a8070', '#a09682', '#b8ad98'], 20, 162, 0.75, 0.34) },
+      { type: 'stain', canvas: blotchesAt(sofa, 163, 16, 60, 400, 330, 140) },
+      { type: 'stain', canvas: blotchesAt(x => x.fill(rectP(140, 556, 240, 22, 6)), 164, 5, 150, 560, 220, 14) },
+    ],
+    parts: [
+      { name: 'Window', mask: x => x.fillRect(48, 128, 174, 204) },
+      { name: 'Bookshelf', mask: x => x.fill(rectP(330, 140, 170, 280, 6)) },
+      { name: 'Sofa', mask: sofa },
+      { name: 'Coffee table', mask: x => x.fill(rectP(140, 556, 240, 22, 6)) },
+      { name: 'Rug', mask: x => x.fill(rectP(60, 590, 420, 110, 10)) },
     ],
     debris: items,
   };
@@ -602,13 +866,13 @@ const LEVELS = [
   { name: 'VINTAGE BICYCLE', scenes: ['bike'], labels: ['BIKE'] },
   { name: 'EXCAVATOR', scenes: ['digger', 'cab'], labels: ['OUTSIDE', 'CAB'] },
   { name: 'PROP PLANE', scenes: ['plane', 'cockpit'], labels: ['OUTSIDE', 'COCKPIT'] },
-  { name: 'FAMILY HOUSE', scenes: ['house', 'kitchen'], labels: ['OUTSIDE', 'KITCHEN'] },
+  { name: 'FAMILY HOUSE', scenes: ['house', 'kitchen', 'bathroom', 'living'], labels: ['OUTSIDE', 'KITCHEN', 'BATH', 'LIVING'] },
 ];
-const SCENE_FN = { exterior: () => sceneExterior(), interior: () => sceneInterior(), engine: () => sceneEngine(), bike: sceneBike, digger: sceneDigger, cab: sceneCab, plane: scenePlane, cockpit: sceneCockpit, house: sceneHouse, kitchen: sceneKitchen };
+const SCENE_FN = { exterior: () => sceneExterior(), interior: () => sceneInterior(), engine: () => sceneEngine(), bike: sceneBike, digger: sceneDigger, cab: sceneCab, plane: scenePlane, cockpit: sceneCockpit, house: sceneHouse, kitchen: sceneKitchen, bathroom: sceneBathroom, living: sceneLiving };
 const DONE_MSG = {
   exterior: ['Exterior spotless', 'Now lift the roof and clean the cabin.', 'OPEN IT UP'], interior: ['Cabin like new', 'Pop the hood. Time for the engine.', 'OPEN THE HOOD'], engine: ['Engine gleaming', 'Time for the reveal.', 'THE REVEAL'],
   bike: ['Bike like new', 'Every spoke shines again.', 'THE REVEAL'], digger: ['Digger washed down', 'Climb into the cab.', 'OPEN THE CAB'], cab: ['Cab spotless', 'Ready for a day of digging.', 'THE REVEAL'],
-  plane: ['Plane gleaming', 'Now the cockpit.', 'OPEN THE COCKPIT'], cockpit: ['Cockpit ready', 'Cleared for take-off.', 'THE REVEAL'], house: ['House like new', 'Step inside the kitchen.', 'GO INSIDE'], kitchen: ['Kitchen sparkling', 'Home, clean home.', 'THE REVEAL'],
+  plane: ['Plane gleaming', 'Now the cockpit.', 'OPEN THE COCKPIT'], cockpit: ['Cockpit ready', 'Cleared for take-off.', 'THE REVEAL'], house: ['House like new', 'Step inside the kitchen.', 'GO INSIDE'], kitchen: ['Kitchen sparkling', 'Next: the bathroom.', 'TO THE BATHROOM'], bathroom: ['Bathroom gleaming', 'Last room: the living room.', 'TO THE LIVING ROOM'], living: ['Living room cozy', 'Home, clean home.', 'THE REVEAL'],
 };
 let LV = 0, levelParts = 0;
 
@@ -793,6 +1057,7 @@ function drawDebris(c, d) {
   else if (d.kind === 'cup') { c.fillStyle = '#f4efe6'; c.beginPath(); c.moveTo(-8, -9); c.lineTo(8, -9); c.lineTo(6, 9); c.lineTo(-6, 9); c.closePath(); c.fill(); c.fillStyle = '#c3352b'; c.fillRect(-7, -3, 14, 4); }
   else if (d.kind === 'crumb') { c.fillStyle = '#b8863a'; for (let i = 0; i < 5; i++) { c.beginPath(); c.arc((hash(i, 1, 7) - 0.5) * 16, (hash(i, 2, 7) - 0.5) * 10, 2.5, 0, 7); c.fill(); } }
   else if (d.kind === 'peel') { c.fillStyle = '#f2c94c'; c.beginPath(); c.moveTo(-12, 0); c.quadraticCurveTo(0, -12, 12, 0); c.quadraticCurveTo(0, -5, -12, 0); c.fill(); }
+  else if (d.kind === 'wrapper') { c.fillStyle = '#2f6fb3'; c.beginPath(); c.moveTo(-11, -6); c.lineTo(9, -8); c.lineTo(12, 5); c.lineTo(-8, 8); c.closePath(); c.fill(); c.fillStyle = '#e2b04a'; c.fillRect(-4, -3, 8, 5); c.strokeStyle = 'rgba(255,255,255,0.35)'; c.lineWidth = 1; c.beginPath(); c.moveTo(-9, -4); c.lineTo(8, -6); c.stroke(); }
   else { c.fillStyle = '#3f86d8'; rr(c, -10, -5, 20, 10, 3); c.fill(); c.fillStyle = '#f2b233'; c.fillRect(-4, -5, 8, 10); }
   c.restore();
 }
