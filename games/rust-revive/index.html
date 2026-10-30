@@ -1,0 +1,591 @@
+<title>Rust & Revive Garage</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  /* Garage at night: slate walls, teal paint, brass and rust accents. One look, always dark. */
+  :root {
+    --bg: #0f1418; --panel: #172026; --panel-2: #1f2a31; --line: rgba(255,255,255,0.12);
+    --fg: #eef2f3; --muted: #93a2ab; --rust: #c8551d; --brass: #e2b04a; --clean: #46d6b4; --warn: #ff6b4a;
+    --disp: "Big Shoulders Display", "Arial Narrow", sans-serif; --ui: Manrope, system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+    color-scheme: dark;
+  }
+  html, body { height: 100%; margin: 0; background: var(--bg); color: var(--fg); font-family: var(--ui); overflow: hidden; -webkit-user-select: none; user-select: none; }
+  #app { height: 100%; display: flex; flex-direction: column; }
+  header { padding-block: 10px 6px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 8px; }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .name { font-family: var(--disp); font-weight: 900; font-size: 22px; letter-spacing: 1.5px; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .icon-btn { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); display: grid; place-items: center; cursor: pointer; padding: 0; }
+  .icon-btn:focus-visible, .tool:focus-visible, .cta:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+  .icon-btn.on { background: #3a2a14; border-color: var(--brass); }
+  .steps { display: flex; gap: 6px; }
+  .step { flex: 1; font-family: var(--mono); font-size: 11px; letter-spacing: 1.5px; text-align: center; padding: 5px 0; border-radius: 999px; background: var(--panel); color: var(--muted); border: 1px solid var(--line); }
+  .step.now { background: var(--rust); color: #fff; border-color: transparent; }
+  .step.done { color: var(--clean); border-color: rgba(70,214,180,0.4); }
+  .bar { height: 8px; border-radius: 4px; background: var(--panel-2); overflow: hidden; flex: 1; }
+  .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--clean), #8ff0d8); transition: width .25s; }
+  .pct { font-family: var(--disp); font-weight: 900; font-size: 22px; min-width: 56px; text-align: right; font-variant-numeric: tabular-nums; }
+  #stage { flex: 1; min-height: 0; position: relative; display: flex; align-items: center; justify-content: center; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  canvas { display: block; touch-action: none; border-radius: 18px; cursor: none; }
+  #toast { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(23,32,38,0.95); border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; font-weight: 700; font-size: 14px; white-space: nowrap; max-width: calc(100% - 40px); overflow: hidden; text-overflow: ellipsis; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  #toast.show { opacity: 1; }
+  #toast b { color: var(--brass); }
+  #tools { display: flex; gap: 8px; justify-content: center; padding-block: 8px 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); overflow-x: auto; }
+  .tool { flex: 0 0 auto; width: 76px; padding: 8px 4px 7px; border-radius: 16px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; font: 700 11px var(--ui); letter-spacing: .3px; }
+  .tool svg { width: 30px; height: 30px; }
+  .tool.on { background: #3a2010; border-color: var(--rust); box-shadow: 0 0 0 2px rgba(200,85,29,0.35) inset; }
+  .tool.hint { animation: pulse 0.6s 3; }
+  @keyframes pulse { 50% { box-shadow: 0 0 0 4px rgba(226,176,74,0.7); } }
+  .card { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(8,12,15,0.72); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .card.show { display: flex; }
+  .card > div { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 22px; width: min(340px, 100%); text-align: center; display: flex; flex-direction: column; gap: 10px; }
+  .card h2 { margin: 0; font-family: var(--disp); font-weight: 900; font-size: 38px; letter-spacing: 1.5px; text-wrap: balance; }
+  .card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+  .stats { display: flex; gap: 8px; justify-content: center; }
+  .stats div { flex: 1; background: var(--panel-2); border-radius: 12px; padding: 8px 4px; }
+  .stats b { display: block; font-family: var(--disp); font-size: 24px; font-variant-numeric: tabular-nums; }
+  .stats span { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+  .stars { font-size: 28px; color: var(--brass); letter-spacing: 6px; }
+  .cta { border: 0; border-radius: 999px; padding: 14px 18px; background: var(--rust); color: #fff; font: 900 18px var(--disp); letter-spacing: 2px; cursor: pointer; }
+  .hintline { font-family: var(--mono); font-size: 11px; color: var(--muted); text-align: center; padding-bottom: 2px; }
+  @media (prefers-reduced-motion: reduce) { .tool.hint { animation: none; } }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Manrope:wght@500;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
+
+<div id="app">
+  <header>
+    <div class="row">
+      <div class="name">CLASSIC COUPE · 1958</div>
+      <button class="icon-btn" id="finder" aria-label="Show remaining dirt" title="Dirt finder">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/><path d="M8 11h6M11 8v6"/></svg>
+      </button>
+      <button class="icon-btn on" id="sound" aria-label="Sound on" title="Sound">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9z"/><path id="wave" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>
+      </button>
+    </div>
+    <div class="steps"><div class="step" data-s="exterior">EXTERIOR</div><div class="step" data-s="interior">INTERIOR</div><div class="step" data-s="engine">ENGINE</div><div class="step" data-s="finale">DONE</div></div>
+    <div class="row"><div class="bar"><i id="barfill"></i></div><div class="pct" id="pct">0%</div></div>
+  </header>
+  <div id="stage">
+    <canvas id="c" aria-label="Car to clean. Drag to use the selected tool."></canvas>
+    <div id="toast"></div>
+    <div class="card" id="card"><div><h2 id="cardTitle"></h2><p id="cardText"></p><div class="stats" id="cardStats"></div><div class="stars" id="cardStars"></div><button class="cta" id="cardBtn"></button></div></div>
+  </div>
+  <div class="hintline" id="hintline">Drag on the car to clean · each dirt has its own tool</div>
+  <div id="tools"></div>
+</div>
+
+<script>
+// ===== noise =====
+function hash(x, y, s) { let h = (Math.imul(x, 374761393) + Math.imul(y, 668265263) + Math.imul(s, 1442695041)) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); h ^= h >>> 16; return (h >>> 0) / 4294967296; }
+function vnoise(x, y, s) { const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi, u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf); const a = hash(xi, yi, s), b = hash(xi + 1, yi, s), c = hash(xi, yi + 1, s), d = hash(xi + 1, yi + 1, s); return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v; }
+function fbm(x, y, s, o = 4) { let t = 0, a = 0.5, f = 1, n = 0; for (let i = 0; i < o; i++) { t += a * vnoise(x * f, y * f, s + i * 17); n += a; a *= 0.5; f *= 2.03; } return t / n; }
+const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+const lerp = (a, b, t) => a + (b - a) * t, clamp01 = x => Math.min(1, Math.max(0, x)), ease = x => 1 - Math.pow(1 - clamp01(x), 3);
+const hex = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+function ramp(st, t) { t = Math.min(0.999, Math.max(0, t)); const n = st.length - 1, i = Math.floor(t * n), k = t * n - i, a = hex(st[i]), b = hex(st[i + 1]); return [lerp(a[0], b[0], k), lerp(a[1], b[1], k), lerp(a[2], b[2], k)]; }
+function mk(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+function rr(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
+
+// ===== layout =====
+const LW = 540, LH = 720, LOW = 4;            // logical scene size; completion is measured on a 1/4 grid
+const cv = document.getElementById('c'), g = cv.getContext('2d');
+const stage = document.getElementById('stage');
+let DPR = Math.min(2, window.devicePixelRatio || 1);
+function fit() {
+  const r = stage.getBoundingClientRect(), padX = 32, s = Math.max(0.2, Math.min((r.width - padX) / LW, (r.height - 8) / LH));
+  cv.style.width = LW * s + 'px'; cv.style.height = LH * s + 'px';
+  cv.width = Math.round(LW * s * DPR); cv.height = Math.round(LH * s * DPR);
+}
+window.addEventListener('resize', fit);
+
+// ===== car geometry (local coordinates, car centred on 0,0) =====
+function bodyPath() { const p = new Path2D(); p.moveTo(-215, 40); p.lineTo(-215, 0); p.quadraticCurveTo(-205, -32, -150, -40); p.lineTo(-95, -42); p.quadraticCurveTo(-62, -104, 0, -104); p.lineTo(70, -104); p.quadraticCurveTo(112, -98, 142, -46); p.lineTo(192, -40); p.quadraticCurveTo(218, -32, 218, 0); p.lineTo(218, 40); p.closePath(); return p; }
+function winFront() { const p = new Path2D(); p.moveTo(6, -46); p.lineTo(6, -94); p.lineTo(66, -94); p.quadraticCurveTo(100, -90, 124, -46); p.closePath(); return p; }
+function winRear() { const p = new Path2D(); p.moveTo(-80, -46); p.quadraticCurveTo(-55, -94, -8, -94); p.lineTo(-8, -46); p.closePath(); return p; }
+function circ(x, y, r) { const p = new Path2D(); p.arc(x, y, r, 0, Math.PI * 2); return p; }
+function rectP(x, y, w, h, r = 0) { const p = new Path2D(); if (r) { p.moveTo(x + r, y); p.arcTo(x + w, y, x + w, y + h, r); p.arcTo(x + w, y + h, x, y + h, r); p.arcTo(x, y + h, x, y, r); p.arcTo(x, y, x + w, y, r); p.closePath(); } else p.rect(x, y, w, h); return p; }
+const CAR = { x: 270, y: 400, s: 1.12 };
+function inCar(c, fn, y = CAR.y) { c.save(); c.translate(CAR.x, y); c.scale(CAR.s, CAR.s); fn(); c.restore(); }
+
+function garage(c) {
+  const wall = c.createLinearGradient(0, 0, 0, LH); wall.addColorStop(0, '#1a2328'); wall.addColorStop(0.68, '#232e34'); wall.addColorStop(0.68, '#2b3439'); wall.addColorStop(1, '#1b2226');
+  c.fillStyle = wall; c.fillRect(0, 0, LW, LH);
+  c.globalAlpha = 0.06; c.strokeStyle = '#fff'; c.lineWidth = 1; for (let y = 30; y < 480; y += 40) { c.beginPath(); c.moveTo(0, y); c.lineTo(LW, y); c.stroke(); } c.globalAlpha = 1;
+  const lamp = c.createRadialGradient(270, 300, 20, 270, 330, 380); lamp.addColorStop(0, 'rgba(255,226,170,0.20)'); lamp.addColorStop(1, 'rgba(255,226,170,0)'); c.fillStyle = lamp; c.fillRect(0, 0, LW, LH);
+  c.fillStyle = 'rgba(255,255,255,0.05)'; for (let x = 0; x < LW; x += 60) c.fillRect(x, 490, 2, 230);
+}
+function wheel(c, x, y) {
+  c.fillStyle = '#141518'; c.beginPath(); c.arc(x, y, 44, 0, 7); c.fill();
+  c.strokeStyle = '#ece8df'; c.lineWidth = 7; c.beginPath(); c.arc(x, y, 31, 0, 7); c.stroke();
+  const hg = c.createRadialGradient(x - 8, y - 8, 2, x, y, 25); hg.addColorStop(0, '#ffffff'); hg.addColorStop(0.5, '#c9d1d8'); hg.addColorStop(1, '#7a848c');
+  c.fillStyle = hg; c.beginPath(); c.arc(x, y, 25, 0, 7); c.fill();
+  c.strokeStyle = 'rgba(60,70,80,0.6)'; c.lineWidth = 1.5; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; c.beginPath(); c.moveTo(x + Math.cos(a) * 7, y + Math.sin(a) * 7); c.lineTo(x + Math.cos(a) * 22, y + Math.sin(a) * 22); c.stroke(); }
+  c.fillStyle = '#9aa5ae'; c.beginPath(); c.arc(x, y, 6, 0, 7); c.fill();
+}
+function carBody(c, opts = {}) {
+  const body = bodyPath();
+  const bg = c.createLinearGradient(0, -104, 0, 40); bg.addColorStop(0, '#5fd0c6'); bg.addColorStop(0.45, '#2a9a92'); bg.addColorStop(1, '#14514c');
+  c.fillStyle = bg; c.fill(body);
+  c.save(); c.clip(body);
+  c.fillStyle = '#0c2422'; c.beginPath(); c.arc(-130, 40, 52, 0, 7); c.arc(130, 40, 52, 0, 7); c.fill();
+  c.fillStyle = 'rgba(255,255,255,0.22)'; c.fillRect(-215, -38, 433, 5);
+  c.strokeStyle = 'rgba(0,0,0,0.35)'; c.lineWidth = 1.6; c.beginPath(); c.moveTo(-2, -44); c.lineTo(-2, 28); c.moveTo(-94, -40); c.lineTo(-100, 28); c.moveTo(140, -44); c.lineTo(150, 28); c.stroke();
+  c.restore();
+  c.strokeStyle = '#dfe5ea'; c.lineWidth = 3; c.beginPath(); c.moveTo(-205, -8); c.lineTo(208, -8); c.stroke();
+  c.fillStyle = '#dfe5ea'; rr(c, 8, -30, 22, 5, 2); c.fill(); rr(c, -84, -30, 22, 5, 2); c.fill();
+  const wg = c.createLinearGradient(0, -94, 0, -46); wg.addColorStop(0, '#d6eef8'); wg.addColorStop(1, '#7fb6cf');
+  c.fillStyle = wg; c.fill(winFront()); c.fill(winRear());
+  c.strokeStyle = '#dfe5ea'; c.lineWidth = 2.5; c.stroke(winFront()); c.stroke(winRear());
+  c.save(); c.clip(winFront()); c.fillStyle = 'rgba(255,255,255,0.45)'; c.beginPath(); c.moveTo(30, -94); c.lineTo(44, -94); c.lineTo(24, -46); c.lineTo(10, -46); c.fill(); c.restore();
+  c.save(); c.clip(winRear()); c.fillStyle = 'rgba(255,255,255,0.4)'; c.beginPath(); c.moveTo(-40, -94); c.lineTo(-30, -94); c.lineTo(-50, -46); c.lineTo(-60, -46); c.fill(); c.restore();
+  c.fillStyle = '#fff4c8'; c.beginPath(); c.arc(206, -16, 11, 0, 7); c.fill(); c.strokeStyle = '#dfe5ea'; c.lineWidth = 3; c.stroke();
+  c.fillStyle = '#d4332a'; rr(c, -217, -24, 9, 22, 3); c.fill();
+  const cg = c.createLinearGradient(0, 16, 0, 34); cg.addColorStop(0, '#ffffff'); cg.addColorStop(0.5, '#b7c1c9'); cg.addColorStop(1, '#6d7880');
+  c.fillStyle = cg; rr(c, -232, 16, 46, 16, 7); c.fill(); rr(c, 190, 16, 46, 16, 7); c.fill();
+  wheel(c, -130, 44); wheel(c, 130, 44);
+  if (opts.polish) {
+    c.save(); c.clip(body); const x = -300 + opts.polish * 600, sg = c.createLinearGradient(x - 60, -110, x + 60, 50);
+    sg.addColorStop(0, 'rgba(255,255,255,0)'); sg.addColorStop(0.5, 'rgba(255,255,255,0.55)'); sg.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = sg; c.fillRect(-240, -120, 480, 180); c.restore();
+  }
+}
+function exteriorArt(c, opts) { garage(c); c.fillStyle = 'rgba(0,0,0,0.45)'; c.beginPath(); c.ellipse(270, 452, 262, 16, 0, 0, 7); c.fill(); inCar(c, () => carBody(c, opts)); }
+
+// interior: roof lifted off, near side panel cut away like a dollhouse
+const IN_Y = 430;
+function interiorArt(c) {
+  garage(c); c.fillStyle = 'rgba(0,0,0,0.45)'; c.beginPath(); c.ellipse(270, 482, 262, 16, 0, 0, 7); c.fill();
+  inCar(c, () => {
+    const body = bodyPath();
+    c.save(); c.clip(body); c.beginPath(); c.rect(-240, -44, 480, 100); c.clip();
+    c.fillStyle = '#1d4f4b'; c.fillRect(-240, -44, 480, 100);
+    c.fillStyle = '#6a5a48'; c.fillRect(-170, -30, 330, 46);              // far door panels
+    c.fillStyle = 'rgba(0,0,0,0.18)'; for (let x = -160; x < 160; x += 22) c.fillRect(x, -30, 2, 46);
+    c.restore();
+    c.fillStyle = '#35302b'; c.fillRect(-170, 12, 352, 18);                // carpet
+    const seat = (x, w, backX) => {
+      const sg = c.createLinearGradient(0, -70, 0, 20); sg.addColorStop(0, '#f2e6cc'); sg.addColorStop(1, '#cdb894');
+      c.fillStyle = sg; rr(c, backX, -74, 26, 86, 12); c.fill(); rr(c, x, -8, w, 24, 9); c.fill();
+      c.strokeStyle = 'rgba(120,90,50,0.35)'; c.lineWidth = 1.2; for (let k = 1; k < 4; k++) { c.beginPath(); c.moveTo(backX + 4, -74 + k * 20); c.lineTo(backX + 22, -74 + k * 20); c.stroke(); c.beginPath(); c.moveTo(x + k * w / 4, -6); c.lineTo(x + k * w / 4, 14); c.stroke(); }
+    };
+    seat(-142, 96, -156); seat(-14, 86, -30);
+    c.fillStyle = '#7a4a2a'; rr(c, 112, -46, 64, 42, 8); c.fill();         // wooden dashboard
+    c.fillStyle = '#1b1b1b'; for (const gx of [128, 150]) { c.beginPath(); c.arc(gx, -26, 8, 0, 7); c.fill(); c.strokeStyle = '#dfe5ea'; c.lineWidth = 1.5; c.stroke(); }
+    c.strokeStyle = '#1c1c1c'; c.lineWidth = 5; c.beginPath(); c.ellipse(96, -46, 7, 30, 0.2, 0, 7); c.stroke(); c.beginPath(); c.moveTo(100, -40); c.lineTo(118, -24); c.stroke();
+    c.save(); c.clip(body); c.beginPath(); c.rect(-240, 22, 480, 40); c.clip();   // near sill stays
+    const bg = c.createLinearGradient(0, 20, 0, 40); bg.addColorStop(0, '#2a9a92'); bg.addColorStop(1, '#14514c'); c.fillStyle = bg; c.fillRect(-240, 22, 480, 40);
+    c.restore();
+    c.strokeStyle = '#dfe5ea'; c.lineWidth = 3; c.beginPath(); c.moveTo(-205, 22); c.lineTo(208, 22); c.stroke();
+    const cg = c.createLinearGradient(0, 16, 0, 34); cg.addColorStop(0, '#ffffff'); cg.addColorStop(1, '#6d7880'); c.fillStyle = cg; rr(c, -232, 16, 46, 16, 7); c.fill(); rr(c, 190, 16, 46, 16, 7); c.fill();
+    wheel(c, -130, 44); wheel(c, 130, 44);
+  }, IN_Y);
+}
+function roofArt(c, lift) {
+  inCar(c, () => {
+    c.save(); c.translate(0, -lift);
+    const body = bodyPath(); c.save(); c.clip(body); c.beginPath(); c.rect(-240, -120, 480, 76); c.clip();
+    const bg = c.createLinearGradient(0, -104, 0, -44); bg.addColorStop(0, '#5fd0c6'); bg.addColorStop(1, '#2a9a92'); c.fillStyle = bg; c.fillRect(-240, -120, 480, 80);
+    c.restore();
+    c.fillStyle = 'rgba(214,238,248,0.5)'; c.fill(winFront()); c.fill(winRear());
+    c.strokeStyle = '#dfe5ea'; c.lineWidth = 2.5; c.stroke(winFront()); c.stroke(winRear());
+    c.restore();
+    if (lift > 20) { c.strokeStyle = 'rgba(255,255,255,0.35)'; c.setLineDash([4, 6]); c.lineWidth = 2; for (const x of [-60, 80]) { c.beginPath(); c.moveTo(x, -40); c.lineTo(x, -40 - lift + 6); c.stroke(); } c.setLineDash([]); }
+  }, IN_Y);
+}
+
+// engine bay, seen from above with the hood open
+const EN = { x: 270, y: 380 };
+function inEngine(c, fn) { c.save(); c.translate(EN.x, EN.y); fn(); c.restore(); }
+function engineArt(c) {
+  const bgr = c.createRadialGradient(270, 380, 40, 270, 380, 420); bgr.addColorStop(0, '#2c343a'); bgr.addColorStop(1, '#0d1215'); c.fillStyle = bgr; c.fillRect(0, 0, LW, LH);
+  inEngine(c, () => {
+    c.fillStyle = '#2a9a92'; rr(c, -270, -330, 40, 640, 14); c.fill(); rr(c, 230, -330, 40, 640, 14); c.fill();
+    c.fillStyle = '#20282d'; rr(c, -228, -320, 456, 620, 22); c.fill();
+    c.fillStyle = '#3a4248'; rr(c, -200, -300, 400, 80, 10); c.fill();                       // radiator
+    c.strokeStyle = '#8e99a3'; c.lineWidth = 1.5; for (let x = -192; x < 196; x += 8) { c.beginPath(); c.moveTo(x, -294); c.lineTo(x, -226); c.stroke(); }
+    c.fillStyle = '#c9d1d8'; c.beginPath(); c.arc(150, -260, 12, 0, 7); c.fill();
+    c.strokeStyle = '#111'; c.lineWidth = 14; c.lineCap = 'round'; c.beginPath(); c.moveTo(-120, -222); c.bezierCurveTo(-120, -190, -60, -200, -60, -160); c.stroke(); c.beginPath(); c.moveTo(130, -222); c.bezierCurveTo(130, -180, 80, -190, 70, -150); c.stroke();
+    c.fillStyle = '#5a636a'; rr(c, -96, -170, 192, 240, 20); c.fill();                        // intake
+    const vc = (x) => { const vg = c.createLinearGradient(x, 0, x + 70, 0); vg.addColorStop(0, '#8a2219'); vg.addColorStop(0.5, '#d4402f'); vg.addColorStop(1, '#8a2219'); c.fillStyle = vg; rr(c, x, -180, 70, 260, 26); c.fill(); c.strokeStyle = 'rgba(255,255,255,0.25)'; c.lineWidth = 2; for (let y = -150; y < 60; y += 30) { c.beginPath(); c.moveTo(x + 14, y); c.lineTo(x + 56, y); c.stroke(); } c.fillStyle = '#c9d1d8'; for (const y of [-160, 60]) { c.beginPath(); c.arc(x + 35, y, 5, 0, 7); c.fill(); } };
+    vc(-176); vc(106);
+    const ag = c.createRadialGradient(-20, -70, 10, 0, -50, 80); ag.addColorStop(0, '#ffffff'); ag.addColorStop(0.5, '#c9d1d8'); ag.addColorStop(1, '#6d7880');
+    c.fillStyle = ag; c.beginPath(); c.arc(0, -50, 78, 0, 7); c.fill(); c.strokeStyle = '#4a545c'; c.lineWidth = 3; c.stroke();   // air cleaner
+    c.fillStyle = '#4a545c'; c.beginPath(); c.arc(0, -50, 14, 0, 7); c.fill(); c.fillStyle = '#c9d1d8'; c.fillRect(-22, -54, 44, 8);
+    c.fillStyle = '#18191b'; rr(c, -215, 120, 130, 96, 10); c.fill(); c.fillStyle = '#2a2c30'; rr(c, -215, 120, 130, 16, 6); c.fill();   // battery
+    c.fillStyle = '#c3352b'; c.beginPath(); c.arc(-190, 118, 11, 0, 7); c.fill(); c.fillStyle = '#9aa0a6'; c.beginPath(); c.arc(-110, 118, 11, 0, 7); c.fill();
+    c.fillStyle = '#c9d1d8'; c.beginPath(); c.arc(160, 160, 34, 0, 7); c.fill(); c.fillStyle = '#6d7880'; c.beginPath(); c.arc(160, 160, 12, 0, 7); c.fill();   // alternator
+    c.strokeStyle = '#111'; c.lineWidth = 6; c.beginPath(); c.moveTo(130, 150); c.lineTo(40, 112); c.moveTo(150, 194); c.lineTo(30, 140); c.stroke();
+    c.fillStyle = '#3a3f45'; c.beginPath(); c.arc(30, 126, 20, 0, 7); c.fill();
+  });
+}
+
+// ===== scenes =====
+const TOOLS = {
+  washer: { name: 'WASHER', r: 22, k: 0.26 }, brush: { name: 'WIRE BRUSH', r: 15, k: 0.34 }, cloth: { name: 'CLOTH', r: 22, k: 0.2 },
+  foam: { name: 'FOAM BRUSH', r: 20, k: 0.26 }, vacuum: { name: 'VACUUM', r: 24, k: 0.3 }, degreaser: { name: 'DEGREASER', r: 26, k: 0 },
+};
+const EFF = {
+  washer: { dust: 1, mud: 1, grime: 0.3, grease: 0.08, rust: 0.04, stain: 0.12, leaves: 1 },
+  brush: { rust: 1, mud: 0.5, grease: 0.35, dust: 0.45, grime: 0.25, stain: 0.25 },
+  cloth: { grime: 1, dust: 0.85, stain: 0.25, mud: 0.2, grease: 0.15 },
+  foam: { stain: 1, dust: 0.5, grime: 0.45 },
+  vacuum: { dust: 1, leaves: 1 },
+  degreaser: {},
+};
+const BEST = { dust: 'washer', mud: 'washer', grime: 'cloth', grease: 'degreaser', rust: 'brush', stain: 'foam', leaves: 'vacuum' };
+const DIRT_NAME = { dust: 'dust', mud: 'mud', grime: 'window grime', grease: 'grease', rust: 'rust', stain: 'a stain', leaves: 'leaves' };
+const ICON = {
+  washer: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 26l9-9"/><rect x="13" y="9" width="10" height="7" rx="2" transform="rotate(-45 18 12.5)"/><path d="M22 8l3-3M24 11l4-1M21 6l1-4"/></svg>',
+  brush: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="16" cy="16" r="5"/><path d="M16 3v6M16 23v6M3 16h6M23 16h6M7 7l4 4M21 21l4 4M25 7l-4 4M11 21l-4 4"/></svg>',
+  cloth: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M6 10l14-4 6 6-14 14-6-6z"/><path d="M12 20l8-8"/></svg>',
+  foam: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="7" y="16" width="18" height="10" rx="3"/><circle cx="11" cy="9" r="3"/><circle cx="19" cy="7" r="4"/><circle cx="24" cy="12" r="2"/></svg>',
+  vacuum: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M8 4c0 10 6 12 12 14"/><path d="M18 16l8 6-3 5-9-4z"/></svg>',
+  degreaser: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M11 12h10v15H11z"/><path d="M13 12V8h8l3 2M21 8V5h-6"/><path d="M26 6l3-1M26 10l3 1"/></svg>',
+};
+
+function regionMask(draw) { const c = mk(LW, LH), x = c.getContext('2d'); x.fillStyle = '#fff'; x.strokeStyle = '#fff'; draw(x); return c; }
+// noise dirt clipped to a region; `w(x,y)` biases coverage (mud is heavier low down, etc.)
+function noiseDirt(region, cols, scale, seed, alpha, thr, w = () => 1) {
+  const m = regionMask(region).getContext('2d').getImageData(0, 0, LW, LH).data, c = mk(LW, LH), x = c.getContext('2d', { willReadFrequently: true });
+  const img = x.createImageData(LW, LH), d = img.data;
+  for (let y = 0; y < LH; y++) for (let xx = 0; xx < LW; xx++) {
+    const i = (y * LW + xx) * 4; if (m[i + 3] < 8) continue;
+    const n = fbm(xx / scale, y / scale, seed) * w(xx, y), cov = smooth(thr - 0.07, thr + 0.07, n); if (cov <= 0) continue;
+    const col = ramp(cols, fbm(xx / 12, y / 12, seed + 5, 3)), sp = vnoise(xx / 2.5, y / 2.5, seed + 9) > 0.8 ? 0.75 : 1;
+    d[i] = col[0] * sp; d[i + 1] = col[1] * sp; d[i + 2] = col[2] * sp; d[i + 3] = 255 * alpha * cov * (m[i + 3] / 255);
+  }
+  x.putImageData(img, 0, 0); return c;
+}
+function blotches(region, seed, n) {    // coffee-ring style stains, clipped to the seats
+  const c = mk(LW, LH), x = c.getContext('2d', { willReadFrequently: true }), m = regionMask(region);
+  for (let i = 0; i < n; i++) {
+    const cx = 60 + hash(i, 1, seed) * 420, cy = 300 + hash(i, 2, seed) * 160, r = 10 + hash(i, 3, seed) * 22;
+    const gr = x.createRadialGradient(cx, cy, r * 0.2, cx, cy, r); gr.addColorStop(0, 'rgba(110,70,30,0.55)'); gr.addColorStop(0.75, 'rgba(110,70,30,0.35)'); gr.addColorStop(0.92, 'rgba(80,45,15,0.85)'); gr.addColorStop(1, 'rgba(80,45,15,0)');
+    x.fillStyle = gr; x.beginPath(); x.ellipse(cx, cy, r * 1.2, r, hash(i, 4, seed) * 3, 0, 7); x.fill();
+  }
+  x.globalCompositeOperation = 'destination-in'; x.drawImage(m, 0, 0); return c;
+}
+
+function sceneExterior() {
+  const carP = (fn) => (x) => inCar(x, () => fn(x));
+  const body = bodyPath(), wf = winFront(), wr = winRear();
+  return {
+    key: 'exterior', title: 'Exterior', tools: ['washer', 'brush', 'cloth'], art: (c, o) => exteriorArt(c, o),
+    layers: [
+      { type: 'dust', canvas: noiseDirt(carP(x => { x.fill(body); x.fill(circ(-130, 44, 44)); x.fill(circ(130, 44, 44)); }), ['#8a8070', '#a09682', '#b8ad98'], 70, 11, 0.62, 0.34) },
+      { type: 'mud', canvas: noiseDirt(carP(x => { x.save(); x.clip(body); x.fillRect(-240, -12, 480, 80); x.restore(); x.fill(circ(-130, 44, 44)); x.fill(circ(130, 44, 44)); x.fillRect(-235, 14, 50, 22); x.fillRect(188, 14, 50, 22); }), ['#3a2816', '#5a3e22', '#76522e', '#4a321c'], 46, 12, 0.96, 0.4, (xx, y) => 0.6 + smooth(360, 470, y) * 0.8) },
+      { type: 'grime', canvas: noiseDirt(carP(x => { x.fill(wf); x.fill(wr); }), ['#5a6650', '#6e7a5e', '#4a5442'], 26, 13, 0.82, 0.32) },
+      { type: 'rust', canvas: noiseDirt(carP(x => { x.fill(rectP(-232, 16, 46, 16, 7)); x.fill(rectP(190, 16, 46, 16, 7)); x.fill(circ(-130, 44, 25)); x.fill(circ(130, 44, 25)); x.lineWidth = 4; x.beginPath(); x.moveTo(-205, -8); x.lineTo(208, -8); x.stroke(); }), ['#5e260c', '#8f3c12', '#bb5a1d', '#d88438'], 9, 14, 1, 0.45) },
+    ],
+    parts: [
+      { name: 'Front wheel', mask: carP(x => x.fill(circ(130, 44, 46))) },
+      { name: 'Rear wheel', mask: carP(x => x.fill(circ(-130, 44, 46))) },
+      { name: 'Windows', mask: carP(x => { x.fill(wf); x.fill(wr); }) },
+      { name: 'Bumpers & trim', mask: carP(x => { x.fill(rectP(-234, 14, 50, 20, 7)); x.fill(rectP(188, 14, 50, 20, 7)); x.lineWidth = 6; x.beginPath(); x.moveTo(-205, -8); x.lineTo(208, -8); x.stroke(); }) },
+      { name: 'Front end', mask: carP(x => { x.save(); x.clip(body); x.fillRect(60, -120, 200, 180); x.restore(); x.globalCompositeOperation = 'destination-out'; x.fill(circ(130, 44, 46)); x.fill(wf); x.fillRect(188, 14, 50, 20); }) },
+      { name: 'Doors', mask: carP(x => { x.save(); x.clip(body); x.fillRect(-96, -120, 156, 180); x.restore(); x.globalCompositeOperation = 'destination-out'; x.fill(wf); x.fill(wr); x.fill(circ(130, 44, 46)); x.fill(circ(-130, 44, 46)); }) },
+      { name: 'Rear end', mask: carP(x => { x.save(); x.clip(body); x.fillRect(-260, -120, 164, 180); x.restore(); x.globalCompositeOperation = 'destination-out'; x.fill(circ(-130, 44, 46)); x.fill(wr); x.fillRect(-234, 14, 50, 20); }) },
+    ],
+    debris: [],
+  };
+}
+function sceneInterior() {
+  const inC = (fn) => (x) => inCar(x, () => fn(x), IN_Y);
+  const seats = inC(x => { x.fill(rectP(-156, -74, 26, 86, 12)); x.fill(rectP(-142, -8, 96, 24, 9)); x.fill(rectP(-30, -74, 26, 86, 12)); x.fill(rectP(-14, -8, 86, 24, 9)); });
+  const items = [];
+  const kinds = ['paper', 'leaf', 'cap', 'paper', 'leaf', 'wrapper', 'leaf', 'paper', 'cap', 'leaf'];
+  kinds.forEach((k, i) => { const lx = -150 + (i * 31) % 310, onSeat = i % 4 === 1; items.push({ kind: k, x: CAR.x + lx * CAR.s, y: IN_Y + (onSeat ? -14 : 18 + (i % 3) * 3) * CAR.s, a: hash(i, 3, 5) * 6, s: 0.9 + hash(i, 4, 5) * 0.5, state: 0, part: lx < -20 ? 'Rear seat' : lx < 100 ? 'Front seat' : 'Floor' }); });
+  return {
+    key: 'interior', title: 'Interior', tools: ['vacuum', 'foam', 'cloth'], art: (c) => interiorArt(c),
+    layers: [
+      { type: 'stain', canvas: blotches(seats, 7, 26) },
+      { type: 'dust', canvas: noiseDirt(inC(x => { x.fill(rectP(112, -46, 64, 42, 8)); x.fillRect(-170, 10, 352, 22); x.fill(rectP(-156, -74, 26, 86, 12)); x.fill(rectP(-30, -74, 26, 86, 12)); }), ['#8a8274', '#a39a88', '#bdb3a0'], 30, 21, 0.75, 0.36) },
+    ],
+    parts: [
+      { name: 'Rear seat', mask: inC(x => { x.fill(rectP(-158, -76, 30, 90, 12)); x.fill(rectP(-144, -10, 100, 28, 9)); }) },
+      { name: 'Front seat', mask: inC(x => { x.fill(rectP(-32, -76, 30, 90, 12)); x.fill(rectP(-16, -10, 90, 28, 9)); }) },
+      { name: 'Dashboard', mask: inC(x => x.fill(rectP(110, -48, 68, 46, 8))) },
+      { name: 'Floor', mask: inC(x => x.fillRect(-172, 8, 356, 26)) },
+    ],
+    debris: items,
+  };
+}
+function sceneEngine() {
+  const en = (fn) => (x) => inEngine(x, () => fn(x));
+  const items = []; for (let i = 0; i < 9; i++) items.push({ kind: 'leaf', x: EN.x - 180 + i * 44 + hash(i, 1, 9) * 20, y: EN.y - 262 + hash(i, 2, 9) * 30, a: hash(i, 3, 9) * 6, s: 1 + hash(i, 4, 9) * 0.5, state: 0, part: 'Radiator' });
+  return {
+    key: 'engine', title: 'Engine', tools: ['degreaser', 'washer', 'brush', 'vacuum'], art: (c) => engineArt(c),
+    layers: [
+      { type: 'grease', canvas: noiseDirt(en(x => { x.fill(rectP(-176, -180, 70, 260, 26)); x.fill(rectP(106, -180, 70, 260, 26)); x.fill(rectP(-96, -170, 192, 240, 20)); x.fill(circ(0, -50, 78)); }), ['#0e0c0a', '#221c16', '#3a2e22', '#16120e'], 40, 31, 0.96, 0.36) },
+      { type: 'dust', canvas: noiseDirt(en(x => { x.fill(rectP(-200, -300, 400, 80, 10)); x.fill(rectP(-215, 106, 130, 110, 10)); x.fill(circ(160, 160, 36)); }), ['#7d7466', '#958b7a', '#ada290'], 28, 32, 0.8, 0.34) },
+      { type: 'rust', canvas: noiseDirt(en(x => { x.fill(circ(-190, 118, 15)); x.fill(circ(-110, 118, 15)); x.fill(circ(150, -260, 14)); }), ['#5e260c', '#8f3c12', '#bb5a1d', '#d88438'], 6, 33, 1, 0.4) },
+    ],
+    parts: [
+      { name: 'Valve covers', mask: en(x => { x.fill(rectP(-176, -180, 70, 260, 26)); x.fill(rectP(106, -180, 70, 260, 26)); x.globalCompositeOperation = 'destination-out'; x.fill(circ(0, -50, 80)); }) },
+      { name: 'Intake', mask: en(x => { x.fill(rectP(-96, -170, 192, 240, 20)); x.globalCompositeOperation = 'destination-out'; x.fill(circ(0, -50, 80)); }) },
+      { name: 'Air cleaner', mask: en(x => x.fill(circ(0, -50, 80))) },
+      { name: 'Battery', mask: en(x => { x.fill(rectP(-217, 104, 134, 114, 10)); }) },
+      { name: 'Radiator', mask: en(x => { x.fill(rectP(-202, -302, 404, 84, 10)); }) },
+      { name: 'Alternator', mask: en(x => x.fill(circ(160, 160, 38))) },
+    ],
+    debris: items,
+  };
+}
+
+// ===== state =====
+let S = null;                    // current scene
+let tool = 'washer', active = false, pointer = null, lastPt = null, flow = 0, finder = 0;
+let particles = [], rings = [], foam = null, foamDirty = false, hintClock = 0, lastHintAt = -9;
+const stats = { t0: performance.now(), wrong: 0 };
+let before = null, sliderX = 270, sceneT = 0, cleanSnap = null;
+const low = mk(LW / LOW, LH / LOW), lowx = low.getContext('2d', { willReadFrequently: true });
+
+function measureParts() {
+  const n = (LW / LOW) * (LH / LOW);
+  S.parts.forEach(p => { if (!p.idx) { const m = regionMask(p.mask); lowx.clearRect(0, 0, LW / LOW, LH / LOW); lowx.drawImage(m, 0, 0, LW / LOW, LH / LOW); const d = lowx.getImageData(0, 0, LW / LOW, LH / LOW).data; p.idx = []; for (let i = 0; i < n; i++) if (d[i * 4 + 3] > 100) p.idx.push(i); p.path = m; } });
+  const sums = S.parts.map(() => 0);
+  S.layers.forEach(L => { lowx.clearRect(0, 0, LW / LOW, LH / LOW); lowx.drawImage(L.canvas, 0, 0, LW / LOW, LH / LOW); const d = lowx.getImageData(0, 0, LW / LOW, LH / LOW).data; S.parts.forEach((p, k) => { let s = 0; for (const i of p.idx) s += d[i * 4 + 3]; sums[k] += s; }); });
+  return sums;
+}
+function loadScene(key) {
+  S = key === 'exterior' ? sceneExterior() : key === 'interior' ? sceneInterior() : key === 'engine' ? sceneEngine() : { key: 'finale', layers: [], parts: [], debris: [], tools: [], art: (c, o) => exteriorArt(c, o) };
+  sceneT = 0; particles = []; rings = [];
+  S.base = mk(LW * 2, LH * 2); const bx = S.base.getContext('2d'); bx.scale(2, 2); S.art(bx, {});
+  foam = mk(LW, LH); foam.getContext('2d', { willReadFrequently: true });
+  S.hasGrease = S.layers.some(L => L.type === 'grease');
+  if (S.parts.length) { const init = measureParts(); S.parts.forEach((p, k) => { p.init = init[k] + 1; p.pct = 0; p.done = false; p.deb = S.debris.filter(d => d.part === p.name); }); }
+  if (key === 'exterior') { before = mk(LW * 2, LH * 2); const b = before.getContext('2d'); b.drawImage(S.base, 0, 0); S.layers.forEach(L => b.drawImage(L.canvas, 0, 0, LW * 2, LH * 2)); }
+  if (key === 'finale') { cleanSnap = mk(LW * 2, LH * 2); }
+  buildTools(); setTool(S.tools[0] || 'washer');
+  document.querySelectorAll('.step').forEach(el => { const order = ['exterior', 'interior', 'engine', 'finale'], i = order.indexOf(el.dataset.s), j = order.indexOf(key); el.className = 'step' + (i < j ? ' done' : i === j ? ' now' : ''); });
+  document.getElementById('hintline').textContent = key === 'finale' ? 'Drag the slider to compare before and after' : key === 'interior' ? 'Vacuum the trash · foam the stains · wipe the dash' : key === 'engine' ? 'Spray degreaser on grease, then rinse or brush it off' : 'Drag on the car to clean · each dirt has its own tool';
+  updateBar();
+}
+
+// ===== tools UI =====
+function buildTools() {
+  const box = document.getElementById('tools'); box.innerHTML = '';
+  S.tools.forEach(t => { const b = document.createElement('button'); b.className = 'tool'; b.dataset.t = t; b.innerHTML = ICON[t] + `<span>${TOOLS[t].name}</span>`; b.onclick = () => setTool(t); box.appendChild(b); });
+}
+function setTool(t) { tool = t; document.querySelectorAll('.tool').forEach(b => b.classList.toggle('on', b.dataset.t === t)); }
+let toastTimer;
+function toast(html, ms = 1600) { const el = document.getElementById('toast'); el.innerHTML = html; el.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), ms); }
+
+// ===== audio (synthesised, no music) =====
+let AC = null, master, chans = {}, muted = false;
+function initAudio() {
+  if (AC) return; try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
+  master = AC.createGain(); master.gain.value = muted ? 0 : 0.8; master.connect(AC.destination);
+  const buf = AC.createBuffer(1, AC.sampleRate * 2, AC.sampleRate), d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  const chan = (name, type, f, q, extra) => {
+    const src = AC.createBufferSource(); src.buffer = buf; src.loop = true;
+    const fl = AC.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q;
+    const gn = AC.createGain(); gn.gain.value = 0; src.connect(fl); fl.connect(gn); gn.connect(master); src.start();
+    if (extra) extra(gn); chans[name] = { gn, fl, f };
+  };
+  chan('washer', 'bandpass', 1900, 0.6); chan('brush', 'highpass', 3200, 0.7, gn => { const o = AC.createOscillator(), og = AC.createGain(); o.frequency.value = 24; og.gain.value = 0.4; o.connect(og); og.connect(gn.gain); o.start(); });
+  chan('cloth', 'bandpass', 800, 1.4); chan('foam', 'bandpass', 520, 1.1); chan('vacuum', 'lowpass', 1100, 0.7); chan('degreaser', 'highpass', 5200, 0.6);
+}
+function sound(on) {
+  if (!AC) return;
+  for (const k in chans) { const target = on && k === tool ? (k === 'washer' ? 0.5 : k === 'vacuum' ? 0.42 : 0.3) * (0.7 + flow * 0.5) : 0; chans[k].gn.gain.setTargetAtTime(target, AC.currentTime, 0.05); chans[k].fl.frequency.setTargetAtTime(chans[k].f * (1 + flow * 0.35), AC.currentTime, 0.1); }
+}
+function ding(pitch = 1) {
+  if (!AC || muted) return; const t = AC.currentTime;
+  [[1046, 0.35], [1568, 0.22], [2093, 0.14]].forEach(([f, a]) => { const o = AC.createOscillator(), gg = AC.createGain(); o.frequency.value = f * pitch; gg.gain.setValueAtTime(a, t); gg.gain.exponentialRampToValueAtTime(0.0001, t + 1.1); o.connect(gg); gg.connect(master); o.start(t); o.stop(t + 1.2); });
+}
+function pop() { if (!AC || muted) return; const t = AC.currentTime, o = AC.createOscillator(), gg = AC.createGain(); o.frequency.setValueAtTime(700, t); o.frequency.exponentialRampToValueAtTime(180, t + 0.12); gg.gain.setValueAtTime(0.25, t); gg.gain.exponentialRampToValueAtTime(0.0001, t + 0.15); o.connect(gg); gg.connect(master); o.start(t); o.stop(t + 0.16); }
+function buzz() { try { navigator.vibrate && navigator.vibrate(6); } catch (e) {} }
+
+// ===== cleaning =====
+function foamAt(x, y) { if (x < 0 || y < 0 || x >= LW || y >= LH) return 0; return foam.getContext('2d', { willReadFrequently: true }).getImageData(x | 0, y | 0, 1, 1).data[3] / 255; }
+function stamp(ctx2, x, y, r, a) { const gr = ctx2.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(0,0,0,${a})`); gr.addColorStop(0.6, `rgba(0,0,0,${a * 0.7})`); gr.addColorStop(1, 'rgba(0,0,0,0)'); ctx2.fillStyle = gr; ctx2.beginPath(); ctx2.arc(x, y, r, 0, 7); ctx2.fill(); }
+function applyAt(x, y) {
+  const T = TOOLS[tool], r = T.r * (1 + flow * 0.25);
+  if (tool === 'degreaser') {
+    const f = foam.getContext('2d'); f.globalCompositeOperation = 'source-over';
+    for (let i = 0; i < 5; i++) { const bx = x + (Math.random() - 0.5) * r * 1.6, by = y + (Math.random() - 0.5) * r * 1.6, br = 3 + Math.random() * 6; f.fillStyle = `rgba(250,250,245,${0.75 + Math.random() * 0.25})`; f.beginPath(); f.arc(bx, by, br, 0, 7); f.fill(); f.strokeStyle = 'rgba(190,200,210,0.8)'; f.lineWidth = 1; f.stroke(); }
+    foamDirty = true; return;
+  }
+  const fz = S.hasGrease && (tool === 'washer' || tool === 'brush') ? foamAt(x, y) : 0;
+  S.layers.forEach(L => {
+    let e = EFF[tool][L.type] || 0;
+    if (L.type === 'grease' && fz > 0.05) e = Math.max(e, Math.min(3, fz * 5));
+    if (e > 0) { const c2 = L.canvas.getContext('2d'); c2.globalCompositeOperation = 'destination-out'; stamp(c2, x, y, r, T.k * e); c2.globalCompositeOperation = 'source-over'; }
+  });
+  if (tool === 'washer' || tool === 'brush') { const f = foam.getContext('2d'); f.globalCompositeOperation = 'destination-out'; stamp(f, x, y, r * 1.1, tool === 'washer' ? 0.12 : 0.1); f.globalCompositeOperation = 'source-over'; }
+  // debris: the vacuum sucks it in, the washer blasts it away
+  if (tool === 'vacuum' || tool === 'washer') S.debris.forEach(d => { if (d.state === 0 && Math.hypot(d.x - x, d.y - y) < (tool === 'vacuum' ? 46 : 34)) { d.state = 1; d.t = 0; d.tx = x; d.ty = y; d.vx = (d.x - x) * 0.2 + (Math.random() - 0.5) * 4; d.vy = -6 - Math.random() * 4; d.mode = tool; pop(); } });
+}
+function sweep(a, b) { const d = Math.hypot(b.x - a.x, b.y - a.y), n = Math.max(1, Math.ceil(d / 4)); for (let i = 1; i <= n; i++) applyAt(a.x + (b.x - a.x) * i / n, a.y + (b.y - a.y) * i / n); }
+
+function checkParts() {
+  if (!S.parts.length) return;
+  const sums = measureParts();
+  S.parts.forEach((p, k) => {
+    if (p.done) return;
+    const alphaPct = 1 - sums[k] / p.init, deb = p.deb, dpct = deb.length ? deb.filter(d => d.state).length / deb.length : 1;
+    p.pct = deb.length ? Math.min(alphaPct, 1) * 0.65 + dpct * 0.35 : alphaPct;
+    if (alphaPct > 0.95 && dpct === 1) finishPart(p);
+  });
+  updateBar();
+  if (S.parts.every(p => p.done) && !S.complete) { S.complete = true; setTimeout(sceneDone, 900); }
+}
+function finishPart(p) {
+  p.done = true; p.pct = 1;
+  S.layers.forEach(L => { const c2 = L.canvas.getContext('2d'); c2.globalCompositeOperation = 'destination-out'; c2.drawImage(p.path, 0, 0); c2.globalCompositeOperation = 'source-over'; });
+  const f = foam.getContext('2d'); f.globalCompositeOperation = 'destination-out'; f.drawImage(p.path, 0, 0); f.globalCompositeOperation = 'source-over';
+  rings.push({ m: p.path, t: 0 }); ding(1 + S.parts.filter(q => q.done).length * 0.04); buzz();
+  toast(`<b>${p.name}</b> · spotless ✓`, 1300);
+}
+function updateBar() {
+  const tot = S.parts.reduce((a, p) => a + p.init, 0) || 1, v = S.parts.length ? S.parts.reduce((a, p) => a + p.init * p.pct, 0) / tot : 1;
+  const pc = Math.max(0, Math.min(100, Math.floor(v * 100)));
+  document.getElementById('barfill').style.width = pc + '%'; document.getElementById('pct').textContent = pc + '%';
+}
+function hintCheck() {
+  if (!active || !pointer || tool === 'degreaser') return;
+  let present = null, best = 0;
+  S.layers.forEach(L => { const a = L.canvas.getContext('2d', { willReadFrequently: true }).getImageData(pointer.x | 0, pointer.y | 0, 1, 1).data[3]; if (a > 60) { let e = EFF[tool][L.type] || 0; if (L.type === 'grease' && foamAt(pointer.x, pointer.y) > 0.15) e = 1; if (e > best) best = e; if (!present || a > present.a) present = { t: L.type, a }; } });
+  if (present && best < 0.3) {
+    hintClock += 0.25; stats.wrong += 0.25;
+    if (hintClock >= 0.75 && sceneT - lastHintAt > 3) {
+      lastHintAt = sceneT; hintClock = 0;
+      const want = BEST[present.t], name = want === 'degreaser' ? 'DEGREASER, then rinse' : TOOLS[want].name;
+      toast(`That's <b>${DIRT_NAME[present.t]}</b>. Try the <b>${name}</b>`, 2200);
+      const btn = document.querySelector(`.tool[data-t="${want}"]`); if (btn) { btn.classList.remove('hint'); void btn.offsetWidth; btn.classList.add('hint'); }
+    }
+  } else hintClock = 0;
+}
+setInterval(() => { if (S && S.parts.length) { checkParts(); hintCheck(); } }, 250);
+
+// ===== scene flow =====
+const NEXT = { exterior: ['Exterior spotless', 'Now lift the roof and clean the cabin.', 'OPEN IT UP', 'interior'], interior: ['Cabin like new', 'Pop the hood. Time for the engine.', 'OPEN THE HOOD', 'engine'], engine: ['Engine gleaming', 'Last step: the polish and the reveal.', 'FINAL POLISH', 'finale'] };
+function sceneDone() {
+  const [h, p, b, nxt] = NEXT[S.key];
+  showCard(h, p, b, () => { hideCard(); loadScene(nxt); if (nxt === 'finale') setTimeout(finaleCard, 2600); });
+}
+function showCard(h, p, b, fn, statsHtml = '', starsTxt = '') {
+  document.getElementById('cardTitle').textContent = h; document.getElementById('cardText').textContent = p;
+  document.getElementById('cardStats').innerHTML = statsHtml; document.getElementById('cardStars').textContent = starsTxt;
+  const btn = document.getElementById('cardBtn'); btn.textContent = b; btn.onclick = fn; document.getElementById('card').classList.add('show'); btn.focus();
+}
+function hideCard() { document.getElementById('card').classList.remove('show'); }
+function finaleCard() {
+  const secs = Math.round((performance.now() - stats.t0) / 1000), mm = Math.floor(secs / 60), ss = String(secs % 60).padStart(2, '0');
+  const stars = stats.wrong < 6 ? 3 : stats.wrong < 15 ? 2 : 1;
+  showCard('RESTORED', 'Outside, inside and under the hood.', 'RESTORE AGAIN', () => { hideCard(); stats.t0 = performance.now(); stats.wrong = 0; loadScene('exterior'); },
+    `<div><b>${mm}:${ss}</b><span>TIME</span></div><div><b>17</b><span>PARTS</span></div><div><b>100%</b><span>CLEAN</span></div>`, '★'.repeat(stars) + '☆'.repeat(3 - stars));
+}
+
+// ===== input =====
+function toLogical(e) { const r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) / r.width * LW, y: (e.clientY - r.top) / r.height * LH }; }
+cv.addEventListener('pointerdown', e => {
+  initAudio(); if (AC && AC.state === 'suspended') AC.resume();
+  cv.setPointerCapture(e.pointerId); pointer = toLogical(e);
+  if (S.key === 'finale') { sliderX = pointer.x; active = true; return; }
+  active = true; lastPt = pointer; applyAt(pointer.x, pointer.y); sound(true);
+});
+cv.addEventListener('pointermove', e => {
+  pointer = toLogical(e);
+  if (!active) return;
+  if (S.key === 'finale') { sliderX = Math.max(0, Math.min(LW, pointer.x)); return; }
+  sweep(lastPt, pointer); lastPt = pointer;
+});
+const end = () => { active = false; flow = 0; sound(false); };
+cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end); cv.addEventListener('pointerleave', () => { if (!active) pointer = null; });
+document.getElementById('finder').onclick = () => { finder = 2.6; toast('Highlighting the dirt you missed', 1400); };
+document.getElementById('sound').onclick = (e) => { muted = !muted; if (master) master.gain.value = muted ? 0 : 0.8; const b = e.currentTarget; b.classList.toggle('on', !muted); b.setAttribute('aria-label', muted ? 'Sound off' : 'Sound on'); document.getElementById('wave').style.display = muted ? 'none' : ''; };
+
+// ===== rendering =====
+function drawDebris(c, d) {
+  c.save(); c.translate(d.x, d.y); c.rotate(d.a); c.scale(d.s * (d.state ? Math.max(0, 1 - d.t * 2.2) : 1), d.s * (d.state ? Math.max(0, 1 - d.t * 2.2) : 1));
+  if (d.kind === 'leaf') { c.fillStyle = '#a8742a'; c.beginPath(); c.ellipse(0, 0, 11, 5, 0, 0, 7); c.fill(); c.strokeStyle = '#6a4a1a'; c.lineWidth = 1; c.beginPath(); c.moveTo(-11, 0); c.lineTo(11, 0); c.stroke(); }
+  else if (d.kind === 'paper') { c.fillStyle = '#e9e4d8'; c.beginPath(); for (let i = 0; i < 9; i++) { const a = i / 9 * 6.28, r = 8 + (i % 2) * 3; c.lineTo(Math.cos(a) * r, Math.sin(a) * r); } c.fill(); c.strokeStyle = 'rgba(0,0,0,0.2)'; c.stroke(); }
+  else if (d.kind === 'cap') { c.fillStyle = '#c3352b'; c.beginPath(); c.arc(0, 0, 6, 0, 7); c.fill(); c.strokeStyle = '#7a1e18'; c.lineWidth = 1.5; c.stroke(); }
+  else { c.fillStyle = '#3f86d8'; rr(c, -10, -5, 20, 10, 3); c.fill(); c.fillStyle = '#f2b233'; c.fillRect(-4, -5, 8, 10); }
+  c.restore();
+}
+function drawTool(c, x, y) {
+  c.save(); c.translate(x, y);
+  if (tool === 'washer') {
+    c.strokeStyle = '#2a3036'; c.lineWidth = 7; c.lineCap = 'round'; c.beginPath(); c.moveTo(70, 120); c.lineTo(20, 34); c.stroke();
+    c.fillStyle = '#f2b233'; c.save(); c.translate(80, 140); c.rotate(-0.52); rr(c, -14, -22, 28, 46, 8); c.fill(); c.restore();
+    if (active) { c.strokeStyle = 'rgba(210,240,255,0.85)'; c.lineWidth = 3; c.beginPath(); c.moveTo(18, 30); c.lineTo(0, 0); c.stroke(); }
+  } else if (tool === 'brush') {
+    c.rotate(performance.now() / 30 * (active ? 1 : 0.1)); c.fillStyle = '#5a636c'; c.beginPath(); c.arc(0, 0, 18, 0, 7); c.fill();
+    c.strokeStyle = 'rgba(225,230,236,0.9)'; c.lineWidth = 0.8; for (let i = 0; i < 60; i++) { const a = i / 60 * 6.28; c.beginPath(); c.moveTo(Math.cos(a) * 6, Math.sin(a) * 6); c.lineTo(Math.cos(a) * 18, Math.sin(a) * 18); c.stroke(); }
+    c.fillStyle = '#2a3036'; c.beginPath(); c.arc(0, 0, 5, 0, 7); c.fill();
+  } else if (tool === 'cloth') {
+    c.rotate(-0.3); c.fillStyle = '#e8c34a'; rr(c, -20, -16, 40, 32, 6); c.fill(); c.strokeStyle = 'rgba(0,0,0,0.15)'; c.lineWidth = 1; for (let i = -16; i < 20; i += 6) { c.beginPath(); c.moveTo(-20, i); c.lineTo(20, i); c.stroke(); }
+  } else if (tool === 'foam') {
+    c.fillStyle = '#7a4a2a'; rr(c, -6, 14, 12, 40, 5); c.fill(); c.fillStyle = '#3f86d8'; rr(c, -20, -6, 40, 22, 6); c.fill();
+    c.fillStyle = 'rgba(255,255,255,0.9)'; for (let i = 0; i < 6; i++) { c.beginPath(); c.arc(-16 + i * 6.5, -8 - (i % 2) * 4, 4 + (i % 3), 0, 7); c.fill(); }
+  } else if (tool === 'vacuum') {
+    c.strokeStyle = '#2a3036'; c.lineWidth = 10; c.lineCap = 'round'; c.beginPath(); c.moveTo(0, 8); c.quadraticCurveTo(40, 80, 120, 110); c.stroke();
+    c.fillStyle = '#6a7680'; rr(c, -24, -8, 48, 18, 6); c.fill(); c.fillStyle = '#18191c'; rr(c, -20, -2, 40, 6, 3); c.fill();
+    if (active) { c.strokeStyle = 'rgba(255,255,255,0.35)'; c.lineWidth = 1.5; for (let i = 0; i < 3; i++) { const t = (performance.now() / 300 + i / 3) % 1, rr2 = 46 * (1 - t); c.beginPath(); c.arc(0, 0, rr2, 0, 7); c.stroke(); } }
+  } else if (tool === 'degreaser') {
+    c.fillStyle = '#46d6b4'; rr(c, 6, 4, 26, 44, 6); c.fill(); c.fillStyle = '#2a3036'; rr(c, 4, -10, 22, 16, 4); c.fill(); rr(c, -6, -10, 14, 6, 2); c.fill();
+  }
+  c.restore();
+}
+function spawn(x, y) {
+  const add = (o) => particles.push(Object.assign({ life: 0, max: 0.6 }, o));
+  if (tool === 'washer') for (let i = 0; i < 4 + flow * 5; i++) { const a = Math.random() * 6.28, v = 2 + Math.random() * 4; add({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 1, col: 'rgba(210,240,255,', sz: 1.2 + Math.random() * 2.2, g: 0.25 }); }
+  if (tool === 'brush') for (let i = 0; i < 3; i++) { const a = -2.4 + Math.random() * 2, v = 3 + Math.random() * 5; add({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, col: Math.random() < 0.5 ? 'rgba(255,190,110,' : 'rgba(160,80,30,', sz: 1 + Math.random() * 1.8, g: 0.3, max: 0.4 }); }
+  if (tool === 'foam') for (let i = 0; i < 2; i++) add({ x: x + (Math.random() - 0.5) * 30, y: y + (Math.random() - 0.5) * 20, vx: (Math.random() - 0.5), vy: -0.6, col: 'rgba(255,255,255,', sz: 2 + Math.random() * 4, g: -0.01, max: 0.9, ring: 1 });
+  if (tool === 'cloth' && Math.random() < 0.3) add({ x: x + (Math.random() - 0.5) * 40, y: y + (Math.random() - 0.5) * 30, vx: 0, vy: 0, col: 'rgba(255,255,255,', sz: 5, g: 0, max: 0.5, star: 1 });
+  if (tool === 'degreaser') for (let i = 0; i < 4; i++) { const a = Math.random() * 6.28; add({ x: x + 30, y: y - 20, vx: -3 + Math.cos(a), vy: 2 + Math.sin(a), col: 'rgba(230,250,245,', sz: 1.2, g: 0, max: 0.35 }); }
+}
+let lastT = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - lastT) / 1000); lastT = now; sceneT += dt;
+  if (active) { flow = Math.min(1, flow + dt * 0.4); if (pointer && S.key !== 'finale') { spawn(pointer.x, pointer.y); if (Math.random() < 0.08) buzz(); } sound(true); }
+  if (foamDirty && S.layers.length) {        // foam only clings where there is grease
+    const grease = S.layers.find(L => L.type === 'grease'); if (grease) { const f = foam.getContext('2d'); f.globalCompositeOperation = 'destination-in'; f.drawImage(grease.canvas, 0, 0); f.globalCompositeOperation = 'source-over'; } foamDirty = false;
+  }
+  g.setTransform(cv.width / LW, 0, 0, cv.height / LH, 0, 0);
+  g.clearRect(0, 0, LW, LH);
+  if (S.key === 'engine') { const z = 0.8 + 0.2 * ease(sceneT / 0.6); g.save(); g.translate(LW / 2, LH / 2); g.scale(z, z); g.translate(-LW / 2, -LH / 2); }
+  if (S.key === 'finale') {
+    const pol = (sceneT * 0.35) % 1.4;
+    exteriorArt(g, { polish: pol < 1 ? pol : 0 });
+    g.save(); g.beginPath(); g.rect(0, 0, sliderX, LH); g.clip(); g.drawImage(before, 0, 0, LW, LH); g.restore();
+    g.fillStyle = '#fff'; g.fillRect(sliderX - 1.5, 140, 3, 420);
+    g.save(); g.shadowColor = 'rgba(0,0,0,0.5)'; g.shadowBlur = 10; g.fillStyle = '#fff'; g.beginPath(); g.arc(sliderX, 400, 20, 0, 7); g.fill(); g.restore();
+    g.fillStyle = '#11161b'; g.beginPath(); g.moveTo(sliderX - 11, 400); g.lineTo(sliderX - 4, 394); g.lineTo(sliderX - 4, 406); g.fill(); g.beginPath(); g.moveTo(sliderX + 11, 400); g.lineTo(sliderX + 4, 394); g.lineTo(sliderX + 4, 406); g.fill();
+    g.font = `600 13px ${'IBM Plex Mono, monospace'}`; g.textAlign = 'center'; g.fillStyle = 'rgba(255,255,255,0.75)';
+    if (sliderX > 80) g.fillText('BEFORE', sliderX / 2, 120); if (sliderX < LW - 80) g.fillText('AFTER', (sliderX + LW) / 2, 120);
+    if (sceneT < 2.4) sliderX = lerp(LW, LW * 0.5, ease((sceneT - 0.3) / 1.8));
+  } else {
+    g.drawImage(S.base, 0, 0, LW, LH);
+    S.layers.forEach(L => g.drawImage(L.canvas, 0, 0));
+    g.drawImage(foam, 0, 0);
+    if (S.key === 'interior') roofArt(g, 130 * ease(sceneT / 1.0));
+    S.debris.forEach(d => {
+      if (d.state === 1) { d.t += dt; if (d.mode === 'vacuum') { d.x = lerp(d.x, d.tx, 0.25); d.y = lerp(d.y, d.ty, 0.25); } else { d.x += d.vx; d.y += d.vy; d.vy += 0.5; } if (d.t > 0.45) d.state = 2; }
+      if (d.state < 2) drawDebris(g, d);
+    });
+    if (finder > 0) {
+      finder -= dt; const k = 0.45 + 0.35 * Math.sin(sceneT * 8);
+      const tmp = mk(LW, LH), tx = tmp.getContext('2d'); S.layers.forEach(L => tx.drawImage(L.canvas, 0, 0)); tx.globalCompositeOperation = 'source-in'; tx.fillStyle = `rgba(255,60,200,${k})`; tx.fillRect(0, 0, LW, LH);
+      g.drawImage(tmp, 0, 0); S.debris.forEach(d => { if (d.state === 0) { g.strokeStyle = `rgba(255,60,200,${k + 0.2})`; g.lineWidth = 2; g.beginPath(); g.arc(d.x, d.y, 16, 0, 7); g.stroke(); } });
+    }
+    rings = rings.filter(r => (r.t += dt) < 1.0);
+    rings.forEach(r => { const tmp = mk(LW, LH), tx = tmp.getContext('2d'); tx.drawImage(r.m, 0, 0); tx.globalCompositeOperation = 'source-in'; tx.fillStyle = `rgba(255,244,210,${0.55 * (1 - r.t)})`; tx.fillRect(0, 0, LW, LH); g.drawImage(tmp, 0, 0); });
+  }
+  particles = particles.filter(p => (p.life += dt) < p.max);
+  particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += p.g; const a = 1 - p.life / p.max;
+    if (p.star) { g.fillStyle = p.col + a + ')'; g.beginPath(); g.moveTo(p.x, p.y - p.sz); g.quadraticCurveTo(p.x, p.y, p.x + p.sz, p.y); g.quadraticCurveTo(p.x, p.y, p.x, p.y + p.sz); g.quadraticCurveTo(p.x, p.y, p.x - p.sz, p.y); g.quadraticCurveTo(p.x, p.y, p.x, p.y - p.sz); g.fill(); }
+    else if (p.ring) { g.strokeStyle = p.col + a + ')'; g.lineWidth = 1; g.beginPath(); g.arc(p.x, p.y, p.sz, 0, 7); g.stroke(); }
+    else { g.fillStyle = p.col + a + ')'; g.beginPath(); g.arc(p.x, p.y, p.sz, 0, 7); g.fill(); } });
+  if (S.key === 'engine') g.restore();
+  if (pointer && S.key !== 'finale') drawTool(g, pointer.x, pointer.y);
+  requestAnimationFrame(frame);
+}
+
+fit();
+loadScene('exterior');
+requestAnimationFrame(frame);
+toast('Grab the <b>WASHER</b> and blast the mud', 2600);
+window.__game = { loadScene, get S() { return S; }, setTool, sweep, checkParts, applyAt };
+</script>
