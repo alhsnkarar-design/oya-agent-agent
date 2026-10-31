@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مدار — وكيل الذكاء الاصطناعي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Readex+Pro:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: dark;
+  --bg:#0A0A12; --bg2:#07070D; --s1:#12121C; --s2:#1A1A27; --s3:#1F1F2E;
+  --line:#222232; --line2:#2A2A3D; --line3:#33334A;
+  --tx:#F3F2FA; --tx2:#B4B2C9; --tx3:#8A88A3; --tx4:#D6D4E6;
+  --vio:#9B8CFF; --vioF:#6A58E8; --vioT:rgba(155,140,255,.14);
+  --sky:#5CD3F5; --skyT:rgba(92,211,245,.12); --skyInk:#06141B;
+  --ok:#5BE3A6; --bad:#FF8A98;
+  --c-podcast:#A99BFF; --c-motion:#5CD3F5; --c-autoedit:#FFB86B; --c-videoedit:#FF8FB1; --c-dubbing:#7AA7FF; --c-voice:#4FE0C0;
+  --r:18px;
+  --side:272px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Readex Pro',sans-serif;margin:0;font-weight:600}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0}
+a{color:var(--sky)}
+svg.i{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+:focus-visible{outline:2px solid var(--sky);outline-offset:2px;border-radius:8px}
+.ltr{direction:ltr;unicode-bidi:isolate}
+.muted{color:var(--tx3)}
+
+/* ---------- layout ---------- */
+.app{display:flex;min-height:100vh}
+.side{position:sticky;top:0;height:100vh;width:var(--side);flex-shrink:0;background:#0C0C15;border-inline-start:0;border-inline-end:1px solid var(--line);display:flex;flex-direction:column;padding:16px 14px;gap:14px;z-index:40}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 6px}
+.brand b{font-family:'Readex Pro';font-size:22px;font-weight:600}
+.newtask{display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;border-radius:14px;background:var(--s1);border:1px solid var(--line2);font-weight:600}
+.newtask:hover{border-color:var(--line3);background:var(--s2)}
+.side h4{margin:6px 8px 0;font-size:12px;font-weight:600;color:var(--tx3)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{display:flex;align-items:center;gap:10px;height:40px;padding:0 10px;border-radius:12px;color:var(--tx4);text-align:start;font-size:14px}
+.nav button:hover{background:var(--s1)}
+.nav button.on{background:var(--s2);color:var(--tx)}
+.dot-ic{width:28px;height:28px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+.recent{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:2px}
+.recent button{display:block;width:100%;text-align:start;padding:8px 10px;border-radius:10px;font-size:13.5px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recent button:hover{background:var(--s1);color:var(--tx)}
+.me{display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;border:1px solid var(--line)}
+.me .av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6A58E8,#5CD3F5);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;min-height:100vh;overflow-x:clip}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;height:64px;padding:0 20px;background:rgba(10,10,18,.82);backdrop-filter:blur(14px);border-bottom:1px solid transparent}
+.topbar.line{border-bottom-color:var(--line)}
+.topbar .ttl{flex:1;min-width:0;display:flex;align-items:center;gap:10px}
+.topbar .ttl .t{display:flex;flex-direction:column;line-height:1.3;min-width:0}
+.topbar .ttl .t b{font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar .ttl .t small{font-size:12px;color:var(--tx3)}
+.ibtn{width:44px;height:44px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;color:var(--tx4);border:1px solid transparent}
+.ibtn:hover{background:var(--s1);border-color:var(--line)}
+.ibtn.box{background:var(--s1);border-color:var(--line2)}
+.only-m{display:none}
+.scrim{display:none}
+.view{display:none;flex:1;padding:24px 28px 40px;position:relative}
+.view.on{display:block;animation:in .35s ease both}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---------- shared bits ---------- */
+.card{background:var(--s1);border:1px solid var(--line);border-radius:var(--r)}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;padding:4px;border-radius:16px;background:var(--bg);border:1px solid var(--line)}
+.seg button{height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--tx2);font-size:14px;font-weight:500;padding:0 12px}
+.seg button.on{background:var(--s3);color:var(--tx);font-weight:600;box-shadow:inset 0 0 0 1px var(--line3)}
+.seg.mode button.on.agent{background:var(--vioF);color:#fff;box-shadow:none}
+.seg.mode button.on.chat{background:var(--sky);color:var(--skyInk);box-shadow:none}
+.seg.sm button{height:32px;font-size:13px;border-radius:9px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line2);background:var(--s1);color:var(--tx4);font-size:13.5px;white-space:nowrap}
+.chip:hover{border-color:var(--line3);color:var(--tx)}
+.chip.on{border:1.5px solid var(--sky);background:var(--skyT);color:#9BE6FA;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.btn{height:48px;padding:0 20px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:15px}
+.btn.pri{background:var(--sky);color:var(--skyInk)}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn.vio{background:var(--vioF);color:#fff}
+.btn.sec{background:var(--s1);border:1px solid var(--line2)}
+.btn.sec:hover{border-color:var(--line3)}
+.btn[disabled]{opacity:.5;cursor:default}
+.lbl{font-size:13px;font-weight:600;color:var(--tx2);margin:0 2px 8px;display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.lbl small{font-weight:400;color:var(--tx3)}
+.field{display:flex;flex-direction:column;gap:6px}
+select.sel,input.inp{height:46px;border-radius:14px;background:var(--s1);border:1px solid var(--line2);padding:0 14px;outline:none;width:100%}
+select.sel{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238A88A3' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:left 14px center;padding-inline-end:40px}
+select.sel:focus,input.inp:focus{border-color:var(--line3)}
+.progress{position:relative;height:6px;border-radius:999px;background:var(--s3);overflow:hidden}
+.progress>i{position:absolute;inset-block:0;inset-inline-start:0;width:0;border-radius:999px;background:var(--sky);transition:width .4s ease;overflow:hidden}
+.progress>i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);animation:shim 1.6s infinite}
+@keyframes shim{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+.spin{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.badge{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.hidden{display:none!important}
+.toast{position:fixed;bottom:24px;inset-inline-start:50%;transform:translateX(50%);background:var(--s2);border:1px solid var(--line3);padding:10px 16px;border-radius:12px;font-size:14px;z-index:100;opacity:0;pointer-events:none;transition:.25s}
+.toast.on{opacity:1}
+
+/* composer */
+.composer{border-radius:26px;border:1px solid transparent;background:linear-gradient(var(--s1),var(--s1)) padding-box,linear-gradient(135deg,#9B8CFF,#5CD3F5 55%,#2E2C48) border-box;padding:8px 8px 10px;box-shadow:0 24px 60px -24px rgba(106,88,232,.55);transition:box-shadow .3s}
+.composer.chat{background:linear-gradient(var(--s1),var(--s1)) padding-box,linear-gradient(135deg,#5CD3F5,#2E5A6A 60%,#22303A) border-box;box-shadow:0 24px 60px -24px rgba(92,211,245,.35)}
+.composer textarea{display:block;width:100%;min-height:96px;max-height:260px;resize:none;border:0;outline:none;background:transparent;padding:12px;font-size:16px;line-height:1.7}
+.composer textarea::placeholder,.minicomp input::placeholder,.inp::placeholder{color:var(--tx3)}
+.ctools{display:flex;align-items:center;gap:8px;padding:0 2px}
+.ctools .sp{flex:1}
+.cbtn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line2);background:var(--s2);display:inline-flex;align-items:center;justify-content:center;color:var(--tx4)}
+.cbtn:hover{border-color:var(--line3)}
+.send{width:48px;height:48px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--vioF);color:#fff}
+.composer.chat .send{background:var(--sky);color:var(--skyInk)}
+.send:disabled{opacity:.45;cursor:default}
+.taskchip{display:inline-flex;align-items:center;gap:6px;height:32px;margin:10px 8px 0;padding:0 6px 0 10px;border-radius:10px;font-size:13px;font-weight:600}
+.minicomp{display:flex;align-items:center;gap:6px;height:56px;padding:0 6px;border-radius:18px;background:var(--s1);border:1px solid var(--line2)}
+.minicomp input{flex:1;min-width:0;height:44px;border:0;outline:none;background:transparent;padding:0 10px;font-size:15px}
+.minicomp .cbtn{width:42px;height:42px;border:0;background:transparent;color:var(--sky)}
+.minicomp .go{width:42px;height:42px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--sky);color:var(--skyInk)}
+.minicomp.agent .go{background:var(--vioF);color:#fff}
+
+/* ---------- home ---------- */
+.home{max-width:820px;margin:0 auto;padding-top:6vh;display:flex;flex-direction:column;gap:22px}
+.orbitbg{position:absolute;top:-220px;left:calc(50% - 160px);width:760px;height:760px;opacity:.45;pointer-events:none;animation:spin 60s linear infinite;z-index:0}
+.hero{text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;position:relative}
+.hero h1{font-size:clamp(28px,4vw,44px);line-height:1.25}
+.hero p{margin:0;color:var(--tx2);font-size:17px}
+.status{background:var(--vioT);color:#B9AFFF}
+.status.chat{background:var(--skyT);color:#7FDDF7}
+.home .composer{position:relative}
+.hint{display:flex;justify-content:center}
+.sect-h{display:flex;align-items:baseline;justify-content:space-between;margin:8px 4px 0}
+.sect-h h2{font-size:16px}
+.tools{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.tool{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:10px;min-height:128px;padding:16px 8px 14px;border-radius:22px;background:var(--s1);border:1px solid var(--line);text-align:center;transition:transform .2s,border-color .2s,background .2s}
+.tool:hover{transform:translateY(-2px);border-color:var(--line3)}
+.tool .ti{width:48px;height:48px;border-radius:15px;display:flex;align-items:center;justify-content:center}
+.tool b{display:block;font-size:13.5px;font-weight:600;line-height:1.3}
+.tool small{display:block;font-size:11.5px;color:var(--tx3);line-height:1.35;margin-top:2px}
+.tool .ck{position:absolute;top:10px;inset-inline-end:10px;width:20px;height:20px;border-radius:50%;background:var(--sky);color:var(--skyInk);display:none;align-items:center;justify-content:center}
+.tools.chat .tool.sel{border:1.5px solid var(--sky);background:rgba(92,211,245,.07)}
+.tools.chat .tool.sel .ck{display:flex}
+.foot-note{text-align:center;font-size:12.5px;color:var(--tx3)}
+
+/* ---------- task ---------- */
+.taskwrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:24px;max-width:1280px;margin:0 auto;align-items:start}
+.thread{display:flex;flex-direction:column;gap:16px;min-width:0}
+.bubble{align-self:flex-end;max-width:88%;padding:12px 16px;border-radius:20px 20px 6px 20px;background:#2A2457;font-size:15px;line-height:1.7}
+.bubble.chat{background:#10313D}
+.agentrow{display:flex;gap:12px;align-items:flex-start}
+.agentrow .av{width:34px;height:34px;border-radius:11px;background:var(--s1);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.agentrow .body{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px}
+.agentrow p{margin:6px 0 0;color:var(--tx4)}
+.steps{padding:4px 14px}
+.step{display:flex;align-items:center;gap:12px;min-height:46px;border-top:1px solid #1C1C2A;font-size:14px}
+.step:first-child{border-top:0}
+.step .st{width:22px;height:22px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.step.done .st{background:rgba(91,227,166,.14);color:var(--ok)}
+.step.wait .st{border:1.5px dashed #4A4864;width:20px;height:20px;margin:1px}
+.step.wait .tx{color:var(--tx3)}
+.step.done .tx{color:var(--tx2)}
+.step.run .tx{font-weight:600}
+.step .tx{flex:1}
+.step .tm{font-size:12px;color:var(--tx3)}
+.step .tool-tag{font-size:11.5px;padding:2px 8px;border-radius:999px}
+.step-sub{padding:0 34px 12px 0}
+.result{background:#161426;border:1px solid #332D63;border-radius:20px;padding:14px 16px}
+.player{display:flex;align-items:center;gap:14px}
+.playbtn{width:48px;height:48px;border-radius:50%;background:var(--vioF);color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.wave{display:flex;align-items:center;gap:2px;height:34px;flex:1;min-width:0}
+.wave i{display:block;flex:1;min-width:2px;border-radius:2px;background:var(--line3);transition:background .2s}
+.wave i.p{background:var(--vio)}
+.wave.sky i.p{background:var(--sky)}
+.live{position:sticky;top:84px;overflow:hidden;border-radius:22px;background:var(--bg2);border:1px solid var(--line2)}
+.live .bar{display:flex;align-items:center;gap:8px;height:44px;padding:0 14px;border-bottom:1px solid #1C1C2A;font-size:13px}
+.live .bar .rec{width:8px;height:8px;border-radius:50%;background:#FF8FB1;animation:blink 1.4s infinite}
+@keyframes blink{50%{opacity:.3}}
+.stage{position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--bg2)}
+.stage .grid{position:absolute;inset:0;background-image:linear-gradient(#14141F 1px,transparent 1px),linear-gradient(90deg,#14141F 1px,transparent 1px);background-size:28px 28px}
+.stage .ttl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:20px}
+.stage .ttl b{font-family:'Readex Pro';font-size:clamp(22px,3vw,36px);font-weight:700}
+.stage .ttl small{color:#9BE6FA}
+.live .foot{display:flex;align-items:center;gap:10px;padding:12px 14px;border-top:1px solid #1C1C2A;font-size:12.5px;color:var(--tx3)}
+.live .foot .progress{flex:1}
+.particles{position:absolute;inset-block-start:50%;inset-inline-start:50%;width:0;height:0}
+.particles span{position:absolute;display:block;border-radius:50%;animation:gather 4s cubic-bezier(.2,.7,.2,1) infinite}
+@keyframes gather{0%{transform:translate(var(--dx),var(--dy)) scale(.6);opacity:0}25%{opacity:1}70%,100%{transform:translate(0,0) scale(1);opacity:.9}}
+.sweep{position:absolute;top:50%;left:8%;width:84%;height:2px;background:linear-gradient(90deg,transparent,var(--sky),transparent);animation:sweep 4s ease-out infinite}
+@keyframes sweep{0%{transform:rotate(-24deg) scaleX(.2);opacity:0}60%{opacity:1}100%{transform:rotate(-24deg) scaleX(1);opacity:.8}}
+.reveal{animation:reveal 4s ease-out infinite}
+@keyframes reveal{0%,50%{opacity:0;transform:translateY(10px)}72%,100%{opacity:1;transform:none}}
+.task-comp{position:sticky;bottom:0;padding:12px 0 4px;background:linear-gradient(transparent,var(--bg) 30%)}
+
+/* ---------- tool pages ---------- */
+.tp{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,1fr);gap:24px;max-width:1280px;margin:0 auto;align-items:start}
+.tp.single{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.col{display:flex;flex-direction:column;gap:18px;min-width:0}
+.preview{position:relative;border-radius:22px;overflow:hidden;border:1px solid var(--line2);background:var(--bg2)}
+.preview .ov{position:absolute;top:12px;display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:999px;background:rgba(10,10,18,.82);border:1px solid var(--line2);font-size:12px}
+.ov.r{inset-inline-start:12px}
+.ov.l{inset-inline-end:12px}
+.scene{display:block;width:100%;height:100%}
+.vctrl{display:flex;align-items:center;gap:10px}
+.vctrl .pb{width:42px;height:42px;border-radius:50%;background:var(--tx);color:var(--bg);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.timeline{position:relative;flex:1;height:44px;border-radius:12px;background:var(--s1);border:1px solid var(--line);overflow:hidden;display:flex;gap:2px;padding:6px}
+.timeline i{flex:1;border-radius:4px;background:#2A2235}
+.timeline i:nth-child(3n){background:#3A3048}
+.timeline i:nth-child(3n+1){background:#4C3F63}
+.timeline .cut{position:absolute;inset-block:0;inset-inline-start:0;width:11%;background:repeating-linear-gradient(135deg,rgba(255,138,152,.4) 0 4px,rgba(10,10,18,.6) 4px 8px);transition:width .4s}
+.timeline .head{position:absolute;inset-block:0;inset-inline-start:26%;width:2px;background:var(--sky);transition:inset-inline-start .3s}
+.timeline .head::before{content:"";position:absolute;top:3px;inset-inline-start:-4px;width:10px;height:10px;border-radius:50%;background:var(--sky)}
+.optgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.opt{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:12px;min-height:100px;padding:14px;border-radius:18px;background:var(--s1);border:1px solid var(--line);text-align:start;position:relative}
+.opt:hover{border-color:var(--line3)}
+.opt.on{border:1.5px solid var(--sky);background:rgba(92,211,245,.07)}
+.opt b{font-size:15px}
+.opt small{display:block;color:var(--tx3);font-size:12.5px}
+.opt .ck{position:absolute;top:12px;inset-inline-end:12px;width:22px;height:22px;border-radius:50%;background:var(--sky);color:var(--skyInk);display:none;align-items:center;justify-content:center}
+.opt.on .ck{display:flex}
+.drop{display:flex;align-items:center;gap:14px;padding:16px;border-radius:18px;border:1.5px dashed var(--line3);background:rgba(18,18,28,.6);cursor:pointer}
+.drop:hover{border-color:var(--sky)}
+.drop.has{border-style:solid;border-color:var(--line2);background:var(--s1)}
+.drop .bk{width:46px;height:58px;border-radius:6px 10px 10px 6px;background:#2A2457;border-inline-end:4px solid var(--vioF);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#C6BEFF}
+.rows{padding:0 16px}
+.row{display:flex;align-items:center;gap:12px;min-height:56px;border-top:1px solid #1C1C2A}
+.row:first-child{border-top:0}
+.row>span:first-child{flex:1;color:var(--tx2);font-size:14px}
+.row select.sel{width:auto;min-width:150px;height:40px;border-radius:11px}
+.toggle{position:relative;width:46px;height:28px;border-radius:999px;background:var(--line3);transition:.2s;flex-shrink:0}
+.toggle::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+.toggle[aria-checked="true"]{background:var(--sky)}
+.toggle[aria-checked="true"]::after{inset-inline-start:21px}
+.note{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);font-size:13px;color:var(--tx2)}
+.clips{display:flex;gap:8px;flex-wrap:wrap}
+.clip{position:relative;width:96px;height:58px;border-radius:12px;overflow:hidden;font-size:11px}
+.clip span{position:absolute;bottom:4px;inset-inline-end:6px;color:#fff}
+.clip.add{border:1.5px dashed var(--line3);display:flex;align-items:center;justify-content:center;color:var(--tx4)}
+.variants{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.variant{height:70px;border-radius:14px;border:1px solid var(--line);background:var(--s1);position:relative;overflow:hidden;font-size:12px;color:var(--tx2)}
+.variant.on{border:1.5px solid var(--sky);color:#9BE6FA}
+.variant span{position:absolute;bottom:6px;inset-inline-start:10px}
+.variant.new{border-style:dashed;display:flex;align-items:center;justify-content:center;gap:6px}
+.edits .step .tx small{color:var(--tx3);font-weight:400}
+.voices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.voice{display:flex;align-items:center;gap:8px;min-height:58px;padding:0 10px;border-radius:14px;background:var(--s1);border:1px solid var(--line);text-align:start}
+.voice:hover{border-color:var(--line3)}
+.voice.on{border:1.5px solid var(--sky);background:rgba(92,211,245,.07)}
+.voice .vd{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#10313D;color:#7FDDF7}
+.voice:nth-child(even) .vd{background:#2A2457;color:#B9AFFF}
+.voice.on .vd{background:var(--sky);color:var(--skyInk)}
+.voice b{display:block;font-size:13px;line-height:1.25}
+.voice small{display:block;font-size:11px;color:var(--tx3);line-height:1.25}
+.langs{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;align-items:end}
+.sub{position:absolute;bottom:14px;inset-inline:60px;text-align:center}
+.sub p{display:inline-block;margin:0;padding:6px 12px;border-radius:10px;background:rgba(10,10,18,.8);font-size:14px}
+
+/* modal + overlay */
+.modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(4,4,8,.72)}
+.modal.on{display:flex}
+.sheet{width:min(640px,100%);max-height:90vh;display:flex;flex-direction:column;border-radius:26px;background:#11111A;border:1px solid var(--line2);animation:in .3s ease both}
+.sheet header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 10px}
+.sheet .bd{overflow:auto;padding:6px 20px 16px;display:flex;flex-direction:column;gap:14px}
+.sheet footer{display:flex;align-items:center;gap:12px;padding:14px 20px;border-top:1px solid var(--s3)}
+.vo{position:fixed;inset:0;z-index:70;display:none;flex-direction:column;background:radial-gradient(800px 500px at 50% 45%,rgba(106,88,232,.22),transparent),var(--bg);padding:20px}
+.vo.on{display:flex;animation:in .3s ease both}
+.vo .top{display:flex;align-items:center;justify-content:space-between;max-width:860px;width:100%;margin:0 auto}
+.vo .mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;max-width:720px;width:100%;margin:0 auto;text-align:center}
+.vo .tr{min-height:120px;display:flex;flex-direction:column;gap:12px}
+.vo .tr .a{color:var(--tx4);opacity:.7}
+.vo .tr .u{font-family:'Readex Pro';font-size:clamp(20px,3vw,28px);font-weight:500;line-height:1.6}
+.orb{position:relative;width:260px;height:260px;display:flex;align-items:center;justify-content:center}
+.orb .ring{position:absolute;inset:0;border-radius:50%;border:1.5px solid var(--sky);animation:ripple 3s ease-out infinite}
+.orb .ring:nth-child(2){animation-delay:1s;border-color:var(--vio)}
+.orb .ring:nth-child(3){animation-delay:2s}
+@keyframes ripple{0%{transform:scale(.7);opacity:.55}100%{transform:scale(1.25);opacity:0}}
+.orb .core{width:140px;height:140px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#B5AAFF 0%,#6A58E8 45%,#2A2457 100%);box-shadow:0 0 70px rgba(106,88,232,.5),inset 0 0 0 1px rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;gap:5px;animation:breathe 2.4s ease-in-out infinite}
+.orb.speak .core{background:radial-gradient(circle at 35% 30%,#B9F0FF 0%,#2FB6DD 45%,#0E3E52 100%);box-shadow:0 0 70px rgba(92,211,245,.45)}
+.orb.think .core{animation:breathe .9s ease-in-out infinite}
+.orb.paused .ring,.orb.paused .core,.orb.paused .core i{animation-play-state:paused}
+@keyframes breathe{50%{transform:scale(1.05)}}
+.orb .core i{display:block;width:5px;border-radius:3px;background:#fff;animation:eq 1s ease-in-out infinite}
+@keyframes eq{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
+.vo .ctl{display:flex;align-items:flex-end;justify-content:center;gap:40px;padding-bottom:20px}
+.vo .ctl div{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12.5px;color:var(--tx3)}
+.vo .big{width:88px;height:88px;border-radius:50%;background:var(--sky);color:var(--skyInk);display:inline-flex;align-items:center;justify-content:center;box-shadow:0 0 0 8px rgba(92,211,245,.12)}
+.vo .big.off{background:var(--s2);color:var(--tx);box-shadow:none;border:1px solid var(--line3)}
+.vo .rnd{width:58px;height:58px;border-radius:50%;background:var(--s1);border:1px solid var(--line2);display:inline-flex;align-items:center;justify-content:center;color:var(--tx4)}
+.vo .rnd.end{background:#2A1219;border-color:#5A2A36;color:var(--bad)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1100px){
+  .tools{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .tp,.tp.single,.taskwrap{grid-template-columns:minmax(0,1fr)}
+  .live{position:relative;top:0}
+}
+@media (max-width:860px){
+  .only-m{display:inline-flex}
+  .side{position:fixed;inset-block:0;inset-inline-start:0;transform:translateX(100%);transition:transform .3s ease;box-shadow:-30px 0 60px rgba(0,0,0,.5)}
+  body.drawer .side{transform:none}
+  body.drawer .scrim{display:block;position:fixed;inset:0;z-index:30;background:rgba(4,4,8,.6)}
+  .view{padding:16px 16px 32px}
+  .topbar{padding:0 12px}
+  .home{padding-top:2vh}
+  .hero{text-align:start;align-items:flex-start}
+  .hint{justify-content:flex-start}
+  .tools.chat{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tools.chat .tool{flex-direction:row;min-height:66px;padding:0 12px;justify-content:flex-start;text-align:start}
+  .tools.chat .tool .ti{width:40px;height:40px;border-radius:12px}
+  .tools.chat .tool small{display:none}
+  .tools.chat .tool .ck{display:none!important}
+  .voices{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sub{inset-inline:50px 12px}
+}
+@media (max-width:480px){
+  .hero h1{font-size:28px}
+  .tool{min-height:112px}
+  .optgrid{gap:10px}
+  .row select.sel{min-width:120px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" aria-label="القائمة الجانبية">
+    <div class="brand">
+      <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="5.5" fill="#9B8CFF"/><ellipse cx="16" cy="16" rx="13.5" ry="6" fill="none" stroke="#5CD3F5" stroke-width="1.8" transform="rotate(-28 16 16)"/><circle cx="27.9" cy="9.7" r="2.1" fill="#5CD3F5"/></svg>
+      <b>مدار</b>
+      <span style="flex:1"></span>
+      <button class="ibtn only-m" data-act="drawer" aria-label="إغلاق القائمة"><svg class="i" width="20" height="20" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <button class="newtask" data-go="home"><svg class="i" width="18" height="18" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>مهمة جديدة</button>
+    <h4>الأدوات</h4>
+    <nav class="nav" id="nav"></nav>
+    <h4>المهام الأخيرة</h4>
+    <div class="recent" id="recent"></div>
+    <div class="me"><span class="av">م</span><span style="flex:1;font-size:13.5px">حسابي</span><button class="ibtn" data-go="voice" aria-label="المساعد الصوتي" style="width:36px;height:36px;color:var(--c-voice)"><svg class="i" width="18" height="18" viewBox="0 0 24 24"><path d="M4 10v4M8 6.5v11M12 3.5v17M16 6.5v11M20 10v4"/></svg></button></div>
+  </aside>
+  <div class="scrim" data-act="drawer"></div>
+
+  <div class="main">
+    <header class="topbar" id="topbar">
+      <button class="ibtn box only-m" data-act="drawer" aria-label="فتح القائمة"><svg class="i" width="20" height="20" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M10 17h10"/></svg></button>
+      <div class="ttl" id="ttl"></div>
+      <button class="ibtn box" data-go="voice" aria-label="المساعد الصوتي المباشر" style="color:var(--sky)"><svg class="i" width="20" height="20" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
+    </header>
+
+    <!-- HOME -->
+    <section class="view" id="v-home" aria-label="الرئيسية">
+      <svg class="orbitbg" viewBox="0 0 560 560" aria-hidden="true"><ellipse cx="280" cy="280" rx="262" ry="118" fill="none" stroke="#262636" transform="rotate(-24 280 280)"/><ellipse cx="280" cy="280" rx="200" ry="86" fill="none" stroke="#1F1F2E" transform="rotate(-24 280 280)"/><circle cx="519" cy="173" r="3" fill="#5CD3F5"/></svg>
+      <div class="home">
+        <div class="hero">
+          <span class="badge status" id="hstatus">الوكيل جاهز</span>
+          <h1 id="htitle">ماذا تريد أن ننجز اليوم؟</h1>
+          <p id="hsub">صِف المهمة، وسيخطط الوكيل لها وينفّذها حتى النهاية.</p>
+        </div>
+        <form class="composer" id="composer" autocomplete="off">
+          <div class="seg mode" role="tablist" aria-label="وضع المحادثة">
+            <button type="button" role="tab" class="agent on" data-mode="agent" aria-selected="true"><svg class="i" width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="4.5" transform="rotate(-30 12 12)"/></svg><span class="ltr">AI Agent</span></button>
+            <button type="button" role="tab" class="chat" data-mode="chat" aria-selected="false"><svg class="i" width="18" height="18" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4A8 8 0 1 1 20 12z"/></svg><span class="ltr">Chat</span></button>
+          </div>
+          <div id="selchip"></div>
+          <textarea id="prompt" aria-label="اكتب طلبك" rows="3" placeholder="صِف ما تريد إنجازه، وسأعمل على تنفيذه."></textarea>
+          <div class="ctools">
+            <label class="cbtn" aria-label="إرفاق ملف" title="إرفاق ملف"><input type="file" id="hfile" class="hidden"><svg class="i" width="20" height="20" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></label>
+            <span class="muted" id="hfilename" style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40%"></span>
+            <span class="sp"></span>
+            <button type="button" class="cbtn" data-go="voice" aria-label="المساعد الصوتي المباشر" style="color:var(--sky)"><svg class="i" width="20" height="20" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
+            <button type="submit" class="send" id="send" aria-label="إرسال" disabled><svg class="i" width="22" height="22" viewBox="0 0 24 24" style="stroke-width:2"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
+          </div>
+        </form>
+        <div class="chips" id="examples" style="justify-content:center"></div>
+        <div>
+          <div class="sect-h"><h2 id="toolsh">قدرات الوكيل</h2><small class="muted" id="toolsn">اضغط لإدراج مثال — يجمع الوكيل بين الأدوات تلقائيًا</small></div>
+          <div class="tools" id="tools" style="margin-top:12px"></div>
+        </div>
+        <p class="foot-note">بلا موسيقى أو معازف — المؤثرات الصوتية الطبيعية فقط في مهام المونتاج.</p>
+      </div>
+    </section>
+
+    <!-- TASK -->
+    <section class="view" id="v-task" aria-label="تنفيذ المهمة">
+      <div class="taskwrap">
+        <div class="thread">
+          <div id="thread" class="thread"></div>
+          <div class="task-comp">
+            <form class="minicomp agent" id="taskform" autocomplete="off">
+              <label class="hidden" for="taskinp">تعليمات إضافية</label>
+              <input id="taskinp" placeholder="أضف تعليمات أو عدّل الخطة…">
+              <button type="button" class="cbtn" data-go="voice" aria-label="المساعد الصوتي"><svg class="i" width="20" height="20" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
+              <button class="go" aria-label="إرسال"><svg class="i" width="20" height="20" viewBox="0 0 24 24" style="stroke-width:2"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
+            </form>
+          </div>
+        </div>
+        <aside class="live" aria-label="شاشة الوكيل المباشرة">
+          <div class="bar"><span class="rec"></span><b style="flex:1;font-weight:600">شاشة الوكيل · مباشر</b><span id="livetool" style="font-size:12px"></span></div>
+          <div class="stage" id="livestage"><div class="grid"></div><div class="sweep"></div><div class="particles" id="lp"></div><div class="ttl reveal"><b id="livetitle">…</b><small id="livesub"></small></div></div>
+          <div class="foot"><span id="livestep" style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:55%"></span><div class="progress"><i id="liveprog"></i></div><span id="livepct" class="ltr">0%</span></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- PODCAST -->
+    <section class="view" id="v-podcast" aria-label="صوت وبودكاست">
+      <div class="tp single">
+        <div class="col">
+          <div class="seg" role="tablist" aria-label="مصدر المحتوى" id="pcsrc">
+            <button type="button" data-src="text">كتابة نص</button>
+            <button type="button" data-src="file" class="on">ملف أو كتاب</button>
+          </div>
+          <label class="drop" id="pcdrop"><input type="file" id="pcfile" class="hidden" accept=".pdf,.epub,.txt,.docx">
+            <span class="bk"><svg class="i" width="20" height="20" viewBox="0 0 24 24"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19"/></svg></span>
+            <span style="flex:1;min-width:0"><b id="pcfname" style="display:block" dir="auto">اختر ملفًا أو كتابًا</b><small class="muted" id="pcfmeta">PDF · EPUB · DOCX · TXT</small></span>
+            <span class="chip" style="pointer-events:none">تصفّح</span>
+          </label>
+          <textarea id="pctext" class="hidden card" rows="7" placeholder="الصق النص هنا…" style="width:100%;padding:14px;outline:none;resize:vertical;font-size:15px;line-height:1.7"></textarea>
+          <div>
+            <div class="lbl">ماذا تريد أن تُنتج؟</div>
+            <div class="optgrid" id="pcout">
+              <button type="button" class="opt" data-out="audio"><span class="ck"><svg class="i" width="12" height="12" viewBox="0 0 24 24" style="stroke-width:3"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><svg class="i" width="24" height="24" viewBox="0 0 24 24" style="color:var(--tx4)"><path d="M4 10v4M8 6.5v11M12 3.5v17M16 6.5v11M20 10v4"/></svg><span><b>تحويل إلى صوت</b><small>قراءة كاملة بصوت واحد</small></span></button>
+              <button type="button" class="opt on" data-out="podcast"><span class="ck"><svg class="i" width="12" height="12" viewBox="0 0 24 24" style="stroke-width:3"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><svg class="i" width="24" height="24" viewBox="0 0 24 24" style="color:var(--sky)"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg><span><b>نسخة بودكاست</b><small>حوار بين مقدّمَين</small></span></button>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card rows">
+            <div class="row"><span id="pcv1l">صوت المقدّم الأول</span><select class="sel" id="pcv1" aria-labelledby="pcv1l"></select></div>
+            <div class="row" id="pcv2row"><span id="pcv2l">صوت المقدّم الثاني</span><select class="sel" id="pcv2" aria-labelledby="pcv2l"></select></div>
+            <div class="row"><span id="pcstl">الأسلوب</span><select class="sel" id="pcst" aria-labelledby="pcstl"><option>هادئ وتحليلي</option><option>ودّي وحواري</option><option>تعليمي مبسّط</option><option>قصصي</option></select></div>
+            <div class="row"><span>الطول</span><div class="seg sm" id="pclen"><button type="button">مختصر</button><button type="button" class="on">متوسط</button><button type="button">كامل</button></div></div>
+          </div>
+          <form class="minicomp" id="pcform" autocomplete="off"><label class="hidden" for="pcnote">ملاحظات</label><input id="pcnote" placeholder="ملاحظات: ركّز على الفصل الثالث…"><button class="btn pri" style="height:44px;padding:0 16px" id="pcgo">إنشاء</button></form>
+          <div class="result hidden" id="pcres"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MOTION -->
+    <section class="view" id="v-motion" aria-label="موشن جرافيكس">
+      <div class="tp">
+        <div class="col">
+          <div class="preview" id="mstage" style="aspect-ratio:16/9">
+            <div class="stage" style="position:absolute;inset:0;aspect-ratio:auto"><div class="grid"></div><div class="sweep" id="msweep"></div><div class="particles" id="mp"></div><div class="ttl reveal" id="mreveal"><b id="mtitle">فن الإصغاء</b><small id="msub">الحلقة الأولى · الآن</small></div></div>
+            <span class="ov r"><span class="badge" style="height:auto;padding:0;color:var(--ok)"></span><span id="mver">المعاينة · النسخة 2</span></span>
+            <span class="ov l ltr" id="mmeta">16:9 · 6s</span>
+          </div>
+          <div class="vctrl"><button class="pb" id="mplay" aria-label="إيقاف مؤقت"></button><div class="timeline" style="padding:0"><span style="position:absolute;inset-block:8px;inset-inline-start:6%;width:38%;border-radius:4px;background:rgba(92,211,245,.22)"></span><span style="position:absolute;inset-block:8px;inset-inline-start:48%;width:46%;border-radius:4px;background:rgba(155,140,255,.24)"></span></div></div>
+          <div>
+            <div class="lbl">النسخ المولّدة</div>
+            <div class="variants" id="mvars"></div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card" style="padding:14px 16px;display:flex;gap:10px"><svg class="i" width="18" height="18" viewBox="0 0 24 24" style="color:var(--sky);margin-top:3px"><path d="M5 6h14M5 12h14M5 18h9"/></svg><p style="margin:0;color:var(--tx4)" id="mdesc">جزيئات ضوئية تتجمع في المنتصف، يعبرها خط ضوء مائل، ثم يظهر العنوان بحركة انسيابية.</p></div>
+          <div><div class="lbl">المقاس</div><div class="chips" id="mratio"><button type="button" class="chip ltr" data-r="9/16">9:16</button><button type="button" class="chip ltr" data-r="1/1">1:1</button><button type="button" class="chip ltr on" data-r="16/9">16:9</button></div></div>
+          <div><div class="lbl">المدة</div><div class="chips" id="mdur"><button type="button" class="chip">3 ث</button><button type="button" class="chip on">6 ث</button><button type="button" class="chip">10 ث</button><button type="button" class="chip">15 ث</button></div></div>
+          <div><div class="lbl">الأسلوب</div><div class="chips" id="mstyle"><button type="button" class="chip on">ضوئي</button><button type="button" class="chip">انسيابي</button><button type="button" class="chip">هندسي</button><button type="button" class="chip">بسيط</button><button type="button" class="chip">سينمائي</button></div></div>
+          <form class="minicomp" id="mform" autocomplete="off"><label class="hidden" for="minp">وصف المشهد</label><input id="minp" placeholder="صِف المشهد أو الحركة أو التأثير…"><button type="button" class="cbtn" data-go="voice" aria-label="المساعد الصوتي"><svg class="i" width="20" height="20" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button><button class="go" aria-label="إنشاء"><svg class="i" width="20" height="20" viewBox="0 0 24 24" style="stroke-width:2"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button></form>
+          <div class="hidden" id="mprog"><div class="lbl">جارٍ إنشاء نسخة جديدة <small id="mpct" class="ltr">0%</small></div><div class="progress"><i id="mbar"></i></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AUTO EDIT -->
+    <section class="view" id="v-autoedit" aria-label="المونتاج التلقائي">
+      <div class="tp">
+        <div class="col">
+          <div class="preview" style="aspect-ratio:16/9">
+            <svg class="scene" viewBox="0 0 358 202" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="358" height="202" fill="#18203A"/><circle cx="250" cy="78" r="26" fill="#E9B98A" opacity=".85"/><path d="M0 132 L60 96 L118 124 L184 82 L250 120 L310 92 L358 112 V202 H0z" fill="#232C4A"/><path d="M0 158 L80 128 L150 150 L230 118 L300 146 L358 132 V202 H0z" fill="#121A30"/><path d="M150 202 L176 150 L184 150 L214 202z" fill="#2B3352"/></svg>
+            <div id="aelower" style="position:absolute;bottom:20px;inset-inline-start:20px;display:flex;flex-direction:column;gap:4px"><span style="display:block;width:44px;height:3px;border-radius:2px;background:var(--sky)"></span><b style="font-family:'Readex Pro';font-size:clamp(17px,2.4vw,24px)">الطريق إلى الشمال</b><small style="color:var(--tx4)">اليوم الأول</small></div>
+            <span class="ov r" id="aestate">جاهز للمونتاج</span>
+            <span class="ov l ltr" id="aetime">00:00 / 01:00</span>
+          </div>
+          <div>
+            <div class="lbl">المقاطع الأصلية <small id="aecount">3 مقاطع · 04:12</small></div>
+            <div class="clips" id="aeclips">
+              <div class="clip" style="background:#232C4A"><span class="ltr">1:48</span></div>
+              <div class="clip" style="background:#3A2E3E"><span class="ltr">0:56</span></div>
+              <div class="clip" style="background:#1E3436"><span class="ltr">1:28</span></div>
+              <label class="clip add" aria-label="إضافة فيديو"><input type="file" accept="video/*" multiple class="hidden" id="aefile"><svg class="i" width="20" height="20" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></label>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card rows">
+            <div class="row"><span>موشن جرافيكس</span><button class="toggle" role="switch" aria-checked="true" aria-label="موشن جرافيكس"></button></div>
+            <div class="row"><span>تأثيرات بصرية</span><button class="toggle" role="switch" aria-checked="true" aria-label="تأثيرات بصرية"></button></div>
+            <div class="row"><span>مؤثرات صوتية طبيعية</span><button class="toggle" role="switch" aria-checked="true" aria-label="مؤثرات صوتية طبيعية"></button></div>
+            <div class="row"><span id="aelenl">المدة النهائية</span><select class="sel" id="aelen" aria-labelledby="aelenl"><option>30 ثانية</option><option selected>60 ثانية</option><option>90 ثانية</option><option>3 دقائق</option></select></div>
+          </div>
+          <div class="note"><svg class="i" width="18" height="18" viewBox="0 0 24 24" style="color:var(--c-autoedit)"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>لا يضيف الوكيل موسيقى أو معازف؛ يستخدم المؤثرات الصوتية الطبيعية المناسبة للمشهد فقط.</div>
+          <div class="card steps" id="aesteps"></div>
+          <form class="minicomp" id="aeform" autocomplete="off"><label class="hidden" for="aeinp">أسلوب المونتاج</label><input id="aeinp" placeholder="صِف الأسلوب: سريع وحماسي، لقطات قصيرة…"><button class="btn pri" style="height:44px;padding:0 16px" id="aego">ابدأ المونتاج</button></form>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIDEO EDIT -->
+    <section class="view" id="v-videoedit" aria-label="تعديل الفيديو">
+      <div class="tp">
+        <div class="col">
+          <div class="preview" style="aspect-ratio:16/9">
+            <svg class="scene" viewBox="0 0 358 196" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="358" height="196" fill="#2A2235"/><rect y="120" width="358" height="76" fill="#1C1726"/><rect x="24" y="30" width="70" height="90" rx="4" fill="#3A3048"/><rect x="270" y="20" width="64" height="100" rx="4" fill="#3A3048"/><circle cx="179" cy="78" r="20" fill="#C9A88E"/><path d="M139 196 C139 134 219 134 219 196z" fill="#4C3F63"/><g id="veobj"><circle cx="292" cy="96" r="9" fill="#8C7C9E"/><rect x="282" y="106" width="20" height="40" rx="8" fill="#8C7C9E"/></g><rect id="vebox" x="270" y="80" width="44" height="76" rx="8" fill="none" stroke="#5CD3F5" stroke-width="1.6" stroke-dasharray="6 4" opacity="0"/><g id="vetitle" opacity="0"><rect x="20" y="20" width="4" height="30" fill="#5CD3F5"/><text x="30" y="42" fill="#F3F2FA" font-family="Readex Pro" font-size="18" font-weight="700">مقابلة اليوم</text></g></svg>
+            <span class="ov r" id="vever">النسخة 1</span>
+            <span class="ov l ltr" id="vetime">00:00 / 00:47</span>
+          </div>
+          <div class="vctrl"><button class="pb" aria-label="تشغيل"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg></button><div class="timeline" id="vetl"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><span class="cut" id="vecut" style="width:0"></span><span class="head"></span></div><button class="ibtn box" id="veundo" aria-label="تراجع"><svg class="i" width="18" height="18" viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button></div>
+        </div>
+        <div class="col">
+          <div class="thread" id="vethread" style="min-height:120px"><div class="agentrow"><span class="av" data-logo></span><div class="body"><p>صِف التعديلات التي تريدها على الفيديو، ويمكنك جمع أكثر من تعديل في وصف واحد.</p></div></div></div>
+          <div class="chips" id="vesug"></div>
+          <form class="minicomp" id="veform" autocomplete="off"><label class="hidden" for="veinp">التعديل التالي</label><input id="veinp" placeholder="اكتب التعديل التالي…"><button type="button" class="cbtn" data-go="voice" aria-label="المساعد الصوتي"><svg class="i" width="20" height="20" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button><button class="go" aria-label="إرسال"><svg class="i" width="20" height="20" viewBox="0 0 24 24" style="stroke-width:2"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button></form>
+        </div>
+      </div>
+    </section>
+
+    <!-- DUBBING -->
+    <section class="view" id="v-dubbing" aria-label="دبلجة الفيديو">
+      <div class="tp">
+        <div class="col">
+          <div class="preview" style="aspect-ratio:16/9">
+            <svg class="scene" viewBox="0 0 358 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="358" height="200" fill="#16263A"/><rect x="210" width="148" height="200" fill="#1B2F47"/><circle cx="150" cy="84" r="26" fill="#C9A88E"/><path d="M92 200 C92 126 208 126 208 200z" fill="#2C4766"/></svg>
+            <div class="seg sm" id="dbcmp" style="position:absolute;top:10px;inset-inline-start:10px;background:rgba(10,10,18,.85)"><button type="button" class="on" data-v="orig">الأصلي</button><button type="button" data-v="dub" disabled>المدبلج</button></div>
+            <span class="ov l" id="dbstate" style="color:var(--tx2)">لم تبدأ الدبلجة</span>
+            <div class="sub"><p id="dbsub">المهم ليس أن نصل أولًا، بل أن نصل معًا.</p></div>
+          </div>
+          <div class="hidden" id="dbprog"><div class="lbl"><span id="dbstep">جارٍ التفريغ النصي</span><small id="dbpct" class="ltr">0%</small></div><div class="progress"><i id="dbbar"></i></div></div>
+        </div>
+        <div class="col">
+          <div class="langs">
+            <div class="field"><label class="lbl" for="dbsrc" style="margin-bottom:0">لغة الفيديو</label><select class="sel" id="dbsrc"></select></div>
+            <button class="cbtn" id="dbswap" aria-label="تبديل اللغتين" style="margin-bottom:1px"><svg class="i" width="18" height="18" viewBox="0 0 24 24"><path d="M17 7H5l3-3M7 17h12l-3 3"/></svg></button>
+            <div class="field"><label class="lbl" for="dbdst" style="margin-bottom:0">لغة الدبلجة</label><select class="sel" id="dbdst"></select></div>
+          </div>
+          <div>
+            <div class="lbl">الصوت <small>· 20 صوتًا مدعومًا</small><button class="chip" style="height:30px;margin-inline-start:auto" data-act="voices">عرض الكل</button></div>
+            <div class="voices" id="dbvoices"></div>
+          </div>
+          <div>
+            <div class="lbl">النبرة <small>· 15 نبرة مدعومة</small></div>
+            <div class="chips" id="dbtones"></div>
+          </div>
+          <button class="btn pri" id="dbgo" style="width:100%">ابدأ الدبلجة</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- voices modal -->
+<div class="modal" id="vmodal" role="dialog" aria-modal="true" aria-labelledby="vmh">
+  <div class="sheet">
+    <header><h2 id="vmh" style="font-size:19px">الصوت والنبرة</h2><button class="cbtn" data-act="closevm" aria-label="إغلاق"><svg class="i" width="18" height="18" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>
+    <div class="bd">
+      <div class="lbl" style="margin:0">الأصوات <small>· 20</small><div class="seg sm" id="vmfilter" style="margin-inline-start:auto"><button type="button" class="on" data-g="all">الكل</button><button type="button" data-g="f">أنثوي</button><button type="button" data-g="m">ذكوري</button></div></div>
+      <div class="voices" id="vmvoices"></div>
+      <div class="lbl" style="margin:6px 0 0">النبرات <small>· 15</small></div>
+      <div class="chips" id="vmtones"></div>
+    </div>
+    <footer><span style="flex:1"><b id="vmsel" style="display:block">صوت 07 · نبرة هادئة</b><small class="muted">يُطبَّق على الدبلجة الحالية</small></span><button class="btn pri" data-act="closevm">تأكيد</button></footer>
+  </div>
+</div>
+
+<!-- voice assistant -->
+<div class="vo" id="vo" role="dialog" aria-modal="true" aria-label="المساعد الصوتي المباشر">
+  <div class="top">
+    <button class="ibtn box" data-act="closevo" aria-label="رجوع"><svg class="i" width="20" height="20" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+    <div class="seg mode sm" style="width:200px" id="vomode"><button type="button" class="agent on" data-mode="agent"><span class="ltr">AI Agent</span></button><button type="button" class="chat" data-mode="chat"><span class="ltr">Chat</span></button></div>
+    <span style="width:44px"></span>
+  </div>
+  <div class="mid">
+    <div class="tr" id="votr"></div>
+    <div class="orb" id="orb"><span class="ring"></span><span class="ring"></span><span class="ring"></span><div class="core"><i style="height:34px"></i><i style="height:50px;animation-delay:.15s"></i><i style="height:26px;animation-delay:.3s"></i><i style="height:44px;animation-delay:.45s"></i><i style="height:30px;animation-delay:.6s"></i></div></div>
+    <div><b id="vostate" style="font-size:17px">أستمع إليك…</b><div class="muted" style="font-size:13px">تحدّث بشكل طبيعي، ويمكنك المقاطعة في أي وقت</div></div>
+  </div>
+  <div class="ctl">
+    <div><button class="rnd" data-act="closevo" aria-label="التبديل إلى الكتابة"><svg class="i" width="22" height="22" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M7 10h.01M11 10h.01M15 10h.01M7.5 14h9"/></svg></button>كتابة</div>
+    <div><button class="big" id="vomic" aria-label="إيقاف مؤقت"><svg class="i" width="32" height="32" viewBox="0 0 24 24" style="stroke-width:2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button><span id="vomicl">إيقاف مؤقت</span></div>
+    <div><button class="rnd end" data-act="closevo" aria-label="إنهاء المحادثة"><svg class="i" width="22" height="22" viewBox="0 0 24 24" style="stroke-width:2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>إنهاء</div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const ic = (d, s = 20, st = '') => `<svg class="i" width="${s}" height="${s}" viewBox="0 0 24 24" aria-hidden="true" style="${st}">${d}</svg>`;
+const P = {
+  podcast:'<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4.5" height="6.5" rx="1.6"/><rect x="16.5" y="14" width="4.5" height="6.5" rx="1.6"/>',
+  motion:'<path d="M11 3.5l1.9 5 5 1.9-5 1.9-1.9 5-1.9-5-5-1.9 5-1.9z"/><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>',
+  autoedit:'<rect x="3" y="4" width="11" height="4" rx="1.5"/><rect x="9" y="10" width="12" height="4" rx="1.5"/><rect x="5" y="16" width="9" height="4" rx="1.5"/>',
+  videoedit:'<rect x="3" y="4.5" width="14" height="11" rx="2.2"/><path d="M8.5 8l3.5 2-3.5 2z"/><path d="M14 20.5l6.2-6.2-2-2L12 18.5l-.5 2.5z"/>',
+  dubbing:'<path d="M3.5 5.5h8M7.5 3.5v2M5 5.5c.6 3 2.8 5.6 6 7M10 5.5c-.6 3-2.8 5.6-6 7"/><path d="M12.5 20.5l4-9 4 9M14 17.3h5"/>',
+  voice:'<path d="M4 10v4M8 6.5v11M12 3.5v17M16 6.5v11M20 10v4"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>', x:'<path d="M6 6l12 12M18 6L6 18"/>', back:'<path d="M9 5l7 7-7 7"/>',
+  dl:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>', share:'<path d="M12 15V4M8 8l4-4 4 4"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/>'
+};
+const PLAY = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>';
+const PAUSE = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6.5" y="5" width="3.5" height="14" rx="1"/><rect x="14" y="5" width="3.5" height="14" rx="1"/></svg>';
+const SPIN = '<svg class="spin" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="#262636" stroke-width="2.4"/><path d="M12 3a9 9 0 0 1 9 9" fill="none" stroke="#5CD3F5" stroke-width="2.4" stroke-linecap="round"/></svg>';
+const LOGO = '<svg width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="5.5" fill="#9B8CFF"/><ellipse cx="16" cy="16" rx="13.5" ry="6" fill="none" stroke="#5CD3F5" stroke-width="2" transform="rotate(-28 16 16)"/></svg>';
+const TOOLS = [
+  {id:'podcast', name:'صوت وبودكاست', sub:'من النصوص والكتب', ex:'حوّل هذا الكتاب إلى حلقة بودكاست بصوتين.'},
+  {id:'motion', name:'موشن جرافيكس', sub:'وتأثيرات بصرية', ex:'اصنع عنوانًا متحركًا تتجمع فيه جزيئات ضوئية.'},
+  {id:'autoedit', name:'مونتاج تلقائي', sub:'للفيديو', ex:'اعمل مونتاج لفيديو رحلتي في دقيقة واحدة.'},
+  {id:'videoedit', name:'تعديل الفيديو', sub:'بالأوامر النصية', ex:'احذف أول 5 ثوانٍ وأزل الشخص الذي يمر في الخلفية.'},
+  {id:'dubbing', name:'دبلجة الفيديو', sub:'إلى أي لغة', ex:'دبلج هذا الفيديو إلى الإنجليزية بصوت هادئ.'},
+  {id:'voice', name:'المساعد الصوتي', sub:'محادثة مباشرة', ex:''}
+];
+const T = Object.fromEntries(TOOLS.map(t => [t.id, t]));
+const col = id => `var(--c-${id})`;
+const tint = id => ({podcast:'169,155,255',motion:'92,211,245',autoedit:'255,184,107',videoedit:'255,143,177',dubbing:'122,167,255',voice:'79,224,192'})[id];
+const tIcon = (id, s = 44, r = 14, isz = 22) => `<span class="ti" style="width:${s}px;height:${s}px;border-radius:${r}px;background:rgba(${tint(id)},.14);color:${col(id)};box-shadow:inset 0 0 0 1px rgba(${tint(id)},.25);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">${ic(P[id], isz)}</span>`;
+const VOICES = ['دافئ','عميق','هادئ','مشرق','رخيم','شاب','ناعم','ناضج','واضح','رزين','حيوي','خافت','قوي','رقيق','إذاعي','ودود','جاد','مرح','حكيم','صافٍ'].map((d, i) => ({n: String(i + 1).padStart(2, '0'), d, g: i % 2 ? 'm' : 'f'}));
+const TONES = ['هادئة','ودّية','رسمية','حماسية','قصصية','تعليمية','درامية','مرحة','واثقة','حزينة','إخبارية','تحفيزية','دافئة','جادة','ساخرة'];
+const LANGS = ['العربية','الإنجليزية','الفرنسية','الإسبانية','الألمانية','الإيطالية','البرتغالية','الروسية','التركية','الفارسية','الأردية','الهندية','البنغالية','الإندونيسية','الملايوية','الصينية','اليابانية','الكورية','التايلاندية','الفيتنامية','السواحيلية','الهولندية','السويدية','البولندية','اليونانية','العبرية','الأوكرانية','الرومانية','التشيكية','المجرية','الفلبينية','الأمهرية','الهوسا','اليوروبا'];
+const SUBS = {'العربية':'المهم ليس أن نصل أولًا، بل أن نصل معًا.','الإنجليزية':'What matters is not arriving first, but arriving together.','الفرنسية':"L'important n'est pas d'arriver le premier, mais d'arriver ensemble.",'الإسبانية':'Lo importante no es llegar primero, sino llegar juntos.','الألمانية':'Wichtig ist nicht, als Erster anzukommen, sondern gemeinsam.','التركية':'Önemli olan ilk varmak değil, birlikte varmaktır.'};
+const toast = (m) => { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('on'), 2200); };
+const store = { get(k, d) { try { const v = localStorage.getItem('madar.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } }, set(k, v) { try { localStorage.setItem('madar.' + k, JSON.stringify(v)); } catch {} } };
+$$('[data-logo]').forEach(e => e.innerHTML = LOGO);
+
+/* ---------- sidebar ---------- */
+$('#nav').innerHTML = TOOLS.map(t => `<button data-go="${t.id}">${tIcon(t.id, 28, 9, 16)}<span>${t.name}</span></button>`).join('');
+let recent = store.get('recent', ['بودكاست ومقطع ترويجي من كتاب', 'دبلجة مقابلة إلى الإسبانية', 'مونتاج رحلة الشمال']);
+const renderRecent = () => $('#recent').innerHTML = recent.slice(0, 8).map(r => `<button data-recent="${r.replace(/"/g, '&quot;')}">${r}</button>`).join('');
+renderRecent();
+
+/* ---------- routing ---------- */
+const VIEWS = ['home','task','podcast','motion','autoedit','videoedit','dubbing'];
+function title(view) {
+  const el = $('#ttl'), bar = $('#topbar');
+  bar.classList.toggle('line', view !== 'home');
+  if (view === 'home') { el.innerHTML = ''; return; }
+  if (view === 'task') { el.innerHTML = `<button class="ibtn" data-go="home" aria-label="رجوع">${ic(P.back, 22)}</button><span class="t"><b>${task.title || 'مهمة جديدة'}</b><small><span class="ltr" style="color:#B9AFFF;font-weight:600">AI Agent</span> · <span id="tstep">${task.stepLabel || ''}</span></small></span>`; return; }
+  const t = T[view];
+  el.innerHTML = `<button class="ibtn" data-go="home" aria-label="رجوع">${ic(P.back, 22)}</button>${tIcon(view, 36, 11, 18)}<span class="t"><b>${t.name}</b><small><span class="ltr" style="color:#7FDDF7;font-weight:600">Chat</span> · مهمة واحدة</small></span>`;
+}
+function route() {
+  let v = location.hash.slice(1) || 'home';
+  if (v === 'voice') { openVoice(); v = route.last || 'home'; }
+  if (!VIEWS.includes(v)) v = 'home';
+  if (v === 'task' && !task.started) v = 'home';
+  route.last = v;
+  $$('.view').forEach(s => s.classList.toggle('on', s.id === 'v-' + v));
+  $$('#nav button').forEach(b => b.classList.toggle('on', b.dataset.go === v));
+  title(v);
+  document.body.classList.remove('drawer');
+  window.scrollTo(0, 0);
+}
+function go(v) { if (location.hash.slice(1) === v) route(); else location.hash = v; }
+window.addEventListener('hashchange', route);
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-go]');
+  if (g) { e.preventDefault(); if (g.dataset.go === 'voice') openVoice(); else go(g.dataset.go); return; }
+  const a = e.target.closest('[data-act]');
+  if (a) {
+    const act = a.dataset.act;
+    if (act === 'drawer') document.body.classList.toggle('drawer');
+    if (act === 'voices') openVM();
+    if (act === 'closevm') closeVM();
+    if (act === 'closevo') closeVoice();
+  }
+  const r = e.target.closest('[data-recent]');
+  if (r) { $('#prompt').value = r.dataset.recent; setMode('agent'); go('home'); updSend(); $('#prompt').focus(); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeVM(); closeVoice(); document.body.classList.remove('drawer'); } });
+
+/* ---------- home ---------- */
+let mode = 'agent', selTool = 'podcast';
+const EXAMPLES = [['podcast','حوّل كتابًا إلى بودكاست'],['dubbing','دبلج فيديو للإنجليزية'],['autoedit','مونتاج لفيديو رحلتي'],['motion','عنوان متحرك لقناتي']];
+function renderHome() {
+  const chat = mode === 'chat';
+  $('#composer').classList.toggle('chat', chat);
+  $$('#composer .seg button').forEach(b => { const on = b.dataset.mode === mode; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+  $('#hstatus').textContent = chat ? 'مهمة واحدة في كل مرة' : 'الوكيل جاهز';
+  $('#hstatus').classList.toggle('chat', chat);
+  $('#htitle').textContent = chat ? 'اختر أداة، واكتب التفاصيل' : 'ماذا تريد أن ننجز اليوم؟';
+  $('#hsub').textContent = chat ? 'تُضاف الأداة المختارة إلى المحادثة، ويُكمل الوكيل تنفيذها وفق طلبك فقط.' : 'صِف المهمة، وسيخطط الوكيل لها وينفّذها حتى النهاية.';
+  $('#toolsh').textContent = chat ? 'اختر المهمة' : 'قدرات الوكيل';
+  $('#toolsn').textContent = chat ? 'أداة واحدة لكل محادثة' : 'اضغط لإدراج مثال — يجمع الوكيل بين الأدوات تلقائيًا';
+  $('#tools').classList.toggle('chat', chat);
+  $('#tools').innerHTML = TOOLS.map(t => `<button type="button" class="tool${chat && selTool === t.id ? ' sel' : ''}" data-tool="${t.id}" ${chat ? `aria-pressed="${selTool === t.id}"` : ''}><span class="ck">${ic(P.check, 12, 'stroke-width:3')}</span>${tIcon(t.id, chat && innerWidth <= 860 ? 40 : 48, 15, 22)}<span><b>${t.name}</b><small>${t.sub}</small></span></button>`).join('');
+  $('#selchip').innerHTML = chat ? `<span class="taskchip" style="background:rgba(${tint(selTool)},.12);border:1px solid rgba(${tint(selTool)},.4);color:${col(selTool)}">${ic(P[selTool], 16)}${T[selTool].name}<button type="button" class="ibtn" style="width:26px;height:26px;border-radius:7px" data-clearsel aria-label="إزالة المهمة">${ic(P.x, 14)}</button></span>` : '';
+  $('#prompt').placeholder = chat ? (T[selTool].ex ? 'اكتب تفاصيل المهمة… مثل: ' + T[selTool].ex : 'اضغط إرسال لبدء محادثة صوتية') : 'صِف ما تريد إنجازه، وسأعمل على تنفيذه.';
+  $('#examples').innerHTML = chat ? '' : EXAMPLES.map(([id, l]) => `<button type="button" class="chip" data-ex="${id}"><span style="width:7px;height:7px;border-radius:50%;background:${col(id)}"></span>${l}</button>`).join('');
+  $('#examples').classList.toggle('hidden', chat);
+  updSend();
+  store.set('mode', mode);
+}
+function setMode(m) { mode = m; renderHome(); $$('#vomode button').forEach(b => b.classList.toggle('on', b.dataset.mode === m)); }
+function updSend() { $('#send').disabled = !($('#prompt').value.trim() || (mode === 'chat' && selTool === 'voice')); }
+$('#composer .seg').addEventListener('click', e => { const b = e.target.closest('[data-mode]'); if (b) setMode(b.dataset.mode); });
+$('#tools').addEventListener('click', e => {
+  const b = e.target.closest('[data-tool]'); if (!b) return;
+  const id = b.dataset.tool;
+  if (mode === 'chat') { selTool = id; renderHome(); $('#prompt').focus(); return; }
+  if (id === 'voice') { openVoice(); return; }
+  $('#prompt').value = T[id].ex; updSend(); $('#prompt').focus();
+});
+$('#selchip').addEventListener('click', e => { if (e.target.closest('[data-clearsel]')) setMode('agent'); });
+$('#examples').addEventListener('click', e => { const b = e.target.closest('[data-ex]'); if (b) { $('#prompt').value = T[b.dataset.ex].ex; updSend(); $('#prompt').focus(); } });
+$('#prompt').addEventListener('input', () => { updSend(); const t = $('#prompt'); t.style.height = 'auto'; t.style.height = Math.min(260, Math.max(96, t.scrollHeight)) + 'px'; });
+$('#prompt').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); $('#composer').requestSubmit(); } });
+$('#hfile').addEventListener('change', e => { const f = e.target.files[0]; $('#hfilename').textContent = f ? f.name : ''; });
+$('#composer').addEventListener('submit', e => {
+  e.preventDefault();
+  const text = $('#prompt').value.trim();
+  if (mode === 'chat') {
+    if (selTool === 'voice') { openVoice(); return; }
+    handoff(selTool, text);
+  } else {
+    if (!text) return;
+    startTask(text, $('#hfilename').textContent);
+  }
+  $('#prompt').value = ''; $('#hfilename').textContent = ''; $('#hfile').value = ''; updSend();
+});
+function handoff(id, text) {
+  go(id);
+  if (!text) return;
+  if (id === 'podcast') $('#pcnote').value = text;
+  if (id === 'motion') { $('#minp').value = text; $('#mform').requestSubmit(); }
+  if (id === 'autoedit') $('#aeinp').value = text;
+  if (id === 'videoedit') { $('#veinp').value = text; $('#veform').requestSubmit(); }
+  if (id === 'dubbing') { const l = LANGS.find(l => text.includes(l.replace('ال', ''))); if (l) { $('#dbdst').value = l; } }
+}
+
+/* ---------- task (agent) ---------- */
+const task = {started:false};
+function planFor(text) {
+  const K = [['podcast',/بودكاست|صوت|كتاب|ملف|نص|اقرأ|قراءة/],['motion',/موشن|متحرك|حرك|تأثير|عنوان/],['autoedit',/مونتاج|منتج|اختصر|رحلة/],['videoedit',/احذف|قص|أزل|عدّل|عدل|أضف/],['dubbing',/دبلج|ترجم|لغة|الإنجليزية|الإسبانية|الفرنسية/]];
+  let tools = K.filter(([, r]) => r.test(text)).map(([id]) => id);
+  if (!tools.length) tools = ['podcast'];
+  const S = {podcast:['تحليل المحتوى واستخراج الأفكار','كتابة النص وتوليد الصوت'],motion:['تصميم المشهد والحركة','توليد الموشن جرافيكس'],autoedit:['تحليل اللقطات واختيار أفضل اللحظات','القص والانتقالات والمؤثرات الطبيعية'],videoedit:['فهم التعديلات المطلوبة','تنفيذ التعديلات على المشهد'],dubbing:['التفريغ النصي والترجمة','توليد الأصوات ومزامنة التوقيت']};
+  const steps = [{t:'فهم الطلب وتخطيط المهمة', tool:null}];
+  tools.forEach(id => S[id].forEach(t => steps.push({t, tool:id})));
+  steps.push({t:'مراجعة النتيجة وتجهيزها', tool:null});
+  return {tools, steps};
+}
+function startTask(text, file) {
+  clearInterval(task.timer);
+  const plan = planFor(text);
+  Object.assign(task, {started:true, text, file, ...plan, i:0, p:0, done:false, title: text.length > 44 ? text.slice(0, 44) + '…' : text});
+  recent = [task.title, ...recent.filter(r => r !== task.title)]; store.set('recent', recent.slice(0, 8)); renderRecent();
+  go('task');
+  renderTask();
+  task.timer = setInterval(tick, 120);
+}
+function tick() {
+  task.p += 2.2 + Math.random() * 2.5;
+  if (task.p >= 100) { task.p = 0; task.i++; if (task.i >= task.steps.length) { task.done = true; clearInterval(task.timer); } }
+  renderTask();
+}
+function renderTask() {
+  const n = task.steps.length, i = Math.min(task.i, n - 1);
+  const pct = task.done ? 100 : Math.round(((task.i + task.p / 100) / n) * 100);
+  task.stepLabel = task.done ? 'اكتملت المهمة' : `الخطوة ${task.i + 1} من ${n}`;
+  const ts = $('#tstep'); if (ts) ts.textContent = task.stepLabel;
+  const cur = task.steps[i];
+  const doneN = task.done ? n : task.i;
+  const stepsHtml = task.steps.map((s, k) => {
+    const st = task.done || k < task.i ? 'done' : k === task.i ? 'run' : 'wait';
+    const tag = s.tool ? `<span class="tool-tag" style="background:rgba(${tint(s.tool)},.12);color:${col(s.tool)}">${T[s.tool].name}</span>` : '';
+    const mark = st === 'done' ? `<span class="st">${ic(P.check, 13, 'stroke-width:2.6')}</span>` : st === 'run' ? `<span class="st">${SPIN}</span>` : '<span class="st"></span>';
+    return `<div class="step ${st}">${mark}<span class="tx">${s.t}</span>${tag}${st === 'run' ? `<span class="tm ltr" style="color:var(--sky);font-weight:600">${Math.round(task.p)}%</span>` : ''}</div>${st === 'run' ? `<div class="step-sub"><div class="progress"><i style="width:${task.p}%"></i></div></div>` : ''}`;
+  }).join('');
+  const msg = task.done ? `اكتملت المهمة. استخدمتُ ${task.tools.map(t => T[t].name).join(' و')}، وهذه النتيجة.` : `خطتي من ${n} خطوات${task.tools.length === 2 ? ' وتجمع بين قدرتين' : task.tools.length > 2 ? ' وتجمع بين ' + task.tools.length + ' قدرات' : ''}. أعمل الآن على: ${cur.t}.`;
+  $('#thread').innerHTML = `
+    ${task.file ? `<div class="card" style="align-self:flex-end;display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:14px"><span style="color:#B3A8FF">${ic('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>', 18)}</span><b style="font-size:13.5px" dir="ltr">${esc(task.file)}</b></div>` : ''}
+    <div class="bubble">${esc(task.text)}</div>
+    <div class="agentrow"><span class="av">${LOGO}</span><div class="body"><p>${msg}</p>
+      <div class="card steps">${stepsHtml}</div>
+      ${task.done ? resultCard(task.tools[task.tools.length - 1]) : ''}
+    </div></div>`;
+  const lt = task.done ? task.tools[task.tools.length - 1] : (cur.tool || task.tools[0]);
+  $('#livetool').innerHTML = `<span style="color:${col(lt)}">${T[lt].name}</span>`;
+  $('#livetitle').textContent = task.done ? 'جاهز ✓' : (cur.tool ? T[cur.tool].name : 'تخطيط المهمة');
+  $('#livesub').textContent = task.done ? 'اكتملت كل الخطوات' : cur.t;
+  $('#livestep').textContent = task.done ? 'اكتملت المهمة' : cur.t;
+  $('#liveprog').style.width = pct + '%';
+  $('#livepct').textContent = pct + '%';
+  if (!$('#lp').childElementCount) particles($('#lp'), 22, 150);
+}
+function resultCard(id) {
+  const label = {podcast:'الحلقة 1 · جاهزة للاستماع', motion:'المقطع المتحرك · 6 ثوانٍ', autoedit:'الفيديو بعد المونتاج · 01:00', videoedit:'الفيديو بعد التعديل · النسخة 2', dubbing:'الفيديو المدبلج · 02:14'}[id];
+  return `<div class="result"><div style="display:flex;align-items:center;justify-content:space-between"><span class="badge" style="color:var(--ok);padding:0">النتيجة جاهزة</span><span><button class="ibtn" style="width:38px;height:38px" aria-label="تنزيل" data-dl>${ic(P.dl, 18)}</button><button class="ibtn" style="width:38px;height:38px" aria-label="مشاركة" data-dl>${ic(P.share, 18)}</button></span></div>
+    ${id === 'podcast' ? `<div class="player" style="margin-top:6px"><button class="playbtn" data-play aria-label="تشغيل">${PLAY}</button><div style="flex:1;min-width:0"><b style="font-size:14px">${label}</b><div class="wave" data-wave>${waveBars(46)}</div></div></div>` : `<div class="stage" style="margin-top:10px;border-radius:14px;aspect-ratio:16/9;border:1px solid var(--line2)"><div class="grid"></div><div class="ttl"><b>${esc(task.title.split(' ').slice(0, 3).join(' '))}</b><small>${label}</small></div><button class="playbtn" style="position:absolute;bottom:12px;inset-inline-start:12px;width:44px;height:44px" aria-label="تشغيل" data-dl>${PLAY}</button></div>`}</div>`;
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+function waveBars(n) { let h = ''; for (let k = 0; k < n; k++) { const v = 6 + Math.round(Math.abs(Math.sin(k * 1.7) * 18 + Math.cos(k * .6) * 8)); h += `<i style="height:${Math.min(32, v)}px"></i>`; } return h; }
+document.addEventListener('click', e => {
+  const p = e.target.closest('[data-play]');
+  if (p) {
+    const w = p.parentElement.querySelector('[data-wave]'); const bars = $$('i', w);
+    if (p._t) { clearInterval(p._t); p._t = null; p.innerHTML = PLAY; p.setAttribute('aria-label', 'تشغيل'); return; }
+    p.innerHTML = PAUSE; p.setAttribute('aria-label', 'إيقاف مؤقت');
+    let k = bars.findIndex(b => !b.classList.contains('p')); if (k < 0) { bars.forEach(b => b.classList.remove('p')); k = 0; }
+    p._t = setInterval(() => { if (k >= bars.length) { clearInterval(p._t); p._t = null; p.innerHTML = PLAY; return; } bars[k++].classList.add('p'); }, 160);
+  }
+  if (e.target.closest('[data-dl]')) toast('هذا نموذج تصميم — التنزيل يعمل في التطبيق الفعلي');
+});
+$('#taskform').addEventListener('submit', e => { e.preventDefault(); const v = $('#taskinp').value.trim(); if (!v) return; $('#taskinp').value = ''; startTask(task.text + ' — ' + v, task.file); });
+function particles(el, n, R) {
+  let h = '';
+  for (let k = 0; k < n; k++) {
+    const a = k / n * Math.PI * 2, r = R + (k % 3) * 30, c = k % 2 ? '#5CD3F5' : '#9B8CFF', s = 3 + k % 3;
+    h += `<span style="left:${Math.round(Math.cos(a) * (14 + k % 4 * 9))}px;top:${Math.round(Math.sin(a) * (10 + k % 4 * 6)) - 34}px;width:${s}px;height:${s}px;background:${c};box-shadow:0 0 8px ${c};--dx:${Math.round(Math.cos(a) * r)}px;--dy:${Math.round(Math.sin(a) * r * .7)}px;animation-delay:${(k % 6) * .08}s"></span>`;
+  }
+  el.innerHTML = h;
+}
+
+/* ---------- podcast ---------- */
+const voiceOpts = VOICES.map(v => `<option value="${v.n}">صوت ${v.n} · ${v.d}</option>`).join('');
+$('#pcv1').innerHTML = voiceOpts; $('#pcv2').innerHTML = voiceOpts; $('#pcv1').value = '04'; $('#pcv2').value = '11';
+$('#pcsrc').addEventListener('click', e => { const b = e.target.closest('[data-src]'); if (!b) return; $$('#pcsrc button').forEach(x => x.classList.toggle('on', x === b)); const f = b.dataset.src === 'file'; $('#pcdrop').classList.toggle('hidden', !f); $('#pctext').classList.toggle('hidden', f); });
+$('#pcfile').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; $('#pcfname').textContent = f.name; $('#pcfmeta').textContent = (f.size / 1048576).toFixed(1) + ' ميجابايت · جاهز للتحويل'; $('#pcdrop').classList.add('has'); });
+$('#pcout').addEventListener('click', e => { const b = e.target.closest('[data-out]'); if (!b) return; $$('#pcout .opt').forEach(x => x.classList.toggle('on', x === b)); const pod = b.dataset.out === 'podcast'; $('#pcv2row').classList.toggle('hidden', !pod); $('#pcv1l').textContent = pod ? 'صوت المقدّم الأول' : 'صوت القراءة'; $('#pcgo').textContent = pod ? 'إنشاء البودكاست' : 'تحويل إلى صوت'; });
+segGroup('#pclen');
+$('#pcform').addEventListener('submit', e => {
+  e.preventDefault();
+  const pod = $('#pcout .on').dataset.out === 'podcast';
+  const hasSrc = $('#pcdrop').classList.contains('has') || $('#pctext').value.trim();
+  if (!hasSrc) { toast('اختر ملفًا أو اكتب نصًا أولًا'); return; }
+  const r = $('#pcres'); r.classList.remove('hidden');
+  let p = 0; $('#pcgo').disabled = true;
+  r.innerHTML = `<div class="lbl" style="margin-bottom:10px"><span>${pod ? 'جارٍ إنتاج الحلقة' : 'جارٍ التحويل إلى صوت'}</span><small class="ltr" id="pcpct">0%</small></div><div class="progress"><i id="pcbar"></i></div>`;
+  const t = setInterval(() => { p += 4 + Math.random() * 6; if (p >= 100) { clearInterval(t); $('#pcgo').disabled = false; r.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between"><b>${pod ? 'الحلقة 1 · حوار بين مقدّمَين' : 'النسخة الصوتية الكاملة'}</b><span class="badge" style="color:var(--ok);padding:0">جاهزة</span></div><div class="player" style="margin-top:10px"><button class="playbtn" data-play aria-label="تشغيل" style="background:var(--sky);color:var(--skyInk)">${PLAY}</button><div class="wave sky" data-wave>${waveBars(52)}</div></div><div style="display:flex;justify-content:space-between;margin-top:8px" class="muted"><small>صوت ${$('#pcv1').value}${pod ? ' + صوت ' + $('#pcv2').value : ''} · ${$('#pcst').value}</small><button class="chip" style="height:32px" data-dl>${ic(P.dl, 16)}تنزيل</button></div>`; return; } $('#pcbar').style.width = p + '%'; $('#pcpct').textContent = Math.round(p) + '%'; }, 140);
+});
+
+/* ---------- motion ---------- */
+particles($('#mp'), 20, 140);
+let mVar = 1, mPlaying = true;
+const mVars = [{t:'فن الإصغاء', s:'الحلقة الأولى · الآن', d:'جزيئات ضوئية تتجمع في المنتصف، يعبرها خط ضوء مائل، ثم يظهر العنوان بحركة انسيابية.'},{t:'فن الإصغاء', s:'نسخة هادئة', d:'العنوان يظهر بتلاشٍ هادئ مع خطوط مدارية بطيئة.'}];
+function renderMVars() { $('#mvars').innerHTML = mVars.map((v, k) => `<button type="button" class="variant${k === mVar ? ' on' : ''}" data-v="${k}"><span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">${k % 2 ? '<i style="width:60px;height:2px;background:var(--sky);transform:rotate(-24deg)"></i>' : '<i style="width:20px;height:20px;border-radius:50%;border:1.5px solid var(--vio)"></i>'}</span><span>النسخة ${k + 1}</span></button>`).join('') + `<button type="button" class="variant new" data-v="new">${ic('<path d="M12 5v14M5 12h14"/>', 16)}نسخة جديدة</button>`; }
+function showMVar() { const v = mVars[mVar]; $('#mtitle').textContent = v.t; $('#msub').textContent = v.s; $('#mdesc').textContent = v.d; $('#mver').textContent = 'المعاينة · النسخة ' + (mVar + 1); restartAnim(); renderMVars(); }
+function restartAnim() { ['#mreveal', '#msweep'].forEach(s => { const el = $(s); el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; }); particles($('#mp'), 20, 140); }
+$('#mvars').addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b) return; if (b.dataset.v === 'new') { genMotion('نسخة بديلة بأسلوب ' + $('#mstyle .on').textContent); return; } mVar = +b.dataset.v; showMVar(); });
+function genMotion(desc) {
+  $('#mprog').classList.remove('hidden'); let p = 0;
+  const t = setInterval(() => { p += 6 + Math.random() * 8; if (p >= 100) { clearInterval(t); $('#mprog').classList.add('hidden'); const words = desc.replace(/[،.]/g, '').split(' ').filter(w => w.length > 2); mVars.push({t: words.slice(0, 3).join(' ') || 'مشهد جديد', s: $('#mstyle .on').textContent + ' · ' + $('#mdur .on').textContent, d: desc}); if (mVars.length > 5) mVars.splice(0, 1); mVar = mVars.length - 1; showMVar(); return; } $('#mbar').style.width = p + '%'; $('#mpct').textContent = Math.round(p) + '%'; }, 140);
+}
+$('#mform').addEventListener('submit', e => { e.preventDefault(); const v = $('#minp').value.trim(); if (!v) return; $('#minp').value = ''; genMotion(v); });
+$('#mratio').addEventListener('click', e => { const b = e.target.closest('[data-r]'); if (!b) return; $$('#mratio .chip').forEach(x => x.classList.toggle('on', x === b)); $('#mstage').style.aspectRatio = b.dataset.r; $('#mstage').style.maxHeight = b.dataset.r === '9/16' ? '640px' : ''; $('#mstage').style.marginInline = b.dataset.r === '16/9' ? '' : 'auto'; $('#mstage').style.width = b.dataset.r === '9/16' ? 'min(100%,360px)' : b.dataset.r === '1/1' ? 'min(100%,520px)' : ''; updMeta(); });
+chipGroup('#mdur', updMeta); chipGroup('#mstyle');
+function updMeta() { $('#mmeta').textContent = $('#mratio .on').textContent + ' · ' + $('#mdur .on').textContent.replace(' ث', 's'); }
+$('#mplay').innerHTML = PAUSE;
+$('#mplay').addEventListener('click', () => { mPlaying = !mPlaying; $$('#mstage .reveal, #mstage .sweep, #mstage .particles span').forEach(el => el.style.animationPlayState = mPlaying ? 'running' : 'paused'); $('#mplay').innerHTML = mPlaying ? PAUSE : PLAY; $('#mplay').setAttribute('aria-label', mPlaying ? 'إيقاف مؤقت' : 'تشغيل'); });
+renderMVars();
+
+/* ---------- auto edit ---------- */
+const AE = ['تحليل اللقطات واختيار أفضل اللحظات','القص والترتيب والانتقالات','إضافة الموشن جرافيكس والتأثيرات','مؤثرات صوتية طبيعية: رياح، خطوات، طريق','التصدير بجودة 1080p'];
+let ae = {i:-1, p:0};
+function renderAE() {
+  $('#aesteps').innerHTML = AE.map((s, k) => { const st = k < ae.i ? 'done' : k === ae.i ? 'run' : 'wait'; return `<div class="step ${st}">${st === 'done' ? `<span class="st">${ic(P.check, 13, 'stroke-width:2.6')}</span>` : st === 'run' ? `<span class="st">${SPIN}</span>` : '<span class="st"></span>'}<span class="tx">${s}</span>${st === 'run' ? `<span class="tm ltr" style="color:var(--sky);font-weight:600">${Math.round(ae.p)}%</span>` : ''}</div>`; }).join('');
+}
+$$('.toggle').forEach(t => t.addEventListener('click', () => t.setAttribute('aria-checked', t.getAttribute('aria-checked') !== 'true')));
+$('#aefile').addEventListener('change', e => { const fs = [...e.target.files]; fs.forEach((f, k) => { const d = document.createElement('div'); d.className = 'clip'; d.style.background = ['#2E2A44', '#203A3A', '#3A2A2A'][k % 3]; d.innerHTML = `<span style="inset-inline-end:auto;inset-inline-start:6px;max-width:84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(f.name)}</span>`; $('#aeclips').insertBefore(d, $('#aeclips .add')); }); $('#aecount').textContent = ($$('#aeclips .clip:not(.add)').length) + ' مقاطع'; });
+$('#aeform').addEventListener('submit', e => {
+  e.preventDefault(); if (ae.i >= 0 && ae.i < AE.length) return;
+  ae = {i:0, p:0}; $('#aego').disabled = true; $('#aego').textContent = 'جارٍ المونتاج';
+  const len = parseInt($('#aelen').value) || 60;
+  const t = setInterval(() => {
+    ae.p += 5 + Math.random() * 7;
+    if (ae.p >= 100) { ae.p = 0; ae.i++; }
+    const total = Math.min(100, Math.round((ae.i + ae.p / 100) / AE.length * 100));
+    $('#aestate').innerHTML = ae.i >= AE.length ? `<span style="color:var(--ok)">● اكتمل المونتاج</span>` : `${SPIN.replace('width="22" height="22"', 'width="14" height="14"')} جارٍ المونتاج · <span class="ltr">${total}%</span>`;
+    const secs = Math.round(len * total / 100); $('#aetime').textContent = `00:${String(Math.min(59, secs)).padStart(2, '0')} / ${len >= 60 ? '0' + (len / 60 | 0) + ':' + String(len % 60).padStart(2, '0') : '00:' + len}`;
+    if (ae.i >= AE.length) { clearInterval(t); $('#aego').disabled = false; $('#aego').textContent = 'إعادة المونتاج'; ae.i = AE.length; }
+    renderAE();
+  }, 130);
+});
+renderAE();
+
+/* ---------- video edit ---------- */
+const VESUG = ['قص مقطع','إزالة عنصر','إضافة عنصر','تعديل عنصر','موشن جرافيكس','عدة تعديلات معًا'];
+const VEX = {'قص مقطع':'احذف أول 5 ثوانٍ','إزالة عنصر':'أزل الشخص الذي يمر في الخلفية عند 00:12','إضافة عنصر':'أضف شعارًا صغيرًا في الزاوية','تعديل عنصر':'اجعل الإضاءة أدفأ في المشهد','موشن جرافيكس':'أضف عنوانًا متحركًا في البداية','عدة تعديلات معًا':'احذف أول 5 ثوانٍ، وأزل الشخص في الخلفية، ثم أضف عنوانًا متحركًا'};
+$('#vesug').innerHTML = VESUG.map(s => `<button type="button" class="chip" data-s="${s}">${s}</button>`).join('');
+$('#vesug').addEventListener('click', e => { const b = e.target.closest('[data-s]'); if (b) { $('#veinp').value = VEX[b.dataset.s]; $('#veinp').focus(); } });
+let veVer = 1, veHist = [];
+function parseEdits(t) {
+  const out = [];
+  if (/احذف|قص|أول/.test(t)) out.push({k:'cut', l:'قص', d:(t.match(/\d+/) || ['5'])[0] + ' ثوانٍ من البداية'});
+  if (/أزل|إزالة|امسح/.test(t)) out.push({k:'remove', l:'إزالة عنصر من المشهد', d:'الشخص في الخلفية'});
+  if (/عنوان|موشن|متحرك/.test(t)) out.push({k:'title', l:'إضافة عنوان متحرك', d:'موشن جرافيكس'});
+  if (/أضف|إضافة/.test(t) && !out.some(o => o.k === 'title')) out.push({k:'add', l:'إضافة عنصر جديد', d:'وفق الوصف'});
+  if (/اجعل|غيّر|عدّل|تعديل|أدفأ|لون|إضاءة/.test(t)) out.push({k:'adjust', l:'تعديل عنصر في المشهد', d:'وفق الإمكانات المدعومة'});
+  return out.length ? out : [{k:'adjust', l:'تعديل وفق الوصف', d:''}];
+}
+function applyEdit(k, on) {
+  if (k === 'cut') $('#vecut').style.width = on ? '11%' : '0';
+  if (k === 'remove') { $('#veobj').style.opacity = on ? 0 : 1; $('#vebox').setAttribute('opacity', 0); }
+  if (k === 'title') $('#vetitle').setAttribute('opacity', on ? 1 : 0);
+}
+$('#veform').addEventListener('submit', e => {
+  e.preventDefault(); const v = $('#veinp').value.trim(); if (!v) return; $('#veinp').value = '';
+  const edits = parseEdits(v); const th = $('#vethread');
+  th.insertAdjacentHTML('beforeend', `<div class="bubble chat">${esc(v)}</div><div class="agentrow"><span class="av">${LOGO}</span><div class="body"><p>فهمت ${edits.length} ${edits.length > 1 ? 'تعديلات' : 'تعديلًا'}، أنفّذها بالترتيب.</p><div class="card steps edits"></div></div></div>`);
+  const box = th.lastElementChild.querySelector('.edits');
+  let i = 0, p = 0;
+  const draw = () => box.innerHTML = edits.map((ed, k) => { const st = k < i ? 'done' : k === i ? 'run' : 'wait'; return `<div class="step ${st}">${st === 'done' ? `<span class="st">${ic(P.check, 13, 'stroke-width:2.6')}</span>` : st === 'run' ? `<span class="st">${SPIN}</span>` : '<span class="st"></span>'}<span class="tx">${ed.l} <small>${ed.d}</small></span>${st === 'run' ? `<span class="tm ltr" style="color:var(--sky);font-weight:600">${Math.round(p)}%</span>` : st === 'done' ? '<span class="tm">تم</span>' : '<span class="tm">التالي</span>'}</div>`; }).join('');
+  draw();
+  if (edits[0].k === 'remove') $('#vebox').setAttribute('opacity', 1);
+  const t = setInterval(() => { p += 7 + Math.random() * 9; if (p >= 100) { applyEdit(edits[i].k, true); p = 0; i++; if (edits[i] && edits[i].k === 'remove') $('#vebox').setAttribute('opacity', 1); if (i >= edits.length) { clearInterval(t); veHist.push(edits.map(x => x.k)); veVer++; $('#vever').textContent = 'النسخة ' + veVer; } } draw(); }, 130);
+  draw(); th.lastElementChild.scrollIntoView({block:'nearest'});
+});
+$('#veundo').addEventListener('click', () => { const last = veHist.pop(); if (!last) { toast('لا توجد تعديلات للتراجع عنها'); return; } last.forEach(k => applyEdit(k, false)); veVer--; $('#vever').textContent = 'النسخة ' + veVer; toast('تم التراجع إلى النسخة ' + veVer); });
+
+/* ---------- dubbing ---------- */
+let dbVoice = '07', dbTone = 'هادئة', dbDone = false;
+$('#dbsrc').innerHTML = '<option value="auto">كشف تلقائي (العربية)</option>' + LANGS.map(l => `<option>${l}</option>`).join('');
+$('#dbdst').innerHTML = LANGS.map(l => `<option>${l}</option>`).join(''); $('#dbdst').value = 'الإسبانية';
+$('#dbswap').addEventListener('click', () => { const s = $('#dbsrc').value === 'auto' ? 'العربية' : $('#dbsrc').value; $('#dbsrc').value = $('#dbdst').value; $('#dbdst').value = s; dbReset(); });
+['#dbsrc', '#dbdst'].forEach(s => $(s).addEventListener('change', dbReset));
+function dbReset() { dbDone = false; $('#dbcmp [data-v="dub"]').disabled = true; setCmp('orig'); $('#dbstate').textContent = 'لم تبدأ الدبلجة'; $('#dbstate').style.color = 'var(--tx2)'; $('#dbgo').textContent = 'ابدأ الدبلجة'; }
+function voiceBtn(v) { return `<button type="button" class="voice${v.n === dbVoice ? ' on' : ''}" data-voice="${v.n}" aria-pressed="${v.n === dbVoice}"><span class="vd">${ic(P.voice, 14)}</span><span><b>صوت ${v.n}</b><small>${v.d}</small></span></button>`; }
+function renderVoices() {
+  const quick = ['07', '02', '11', '15']; if (!quick.includes(dbVoice)) quick[3] = dbVoice;
+  $('#dbvoices').innerHTML = quick.map(n => voiceBtn(VOICES[+n - 1])).join('');
+  const g = $('#vmfilter .on').dataset.g;
+  $('#vmvoices').innerHTML = VOICES.filter(v => g === 'all' || v.g === g).map(voiceBtn).join('');
+  const tones = (list) => list.map(t => `<button type="button" class="chip${t === dbTone ? ' on' : ''}" data-tone="${t}" aria-pressed="${t === dbTone}">${t}</button>`).join('');
+  const qt = TONES.slice(0, 5); if (!qt.includes(dbTone)) qt[4] = dbTone;
+  $('#dbtones').innerHTML = tones(qt) + `<button type="button" class="chip" data-act="voices" style="border-style:dashed"><span class="ltr">+${TONES.length - 5}</span></button>`;
+  $('#vmtones').innerHTML = tones(TONES);
+  $('#vmsel').textContent = `صوت ${dbVoice} · نبرة ${dbTone}`;
+}
+document.addEventListener('click', e => {
+  const v = e.target.closest('[data-voice]'); if (v) { dbVoice = v.dataset.voice; renderVoices(); if (dbDone) dbReset(); }
+  const t = e.target.closest('[data-tone]'); if (t) { dbTone = t.dataset.tone; renderVoices(); if (dbDone) dbReset(); }
+});
+segGroup('#vmfilter', renderVoices);
+function openVM() { $('#vmodal').classList.add('on'); renderVoices(); $('#vmodal .cbtn').focus(); }
+function closeVM() { $('#vmodal').classList.remove('on'); }
+$('#vmodal').addEventListener('click', e => { if (e.target.id === 'vmodal') closeVM(); });
+function setCmp(v) { $$('#dbcmp button').forEach(b => b.classList.toggle('on', b.dataset.v === v)); const src = $('#dbsrc').value === 'auto' ? 'العربية' : $('#dbsrc').value; const lang = v === 'dub' ? $('#dbdst').value : src; const s = SUBS[lang] || SUBS['الإنجليزية']; $('#dbsub').textContent = s; $('#dbsub').dir = /[؀-ۿ֐-׿]/.test(s) ? 'rtl' : 'ltr'; }
+$('#dbcmp').addEventListener('click', e => { const b = e.target.closest('button'); if (b && !b.disabled) setCmp(b.dataset.v); });
+$('#dbgo').addEventListener('click', () => {
+  if (dbDone) { toast('هذا نموذج تصميم — التنزيل يعمل في التطبيق الفعلي'); return; }
+  if ($('#dbsrc').value === $('#dbdst').value) { toast('اختر لغة دبلجة مختلفة عن لغة الفيديو'); return; }
+  const ST = ['جارٍ التفريغ النصي', 'جارٍ الترجمة', `جارٍ توليد صوت ${dbVoice} بنبرة ${dbTone}`, 'جارٍ مزامنة التوقيت'];
+  $('#dbprog').classList.remove('hidden'); $('#dbgo').disabled = true; let p = 0;
+  const t = setInterval(() => { p += 2.5 + Math.random() * 4; $('#dbbar').style.width = Math.min(100, p) + '%'; $('#dbpct').textContent = Math.min(100, Math.round(p)) + '%'; $('#dbstep').textContent = ST[Math.min(3, p / 25 | 0)]; $('#dbstate').textContent = 'جارٍ الدبلجة…'; $('#dbstate').style.color = 'var(--sky)';
+    if (p >= 100) { clearInterval(t); dbDone = true; $('#dbprog').classList.add('hidden'); $('#dbgo').disabled = false; $('#dbgo').innerHTML = ic(P.dl, 18) + ' تنزيل النسخة المدبلجة'; $('#dbstate').textContent = '● تمت الدبلجة'; $('#dbstate').style.color = 'var(--ok)'; $('#dbcmp [data-v="dub"]').disabled = false; setCmp('dub'); } }, 120);
+});
+renderVoices(); setCmp('orig');
+
+/* ---------- voice assistant ---------- */
+const VO_SCRIPT = [
+  {a:'أهلًا! أنا مدار. بماذا أبدأ؟', u:'أريد دبلجة الفيديو الأخير إلى الإسبانية بصوت هادئ'},
+  {a:'حسنًا، سأدبلجه إلى الإسبانية بصوت 07 ونبرة هادئة. هل أبدأ الآن؟', u:'نعم، ابدأ'},
+  {a:'بدأت الدبلجة. سأخبرك فور اكتمالها.', u:''}
+];
+let vo = {k:0, timer:null, paused:false};
+function openVoice() { $('#vo').classList.add('on'); vo = {k:0, timer:null, paused:false}; $('#votr').innerHTML = ''; voCycle(); $('#vomic').focus(); if (location.hash === '#voice') history.replaceState(null, '', '#' + (route.last || 'home')); }
+function closeVoice() { if (!$('#vo').classList.contains('on')) return; $('#vo').classList.remove('on'); clearTimeout(vo.timer); }
+function voSet(state, label) { const o = $('#orb'); o.classList.remove('speak', 'think'); if (state) o.classList.add(state); $('#vostate').textContent = label; }
+function voCycle() {
+  const s = VO_SCRIPT[vo.k]; if (!s) { voSet('', 'أستمع إليك…'); return; }
+  voSet('speak', 'مدار يتحدث…');
+  $('#votr').innerHTML = `<div class="a">${s.a}</div>`;
+  vo.timer = setTimeout(() => {
+    if (!s.u) { voSet('', 'أستمع إليك…'); return; }
+    voSet('', 'أستمع إليك…');
+    let w = 0; const words = s.u.split(' ');
+    const typeW = () => { if (vo.paused) { vo.timer = setTimeout(typeW, 300); return; } w++; $('#votr').innerHTML = `<div class="a">${s.a}</div><div class="u">${words.slice(0, w).join(' ')}<span style="display:inline-block;width:2px;height:24px;margin-inline-start:4px;vertical-align:-4px;background:var(--sky)"></span></div>`; if (w < words.length) vo.timer = setTimeout(typeW, 260); else vo.timer = setTimeout(() => { voSet('think', 'أفكّر…'); vo.timer = setTimeout(() => { vo.k++; voCycle(); }, 1100); }, 700); };
+    vo.timer = setTimeout(typeW, 600);
+  }, 2200);
+}
+$('#vomic').addEventListener('click', () => { vo.paused = !vo.paused; $('#orb').classList.toggle('paused', vo.paused); $('#vomic').classList.toggle('off', vo.paused); $('#vomicl').textContent = vo.paused ? 'استئناف' : 'إيقاف مؤقت'; $('#vomic').setAttribute('aria-label', vo.paused ? 'استئناف' : 'إيقاف مؤقت'); if (vo.paused) $('#vostate').textContent = 'متوقف مؤقتًا'; });
+$('#vomode').addEventListener('click', e => { const b = e.target.closest('[data-mode]'); if (b) setMode(b.dataset.mode); });
+
+/* ---------- helpers ---------- */
+function segGroup(sel, cb) { $(sel).addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; $$(sel + ' button').forEach(x => x.classList.toggle('on', x === b)); cb && cb(); }); }
+function chipGroup(sel, cb) { $(sel).addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; $$(sel + ' .chip').forEach(x => x.classList.toggle('on', x === b)); cb && cb(); }); }
+
+setMode(store.get('mode', 'agent'));
+route();
+})();
+</script>
+</body>
+</html>
