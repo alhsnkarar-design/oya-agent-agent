@@ -25,7 +25,7 @@
 | 🧩 قوالب | 8 قوالب جاهزة (SaaS، مطعم، متجر، حجز عيادة، مهام، ملف أعمال، فعالية، لوحة تحليلات) |
 | 🔒 رمز دخول | `BANNAA_ACCESS_CODE` لحماية رصيدك قبل إضافة نظام الحسابات |
 | 🧪 وضع تجريبي | يعمل بدون أي مفتاح لتجربة الواجهة بالكامل |
-| 👤 حسابات | تسجيل/دخول بالبريد وكلمة المرور (scrypt + جلسة موقّعة httpOnly)، ونقل المشاريع المحلية للحساب تلقائياً |
+| 👤 حسابات | الدخول بحساب **Google** أو بالبريد وكلمة المرور (scrypt + جلسة موقّعة httpOnly)، ونقل المشاريع المحلية للحساب تلقائياً |
 | ☁️ حفظ سحابي | المشاريع تُحفظ في Postgres تلقائياً أثناء العمل، وتفتحها من أي جهاز |
 | 🚀 نشر بضغطة | رابط عام `/s/<اسم>/` لكل موقع، مع تحديث وإيقاف النشر ومشاركة واتساب |
 | 🖼️ صور ورؤية | إرفاق شعار/صور/لقطة تصميم (رفع، سحب وإفلات، لصق) — تُضغط وتُحفظ كأصول، ويراها النموذج ليحوّل التصميم إلى كود |
@@ -66,6 +66,25 @@ npm run dev                  # http://localhost:3000
 > `Content-Security-Policy: sandbox` (أصل معزول لا يرسل كوكيز المنصة)، مع بديل في الذاكرة لـ localStorage.
 > ومع `SITES_URL` تُخدم من نطاق منفصل تماماً. كل طلبات التعديل في الـ API محمية من CSRF بفحص `Origin`.
 
+## تسجيل الدخول بحساب Google
+
+الزر «Continue with Google» يظهر تلقائياً عند ضبط المفتاحين. يعمل جنباً إلى جنب مع البريد وكلمة المرور، وإذا سجّل
+مستخدم بـ Google ببريد له حساب سابق (وبريده موثّق لدى Google) يُربط الحسابان ولا يتكرر المستخدم.
+
+1. افتح [Google Cloud Console](https://console.cloud.google.com/) وأنشئ مشروعاً.
+2. **OAuth consent screen**: اختر External، واكتب **App name** = اسم موقعك (مثلاً Bannaa)، وارفع الشعار، وأضف بريد الدعم
+   ونطاقك في Authorized domains. هذا الاسم والشعار هما ما يراه المستخدم في نافذة Google («Sign in to Bannaa»).
+   لإظهار الشعار للعامة قد تطلب Google توثيق العلامة (Brand verification) — لا يحتاج النطاقات الحساسة لأننا نطلب `openid email profile` فقط.
+3. **Credentials ← Create credentials ← OAuth client ID ← Web application**:
+   - Authorized JavaScript origins: `https://your-domain.com`
+   - Authorized redirect URIs: `https://your-domain.com/api/auth/google/callback`
+   (وللتجربة محلياً: `http://localhost:3000/api/auth/google/callback`)
+4. ضع في متغيرات البيئة: `GOOGLE_CLIENT_ID`، `GOOGLE_CLIENT_SECRET`، و`APP_URL=https://your-domain.com`.
+5. اضغط **Publish app** في شاشة الموافقة لإخراجه من وضع الاختبار (وإلا فلن يدخل إلا المستخدمون التجريبيون).
+
+> الأمان: تدفق OAuth 2.0 / OpenID Connect مع PKCE وفحص `state` (حماية من CSRF)، ورفض البريد غير الموثّق، ومنع إعادة التوجيه
+> إلى مواقع خارجية، وحسابات Google فقط لا يمكن الدخول إليها بكلمة مرور.
+
 ## البنية
 
 ```
@@ -77,7 +96,7 @@ platform/
 │   ├── s/[slug]/[[...path]]  خدمة المواقع المنشورة
 │   └── api/
 │       ├── generate/         بث التوليد (+ صور، حد يومي)
-│       ├── auth/             register · login · logout · me
+│       ├── auth/             register · login · logout · me · google (+callback)
 │       └── projects/         CRUD + publish
 ├── components/               Workspace, ChatPanel, CodePane, HeroPrompt, icons, landing/*
 ├── lib/
@@ -88,7 +107,7 @@ platform/
 │   ├── storage.ts            حفظ المشاريع والنسخ في المتصفح (للزوار)
 │   ├── cloud.ts              عميل الحسابات والحفظ السحابي والنشر
 │   ├── assets.ts             ضغط الصور وتحويلها لأصول
-│   └── server/               db (Postgres/ملف) · auth · validate · sites
+│   └── server/               db (Postgres/ملف) · auth · google · validate · sites
 │   └── templates.ts          القوالب
 ├── db/schema.sql             مخطط قاعدة البيانات (يُطبّق تلقائياً)
 └── tests/                    اختبارات الوحدات (npm test)

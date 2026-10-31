@@ -6,6 +6,7 @@ export interface Me {
   user: { id: string; email: string; name: string } | null;
   signupOpen: boolean;
   requireLogin: boolean;
+  google?: boolean;
 }
 
 export interface CloudSummary {

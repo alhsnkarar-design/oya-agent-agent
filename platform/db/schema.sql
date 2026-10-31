@@ -15,6 +15,7 @@ create table if not exists bannaa_projects (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+alter table bannaa_users add column if not exists google_sub text unique;
 create index if not exists bannaa_projects_user_idx on bannaa_projects(user_id, updated_at desc);
 create table if not exists bannaa_sites (
   slug text primary key,

@@ -13,7 +13,8 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  passwordHash: string;
+  passwordHash: string; // empty for accounts created with Google only
+  googleSub: string | null; // Google account id ("sub" claim) when linked
   createdAt: string;
 }
 
@@ -55,7 +56,9 @@ export interface Site {
 export class ConflictError extends Error {}
 
 export interface Db {
-  createUser(email: string, name: string, passwordHash: string): Promise<User>;
+  createUser(email: string, name: string, passwordHash: string, googleSub?: string | null): Promise<User>;
+  getUserByGoogleSub(sub: string): Promise<User | null>;
+  linkGoogle(userId: string, sub: string): Promise<void>;
   getUserByEmail(email: string): Promise<User | null>;
   getUserById(id: string): Promise<User | null>;
   listProjects(userId: string): Promise<ProjectSummary[]>;
@@ -99,6 +102,7 @@ create table if not exists bannaa_projects (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+alter table bannaa_users add column if not exists google_sub text unique;
 create index if not exists bannaa_projects_user_idx on bannaa_projects(user_id, updated_at desc);
 create table if not exists bannaa_sites (
   slug text primary key,
@@ -121,6 +125,7 @@ const rowUser = (r: any): User => ({
   email: r.email,
   name: r.name,
   passwordHash: r.password_hash,
+  googleSub: r.google_sub ?? null,
   createdAt: new Date(r.created_at).toISOString(),
 });
 const rowProject = (r: any): ProjectRecord => ({
@@ -150,17 +155,24 @@ class PgDb implements Db {
     await this.ready;
     return this.pool.query(sql, params);
   }
-  async createUser(email: string, name: string, passwordHash: string) {
+  async createUser(email: string, name: string, passwordHash: string, googleSub: string | null = null) {
     try {
       const r = await this.q(
-        "insert into bannaa_users (id, email, name, password_hash) values ($1,$2,$3,$4) returning *",
-        [randomUUID(), email, name, passwordHash],
+        "insert into bannaa_users (id, email, name, password_hash, google_sub) values ($1,$2,$3,$4,$5) returning *",
+        [randomUUID(), email, name, passwordHash, googleSub],
       );
       return rowUser(r.rows[0]);
     } catch (e: any) {
       if (e?.code === "23505") throw new ConflictError("email");
       throw e;
     }
+  }
+  async getUserByGoogleSub(sub: string) {
+    const r = await this.q("select * from bannaa_users where google_sub = $1", [sub]);
+    return r.rows[0] ? rowUser(r.rows[0]) : null;
+  }
+  async linkGoogle(userId: string, sub: string) {
+    await this.q("update bannaa_users set google_sub = $1 where id = $2", [sub, userId]);
   }
   async getUserByEmail(email: string) {
     const r = await this.q("select * from bannaa_users where email = $1", [email]);
@@ -280,12 +292,21 @@ class FileDb implements Db {
     return next;
   }
 
-  createUser(email: string, name: string, passwordHash: string) {
+  createUser(email: string, name: string, passwordHash: string, googleSub: string | null = null) {
     return this.run((s) => {
       if (s.users.some((u) => u.email === email)) throw new ConflictError("email");
-      const u: User = { id: randomUUID(), email, name, passwordHash, createdAt: now() };
+      const u: User = { id: randomUUID(), email, name, passwordHash, googleSub, createdAt: now() };
       s.users.push(u);
       return u;
+    }, true);
+  }
+  getUserByGoogleSub(sub: string) {
+    return this.run((s) => s.users.find((u) => u.googleSub === sub) ?? null);
+  }
+  linkGoogle(userId: string, sub: string) {
+    return this.run((s) => {
+      const u = s.users.find((x) => x.id === userId);
+      if (u) u.googleSub = sub;
     }, true);
   }
   getUserByEmail(email: string) {

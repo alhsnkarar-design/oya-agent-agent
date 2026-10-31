@@ -9,6 +9,9 @@ export async function POST(req: Request) {
   const email = String(body.email ?? "").trim().toLowerCase();
   const password = String(body.password ?? "");
   const user = email ? await (await getDb()).getUserByEmail(email) : null;
+  if (user && !user.passwordHash) {
+    return jsonError("This account uses Google sign-in. Continue with Google instead.", 400);
+  }
   if (!user || !(await verifyPassword(password, user.passwordHash))) {
     return jsonError("Incorrect email or password", 401);
   }
