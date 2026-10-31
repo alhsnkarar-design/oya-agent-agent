@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>مدار — هوية «الاستوديو»</title>
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F3F0E8;--card:#FFFFFF;--ink:#151515;--ink2:#4F4B45;--ink3:#736E66;--line:#E4DED3;--acc:#FF5A1F;
+--pod:#C8B6FF;--mot:#D4F35A;--aut:#FF9A4D;--edt:#FFA6CB;--dub:#8DB8FF;--voi:#7FE3C4}
+*{box-sizing:border-box}
+body{margin:0;background:#D9D4CA;color:var(--ink);font-family:'Noto Sans Arabic',sans-serif;display:flex;flex-wrap:wrap;gap:40px;padding:40px}
+h1,h2,h3,.d{font-family:'Alexandria',sans-serif;margin:0;letter-spacing:-.2px}
+p{margin:0}
+svg.i{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ltr{direction:ltr;unicode-bidi:isolate}
+.screen{width:390px;height:844px;position:relative;overflow:hidden;background:var(--paper);display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:10px;height:64px;padding:12px 18px 0;flex-shrink:0}
+.ib{width:44px;height:44px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--line);flex-shrink:0}
+.ib.ink{background:var(--ink);color:#fff;border:0}
+.body{flex:1;min-height:0;padding:6px 18px 0;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.card{background:var(--card);border-radius:24px;border:1px solid var(--line)}
+.row{display:flex;align-items:center;gap:10px}
+.pill{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:13px;font-weight:500;white-space:nowrap}
+.pill.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.btn{height:56px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:10px;font:600 16px 'Alexandria';background:var(--ink);color:#fff}
+.btn.acc{background:var(--acc)}
+.btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.lbl{display:flex;align-items:baseline;justify-content:space-between;font:600 14px 'Alexandria'}
+.lbl small{font:400 12px 'Noto Sans Arabic';color:var(--ink3)}
+.dock{position:absolute;left:18px;right:18px;bottom:22px;height:66px;border-radius:999px;background:var(--ink);display:flex;align-items:center;justify-content:space-around;padding:0 8px;box-shadow:0 18px 40px -16px rgba(0,0,0,.5)}
+.dock a{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#8F8A82}
+.dock a.on{background:#fff;color:var(--ink)}
+.dock a.plus{background:var(--acc);color:#fff;width:54px;height:54px}
+.blk{border-radius:28px;position:relative;overflow:hidden}
+.tic{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(21,21,21,.1);color:var(--ink);flex-shrink:0}
+.tag{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 10px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.foot{padding:12px 18px 28px;flex-shrink:0}
+.wv{display:flex;align-items:center;gap:2px}
+.wv i{display:block;flex:1;min-width:2px;border-radius:3px}
+.chk{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.comp{display:flex;align-items:center;gap:6px;height:58px;padding:0 6px 0 6px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
+.comp .ph{flex:1;color:var(--ink3);font-size:14.5px;padding:0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.go{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.prog{height:8px;border-radius:999px;background:rgba(21,21,21,.1);overflow:hidden;position:relative}
+.prog i{position:absolute;inset-block:0;inset-inline-start:0;border-radius:999px;background:var(--ink)}
+.dots{position:absolute;inset:0;background-image:radial-gradient(rgba(21,21,21,.18) 1.2px,transparent 1.4px);background-size:14px 14px}
+.lang{display:inline-flex;align-items:center;justify-content:center;height:28px;min-width:38px;padding:0 8px;border-radius:999px;font:700 11px 'Noto Sans Arabic';direction:ltr;background:var(--card);border:1.5px solid var(--ink)}
+</style>
+</head>
+<body>
+
+<!-- 01 ONBOARDING -->
+<section class="screen" id="s01">
+  <div class="top" style="justify-content:space-between"><span class="row" style="gap:8px"><i data-mark="30"></i><b class="d" style="font-size:21px">مدار</b></span><span style="font-size:14px;color:var(--ink2)">تخطي</span></div>
+  <div style="padding:10px 18px 0;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:92px;gap:10px;flex-shrink:0">
+    <div class="blk" style="background:var(--dub);grid-row:span 2;padding:16px;display:flex;flex-direction:column;justify-content:space-between"><i data-i="dubbing" data-s="30"></i><span><span class="row" style="gap:4px;margin-bottom:8px"><span class="lang" style="background:#fff">AR</span><i data-i="fwd" data-s="16"></i><span class="lang" style="background:var(--ink);color:#fff">EN</span></span><b class="d" style="font-size:19px">دبلجة</b></span></div>
+    <div class="blk" style="background:var(--mot);padding:14px;display:flex;align-items:flex-end;justify-content:space-between"><b class="d" style="font-size:16px">موشن</b><i data-i="motion" data-s="28"></i></div>
+    <div class="blk" style="background:var(--pod);padding:14px;display:flex;align-items:flex-end;justify-content:space-between"><b class="d" style="font-size:16px">بودكاست</b><i data-i="podcast" data-s="28"></i></div>
+    <div class="blk" style="background:var(--aut);padding:14px;display:flex;align-items:flex-end;justify-content:space-between"><b class="d" style="font-size:16px">مونتاج</b><i data-i="autoedit" data-s="28"></i></div>
+    <div class="blk" style="background:var(--edt);padding:14px;display:flex;align-items:flex-end;justify-content:space-between"><b class="d" style="font-size:16px">تعديل</b><i data-i="videoedit" data-s="28"></i></div>
+    <div class="blk" style="background:var(--ink);color:#fff;grid-column:span 2;padding:0 18px;display:flex;align-items:center;gap:14px"><span style="width:52px;height:52px;border-radius:50%;background:var(--voi);color:var(--ink);display:flex;align-items:center;justify-content:center"><i data-i="mic" data-s="24"></i></span><span style="flex:1"><b class="d" style="font-size:16px;display:block">«مدار، دبلج فيديو اليوم للإنجليزية»</b><small style="color:#A8A39A;font-size:12px">تحدّث معه مباشرة</small></span></div>
+  </div>
+  <div style="padding:26px 22px 0">
+    <h1 style="font-size:38px;line-height:1.2;font-weight:800">قل ما تريد.<br><span style="color:var(--acc)">ودَع الوكيل</span><br>يصنعه.</h1>
+    <p style="margin-top:12px;font-size:15px;line-height:1.7;color:var(--ink2)">وكيل واحد للصوت والفيديو: يحوّل ويصمّم ويمنتج ويعدّل ويدبلج — كلها من محادثة.</p>
+  </div>
+  <div style="margin-top:auto;padding:0 18px 30px;display:flex;flex-direction:column;gap:8px"><span class="btn">ابدأ مجانًا<i data-i="fwd" data-s="18"></i></span><span style="height:40px;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--ink2)">لدي حساب</span></div>
+</section>
+
+<!-- 02 HOME AGENT -->
+<section class="screen" id="s02">
+  <div class="top"><span class="row" style="gap:8px;flex:1"><i data-mark="30"></i><b class="d" style="font-size:21px">مدار</b></span><span class="pill" style="height:38px;font-weight:600"><i style="width:8px;height:8px;border-radius:50%;background:var(--acc)"></i>1,240 نقطة</span><span class="ib" style="background:var(--pod);border:0;font:700 15px 'Alexandria'">م</span></div>
+  <div class="body" style="gap:12px">
+    <h1 style="font-size:32px;line-height:1.2;font-weight:800;margin-top:4px">ماذا نصنع<br>اليوم؟</h1>
+    <div class="blk" style="background:var(--ink);color:#fff;padding:8px 8px 10px;border-radius:30px">
+      <div class="row" style="gap:4px;padding:4px;border-radius:999px;background:#2A2A2A;width:fit-content"><span class="row" style="gap:6px;height:36px;padding:0 16px;border-radius:999px;background:#fff;color:var(--ink);font:600 13.5px 'Alexandria'"><i data-i="orbit" data-s="16"></i><span class="ltr">Agent</span></span><span class="row" style="gap:6px;height:36px;padding:0 16px;border-radius:999px;color:#A8A39A;font:500 13.5px 'Alexandria'"><i data-i="chat" data-s="16"></i><span class="ltr">Chat</span></span></div>
+      <p style="padding:16px 12px 0;height:84px;font-size:16px;line-height:1.7;color:#8F8A82">صِف المهمة كاملة… مثل: «حوّل هذا الكتاب إلى بودكاست، ثم اصنع له إعلانًا قصيرًا»</p>
+      <div class="row" style="gap:8px;padding:0 4px"><span class="go" style="background:#2A2A2A;color:#fff"><i data-i="plus" data-s="20"></i></span><span class="go" style="background:#2A2A2A;color:var(--voi)"><i data-i="mic" data-s="20"></i></span><span style="flex:1"></span><span class="go" style="width:52px;height:52px;background:var(--acc);color:#fff"><i data-i="send" data-s="22"></i></span></div>
+    </div>
+    <div class="lbl" style="margin-top:2px">ما يستطيع الوكيل فعله<small>يجمع بينها وحده</small></div>
+    <div style="display:grid;grid-template-columns:1.25fr 1fr 1fr;grid-template-rows:96px 96px;gap:8px">
+      <div class="blk" style="background:var(--dub);grid-row:span 2;border-radius:24px;padding:14px;display:flex;flex-direction:column;justify-content:space-between"><i data-i="dubbing" data-s="26"></i><span><span class="row" style="gap:3px;margin-bottom:6px"><span class="lang" style="height:22px;min-width:30px;font-size:9.5px;background:#fff">AR</span><span class="lang" style="height:22px;min-width:30px;font-size:9.5px;background:var(--ink);color:#fff">EN</span></span><b class="d" style="font-size:15px;display:block">دبلجة الفيديو</b><small style="font-size:11px;color:var(--ink2)">30+ لغة بصوتك</small></span></div>
+      <div class="blk" style="background:var(--pod);border-radius:22px;padding:12px;display:flex;flex-direction:column;justify-content:space-between"><i data-i="podcast" data-s="22"></i><b class="d" style="font-size:13px">بودكاست</b></div>
+      <div class="blk" style="background:var(--mot);border-radius:22px;padding:12px;display:flex;flex-direction:column;justify-content:space-between"><i data-i="motion" data-s="22"></i><b class="d" style="font-size:13px">موشن</b></div>
+      <div class="blk" style="background:var(--aut);border-radius:22px;padding:12px;display:flex;flex-direction:column;justify-content:space-between"><i data-i="autoedit" data-s="22"></i><b class="d" style="font-size:13px">مونتاج</b></div>
+      <div class="blk" style="background:var(--edt);border-radius:22px;padding:12px;display:flex;flex-direction:column;justify-content:space-between"><i data-i="videoedit" data-s="22"></i><b class="d" style="font-size:13px">تعديل بالأوامر</b></div>
+    </div>
+    <div class="card row" style="padding:10px 12px;gap:12px;border-radius:22px"><span class="d" style="width:46px;height:46px;border-radius:50%;background:conic-gradient(var(--acc) 0 57%,#EFEAE0 0);display:flex;align-items:center;justify-content:center"><span style="width:34px;height:34px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font:700 11px 'Alexandria'" class="ltr">57%</span></span><span style="flex:1;min-width:0"><b style="display:block;font-size:13.5px">بودكاست + إعلان من كتاب</b><small style="color:var(--ink3);font-size:12px">الوكيل يعمل الآن · 4 من 7</small></span><i data-i="fwd" data-s="18"></i></div>
+  </div>
+  <div class="dock"><a class="on"><i data-i="home" data-s="22"></i></a><a><i data-i="folder" data-s="22"></i></a><a class="plus"><i data-i="plus" data-s="26"></i></a><a><i data-i="voice" data-s="22"></i></a><a><i data-i="user" data-s="22"></i></a></div>
+</section>
+
+<!-- 03 HOME CHAT -->
+<section class="screen" id="s03">
+  <div class="top"><span class="row" style="gap:8px;flex:1"><i data-mark="30"></i><b class="d" style="font-size:21px">مدار</b></span><span class="pill" style="height:38px;font-weight:600"><i style="width:8px;height:8px;border-radius:50%;background:var(--acc)"></i>1,240 نقطة</span><span class="ib" style="background:var(--pod);border:0;font:700 15px 'Alexandria'">م</span></div>
+  <div class="body" style="gap:12px">
+    <h1 style="font-size:32px;line-height:1.2;font-weight:800;margin-top:4px">أداة واحدة،<br>مهمة واحدة.</h1>
+    <div class="card" style="padding:8px 8px 10px;border-radius:30px;border:2px solid var(--ink)">
+      <div class="row" style="gap:4px;padding:4px;border-radius:999px;background:var(--paper);width:fit-content"><span class="row" style="gap:6px;height:36px;padding:0 16px;border-radius:999px;color:var(--ink3);font:500 13.5px 'Alexandria'"><i data-i="orbit" data-s="16"></i><span class="ltr">Agent</span></span><span class="row" style="gap:6px;height:36px;padding:0 16px;border-radius:999px;background:var(--ink);color:#fff;font:600 13.5px 'Alexandria'"><i data-i="chat" data-s="16"></i><span class="ltr">Chat</span></span></div>
+      <div class="row" style="gap:6px;margin:12px 8px 0"><span class="row" style="gap:6px;height:34px;padding:0 8px 0 12px;border-radius:999px;background:var(--pod);font:600 13px 'Alexandria'"><i data-i="podcast" data-s="15"></i>صوت وبودكاست<i data-i="x" data-s="14"></i></span><span class="row" style="gap:6px;height:34px;padding:0 12px;border-radius:999px;background:var(--paper);font-size:12.5px"><i data-i="book" data-s="14"></i>كتاب العادات</span></div>
+      <p style="padding:12px 12px 0;height:62px;font-size:16px;line-height:1.7">حوّل الفصل الثاني إلى حلقة بصوتين<span style="display:inline-block;width:2px;height:19px;background:var(--acc);vertical-align:-4px;margin-right:2px"></span></p>
+      <div class="row" style="gap:8px;padding:0 4px"><span class="go" style="background:var(--paper)"><i data-i="plus" data-s="20"></i></span><span class="go" style="background:var(--paper);color:#13916F"><i data-i="mic" data-s="20"></i></span><span style="flex:1"></span><span class="go" style="width:52px;height:52px;background:var(--ink);color:#fff"><i data-i="send" data-s="22"></i></span></div>
+    </div>
+    <div class="lbl">اختر الأداة<small>تتغيّر الخيارات حسبها</small></div>
+    <div style="display:flex;flex-direction:column;gap:6px" data-toolrows></div>
+  </div>
+  <div class="dock"><a class="on"><i data-i="home" data-s="22"></i></a><a><i data-i="folder" data-s="22"></i></a><a class="plus"><i data-i="plus" data-s="26"></i></a><a><i data-i="voice" data-s="22"></i></a><a><i data-i="user" data-s="22"></i></a></div>
+</section>
+
+<!-- 04 AGENT RUNNING -->
+<section class="screen" id="s04">
+  <div class="top"><span class="ib"><i data-i="back" data-s="20"></i></span><span style="flex:1;text-align:center"><b class="d" style="font-size:15px;display:block">الوكيل يعمل</b><small style="font-size:12px;color:var(--ink3)">بودكاست + إعلان من كتاب</small></span><span class="ib"><i data-i="more" data-s="20"></i></span></div>
+  <div class="body" style="gap:12px">
+    <div class="row" style="align-items:flex-end;justify-content:space-between;margin-top:4px"><b class="d ltr" style="font-size:64px;line-height:1;font-weight:800">57<span style="font-size:30px">%</span></b><span style="text-align:left;font-size:12.5px;color:var(--ink2)">الخطوة 4 من 7<br>متبقٍ ~3 دقائق</span></div>
+    <div class="prog" style="height:10px"><i style="width:57%;background:linear-gradient(90deg,var(--pod),var(--mot) 50%,var(--dub))"></i></div>
+    <div class="blk" style="background:var(--mot);padding:12px;border-radius:26px">
+      <div class="row" style="justify-content:space-between;margin-bottom:10px"><span class="tag" style="background:var(--ink);color:#fff"><i style="width:6px;height:6px;border-radius:50%;background:#FF4D4D"></i>شاشة الوكيل · مباشر</span><span class="tag" style="background:rgba(21,21,21,.1)">موشن جرافيكس</span></div>
+      <div style="position:relative;height:150px;border-radius:18px;background:var(--ink);overflow:hidden"><div data-burst style="position:absolute;inset:0"></div><b class="d" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;font-weight:800">قوة العادات</b><span class="ltr" style="position:absolute;bottom:8px;left:10px;font-size:10.5px;color:#8F8A82">frame 96 / 150</span></div>
+    </div>
+    <div style="position:relative;padding-inline-start:28px;display:flex;flex-direction:column;gap:12px">
+      <span style="position:absolute;top:10px;bottom:10px;right:11px;width:2px;background:var(--line)"></span>
+      <div class="row" style="position:relative"><span class="chk" style="position:absolute;right:-28px;background:var(--ink);color:#fff"><i data-i="check" data-s="13"></i></span><span style="flex:1;font-size:14px;color:var(--ink2)">قراءة الكتاب وكتابة الحوار</span><span class="tag" style="background:var(--pod)">بودكاست</span></div>
+      <div class="row" style="position:relative"><span class="chk" style="position:absolute;right:-28px;background:var(--ink);color:#fff"><i data-i="check" data-s="13"></i></span><span style="flex:1;font-size:14px;color:var(--ink2)">توليد الحلقة بصوتين</span><span class="tag" style="background:var(--pod)">بودكاست</span></div>
+      <div class="row" style="position:relative"><span class="chk" style="position:absolute;right:-28px;background:var(--acc);color:#fff;box-shadow:0 0 0 5px rgba(255,90,31,.2)"><i data-i="motion" data-s="13"></i></span><b style="flex:1;font-size:14px">تصميم الإعلان المتحرك</b><span class="tag" style="background:var(--mot)">موشن</span></div>
+      <div class="row" style="position:relative"><span class="chk" style="position:absolute;right:-28px;background:var(--paper);border:2px dashed #C9C2B5"></span><span style="flex:1;font-size:14px;color:var(--ink3)">دبلجة الإعلان للإنجليزية</span><span class="tag" style="background:var(--dub)">دبلجة</span></div>
+    </div>
+  </div>
+  <div class="foot"><div class="comp"><span class="ph">أضف تعليمات للوكيل…</span><span class="go" style="background:var(--paper);color:#13916F"><i data-i="mic" data-s="20"></i></span><span class="go" style="background:var(--ink);color:#fff"><i data-i="stop" data-s="14" data-fill></i></span></div></div>
+</section>
+
+<!-- 05 AGENT RESULT -->
+<section class="screen" id="s05">
+  <div class="top"><span class="ib"><i data-i="back" data-s="20"></i></span><span style="flex:1"></span><span class="ib"><i data-i="share" data-s="20"></i></span></div>
+  <div class="body" style="gap:12px">
+    <div><span class="tag" style="background:var(--ink);color:#fff;height:28px;padding:0 12px"><i data-i="check" data-s="13"></i>اكتملت في 6 دقائق</span><h1 style="font-size:30px;line-height:1.25;font-weight:800;margin-top:10px">3 أشياء جاهزة<br>من كتاب واحد.</h1></div>
+    <div class="blk" style="background:var(--pod);padding:14px 16px;border-radius:26px">
+      <div class="row"><span class="go" style="width:50px;height:50px;background:var(--ink);color:#fff"><i data-i="play" data-s="16" data-fill></i></span><span style="flex:1"><small style="font-size:11.5px;color:var(--ink2)">حلقة بودكاست · صوتان</small><b class="d" style="display:block;font-size:16px">الحلقة 1: لماذا نكرر؟</b></span><b class="d ltr" style="font-size:14px">18:42</b></div>
+      <div class="wv" data-wave2="44" data-h="26" data-p="16" style="height:30px;margin-top:10px"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="blk" style="background:var(--mot);padding:10px;border-radius:24px"><div style="position:relative;height:150px;border-radius:16px;background:var(--ink);overflow:hidden"><div data-burst style="position:absolute;inset:0"></div><b class="d" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:800">قوة العادات</b><span class="ltr" style="position:absolute;top:8px;left:8px;font-size:10px;color:#fff;background:rgba(255,255,255,.15);padding:1px 6px;border-radius:6px">9:16 · 15s</span></div><b class="d" style="display:block;font-size:13.5px;margin:8px 4px 0">الإعلان المتحرك</b></div>
+      <div class="blk" style="background:var(--dub);padding:10px;border-radius:24px"><div style="position:relative;height:150px;border-radius:16px;background:var(--ink);overflow:hidden"><div data-burst style="position:absolute;inset:0"></div><b class="d ltr" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;text-align:center">The Power<br>of Habit</b><span class="lang" style="position:absolute;top:8px;left:8px;height:22px;min-width:30px;font-size:9.5px">EN</span></div><b class="d" style="display:block;font-size:13.5px;margin:8px 4px 0">النسخة الإنجليزية</b></div>
+    </div>
+    <div class="card" style="padding:12px 14px;border-radius:22px"><div class="lbl" style="margin-bottom:8px">ما فعله الوكيل<small>420 نقطة</small></div><div class="row" style="gap:6px"><span class="tag" style="background:var(--pod)">بودكاست</span><i data-i="fwd" data-s="14" style="color:var(--ink3)"></i><span class="tag" style="background:var(--mot)">موشن</span><i data-i="fwd" data-s="14" style="color:var(--ink3)"></i><span class="tag" style="background:var(--dub)">دبلجة</span><span style="flex:1"></span><small style="font-size:11.5px;color:var(--ink3)">7 خطوات</small></div></div>
+    <div class="pills"><span class="pill">+ نسخة مربعة</span><span class="pill">+ دبلجة للفرنسية</span><span class="pill">+ الحلقة 2</span></div>
+  </div>
+  <div class="foot row" style="gap:8px"><span class="btn ghost" style="flex:1">حفظ الكل</span><span class="btn acc" style="flex:1.3">مهمة متابعة</span></div>
+</section>
+
+<!-- 06 PODCAST -->
+<section class="screen" id="s06">
+  <div class="blk" style="background:var(--pod);border-radius:0 0 34px 34px;padding:12px 18px 18px;flex-shrink:0">
+    <div class="row" style="height:52px"><span class="ib" style="background:rgba(255,255,255,.6);border:0"><i data-i="back" data-s="20"></i></span><span style="flex:1"></span><span class="tag" style="background:rgba(21,21,21,.1);height:30px"><span class="ltr">Chat</span> · مهمة واحدة</span></div>
+    <h1 style="font-size:34px;font-weight:800;line-height:1.15;margin-top:8px">صوت<br>وبودكاست</h1>
+    <div class="row" style="margin-top:14px;padding:10px;border-radius:20px;background:rgba(255,255,255,.7)"><span style="width:42px;height:54px;border-radius:5px 9px 9px 5px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center"><i data-i="book" data-s="18"></i></span><span style="flex:1"><b style="display:block;font-size:14px">كتاب العادات</b><small style="font-size:12px;color:var(--ink2)">240 صفحة · 12 فصلًا</small></span><span class="pill" style="height:32px;background:transparent;border-color:rgba(21,21,21,.2)">تغيير</span></div>
+  </div>
+  <div class="body" style="padding-top:16px;gap:14px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="card" style="padding:14px;border-radius:22px"><i data-i="voice" data-s="22"></i><b class="d" style="display:block;font-size:14px;margin-top:10px">صوت</b><small style="font-size:11.5px;color:var(--ink3)">قارئ واحد</small></div>
+      <div class="card" style="padding:14px;border-radius:22px;border:2px solid var(--ink);position:relative"><span class="chk" style="position:absolute;top:12px;left:12px;background:var(--ink);color:#fff"><i data-i="check" data-s="13"></i></span><i data-i="mic" data-s="22"></i><b class="d" style="display:block;font-size:14px;margin-top:10px">بودكاست</b><small style="font-size:11.5px;color:var(--ink3)">حوار بصوتين</small></div>
+    </div>
+    <div><div class="lbl" style="margin-bottom:8px">الفصول</div><div class="pills"><span class="pill on">1</span><span class="pill on">2</span><span class="pill">3</span><span class="pill">4</span><span class="pill">5</span><span class="pill">6</span><span class="pill">…12</span></div></div>
+    <div class="card" style="padding:4px 14px;border-radius:22px">
+      <div class="row" style="height:52px"><span style="width:32px;height:32px;border-radius:50%;background:var(--pod);display:flex;align-items:center;justify-content:center;font:700 13px 'Alexandria'">ل</span><span style="flex:1;font-size:14px">المقدّمة</span><span style="font-size:13px;color:var(--ink2)">صوت 04 · مشرق</span></div>
+      <div class="row" style="height:52px;border-top:1px solid var(--line)"><span style="width:32px;height:32px;border-radius:50%;background:var(--dub);display:flex;align-items:center;justify-content:center;font:700 13px 'Alexandria'">س</span><span style="flex:1;font-size:14px">الضيف</span><span style="font-size:13px;color:var(--ink2)">صوت 11 · عميق</span></div>
+      <div class="row" style="height:52px;border-top:1px solid var(--line)"><span style="flex:1;font-size:14px">الأسلوب</span><span style="font-size:13px;color:var(--ink2)">هادئ وتحليلي</span></div>
+    </div>
+  </div>
+  <div class="foot"><span class="btn">أنشئ الحلقة<small style="font:400 12px 'Noto Sans Arabic';color:#A8A39A">· 180 نقطة</small></span></div>
+</section>
+
+<!-- 07 MOTION -->
+<section class="screen" id="s07">
+  <div class="blk" style="background:var(--mot);border-radius:0 0 34px 34px;padding:12px 18px 18px;flex-shrink:0">
+    <div class="row" style="height:52px"><span class="ib" style="background:rgba(255,255,255,.6);border:0"><i data-i="back" data-s="20"></i></span><b class="d" style="flex:1;font-size:17px">موشن جرافيكس</b><span class="ib ink"><i data-i="download" data-s="18"></i></span></div>
+    <div style="position:relative;height:210px;border-radius:24px;background:var(--ink);overflow:hidden;margin-top:8px"><div data-burst="26" style="position:absolute;inset:0"></div><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#fff"><b class="d" style="font-size:34px;font-weight:800">قوة العادات</b><small style="font-size:12px;color:var(--mot)">بودكاست جديد كل أحد</small></div><span class="tag ltr" style="position:absolute;top:10px;left:10px;background:rgba(255,255,255,.14);color:#fff">16:9 · 6s</span><span class="tag" style="position:absolute;top:10px;right:10px;background:var(--mot)">النسخة 2</span></div>
+  </div>
+  <div class="body" style="padding-top:14px;gap:12px">
+    <div class="card" style="padding:12px 14px;border-radius:22px">
+      <div class="row" style="margin-bottom:10px"><span class="go" style="width:32px;height:32px;background:var(--ink);color:#fff"><i data-i="pause" data-s="12" data-fill></i></span><b class="d" style="flex:1;font-size:13px">الطبقات</b><span class="ltr" style="font-size:12px;color:var(--ink3)">0:03 / 0:06</span></div>
+      <div style="position:relative;display:flex;flex-direction:column;gap:6px">
+        <div class="row" style="gap:8px"><span style="width:60px;font-size:12px">العنوان</span><div style="flex:1;height:16px;position:relative"><i style="position:absolute;inset-block:0;right:50%;left:0;border-radius:6px;background:var(--pod)"></i></div></div>
+        <div class="row" style="gap:8px"><span style="width:60px;font-size:12px">الجزيئات</span><div style="flex:1;height:16px;position:relative"><i style="position:absolute;inset-block:0;right:0;left:28%;border-radius:6px;background:var(--mot)"></i></div></div>
+        <div class="row" style="gap:8px"><span style="width:60px;font-size:12px">خط الضوء</span><div style="flex:1;height:16px;position:relative"><i style="position:absolute;inset-block:0;right:18%;left:40%;border-radius:6px;background:var(--aut)"></i></div></div>
+        <i style="position:absolute;top:-4px;bottom:-4px;right:calc(68px + (100% - 68px)*.5);width:2px;background:var(--acc)"></i>
+      </div>
+    </div>
+    <div class="pills"><span class="pill ltr">9:16</span><span class="pill ltr">1:1</span><span class="pill on ltr">16:9</span><span class="pill">ضوئي</span><span class="pill">انسيابي</span></div>
+    <div class="card" style="padding:12px 14px;border-radius:22px;font-size:14px;line-height:1.7;color:var(--ink2)">«جزيئات تتجمع في المنتصف، يعبرها خط ضوء مائل، ثم يظهر العنوان بحركة انسيابية»</div>
+  </div>
+  <div class="foot"><div class="comp"><span class="ph">صِف المشهد أو الحركة…</span><span class="go" style="background:var(--paper);color:#13916F"><i data-i="mic" data-s="20"></i></span><span class="go" style="background:var(--ink);color:#fff"><i data-i="send" data-s="20"></i></span></div></div>
+</section>
+
+<!-- 08 AUTO EDIT -->
+<section class="screen" id="s08">
+  <div class="blk" style="background:var(--aut);border-radius:0 0 34px 34px;padding:12px 18px 18px;flex-shrink:0">
+    <div class="row" style="height:52px"><span class="ib" style="background:rgba(255,255,255,.6);border:0"><i data-i="back" data-s="20"></i></span><b class="d" style="flex:1;font-size:17px">مونتاج تلقائي</b><span class="tag" style="background:var(--ink);color:#fff;height:30px">72%</span></div>
+    <div style="position:relative;height:196px;border-radius:24px;overflow:hidden;margin-top:8px">
+      <svg width="354" height="196" viewBox="0 0 354 196" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0" aria-hidden="true"><rect width="354" height="196" fill="#2B3A55"/><circle cx="240" cy="74" r="28" fill="#FFD29A"/><path d="M0 128 L60 92 L118 120 L184 80 L250 116 L310 88 L354 108 V196 H0z" fill="#1E2A40"/><path d="M0 154 L80 124 L150 146 L230 114 L300 142 L354 128 V196 H0z" fill="#141C2C"/></svg>
+      <div style="position:absolute;bottom:16px;right:16px;color:#fff"><b class="d" style="font-size:20px;font-weight:800;display:block">الطريق إلى الشمال</b><span class="tag" style="background:var(--aut);margin-top:4px">اليوم الأول</span></div>
+    </div>
+  </div>
+  <div class="body" style="padding-top:14px;gap:12px">
+    <div><div class="lbl" style="margin-bottom:8px">اللقطات المختارة<small>11 من 3 مقاطع</small></div><div style="display:flex;gap:3px;height:42px" data-strip></div></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      <div class="card" style="padding:12px;border-radius:20px;border:2px solid var(--ink)"><i data-i="film" data-s="20"></i><b class="d" style="display:block;font-size:13px;margin-top:8px">سينمائي</b></div>
+      <div class="card" style="padding:12px;border-radius:20px"><i data-i="bolt" data-s="20"></i><b class="d" style="display:block;font-size:13px;margin-top:8px">سريع</b></div>
+      <div class="card" style="padding:12px;border-radius:20px"><i data-i="eye" data-s="20"></i><b class="d" style="display:block;font-size:13px;margin-top:8px">وثائقي</b></div>
+    </div>
+    <div class="card" style="padding:4px 14px;border-radius:22px">
+      <div class="row" style="height:46px"><span style="flex:1;font-size:14px">موشن جرافيكس وتأثيرات</span><span class="chk" style="background:var(--ink);color:#fff"><i data-i="check" data-s="13"></i></span></div>
+      <div class="row" style="height:46px;border-top:1px solid var(--line)"><span style="flex:1;font-size:14px">مؤثرات صوتية طبيعية</span><span class="chk" style="background:var(--ink);color:#fff"><i data-i="check" data-s="13"></i></span></div>
+      <div class="row" style="height:42px;border-top:1px solid var(--line);font-size:12px;color:var(--ink3)"><i data-i="voice" data-s="15"></i>رياح · خطوات · طريق — بلا موسيقى أو معازف</div>
+    </div>
+  </div>
+  <div class="foot"><div class="comp"><span class="ph">أبطئ الإيقاع في لقطة الغروب…</span><span class="go" style="background:var(--ink);color:#fff"><i data-i="send" data-s="20"></i></span></div></div>
+</section>
+
+<!-- 09 VIDEO EDIT -->
+<section class="screen" id="s09">
+  <div class="blk" style="background:var(--edt);border-radius:0 0 34px 34px;padding:12px 18px 16px;flex-shrink:0">
+    <div class="row" style="height:52px"><span class="ib" style="background:rgba(255,255,255,.6);border:0"><i data-i="back" data-s="20"></i></span><b class="d" style="flex:1;font-size:17px">تعديل بالأوامر</b><span class="ib" style="background:rgba(255,255,255,.6);border:0"><i data-i="undo" data-s="18"></i></span><span class="tag" style="background:var(--ink);color:#fff;height:30px">النسخة 3</span></div>
+    <div style="position:relative;height:190px;border-radius:24px;overflow:hidden;margin-top:8px">
+      <svg width="354" height="190" viewBox="0 0 354 190" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0" aria-hidden="true"><rect width="354" height="190" fill="#3B2F44"/><rect y="118" width="354" height="72" fill="#2A2232"/><rect x="24" y="28" width="70" height="90" rx="4" fill="#4D3F58"/><rect x="266" y="18" width="64" height="100" rx="4" fill="#4D3F58"/><circle cx="177" cy="76" r="20" fill="#E3B796"/><path d="M137 190 C137 130 217 130 217 190z" fill="#6A5480"/><g opacity=".4"><circle cx="288" cy="94" r="9" fill="#B9A6C8"/><rect x="278" y="104" width="20" height="40" rx="8" fill="#B9A6C8"/></g><rect x="266" y="78" width="44" height="76" rx="10" fill="none" stroke="#FFA6CB" stroke-width="2" stroke-dasharray="6 4"/></svg>
+      <span class="tag" style="position:absolute;top:54px;left:250px;background:var(--edt)">تُزال الآن</span>
+      <span class="tag" style="position:absolute;top:12px;right:12px;background:#fff">مقابلة اليوم</span>
+    </div>
+  </div>
+  <div class="body" style="padding-top:12px;gap:10px">
+    <div style="display:flex;gap:2px;height:36px;position:relative" data-frames></div>
+    <p style="align-self:flex-end;max-width:300px;padding:11px 14px;border-radius:20px 20px 6px 20px;background:var(--ink);color:#fff;font-size:14px;line-height:1.65">احذف أول 5 ثوانٍ، وأزل الشخص في الخلفية، وأضف عنوانًا متحركًا.</p>
+    <div class="card" style="padding:4px 14px;border-radius:22px">
+      <div class="row" style="height:44px"><span class="chk" style="background:var(--ink);color:#fff"><i data-i="check" data-s="13"></i></span><span style="flex:1;font-size:14px">قص أول 5 ثوانٍ</span><i style="width:10px;height:10px;border-radius:3px;background:#FF4D4D"></i></div>
+      <div class="row" style="height:44px;border-top:1px solid var(--line)"><span class="chk" style="background:var(--acc);color:#fff"><i data-i="videoedit" data-s="12"></i></span><b style="flex:1;font-size:14px">إزالة عنصر من المشهد</b><span class="ltr" style="font:700 12px 'Alexandria'">58%</span></div>
+      <div class="row" style="height:44px;border-top:1px solid var(--line)"><span class="chk" style="background:var(--paper);border:2px dashed #C9C2B5"></span><span style="flex:1;font-size:14px;color:var(--ink3)">عنوان متحرك</span><i style="width:10px;height:10px;border-radius:3px;background:var(--pod)"></i></div>
+    </div>
+    <div style="display:flex;gap:6px;overflow:hidden;margin:0 -18px;padding:0 18px"><span class="pill">قص</span><span class="pill">إزالة عنصر</span><span class="pill">إضافة عنصر</span><span class="pill">تعديل عنصر</span><span class="pill">موشن</span></div>
+  </div>
+  <div class="foot"><div class="comp"><span class="ph">اكتب التعديل التالي…</span><span class="go" style="background:var(--paper);color:#13916F"><i data-i="mic" data-s="20"></i></span><span class="go" style="background:var(--ink);color:#fff"><i data-i="send" data-s="20"></i></span></div></div>
+</section>
+
+<!-- 10 DUBBING SETUP -->
+<section class="screen" id="s10">
+  <div class="blk" style="background:var(--dub);border-radius:0 0 34px 34px;padding:12px 18px 18px;flex-shrink:0">
+    <div class="row" style="height:52px"><span class="ib" style="background:rgba(255,255,255,.6);border:0"><i data-i="back" data-s="20"></i></span><span style="flex:1"></span><span class="tag" style="background:rgba(21,21,21,.1);height:30px">الخطوة 1 من 2</span></div>
+    <h1 style="font-size:34px;font-weight:800;line-height:1.15;margin-top:6px">إلى أي لغة<br>نأخذ صوتك؟</h1>
+    <div class="row" style="margin-top:14px;padding:10px;border-radius:20px;background:rgba(255,255,255,.7)"><div style="position:relative;width:76px;height:50px;border-radius:12px;overflow:hidden;background:#2C4766"><i style="position:absolute;left:28px;top:8px;width:20px;height:20px;border-radius:50%;background:#E3B796"></i><i style="position:absolute;bottom:0;left:16px;width:44px;height:18px;border-radius:22px 22px 0 0;background:#5C7FA8"></i></div><span style="flex:1"><b style="display:block;font-size:14px">مقابلة البودكاست</b><small style="font-size:12px;color:var(--ink2)">العربية (مصرية) · <span class="ltr">04:12</span> · متحدثان</small></span></div>
+  </div>
+  <div class="body" style="padding-top:16px;gap:14px">
+    <div class="row" style="height:50px;padding:0 16px;border-radius:999px;background:var(--card);border:1px solid var(--line);gap:10px"><i data-i="search" data-s="18" style="color:var(--ink3)"></i><span style="color:var(--ink3);font-size:14.5px">ابحث بين 34 لغة</span></div>
+    <div class="pills" data-langpills></div>
+    <div class="card" style="padding:14px;border-radius:22px">
+      <div class="lbl" style="margin-bottom:10px">الصوت<small>20 صوتًا · 15 نبرة</small></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="padding:12px;border-radius:18px;background:var(--ink);color:#fff"><i data-i="record" data-s="20" style="color:var(--voi)"></i><b class="d" style="display:block;font-size:13.5px;margin-top:6px">صوتي الأصلي</b><small style="font-size:11px;color:#A8A39A">نفس بصمتك بكل لغة</small></div>
+        <div style="padding:12px;border-radius:18px;background:var(--paper)"><i data-i="voice" data-s="20"></i><b class="d" style="display:block;font-size:13.5px;margin-top:6px">من المكتبة</b><small style="font-size:11px;color:var(--ink3)">20 صوتًا جاهزًا</small></div>
+      </div>
+      <div class="pills" style="margin-top:10px"><span class="pill on" style="height:32px">طبيعية</span><span class="pill" style="height:32px">هادئة</span><span class="pill" style="height:32px">حماسية</span><span class="pill" style="height:32px">رسمية</span><span class="pill" style="height:32px"><span class="ltr">+11</span></span></div>
+    </div>
+  </div>
+  <div class="foot"><span class="btn acc">دبلج إلى 3 لغات<small style="font:400 12px 'Noto Sans Arabic';color:#FFD9C9">· 380 نقطة</small></span></div>
+</section>
+
+<!-- 11 DUBBING RESULT -->
+<section class="screen" id="s11">
+  <div class="top"><span class="ib"><i data-i="back" data-s="20"></i></span><b class="d" style="flex:1;text-align:center;font-size:15px">مقابلة البودكاست</b><span class="ib"><i data-i="more" data-s="20"></i></span></div>
+  <div class="body" style="gap:12px">
+    <div style="position:relative;height:230px;border-radius:28px;overflow:hidden;background:#2C4766"><i style="position:absolute;left:50%;top:44px;width:76px;height:76px;margin-left:-38px;border-radius:50%;background:#E3B796"></i><i style="position:absolute;bottom:0;left:50%;width:170px;height:80px;margin-left:-85px;border-radius:85px 85px 0 0;background:#5C7FA8"></i>
+      <div class="row" style="position:absolute;top:12px;right:12px;gap:2px;padding:3px;border-radius:999px;background:#fff"><span style="height:30px;padding:0 12px;display:flex;align-items:center;font-size:12px;color:var(--ink3)">الأصلي</span><span style="height:30px;padding:0 12px;display:flex;align-items:center;border-radius:999px;background:var(--ink);color:#fff;font-size:12px;font-weight:600">المدبلج</span></div>
+      <p dir="ltr" style="position:absolute;bottom:14px;left:60px;right:14px;text-align:center"><span style="background:#fff;padding:5px 10px;border-radius:10px;font-size:13px;line-height:1.9">The best ideas come when we truly listen.</span></p>
+      <span class="go" style="position:absolute;bottom:12px;left:12px;width:40px;height:40px;background:var(--acc);color:#fff"><i data-i="play" data-s="14" data-fill></i></span>
+    </div>
+    <div class="row" style="gap:6px"><span class="lang" style="height:40px;min-width:0;flex:1;background:var(--ink);color:#fff;font-size:13px">EN ✓</span><span class="lang" style="height:40px;min-width:0;flex:1;font-size:13px">ES ✓</span><span class="lang" style="height:40px;min-width:0;flex:1;font-size:13px;border-style:dashed;color:var(--ink3)">FR 64%</span></div>
+    <div class="card" style="padding:14px;border-radius:22px">
+      <div class="row" style="gap:10px"><span style="width:28px;font-size:11px;font-weight:700">AR</span><div class="wv" data-wave2="46" data-h="22" data-p="18" data-c="#C8B6FF" style="flex:1;height:24px"></div></div>
+      <div class="row" style="gap:10px;margin-top:6px"><span style="width:28px;font-size:11px;font-weight:700" class="ltr">EN</span><div class="wv" data-wave2="46" data-h="22" data-p="18" data-c="#8DB8FF" data-seed="3" style="flex:1;height:24px"></div></div>
+    </div>
+    <div class="row card" style="padding:12px 14px;gap:10px;border-radius:22px;background:#FFF2EA;border-color:#FFD2BE"><i data-i="sparkle" data-s="20" style="color:var(--acc)"></i><span style="flex:1;font-size:13.5px">جملتان يمكن تحسين توقيتهما</span><b style="font-size:13px;color:var(--acc)">راجع</b></div>
+  </div>
+  <div class="foot row" style="gap:8px"><span class="btn ghost" style="flex:1">محرر النص</span><span class="btn" style="flex:1.4"><i data-i="share" data-s="18"></i>تصدير + «قبل وبعد»</span></div>
+</section>
+
+<!-- 12 VOICE -->
+<section class="screen" id="s12" style="background:var(--voi)">
+  <div class="top"><span class="ib" style="background:rgba(255,255,255,.55);border:0"><i data-i="down" data-s="20"></i></span><span style="flex:1;display:flex;justify-content:center"><span class="row" style="gap:3px;padding:3px;border-radius:999px;background:rgba(21,21,21,.12)"><span style="height:32px;padding:0 14px;display:flex;align-items:center;border-radius:999px;background:var(--ink);color:#fff;font:600 12.5px 'Alexandria'" class="ltr">Agent</span><span style="height:32px;padding:0 14px;display:flex;align-items:center;font:500 12.5px 'Alexandria'" class="ltr">Chat</span></span></span><span style="width:44px"></span></div>
+  <div style="padding:28px 24px 0">
+    <small style="font-size:12.5px;font-weight:600;color:#1C5E4C">مدار</small>
+    <p style="font-size:15px;line-height:1.7;color:#1C5E4C">اكتمل المونتاج. أدبلجه قبل النشر؟</p>
+    <h2 style="font-size:28px;line-height:1.35;font-weight:800;margin-top:16px">نعم، للإسبانية بصوتي، <span style="opacity:.45">وأرسله لي</span><span style="display:inline-block;width:3px;height:28px;background:var(--ink);vertical-align:-5px;margin-right:4px"></span></h2>
+  </div>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center">
+    <div style="position:relative;width:220px;height:220px">
+      <svg width="220" height="220" viewBox="0 0 220 220" style="position:absolute;inset:0" aria-hidden="true"><path d="M110 18c40 0 78 22 88 60s-8 86-44 110-92 18-118-14-26-82 0-118 34-38 74-38z" fill="#151515"/></svg>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:6px"><i style="width:7px;height:34px;border-radius:4px;background:var(--voi)"></i><i style="width:7px;height:62px;border-radius:4px;background:var(--voi)"></i><i style="width:7px;height:44px;border-radius:4px;background:var(--voi)"></i><i style="width:7px;height:72px;border-radius:4px;background:var(--voi)"></i><i style="width:7px;height:38px;border-radius:4px;background:var(--voi)"></i><i style="width:7px;height:24px;border-radius:4px;background:var(--voi)"></i></div>
+    </div>
+  </div>
+  <div style="padding:0 18px"><div class="row" style="padding:12px;border-radius:22px;background:rgba(255,255,255,.6);gap:12px"><span style="width:44px;height:44px;border-radius:14px;background:var(--dub);display:flex;align-items:center;justify-content:center"><i data-i="dubbing" data-s="22"></i></span><span style="flex:1"><b class="d" style="display:block;font-size:14px">سأبدأ: دبلجة للإسبانية</b><small style="font-size:12px;color:#1C5E4C">بصوتك الأصلي · قل «نعم» للتأكيد</small></span></div></div>
+  <div class="row" style="justify-content:center;gap:34px;padding:24px 0 32px">
+    <span class="go" style="width:58px;height:58px;background:rgba(255,255,255,.55)"><i data-i="keyboard" data-s="22"></i></span>
+    <span class="go" style="width:86px;height:86px;background:var(--ink);color:var(--voi)"><i data-i="mic" data-s="32"></i></span>
+    <span class="go" style="width:58px;height:58px;background:#fff;color:#D23B2B"><i data-i="x" data-s="22"></i></span>
+  </div>
+</section>
+
+<!-- 13 LIBRARY -->
+<section class="screen" id="s13">
+  <div class="top"><h1 style="flex:1;font-size:30px;font-weight:800">المكتبة</h1><span class="ib"><i data-i="search" data-s="20"></i></span></div>
+  <div class="body" style="gap:12px">
+    <div style="display:flex;gap:6px;overflow:hidden;margin:0 -18px;padding:0 18px"><span class="pill on">الكل</span><span class="pill"><i style="width:10px;height:10px;border-radius:3px;background:var(--dub)"></i>دبلجة</span><span class="pill"><i style="width:10px;height:10px;border-radius:3px;background:var(--pod)"></i>بودكاست</span><span class="pill"><i style="width:10px;height:10px;border-radius:3px;background:var(--mot)"></i>موشن</span><span class="pill"><i style="width:10px;height:10px;border-radius:3px;background:var(--aut)"></i>مونتاج</span></div>
+    <div style="columns:2;column-gap:10px" data-lib></div>
+  </div>
+  <div class="dock"><a><i data-i="home" data-s="22"></i></a><a class="on"><i data-i="folder" data-s="22"></i></a><a class="plus"><i data-i="plus" data-s="26"></i></a><a><i data-i="voice" data-s="22"></i></a><a><i data-i="user" data-s="22"></i></a></div>
+</section>
+
+<!-- 14 CREDITS -->
+<section class="screen" id="s14">
+  <div class="top"><span class="ib"><i data-i="x" data-s="20"></i></span><b class="d" style="flex:1;text-align:center;font-size:15px">الرصيد</b><span style="width:44px"></span></div>
+  <div class="body" style="gap:12px">
+    <div style="padding:6px 2px 0"><small style="font-size:13px;color:var(--ink2)">رصيدك لكل الأدوات</small><b class="d ltr" style="display:block;font-size:58px;font-weight:800;line-height:1.1;text-align:right">1,240</b></div>
+    <div style="display:flex;height:44px;border-radius:14px;overflow:hidden;gap:3px"><i style="flex:38;background:var(--dub)"></i><i style="flex:22;background:var(--pod)"></i><i style="flex:16;background:var(--aut)"></i><i style="flex:12;background:var(--edt)"></i><i style="flex:8;background:var(--mot)"></i><i style="flex:4;background:var(--voi)"></i></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px 8px;font-size:12px;color:var(--ink2)"><span class="row" style="gap:6px"><i style="width:9px;height:9px;border-radius:3px;background:var(--dub)"></i>دبلجة 38%</span><span class="row" style="gap:6px"><i style="width:9px;height:9px;border-radius:3px;background:var(--pod)"></i>بودكاست 22%</span><span class="row" style="gap:6px"><i style="width:9px;height:9px;border-radius:3px;background:var(--aut)"></i>مونتاج 16%</span><span class="row" style="gap:6px"><i style="width:9px;height:9px;border-radius:3px;background:var(--edt)"></i>تعديل 12%</span><span class="row" style="gap:6px"><i style="width:9px;height:9px;border-radius:3px;background:var(--mot)"></i>موشن 8%</span><span class="row" style="gap:6px"><i style="width:9px;height:9px;border-radius:3px;background:var(--voi)"></i>صوتي 4%</span></div>
+    <div class="card row" style="padding:16px;border-radius:24px"><span style="flex:1"><b class="d" style="font-size:16px">مجاني</b><small style="display:block;font-size:12px;color:var(--ink3)">100 نقطة · وضع Chat فقط</small></span><b class="d" style="font-size:20px">0</b></div>
+    <div class="blk" style="background:var(--ink);color:#fff;padding:18px;border-radius:28px">
+      <span class="tag" style="background:var(--acc);color:#fff">الأكثر اختيارًا</span>
+      <div class="row" style="margin-top:10px"><b class="d" style="flex:1;font-size:20px">صانع المحتوى</b><b class="d ltr" style="font-size:28px;font-weight:800">$15<small style="font-size:12px;font-weight:500;color:#A8A39A">/شهر</small></b></div>
+      <div style="display:flex;flex-direction:column;gap:7px;margin-top:10px;font-size:13px;color:#DCD7CE"><span class="row" style="gap:8px"><i data-i="check" data-s="15" style="color:var(--mot)"></i>2,000 نقطة شهريًا</span><span class="row" style="gap:8px"><i data-i="check" data-s="15" style="color:var(--mot)"></i>وضع Agent لمهام متعددة الخطوات</span><span class="row" style="gap:8px"><i data-i="check" data-s="15" style="color:var(--mot)"></i>صوتك الأصلي · بلا علامة مائية</span></div>
+    </div>
+    <div class="card row" style="padding:16px;border-radius:24px"><span style="flex:1"><b class="d" style="font-size:16px">احترافي</b><small style="display:block;font-size:12px;color:var(--ink3)">8,000 نقطة · أولوية · فرق</small></span><b class="d ltr" style="font-size:20px">$49</b></div>
+  </div>
+  <div class="foot"><span class="btn acc">اشترك الآن</span></div>
+</section>
+
+<script src="../agent-v2/base.js"></script>
+<script>
+document.querySelectorAll('[data-mark]').forEach(e=>{const s=e.dataset.mark;e.outerHTML=`<svg width="${s}" height="${s}" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#151515"/><path d="M7 18.5a9.5 9.5 0 0 0 18 0" fill="none" stroke="#FF5A1F" stroke-width="3.2" stroke-linecap="round"/><circle cx="16" cy="12.5" r="3.6" fill="#F3F0E8"/></svg>`;});
+document.querySelectorAll('[data-wave2]').forEach(e=>{const n=+e.dataset.wave2,H=+e.dataset.h,p=+e.dataset.p,c=e.dataset.c||'#151515',sd=+(e.dataset.seed||0);let h='';for(let k=0;k<n;k++){const v=Math.max(4,Math.round(Math.abs(Math.sin((k+sd)*1.7)*.6+Math.cos((k+sd)*.55)*.4)*H));h+=`<i style="height:${v}px;background:${k<p?'#151515':(e.dataset.c?c:'rgba(21,21,21,.22)')}"></i>`;}e.innerHTML=h;});
+document.querySelectorAll('[data-burst]').forEach(e=>{const n=+(e.dataset.burst||18);let h='';const cs=['#D4F35A','#C8B6FF','#8DB8FF','#FF9A4D','#FFA6CB'];for(let k=0;k<n;k++){const a=k/n*Math.PI*2,r=34+(k%4)*16;h+=`<span style="position:absolute;left:calc(50% + ${Math.round(Math.cos(a)*r*1.6)}px);top:calc(50% + ${Math.round(Math.sin(a)*r*.8)}px);width:${4+k%3*2}px;height:${4+k%3*2}px;border-radius:50%;background:${cs[k%5]}"></span>`;}h+='<i style="position:absolute;top:50%;left:6%;width:88%;height:2px;background:linear-gradient(90deg,transparent,#D4F35A,transparent);transform:rotate(-14deg)"></i>';e.innerHTML=h;});
+const TR=[['pod','podcast','صوت وبودكاست','نص أو كتاب ← صوت',1],['dub','dubbing','دبلجة الفيديو','30+ لغة',0],['aut','autoedit','مونتاج تلقائي','من مقاطعك',0],['edt','videoedit','تعديل بالأوامر','قص، إزالة، إضافة',0],['mot','motion','موشن جرافيكس','من وصف نصي',0]];
+document.querySelector('[data-toolrows]').innerHTML=TR.map(([c,ic,n,s,on])=>`<div class="row" style="height:58px;padding:0 8px;border-radius:20px;background:${on?`var(--${c})`:'var(--card)'};border:1px solid ${on?'transparent':'var(--line)'}"><span style="width:42px;height:42px;border-radius:13px;background:${on?'rgba(255,255,255,.55)':`var(--${c})`};display:flex;align-items:center;justify-content:center">${svg(ic,20)}</span><b class="d" style="flex:1;font-size:14px">${n}</b><small style="font-size:12px;color:var(--ink2)">${s}</small>${on?`<span class="chk" style="background:var(--ink);color:#fff;margin-inline-start:6px">${svg('check',13)}</span>`:''}</div>`).join('');
+const st=document.querySelector('[data-strip]');let h='';const cs=['#2B3A55','#5A3F4A','#2E4A44'];for(let k=0;k<20;k++){const sel=[1,2,5,7,8,11,13,15,16,18,19].includes(k);h+=`<i style="flex:1;border-radius:6px;background:${cs[k%3]};${sel?'box-shadow:inset 0 -5px 0 #FF9A4D':'opacity:.25'}"></i>`;}st.innerHTML=h;
+const fr=document.querySelector('[data-frames]');h='';for(let k=0;k<16;k++)h+=`<i style="flex:1;border-radius:6px;background:${['#3B2F44','#4D3F58','#6A5480'][k%3]}"></i>`;fr.innerHTML=h+`<i style="position:absolute;inset-block:0;right:0;width:12%;border-radius:6px;background:repeating-linear-gradient(135deg,rgba(255,77,77,.65) 0 4px,rgba(255,255,255,.6) 4px 8px)"></i><i style="position:absolute;inset-block:-4px;right:26%;width:3px;border-radius:2px;background:var(--acc)"></i>`;
+const LP=[['EN','الإنجليزية',1],['ES','الإسبانية',1],['FR','الفرنسية',1],['TR','التركية',0],['DE','الألمانية',0],['HI','الهندية',0],['ID','الإندونيسية',0],['PT','البرتغالية',0]];
+document.querySelector('[data-langpills]').innerHTML=LP.map(([c,n,on])=>`<span class="pill${on?' on':''}" style="height:40px;padding:0 6px 0 14px">${n}<span style="height:28px;min-width:34px;padding:0 6px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font:700 10.5px 'Noto Sans Arabic';${on?'background:#fff;color:var(--ink)':'background:var(--paper)'}" class="ltr">${c}</span></span>`).join('');
+const LB=[['dub','مقابلة البودكاست','EN · ES · FR',150],['pod','الحلقة 1: لماذا نكرر؟','18:42',110],['mot','قوة العادات · إعلان','0:15',130],['aut','الطريق إلى الشمال','1:00',150],['edt','مقابلة اليوم · ن3','0:42',110],['pod','ملخص كتاب الإصغاء','14:08',130]];
+const ic={dub:'dubbing',pod:'podcast',mot:'motion',aut:'autoedit',edt:'videoedit'};
+document.querySelector('[data-lib]').innerHTML=LB.map(([c,n,d,hh])=>`<div style="break-inside:avoid;margin-bottom:10px;border-radius:22px;background:var(--${c});padding:12px;height:${hh}px;display:flex;flex-direction:column;justify-content:space-between">${svg(ic[c],22)}<span><b class="d" style="display:block;font-size:13.5px;line-height:1.35">${n}</b><small class="ltr" style="font-size:11.5px;color:var(--ink2)">${d}</small></span></div>`).join('');
+</script>
+</body>
+</html>
