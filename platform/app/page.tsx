@@ -1,6 +1,7 @@
 import { HeroPrompt } from "@/components/HeroPrompt";
 import { Logo } from "@/components/Logo";
 import { RecentProjects } from "@/components/RecentProjects";
+import { UserMenu } from "@/components/UserMenu";
 
 const FEATURES = [
   { icon: "💬", title: "صِف بلغتك", text: "اكتب فكرتك بالعربية كما تشرحها لصديق، وبنّاء يفهم ويخطط ويبني." },
@@ -8,7 +9,10 @@ const FEATURES = [
   { icon: "🛠️", title: "عدّل بالمحادثة", text: "«غيّر الألوان»، «أضف صفحة أسعار» — يعدّل الملفات المطلوبة فقط." },
   { icon: "🩺", title: "إصلاح ذاتي للأخطاء", text: "يكتشف أخطاء التشغيل في المعاينة ويصلحها تلقائياً." },
   { icon: "🕘", title: "سجل النسخ", text: "كل تعديل نسخة محفوظة، ارجع لأي نسخة سابقة بضغطة." },
-  { icon: "📦", title: "صدّر وانشر", text: "حمّل المشروع ZIP أو انشره على Netlify وVercel وGitHub Pages." },
+  { icon: "📦", title: "كودك ملكك", text: "صدّر المشروع كاملاً مع الصور كملف ZIP في أي وقت." },
+  { icon: "🚀", title: "انشر برابط بضغطة", text: "رابط مباشر لموقعك تشاركه على واتساب، أو حمّله ZIP وانشره أينما شئت." },
+  { icon: "🖼️", title: "من صورة إلى موقع", text: "أرفق شعارك وصورك، أو لقطة تصميم أعجبتك ليحوّلها بنّاء إلى كود يعمل." },
+  { icon: "☁️", title: "مشاريعك في كل مكان", text: "حسابك يحفظ مشاريعك سحابياً لتكمل العمل من أي جهاز." },
 ];
 
 export default function Home() {
@@ -19,9 +23,7 @@ export default function Home() {
         <nav className="flex items-center gap-6 text-sm text-white/70">
           <a href="#features" className="hover:text-white">المزايا</a>
           <a href="#how" className="hover:text-white">كيف يعمل</a>
-          <a href="/build" className="rounded-xl border border-ink-600 px-4 py-2 hover:border-brand-400 hover:text-white">
-            مساحة العمل
-          </a>
+          <UserMenu />
         </nav>
       </header>
 

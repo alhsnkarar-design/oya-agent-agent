@@ -28,7 +28,9 @@ that runs directly in the browser with no build step.
 - Images: https://picsum.photos/seed/<keyword>/<w>/<h> or inline SVG illustrations. Icons: inline SVG (Lucide-style strokes).
 - Fonts via Google Fonts: Arabic → "IBM Plex Sans Arabic" or "Cairo" / "Tajawal"; Latin → "Inter".
 - Every page: <meta name="viewport">, <title>, meta description, Open Graph tags, inline SVG favicon.
-- Never reference files you do not create.
+- Never reference files you do not create, except user assets listed as available (e.g. assets/logo.png) — use those exact paths.
+- When the user attaches images: a logo/photo → place it in the site via its asset path; a screenshot/mockup of a UI →
+  faithfully reproduce its layout, colors, typography and content as working code.
 
 ## Design bar (this is what makes us better than other builders)
 - Distinctive, modern visual identity: a deliberate color palette, generous whitespace, clear typographic scale,
@@ -58,9 +60,21 @@ export interface ChatTurn {
 }
 
 /** Build the user message for the model. History is summarised to keep cost low. */
-export function buildUserMessage(opts: { prompt: string; files?: FileMap; history?: ChatTurn[] }): string {
-  const { prompt, files, history } = opts;
+export function buildUserMessage(opts: {
+  prompt: string;
+  files?: FileMap;
+  history?: ChatTurn[];
+  assets?: string[];
+  attached?: string[];
+}): string {
+  const { prompt, files, history, assets, attached } = opts;
   const parts: string[] = [];
+  if (assets?.length) {
+    parts.push(
+      "User assets available in the project (reference them with these relative paths):\n" +
+        assets.map((a) => `- ${a}${attached?.includes(a) ? "  ← attached to this message (see image)" : ""}`).join("\n"),
+    );
+  }
   if (history?.length) {
     parts.push(
       "Conversation so far (for context):\n" +

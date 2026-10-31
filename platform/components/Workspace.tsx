@@ -3,7 +3,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { applyChanges, parseOutput, type FileMap, type ParsedOutput } from "@/lib/parse";
 import { buildPreview, htmlPages, resolveNavigation } from "@/lib/preview";
+import { assetPath, dataUrlToBytes, type PendingImage } from "@/lib/assets";
+import { cloud, fetchMe, type Me } from "@/lib/cloud";
 import {
+  deleteProject as deleteLocal,
   getProject,
   newProject,
   projectNameFrom,
@@ -15,6 +18,8 @@ import {
 import { Logo } from "./Logo";
 import { ChatPanel } from "./ChatPanel";
 import { CodePane } from "./CodePane";
+import { PublishDialog } from "./PublishDialog";
+import { UserMenu } from "./UserMenu";
 
 const END = "\u001e";
 type Device = "desktop" | "tablet" | "mobile";
@@ -32,6 +37,12 @@ export function Workspace() {
   const [errors, setErrors] = useState<string[]>([]);
   const [provider, setProvider] = useState<string>("");
   const [showVersions, setShowVersions] = useState(false);
+  const [showPublish, setShowPublish] = useState(false);
+  const [me, setMe] = useState<Me | null>(null);
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [saveError, setSaveError] = useState("");
+  const userRef = useRef<Me["user"]>(null);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const projectRef = useRef<Project | null>(null);
   const autoFixRef = useRef<{ armed: boolean; used: number }>({ armed: false, used: 0 });
@@ -39,14 +50,60 @@ export function Workspace() {
 
   projectRef.current = project;
 
-  const update = useCallback((fn: (p: Project) => Project) => {
-    setProject((prev) => {
-      if (!prev) return prev;
-      const next = fn(prev);
-      saveProject(next);
-      return next;
-    });
+  // ---- persistence: account (cloud, debounced) or this browser (localStorage)
+  const flushSave = useCallback(async () => {
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = null;
+    const p = projectRef.current;
+    if (!p || !userRef.current) return;
+    try {
+      const r = await cloud.save(p);
+      setSaveState("saved");
+      setSaveError("");
+      if (r.publishedSlug !== (p.publishedSlug ?? null)) setProject((cur) => (cur ? { ...cur, publishedSlug: r.publishedSlug } : cur));
+    } catch (e) {
+      setSaveState("error");
+      setSaveError(e instanceof Error ? e.message : "تعذّر الحفظ");
+    }
   }, []);
+
+  const persist = useCallback(
+    (p: Project) => {
+      if (!userRef.current) {
+        saveProject(p);
+        return;
+      }
+      setSaveState("saving");
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+      saveTimer.current = setTimeout(flushSave, 900);
+    },
+    [flushSave],
+  );
+
+  const update = useCallback(
+    (fn: (p: Project) => Project) => {
+      setProject((prev) => {
+        if (!prev) return prev;
+        const next = fn(prev);
+        projectRef.current = next;
+        persist(next);
+        return next;
+      });
+    },
+    [persist],
+  );
+
+  // warn before leaving with unsaved cloud changes
+  useEffect(() => {
+    const onLeave = (e: BeforeUnloadEvent) => {
+      if (saveTimer.current) {
+        e.preventDefault();
+        flushSave();
+      }
+    };
+    window.addEventListener("beforeunload", onLeave);
+    return () => window.removeEventListener("beforeunload", onLeave);
+  }, [flushSave]);
 
   // ---- provider info
   useEffect(() => {
@@ -58,17 +115,31 @@ export function Workspace() {
 
   // ---- streaming generation
   const send = useCallback(
-    async (prompt: string, opts: { isFix?: boolean } = {}) => {
+    async (prompt: string, opts: { isFix?: boolean; images?: PendingImage[] } = {}) => {
       const p = projectRef.current;
       if (!p || !prompt.trim()) return;
       const baseFiles = p.files;
       const isEdit = Object.keys(baseFiles).length > 0;
-      const userMsg: Message = { id: uid(), role: "user", content: prompt, at: Date.now() };
+      // register attached images as project assets so the generated code can reference them by path
+      const assets = { ...p.assets };
+      const attached = (opts.images ?? []).map((img) => {
+        const path = assetPath(img, assets);
+        assets[path] = img.dataUrl;
+        return { path, dataUrl: img.dataUrl };
+      });
+      const userMsg: Message = {
+        id: uid(),
+        role: "user",
+        content: prompt,
+        at: Date.now(),
+        ...(attached.length ? { images: attached.map((a) => a.path) } : {}),
+      };
       const botId = uid();
       const history = p.messages.map((m) => ({ role: m.role, content: m.content }));
       update((pr) => ({
         ...pr,
         name: pr.messages.length ? pr.name : projectNameFrom(prompt),
+        assets,
         messages: [...pr.messages, userMsg, { id: botId, role: "assistant", content: "", at: Date.now(), status: "streaming" }],
       }));
       setBusy(true);
@@ -85,8 +156,12 @@ export function Workspace() {
           method: "POST",
           signal: ctrl.signal,
           headers: { "Content-Type": "application/json", "x-access-code": localStorage.getItem("bannaa:access-code") || "" },
-          body: JSON.stringify({ prompt, files: baseFiles, history }),
+          body: JSON.stringify({ prompt, files: baseFiles, history, images: attached, assets: Object.keys(assets) }),
         });
+        if (res.status === 401 && (await res.clone().json().catch(() => ({}))).needLogin) {
+          window.location.href = `/login?next=${encodeURIComponent(location.pathname + location.search)}`;
+          throw new Error("سجّل الدخول للمتابعة");
+        }
         if (res.status === 401) {
           const code = window.prompt("هذه المنصة محمية. أدخل رمز الدخول:");
           if (code) localStorage.setItem("bannaa:access-code", code);
@@ -156,22 +231,40 @@ export function Workspace() {
   useEffect(() => {
     if (startedRef.current) return;
     startedRef.current = true;
-    const id = params.get("id");
-    const existing = id ? getProject(id) : null;
-    if (existing) {
-      setProject(existing);
-      return;
-    }
-    const p = newProject();
-    saveProject(p);
-    projectRef.current = p;
-    setProject(p);
-    router.replace(`/build?id=${p.id}`);
-    const pending = sessionStorage.getItem("bannaa:pending-prompt");
-    if (pending) {
-      sessionStorage.removeItem("bannaa:pending-prompt");
-      setTimeout(() => send(pending), 0);
-    }
+    (async () => {
+      const who = await fetchMe();
+      userRef.current = who.user;
+      setMe(who);
+      const id = params.get("id");
+      let existing: Project | null = null;
+      if (id && who.user) {
+        existing = await cloud.get(id).catch(() => null);
+        const local = existing ? null : getProject(id);
+        if (local) {
+          // a project started before signing in: move it into the account
+          existing = local;
+          await cloud.save(local).then(() => deleteLocal(id)).catch(() => {});
+        }
+      } else if (id) {
+        existing = getProject(id);
+      }
+      if (existing) {
+        projectRef.current = existing;
+        setProject(existing);
+        return;
+      }
+      const p = newProject();
+      projectRef.current = p;
+      setProject(p);
+      if (who.user) await cloud.save(p).catch(() => {});
+      else saveProject(p);
+      router.replace(`/build?id=${p.id}`);
+      const pending = sessionStorage.getItem("bannaa:pending-prompt");
+      if (pending) {
+        sessionStorage.removeItem("bannaa:pending-prompt");
+        setTimeout(() => send(pending), 0);
+      }
+    })();
   }, [params, router, send]);
 
   // ---- preview bridge (errors + navigation)
@@ -208,7 +301,8 @@ export function Workspace() {
     return merged;
   }, [project, live]);
 
-  const previewDoc = useMemo(() => buildPreview(files, page), [files, page]);
+  const assets = project?.assets;
+  const previewDoc = useMemo(() => buildPreview(files, page, assets ?? {}), [files, page, assets]);
   const pages = useMemo(() => htmlPages(files), [files]);
   const hasFiles = Object.keys(files).length > 0;
 
@@ -218,6 +312,7 @@ export function Workspace() {
     const zip = new JSZip();
     const folder = zip.folder(project.name.replace(/[\\/:*?"<>|]/g, "-")) ?? zip;
     for (const [p, c] of Object.entries(project.files)) folder.file(p, c);
+    for (const [p, url] of Object.entries(project.assets ?? {})) folder.file(p, dataUrlToBytes(url));
     folder.file(
       "README.md",
       `# ${project.name}\n\nتم إنشاؤه بواسطة بنّاء.\n\n## التشغيل\nافتح index.html في المتصفح.\n\n## النشر\n- Netlify Drop: اسحب المجلد إلى https://app.netlify.com/drop\n- GitHub Pages / Vercel / Cloudflare Pages: ارفع الملفات كما هي (لا يحتاج بناء).\n`,
@@ -258,6 +353,7 @@ export function Workspace() {
             وضع تجريبي — أضف مفتاح AI لتفعيل التوليد الحقيقي
           </span>
         )}
+        <SaveBadge loggedIn={!!me?.user} state={saveState} error={saveError} />
         <div className="flex-1" />
         <div className="relative">
           <button
@@ -293,13 +389,38 @@ export function Workspace() {
         <button onClick={downloadZip} disabled={!hasFiles || busy} className="text-sm rounded-lg px-3 py-1.5 hover:bg-ink-800 disabled:opacity-30">
           ⬇️ تحميل ZIP
         </button>
-        <button onClick={() => router.push("/")} className="text-sm rounded-lg btn-primary px-3 py-1.5">
+        <button
+          onClick={() => setShowPublish(true)}
+          disabled={!project.files["index.html"] || busy}
+          className="text-sm rounded-lg btn-primary px-4 py-1.5 font-semibold disabled:opacity-30"
+        >
+          🚀 {project.publishedSlug ? "منشور" : "نشر"}
+        </button>
+        <button onClick={() => router.push("/")} className="text-sm rounded-lg px-3 py-1.5 hover:bg-ink-800" title="مشروع جديد">
           + جديد
         </button>
+        <UserMenu compact />
       </header>
 
+      {showPublish && (
+        <PublishDialog
+          project={project}
+          loggedIn={!!me?.user}
+          flush={flushSave}
+          onClose={() => setShowPublish(false)}
+          onChange={(slug) => setProject((cur) => (cur ? { ...cur, publishedSlug: slug } : cur))}
+        />
+      )}
+
       <div className="flex-1 flex min-h-0">
-        <ChatPanel messages={project.messages} busy={busy} onSend={(t) => send(t)} onStop={() => abortRef.current?.abort()} live={live} />
+        <ChatPanel
+          messages={project.messages}
+          assets={project.assets}
+          busy={busy}
+          onSend={(t, images) => send(t, { images })}
+          onStop={() => abortRef.current?.abort()}
+          live={live}
+        />
 
         {/* preview / code */}
         <section className="flex-1 flex flex-col min-w-0">
@@ -418,4 +539,22 @@ function EmptyPreview({ busy, writing }: { busy: boolean; writing: string | null
       </div>
     </div>
   );
+}
+
+function SaveBadge({ loggedIn, state, error }: { loggedIn: boolean; state: string; error: string }) {
+  if (!loggedIn) {
+    return (
+      <a href="/login" className="hidden lg:inline text-xs text-white/40 hover:text-white" title="المشروع محفوظ في هذا المتصفح فقط">
+        💾 محفوظ في المتصفح — سجّل الدخول للحفظ السحابي
+      </a>
+    );
+  }
+  const map: Record<string, [string, string]> = {
+    idle: ["☁️ محفوظ", "text-white/40"],
+    saved: ["☁️ محفوظ", "text-white/40"],
+    saving: ["⏳ جارٍ الحفظ…", "text-white/50"],
+    error: [`⚠️ ${error || "تعذّر الحفظ"}`, "text-red-300"],
+  };
+  const [label, cls] = map[state] ?? map.idle;
+  return <span className={`hidden md:inline text-xs ${cls}`}>{label}</span>;
 }

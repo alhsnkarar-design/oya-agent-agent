@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { compressImage, type PendingImage } from "@/lib/assets";
 import type { ParsedOutput } from "@/lib/parse";
 import type { Message } from "@/lib/storage";
 
@@ -7,13 +8,34 @@ const SUGGESTIONS = ["غيّر الألوان إلى درجات الأزرق", "
 
 export function ChatPanel(props: {
   messages: Message[];
+  assets: Record<string, string>;
   busy: boolean;
   live: ParsedOutput | null;
-  onSend: (text: string) => void;
+  onSend: (text: string, images: PendingImage[]) => void;
   onStop: () => void;
 }) {
-  const { messages, busy, live, onSend, onStop } = props;
+  const { messages, assets, busy, live, onSend, onStop } = props;
   const [text, setText] = useState("");
+  const [images, setImages] = useState<PendingImage[]>([]);
+  const [imgError, setImgError] = useState("");
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const addFiles = async (list: FileList | File[]) => {
+    setImgError("");
+    const picked = Array.from(list).filter((f) => f.type.startsWith("image/"));
+    for (const f of picked.slice(0, 4 - images.length)) {
+      if (f.size > 15_000_000) {
+        setImgError("الصورة أكبر من 15MB");
+        continue;
+      }
+      try {
+        const img = await compressImage(f);
+        setImages((cur) => (cur.length >= 4 ? cur : [...cur, img]));
+      } catch {
+        setImgError("تعذّرت قراءة الصورة");
+      }
+    }
+  };
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -21,9 +43,11 @@ export function ChatPanel(props: {
   }, [messages.length, live?.writing]);
 
   const submit = () => {
-    if (!text.trim() || busy) return;
-    onSend(text.trim());
+    const t = text.trim() || (images.length ? "استخدم الصور المرفقة" : "");
+    if (!t || busy) return;
+    onSend(t, images);
     setText("");
+    setImages([]);
   };
 
   const done = live ? Object.keys(live.files) : [];
@@ -50,6 +74,16 @@ export function ChatPanel(props: {
                     : "bg-ink-800 border border-ink-700 rounded-bl-md"
               }`}
             >
+              {m.images && m.images.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {m.images.map((p) =>
+                    assets[p] ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img key={p} src={assets[p]} alt={p} className="h-16 w-16 rounded-lg object-cover border border-white/20" />
+                    ) : null,
+                  )}
+                </div>
+              )}
               {m.content || (m.status === "streaming" ? "…" : "")}
               {m.status === "streaming" && (
                 <div className="mt-3 space-y-1 text-xs font-mono">
@@ -82,7 +116,7 @@ export function ChatPanel(props: {
             {SUGGESTIONS.map((s) => (
               <button
                 key={s}
-                onClick={() => onSend(s)}
+                onClick={() => onSend(s, [])}
                 className="shrink-0 text-xs rounded-full border border-ink-600 px-3 py-1 text-white/60 hover:text-white hover:border-brand-400"
               >
                 {s}
@@ -90,10 +124,40 @@ export function ChatPanel(props: {
             ))}
           </div>
         )}
-        <div className="panel rounded-2xl p-2 focus-within:border-brand-500">
+        <div
+          className="panel rounded-2xl p-2 focus-within:border-brand-500"
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            addFiles(e.dataTransfer.files);
+          }}
+        >
+          {images.length > 0 && (
+            <div className="flex gap-2 p-1 pb-2">
+              {images.map((img, i) => (
+                <div key={i} className="relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img.dataUrl} alt={img.name} className="h-14 w-14 rounded-lg object-cover border border-ink-600" />
+                  <button
+                    onClick={() => setImages((cur) => cur.filter((_, j) => j !== i))}
+                    className="absolute -top-1.5 -left-1.5 h-5 w-5 rounded-full bg-ink-600 text-xs leading-none"
+                    aria-label="إزالة الصورة"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
+            onPaste={(e) => {
+              if (e.clipboardData.files.length) {
+                e.preventDefault();
+                addFiles(e.clipboardData.files);
+              }
+            }}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -105,13 +169,36 @@ export function ChatPanel(props: {
             className="w-full resize-none bg-transparent outline-none px-2 py-1 placeholder:text-white/35"
             aria-label="رسالة"
           />
-          <div className="flex justify-end">
+          {imgError && <p className="text-xs text-red-300 px-2">{imgError}</p>}
+          <div className="flex justify-between items-center">
+            <div>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+                multiple
+                hidden
+                onChange={(e) => {
+                  if (e.target.files) addFiles(e.target.files);
+                  e.target.value = "";
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                disabled={busy || images.length >= 4}
+                className="rounded-xl px-3 py-2 text-sm text-white/60 hover:text-white hover:bg-ink-700 disabled:opacity-30"
+                title="أرفق شعاراً أو صوراً أو لقطة تصميم تريد تحويلها إلى موقع"
+              >
+                🖼️ صورة
+              </button>
+            </div>
             {busy ? (
               <button onClick={onStop} className="rounded-xl bg-ink-700 px-4 py-2 text-sm hover:bg-ink-600">
                 ⏹️ إيقاف
               </button>
             ) : (
-              <button onClick={submit} disabled={!text.trim()} className="rounded-xl btn-primary px-4 py-2 text-sm font-semibold disabled:opacity-40">
+              <button onClick={submit} disabled={!text.trim() && !images.length} className="rounded-xl btn-primary px-4 py-2 text-sm font-semibold disabled:opacity-40">
                 إرسال ↵
               </button>
             )}

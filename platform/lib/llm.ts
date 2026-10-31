@@ -10,6 +10,17 @@ import { demoOutput } from "./demo";
 
 export type Provider = "claude" | "openai-compatible" | "demo";
 
+/** An image attached by the user (data URL), sent to the model for vision. */
+export interface InputImage {
+  path: string;
+  dataUrl: string;
+}
+
+function splitDataUrl(url: string): { mediaType: string; data: string } | null {
+  const m = url.match(/^data:(image\/(?:png|jpeg|webp|gif));base64,(.+)$/s);
+  return m ? { mediaType: m[1], data: m[2] } : null;
+}
+
 export interface StreamResult {
   stop: string; // end_turn | max_tokens | refusal | error | demo
   error?: string;
@@ -42,6 +53,7 @@ type Effort = "low" | "medium" | "high" | "xhigh" | "max";
 async function streamClaude(
   system: string,
   user: string,
+  images: InputImage[],
   onText: (t: string) => void,
   signal: AbortSignal,
 ): Promise<StreamResult> {
@@ -51,7 +63,26 @@ async function streamClaude(
     model: process.env.CLAUDE_MODEL || "claude-opus-5-5",
     max_tokens: 64000,
     system: [{ type: "text" as const, text: system, cache_control: { type: "ephemeral" as const } }],
-    messages: [{ role: "user" as const, content: user }],
+    messages: [
+      {
+        role: "user" as const,
+        content: [
+          ...images.flatMap((img) => {
+            const d = splitDataUrl(img.dataUrl);
+            return d
+              ? [
+                  { type: "text" as const, text: `Attached image: ${img.path}` },
+                  {
+                    type: "image" as const,
+                    source: { type: "base64" as const, media_type: d.mediaType as "image/png", data: d.data },
+                  },
+                ]
+              : [];
+          }),
+          { type: "text" as const, text: user },
+        ],
+      },
+    ],
     output_config: { effort: (process.env.CLAUDE_EFFORT || "high") as Effort },
     ...(useFallbacks ? { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" } : {}),
   };
@@ -67,6 +98,7 @@ async function streamClaude(
 async function streamCompat(
   system: string,
   user: string,
+  images: InputImage[],
   onText: (t: string) => void,
   signal: AbortSignal,
 ): Promise<StreamResult> {
@@ -81,7 +113,20 @@ async function streamCompat(
       max_tokens: Number(process.env.LLM_MAX_TOKENS || 32000),
       messages: [
         { role: "system", content: system },
-        { role: "user", content: user },
+        {
+          role: "user",
+          content: images.length
+            ? [
+                ...images
+                  .filter((i) => splitDataUrl(i.dataUrl))
+                  .flatMap((i) => [
+                    { type: "text", text: `Attached image: ${i.path}` },
+                    { type: "image_url", image_url: { url: i.dataUrl } },
+                  ]),
+                { type: "text", text: user },
+              ]
+            : user,
+        },
       ],
     }),
   });
@@ -127,14 +172,15 @@ async function streamDemo(isEdit: boolean, onText: (t: string) => void, signal: 
 export async function streamGeneration(opts: {
   system: string;
   user: string;
+  images?: InputImage[];
   isEdit: boolean;
   onText: (t: string) => void;
   signal: AbortSignal;
 }): Promise<StreamResult> {
   const provider = activeProvider();
   try {
-    if (provider === "claude") return await streamClaude(opts.system, opts.user, opts.onText, opts.signal);
-    if (provider === "openai-compatible") return await streamCompat(opts.system, opts.user, opts.onText, opts.signal);
+    if (provider === "claude") return await streamClaude(opts.system, opts.user, opts.images ?? [], opts.onText, opts.signal);
+    if (provider === "openai-compatible") return await streamCompat(opts.system, opts.user, opts.images ?? [], opts.onText, opts.signal);
     return await streamDemo(opts.isEdit, opts.onText, opts.signal);
   } catch (e) {
     if (e instanceof Anthropic.RateLimitError) return { stop: "error", error: "تم تجاوز حد الطلبات، حاول بعد قليل" };

@@ -1,5 +1,5 @@
-import type { FileMap } from "./parse";
-import { safePath } from "./parse";
+import type { FileMap } from "./parse.ts";
+import { safePath } from "./parse.ts";
 
 /**
  * Turn a multi-file project into a single HTML document for the sandboxed preview iframe.
@@ -19,7 +19,11 @@ function resolve(from: string, ref: string): string | null {
   return safePath(parts.join("/"));
 }
 
-const BRIDGE = `<script>
+/** In-memory localStorage/sessionStorage for sandboxed (opaque-origin) pages, where the real ones throw. */
+export const STORAGE_SHIM = `(function(){function m(){var d={};return{getItem:function(k){return Object.prototype.hasOwnProperty.call(d,k)?d[k]:null},setItem:function(k,v){d[k]=String(v)},removeItem:function(k){delete d[k]},clear:function(){d={}},key:function(i){return Object.keys(d)[i]||null},get length(){return Object.keys(d).length}}}
+["localStorage","sessionStorage"].forEach(function(n){try{window[n].getItem("x")}catch(e){try{Object.defineProperty(window,n,{value:m(),configurable:true})}catch(_){}}})})();`;
+
+const BRIDGE = `<script>${STORAGE_SHIM}
 (function(){
   var send=function(m){try{parent.postMessage(Object.assign({source:'bannaa-preview'},m),'*')}catch(e){}};
   window.addEventListener('error',function(e){send({type:'error',message:String(e.message||'Error'),line:e.lineno||0})});
@@ -36,7 +40,16 @@ const BRIDGE = `<script>
 })();
 </script>`;
 
-export function buildPreview(files: FileMap, page = "index.html"): string {
+/** Replace references like "assets/logo.png", "./assets/logo.png" or "../assets/logo.png" with inline data URLs. */
+function inlineAssets(doc: string, assets: Record<string, string>): string {
+  for (const [p, url] of Object.entries(assets)) {
+    const re = new RegExp(`(?:\\.{1,2}/)*${p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "g");
+    doc = doc.replace(re, url);
+  }
+  return doc;
+}
+
+export function buildPreview(files: FileMap, page = "index.html", assets: Record<string, string> = {}): string {
   const html = files[page] ?? files["index.html"];
   if (html == null) {
     return `<!doctype html><html dir="rtl"><body style="font-family:system-ui;display:grid;place-items:center;height:100vh;color:#64748b">لا توجد صفحة لعرضها بعد</body></html>`;
@@ -51,6 +64,7 @@ export function buildPreview(files: FileMap, page = "index.html"): string {
     const type = /type=["']module["']/i.test(a + b) ? ' type="module"' : "";
     return `<script${type} data-file="${p}">\n${files[p].replace(/<\/script/gi, "<\\/script")}\n</script>`;
   });
+  doc = inlineAssets(doc, assets);
   return /<head[^>]*>/i.test(doc) ? doc.replace(/<head[^>]*>/i, (h) => h + BRIDGE) : BRIDGE + doc;
 }
 

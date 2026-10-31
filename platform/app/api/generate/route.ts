@@ -1,4 +1,6 @@
-import { activeProvider, streamGeneration } from "@/lib/llm";
+import { activeProvider, streamGeneration, type InputImage } from "@/lib/llm";
+import { currentUser } from "@/lib/server/auth";
+import { getDb } from "@/lib/server/db";
 import { BUILD_SYSTEM, EDIT_SYSTEM, buildUserMessage, type ChatTurn } from "@/lib/prompts";
 import type { FileMap } from "@/lib/parse";
 
@@ -9,6 +11,8 @@ export const maxDuration = 300;
 const END = "\u001e";
 const MAX_PROMPT = 8000;
 const MAX_FILES_BYTES = 800_000;
+const MAX_IMAGES = 4;
+const MAX_IMAGE_CHARS = 2_100_000; // ~1.5MB binary as base64
 
 export async function GET() {
   return Response.json({ provider: activeProvider(), protected: Boolean(process.env.BANNAA_ACCESS_CODE) });
@@ -20,7 +24,19 @@ export async function POST(req: Request) {
     return Response.json({ error: "رمز الدخول غير صحيح" }, { status: 401 });
   }
 
-  let body: { prompt?: string; files?: FileMap; history?: ChatTurn[] };
+  const user = await currentUser();
+  if (process.env.REQUIRE_LOGIN === "true" && !user) {
+    return Response.json({ error: "سجّل الدخول لاستخدام المنصة", needLogin: true }, { status: 401 });
+  }
+  const limit = Number(process.env.DAILY_LIMIT || 0);
+  if (user && limit > 0) {
+    const used = await (await getDb()).incrementUsage(user.id, new Date().toISOString().slice(0, 10));
+    if (used > limit) {
+      return Response.json({ error: `وصلت إلى الحد اليومي (${limit} طلب). يتجدد الرصيد غداً.` }, { status: 429 });
+    }
+  }
+
+  let body: { prompt?: string; files?: FileMap; history?: ChatTurn[]; images?: InputImage[]; assets?: string[] };
   try {
     body = await req.json();
   } catch {
@@ -37,13 +53,20 @@ export async function POST(req: Request) {
   }
   const history = (body.history ?? []).filter((t) => t && (t.role === "user" || t.role === "assistant"));
   const isEdit = Object.keys(files).length > 0;
+  const images = (Array.isArray(body.images) ? body.images : [])
+    .filter((i) => i && typeof i.path === "string" && typeof i.dataUrl === "string" && i.dataUrl.length <= MAX_IMAGE_CHARS)
+    .slice(0, MAX_IMAGES);
+  const assets = (Array.isArray(body.assets) ? body.assets : [])
+    .filter((a): a is string => typeof a === "string" && a.startsWith("assets/"))
+    .slice(0, 50);
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       const result = await streamGeneration({
         system: isEdit ? EDIT_SYSTEM : BUILD_SYSTEM,
-        user: buildUserMessage({ prompt, files, history }),
+        user: buildUserMessage({ prompt, files, history, assets, attached: images.map((i) => i.path) }),
+        images,
         isEdit,
         signal: req.signal,
         onText: (t) => controller.enqueue(encoder.encode(t)),

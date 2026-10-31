@@ -8,6 +8,7 @@ export interface Message {
   at: number;
   status?: "streaming" | "done" | "error";
   changed?: string[];
+  images?: string[]; // asset paths attached to this message
 }
 
 export interface Version {
@@ -23,8 +24,10 @@ export interface Project {
   createdAt: number;
   updatedAt: number;
   files: FileMap;
+  assets: Record<string, string>; // "assets/logo.png" -> data URL
   messages: Message[];
   versions: Version[];
+  publishedSlug?: string | null;
 }
 
 const KEY = "bannaa:projects:v1";
@@ -60,7 +63,8 @@ export function listProjects(): Project[] {
 }
 
 export function getProject(id: string): Project | null {
-  return readAll()[id] ?? null;
+  const p = readAll()[id];
+  return p ? { ...p, assets: p.assets ?? {} } : null;
 }
 
 export function saveProject(p: Project) {
@@ -78,7 +82,7 @@ export function deleteProject(id: string) {
 
 export function newProject(name = "مشروع جديد"): Project {
   const now = Date.now();
-  return { id: uid(), name, createdAt: now, updatedAt: now, files: {}, messages: [], versions: [] };
+  return { id: uid(), name, createdAt: now, updatedAt: now, files: {}, assets: {}, messages: [], versions: [] };
 }
 
 export function projectNameFrom(prompt: string): string {
