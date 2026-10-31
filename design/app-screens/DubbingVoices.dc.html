@@ -79,7 +79,7 @@ class Component extends DCLogic {
     const voices = descs.map((d, i) => {
       const on = i === selectedVoice;
       return {
-        num: 'صوت ' + String(i + 1).padStart(2, '0'),
+        num: String(i + 1).padStart(2, '0'),
         desc: d,
         pressed: on ? 'true' : 'false',
         tile: 'height:52px;border-radius:14px;padding:0 8px;display:flex;align-items:center;gap:6px;text-align:right;' + (on ? 'border:1.5px solid #5CD3F5;background:rgba(92,211,245,0.08)' : 'border:1px solid #222232;background:#161622'),
