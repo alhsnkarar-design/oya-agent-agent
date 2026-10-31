@@ -12,6 +12,27 @@
 - **Agent ID:** `2e54f5c0-c499-4c53-bea8-1936621c3e79`
 - **Model:** `gemini/gemini-3.5-flash`
 
+## AI App & Website Builder — منشئ المواقع والتطبيقات بالذكاء الاصطناعي
+
+صف ما تريد بلغتك، ويبني الوكيل مشروعاً كاملاً جاهزاً للتشغيل ويرسله لك كملف ZIP.
+
+| الأداة | ماذا تبني |
+|---|---|
+| `build_website` (`skills/build-website`) | موقع متجاوب متعدد الصفحات (HTML/CSS/JS) + ملف معاينة مباشر، يدعم العربية RTL |
+| `build_app` (`skills/build-app`) | تطبيق متكامل: `fullstack-node`، `react`، `nextjs`، `flask`، `fastapi`، `pwa`، `mobile-expo`، `flutter` |
+
+**أمثلة:**
+- «اصنع لي موقعاً لمطعم شامي فيه قائمة طعام ونموذج حجز، بألوان ذهبية وداكنة»
+- «ابنِ تطبيق حجز مواعيد لعيادة أسنان مع تسجيل دخول ولوحة تحكم للمشرف» (stack: `fullstack-node`)
+- «عدّل الموقع السابق: اجعل الخلفية فاتحة وأضف قسم آراء العملاء»
+
+**الإعداد:** عيّن أحد المتغيرات التالية في بيئة الأدوات (sandbox):
+`GEMINI_API_KEY` أو `OPENROUTER_API_KEY` أو `OPENAI_API_KEY`، أو `LLM_API_KEY` + `LLM_BASE_URL` لأي خدمة متوافقة مع OpenAI.
+اختيارياً: `LLM_MODEL`، `LLM_MAX_TOKENS`. بدون مفتاح، يكتب الوكيل الملفات بنفسه وتقوم الأداة بالتحقق منها وتغليفها (وضع `files`).
+
+**أوضاع العمل:** توليد (`description`) · تعديل (`feedback` + `previous_zip`) · تغليف (`files`).
+يتم التحقق تلقائياً من الملفات (JSON صالح، بايثون يُترجم، وجود README والملفات المرتبطة، عدم وجود TODO) وتنقية المسارات.
+
 ## Usage
 
 Every deployed agent exposes an **OpenAI-compatible API endpoint**. Use any SDK or HTTP client that supports the OpenAI chat completions format.
