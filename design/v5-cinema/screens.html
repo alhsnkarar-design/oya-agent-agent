@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>مدار — الهوية السينمائية</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@500;600;700;800&family=Almarai:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B0B0C;--s1:#151517;--s2:#1E1E21;--hair:rgba(255,255,255,.08);--tx:#F5F2EB;--tx2:#B3AEA5;--tx3:#8A857C;--gold:#E8B65A;--gold2:#C99A3E;--rec:#FF3B30}
+*{box-sizing:border-box}
+body{margin:0;background:#000;color:var(--tx);font-family:'Almarai',sans-serif;display:flex;flex-wrap:wrap;gap:40px;padding:40px}
+h1,h2,.k{font-family:'Noto Kufi Arabic',sans-serif;margin:0}
+p{margin:0}
+svg.i{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ltr{direction:ltr;unicode-bidi:isolate}
+.mono{font-family:ui-monospace,'SF Mono',Menlo,monospace;letter-spacing:.5px;direction:ltr;unicode-bidi:isolate}
+.screen{width:390px;height:844px;position:relative;overflow:hidden;background:var(--bg);display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:10px;height:64px;padding:12px 18px 0;flex-shrink:0;position:relative;z-index:3}
+.ib{width:44px;height:44px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border:1px solid var(--hair);flex-shrink:0;color:var(--tx)}
+.ib.glass{background:rgba(0,0,0,.35);backdrop-filter:blur(8px);border-color:rgba(255,255,255,.14)}
+.row{display:flex;align-items:center;gap:10px}
+.body{flex:1;min-height:0;padding:0 18px;display:flex;flex-direction:column;gap:18px;overflow:hidden}
+.cap{font-size:11px;letter-spacing:2px;color:var(--tx3);font-weight:700}
+.btn{height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:10px;font:700 16px 'Almarai';background:var(--gold);color:#1A1306}
+.btn.line{background:transparent;color:var(--tx);border:1px solid rgba(255,255,255,.18)}
+.seg{display:inline-flex;gap:2px;padding:3px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid var(--hair)}
+.seg span{height:32px;padding:0 14px;border-radius:9px;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--tx3);font-weight:700}
+.seg span.on{background:var(--gold);color:#1A1306}
+.seg span.onw{background:var(--tx);color:#0B0B0C}
+.opt{display:flex;align-items:center;gap:12px;min-height:58px;border-bottom:1px solid var(--hair);font-size:15px}
+.opt:last-child{border-bottom:0}
+.opt .v{color:var(--tx2);font-size:14px}
+.pill{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:10px;border:1px solid rgba(255,255,255,.14);font-size:13.5px;color:var(--tx2);white-space:nowrap}
+.pill.on{border-color:var(--gold);color:var(--gold);background:rgba(232,182,90,.08)}
+.scn{position:relative;overflow:hidden;background:#111}
+.grain::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(rgba(255,255,255,.06) .6px,transparent .8px);background-size:3px 3px;mix-blend-mode:overlay}
+.vig{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 45%,transparent 50%,rgba(0,0,0,.75));pointer-events:none}
+.tc{position:absolute;font:600 11px ui-monospace,Menlo,monospace;color:rgba(255,255,255,.85);letter-spacing:1px;direction:ltr}
+.rec{display:inline-flex;align-items:center;gap:6px}
+.rec::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--rec);box-shadow:0 0 10px var(--rec)}
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:92px;padding:0 26px 22px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(transparent,rgba(11,11,12,.96) 35%)}
+.tabbar a{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--tx3);width:52px}
+.tabbar a.on{color:var(--tx)}
+.shutter{width:66px;height:66px;border-radius:50%;border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;margin-top:-12px}
+.shutter i{width:50px;height:50px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;color:#1A1306}
+.foot{padding:12px 18px 28px;flex-shrink:0}
+.sheet{background:var(--s1);border-radius:26px 26px 0 0;border-top:1px solid var(--hair);padding:10px 18px 0;flex:1;display:flex;flex-direction:column;gap:14px;min-height:0}
+.grab{align-self:center;width:38px;height:4px;border-radius:2px;background:rgba(255,255,255,.18)}
+.cmd{display:flex;align-items:center;gap:8px;height:58px;padding:0 6px 0 6px;border-radius:18px;background:rgba(30,30,33,.92);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(10px)}
+.cmd .ph{flex:1;color:var(--tx3);font-size:15px;padding:0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.go{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- 01 SPLASH -->
+<section class="screen" id="s01">
+  <div data-scene="portrait" style="position:absolute;inset:0"></div>
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,12,.2) 0%,transparent 30%,rgba(11,11,12,.85) 62%,#0B0B0C 80%)"></div>
+  <div style="position:absolute;top:0;left:0;right:0;height:46px;background:#000"></div>
+  <span class="tc" style="top:58px;left:18px">TC 00:00:12:04</span><span class="tc rec" style="top:58px;right:18px;font-family:'Almarai';letter-spacing:0">مباشر</span>
+  <div style="margin-top:auto;position:relative;padding:0 24px 34px;display:flex;flex-direction:column;gap:16px">
+    <span class="row" style="gap:10px"><i data-mark="34"></i><b class="k" style="font-size:22px">مدار</b><span class="cap" style="margin-inline-start:4px">STUDIO AI</span></span>
+    <h1 style="font-size:40px;line-height:1.3;font-weight:800">استوديو كامل.<br><span style="color:var(--gold)">في جملة واحدة.</span></h1>
+    <p style="font-size:16px;line-height:1.75;color:var(--tx2)">دبلجة، مونتاج، موشن، بودكاست وتعديل بالكلام — وكيل ينفّذ عنك كل مراحل الإنتاج.</p>
+    <span class="btn" style="margin-top:8px">ابدأ الإنتاج</span>
+    <span style="text-align:center;font-size:14px;color:var(--tx3);height:28px">لدي حساب</span>
+  </div>
+</section>
+
+<!-- 02 HOME AGENT -->
+<section class="screen" id="s02">
+  <div style="position:relative;height:470px;flex-shrink:0">
+    <div data-scene="desert" style="position:absolute;inset:0"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,12,.55) 0%,transparent 26%,transparent 50%,#0B0B0C 100%)"></div>
+    <div class="top" style="position:absolute;left:0;right:0;top:0"><span class="row" style="gap:8px;flex:1"><i data-mark="30"></i><b class="k" style="font-size:19px">مدار</b></span><span class="ib glass"><i data-i="bolt" data-s="18" style="color:var(--gold)"></i></span><span class="ib glass" style="font:700 14px 'Almarai'">م</span></div>
+    <div style="position:absolute;right:18px;left:18px;bottom:96px"><span class="cap" style="color:var(--gold)">آخر مشروع · جاهز</span><h2 style="font-size:28px;font-weight:800;margin-top:6px;line-height:1.3">الطريق إلى الشمال</h2><span class="row" style="gap:14px;margin-top:8px;font-size:13px;color:var(--tx2)"><span class="mono">01:00</span><span>مونتاج + دبلجة إسبانية</span></span></div>
+    <span style="position:absolute;left:18px;bottom:104px;width:56px;height:56px;border-radius:50%;background:rgba(245,242,235,.95);color:#0B0B0C;display:flex;align-items:center;justify-content:center"><i data-i="play" data-s="20" data-fill></i></span>
+    <div style="position:absolute;left:18px;right:18px;bottom:20px"><div class="cmd"><span class="seg" style="border:0;background:transparent;padding:0"><span class="on" style="height:40px;border-radius:12px"><span class="ltr">Agent</span></span></span><span class="ph">ماذا ننتج اليوم؟</span><span class="go" style="color:var(--tx2)"><i data-i="plus" data-s="20"></i></span><span class="go" style="background:var(--gold);color:#1A1306"><i data-i="send" data-s="20"></i></span></div></div>
+  </div>
+  <div class="body" style="gap:14px;padding-top:6px">
+    <div class="row" style="justify-content:space-between"><span class="cap">الأدوات</span><span style="font-size:13px;color:var(--tx3)">6</span></div>
+    <div style="display:flex;gap:10px;margin:0 -18px;padding:0 18px;overflow:hidden">
+      <div data-tl="dubbing|دبلجة|portrait"></div><div data-tl="autoedit|مونتاج|desert"></div><div data-tl="podcast|بودكاست|studio"></div><div data-tl="motion|موشن|streaks"></div>
+    </div>
+  </div>
+  <i data-tabs="home"></i>
+</section>
+
+<!-- 03 HOME CHAT -->
+<section class="screen" id="s03">
+  <div class="top"><span class="row" style="gap:8px;flex:1"><i data-mark="30"></i><b class="k" style="font-size:19px">مدار</b></span><span class="seg"><span><span class="ltr">Agent</span></span><span class="onw"><span class="ltr">Chat</span></span></span></div>
+  <div class="body" style="padding-top:18px;gap:16px">
+    <div><span class="cap">مهمة واحدة</span><h1 style="font-size:30px;font-weight:800;line-height:1.35;margin-top:6px">اختر أداة.</h1></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" data-grid></div>
+  </div>
+  <i data-tabs="home"></i>
+</section>
+
+<!-- 04 AGENT RENDERING -->
+<section class="screen" id="s04">
+  <div style="position:relative;height:380px;flex-shrink:0">
+    <div data-scene="streaks" style="position:absolute;inset:0"></div>
+    <div style="position:absolute;left:0;right:0;top:0;height:52px;background:#000"></div><div style="position:absolute;left:0;right:0;bottom:0;height:52px;background:linear-gradient(transparent,#0B0B0C)"></div>
+    <div class="top" style="position:absolute;left:0;right:0;top:0;padding-top:4px;height:52px"><span class="ib glass" style="width:38px;height:38px"><i data-i="down" data-s="18"></i></span><span style="flex:1;text-align:center;font-size:13px;color:var(--tx2)">الوكيل يُنتج</span><span class="ib glass" style="width:38px;height:38px"><i data-i="stop" data-s="12" data-fill></i></span></div>
+    <span class="tc rec" style="top:66px;right:18px;font-family:'Almarai';letter-spacing:0;font-size:12px">يُصيَّر الآن</span><span class="tc" style="top:66px;left:18px">FRAME 096 / 150</span>
+    <i style="position:absolute;top:52px;bottom:52px;left:64%;width:2px;background:var(--gold);box-shadow:0 0 14px var(--gold)"></i>
+    <div style="position:absolute;inset:52px 0 52px 64%;background:rgba(11,11,12,.55)"></div>
+  </div>
+  <div class="body" style="gap:16px">
+    <div class="row" style="justify-content:space-between;align-items:flex-end"><span><span class="cap">المرحلة 4 من 6</span><h2 style="font-size:22px;font-weight:700;margin-top:4px">تصيير الإعلان المتحرك</h2></span><b class="mono" style="font-size:34px;color:var(--gold);font-weight:700">57%</b></div>
+    <div>
+      <div class="row" style="justify-content:space-between;font-size:10.5px;color:var(--tx3);margin-bottom:6px" dir="ltr"><span class="mono">00:00</span><span class="mono">02:00</span><span class="mono">04:00</span><span class="mono">06:00</span></div>
+      <div style="position:relative;height:122px;border-radius:12px;background:var(--s1);border:1px solid var(--hair);padding:8px;display:flex;flex-direction:column;gap:6px">
+        <div class="row" style="gap:4px;height:30px"><span style="width:56px;font-size:11px;color:var(--tx3)">صوت</span><i style="flex:2;height:100%;border-radius:6px;background:#3A3326;border:1px solid #5C4B2C;display:flex;align-items:center;padding:0 6px;font-size:10.5px;font-style:normal;color:#E9D3A6">قراءة</i><i style="flex:3;height:100%;border-radius:6px;background:#3A3326;border:1px solid #5C4B2C;display:flex;align-items:center;padding:0 6px;font-size:10.5px;font-style:normal;color:#E9D3A6">الحلقة · صوتان</i><i style="flex:5"></i></div>
+        <div class="row" style="gap:4px;height:30px"><span style="width:56px;font-size:11px;color:var(--tx3)">فيديو</span><i style="flex:5"></i><i style="flex:3;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--gold) 64%,#3A3326 64%);display:flex;align-items:center;padding:0 6px;font-size:10.5px;font-style:normal;color:#1A1306;font-weight:700">موشن</i><i style="flex:2"></i></div>
+        <div class="row" style="gap:4px;height:30px"><span style="width:56px;font-size:11px;color:var(--tx3)">لغات</span><i style="flex:8"></i><i style="flex:2;height:100%;border-radius:6px;border:1px dashed rgba(255,255,255,.2);display:flex;align-items:center;padding:0 6px;font-size:10.5px;font-style:normal;color:var(--tx3)">EN</i></div>
+        <i style="position:absolute;top:0;bottom:0;right:calc(64px + (100% - 72px)*.55);width:2px;background:var(--rec)"></i>
+      </div>
+    </div>
+    <p style="font-size:13.5px;color:var(--tx3);line-height:1.7">الحلقة الصوتية جاهزة. بعد الإعلان سأدبلجه للإنجليزية — حوالي 3 دقائق.</p>
+  </div>
+  <div class="foot"><div class="cmd"><span class="ph">وجّه الوكيل…</span><span class="go" style="color:var(--gold)"><i data-i="mic" data-s="20"></i></span></div></div>
+</section>
+
+<!-- 05 TAKES -->
+<section class="screen" id="s05">
+  <div class="top"><span class="ib"><i data-i="back" data-s="20"></i></span><span style="flex:1;text-align:center"><span class="cap" style="color:var(--gold)">اكتمل · 6 دقائق</span></span><span class="ib"><i data-i="share" data-s="18"></i></span></div>
+  <div class="body" style="padding-top:12px;gap:14px">
+    <h1 style="font-size:26px;font-weight:800;line-height:1.35">3 لقطات جاهزة</h1>
+    <div style="display:flex;gap:12px;margin:0 -18px;padding:0 18px;overflow:hidden">
+      <div style="flex-shrink:0;width:262px;display:flex;flex-direction:column;gap:10px">
+        <div data-scene="streaks" data-title="قوة العادات" style="height:380px;border-radius:20px"></div>
+        <div class="row" style="justify-content:space-between"><span><span class="cap">TAKE 02</span><b style="display:block;font-size:16px">الإعلان المتحرك</b></span><span class="mono" style="font-size:12px;color:var(--tx3)">9:16 · 0:15</span></div>
+      </div>
+      <div style="flex-shrink:0;width:262px;display:flex;flex-direction:column;gap:10px;opacity:.55">
+        <div data-scene="studio" style="height:380px;border-radius:20px"></div>
+        
+      </div>
+    </div>
+    <div class="row" style="gap:6px;justify-content:center"><i style="width:6px;height:6px;border-radius:3px;background:var(--tx3)"></i><i style="width:20px;height:6px;border-radius:3px;background:var(--gold)"></i><i style="width:6px;height:6px;border-radius:3px;background:var(--tx3)"></i></div>
+  </div>
+  <div class="foot row" style="gap:10px"><span class="btn line" style="flex:1">تعديل</span><span class="btn" style="flex:1.4"><i data-i="download" data-s="18"></i>تصدير الكل</span></div>
+</section>
+
+<!-- 06 PODCAST -->
+<section class="screen" id="s06">
+  <div style="position:relative;height:390px;flex-shrink:0"><div data-scene="studio" style="position:absolute;inset:0"></div><div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(21,21,21,.85) 70%,#151517)"></div>
+    <div class="top" style="position:absolute;left:0;right:0;top:0"><span class="ib glass"><i data-i="back" data-s="20"></i></span><span style="flex:1"></span><span class="seg" style="background:rgba(0,0,0,.4)"><span class="onw"><span class="ltr">Chat</span></span></span></div>
+    <div style="position:absolute;right:20px;bottom:24px"><span class="cap" style="color:var(--gold)">بودكاست</span><h1 style="font-size:30px;font-weight:800;margin-top:4px">من كتاب إلى حلقة</h1></div>
+  </div>
+  <div class="sheet" style="border-radius:0;border:0">
+    <div class="opt"><i data-i="book" data-s="20" style="color:var(--gold)"></i><span style="flex:1">المصدر</span><span class="v">كتاب العادات · 12 فصلًا</span></div>
+    <div class="opt"><i data-i="mic" data-s="20" style="color:var(--gold)"></i><span style="flex:1">الشكل</span><span class="seg"><span>صوت</span><span class="on">حوار</span></span></div>
+    <div class="opt"><i data-i="voice" data-s="20" style="color:var(--gold)"></i><span style="flex:1">المتحدثان</span><span class="v">صوت 04 · صوت 11</span></div>
+    <div class="opt"><i data-i="clock" data-s="20" style="color:var(--gold)"></i><span style="flex:1">المدة</span><span class="v">~20 دقيقة</span></div>
+  </div>
+  <div class="foot" style="background:var(--s1)"><span class="btn">إنتاج الحلقة</span></div>
+</section>
+
+<!-- 07 MOTION -->
+<section class="screen" id="s07">
+  <div style="position:relative;height:520px;flex-shrink:0"><div data-scene="streaks" data-title="قوة العادات" data-sub="بودكاست جديد كل أحد" style="position:absolute;inset:0"></div>
+    <div class="top" style="position:absolute;left:0;right:0;top:0"><span class="ib glass"><i data-i="back" data-s="20"></i></span><span style="flex:1"></span><span class="ib glass"><i data-i="download" data-s="18"></i></span></div>
+    <span class="tc" style="bottom:72px;left:18px">16:9 · 6s · V2</span>
+    <div style="position:absolute;left:18px;right:18px;bottom:18px;display:flex;align-items:center;gap:10px"><span style="width:40px;height:40px;border-radius:50%;background:rgba(245,242,235,.95);color:#0B0B0C;display:flex;align-items:center;justify-content:center"><i data-i="pause" data-s="14" data-fill></i></span><div style="flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.2);position:relative"><i style="position:absolute;inset-block:0;right:0;width:50%;background:var(--gold);border-radius:2px"></i><i style="position:absolute;top:-5px;right:calc(50% - 6px);width:12px;height:12px;border-radius:50%;background:var(--gold)"></i></div><span class="mono" style="font-size:11px;color:var(--tx2)">0:03</span></div>
+  </div>
+  <div class="body" style="padding-top:16px;gap:14px">
+    <div><span class="cap" style="color:var(--gold)">موشن جرافيكس</span><p style="font-size:15px;line-height:1.7;color:var(--tx2);margin-top:6px">«خطوط ضوء ذهبية تعبر الشاشة، ثم يظهر العنوان ببطء»</p></div>
+    <div class="row" style="gap:6px"><span class="pill on">سينمائي</span><span class="pill">بسيط</span><span class="pill">سريع</span><span class="pill ltr">9:16</span></div>
+  </div>
+  <div class="foot"><div class="cmd"><span class="ph">صِف لقطة جديدة…</span><span class="go" style="color:var(--gold)"><i data-i="mic" data-s="20"></i></span><span class="go" style="background:var(--gold);color:#1A1306"><i data-i="send" data-s="20"></i></span></div></div>
+</section>
+
+<!-- 08 AUTO EDIT -->
+<section class="screen" id="s08">
+  <div style="position:relative;height:300px;flex-shrink:0"><div data-scene="desert" style="position:absolute;inset:0"></div><div style="position:absolute;left:0;right:0;top:0;height:40px;background:#000"></div><div style="position:absolute;left:0;right:0;bottom:0;height:40px;background:#000"></div>
+    <div class="top" style="position:absolute;left:0;right:0;top:0;height:40px;padding-top:2px"><span class="ib glass" style="width:36px;height:36px"><i data-i="back" data-s="18"></i></span><span style="flex:1;text-align:center;font-size:13px;color:var(--tx2)">مونتاج تلقائي</span><span style="width:36px"></span></div>
+    <span class="tc" style="top:52px;left:18px">2.39 : 1</span><span class="tc" style="bottom:52px;left:18px">00:00:42:10</span>
+  </div>
+  <div class="body" style="padding-top:18px;gap:16px">
+    <div><span class="cap">اللقطات المختارة · 11 من 3 مقاطع</span><div style="display:flex;gap:3px;height:56px;margin-top:10px" data-reel></div></div>
+    <div style="background:var(--s1);border-radius:18px;padding:0 16px;border:1px solid var(--hair)">
+      <div class="opt"><span style="flex:1">الإيقاع</span><span class="seg"><span class="on">سينمائي</span><span>سريع</span><span>هادئ</span></span></div>
+      <div class="opt"><span style="flex:1">موشن وتأثيرات</span><span class="v" style="color:var(--gold)">مفعّل</span></div>
+      <div class="opt"><span style="flex:1">مؤثرات طبيعية <small style="color:var(--tx3)">· بلا موسيقى</small></span><span class="v" style="color:var(--gold)">مفعّل</span></div>
+    </div>
+  </div>
+  <div class="foot"><span class="btn">ابدأ المونتاج · <span class="mono">01:00</span></span></div>
+</section>
+
+<!-- 09 VIDEO EDIT -->
+<section class="screen" id="s09">
+  <div style="position:relative;height:300px;flex-shrink:0"><div data-scene="portrait" data-remove style="position:absolute;inset:0"></div>
+    <div class="top" style="position:absolute;left:0;right:0;top:0"><span class="ib glass"><i data-i="back" data-s="20"></i></span><span style="flex:1"></span><span class="ib glass"><i data-i="undo" data-s="18"></i></span><span class="ib glass mono" style="width:auto;padding:0 12px;border-radius:12px;font-size:12px">V3</span></div>
+  </div>
+  <div style="display:flex;gap:2px;height:44px;margin:12px 18px 0;position:relative;flex-shrink:0" data-strip></div>
+  <div class="body" style="padding-top:16px;gap:12px">
+    <p style="align-self:flex-start;max-width:290px;padding:12px 14px;border-radius:16px 16px 16px 4px;background:var(--s2);font-size:15px;line-height:1.65">احذف أول 5 ثوانٍ وأزل الشخص الذي يمر في الخلفية</p>
+    <div style="border-inline-start:2px solid var(--gold);padding-inline-start:12px;display:flex;flex-direction:column;gap:8px;font-size:14px">
+      <span class="row" style="gap:8px;color:var(--tx2)"><i data-i="check" data-s="15" style="color:var(--gold)"></i>قص <span class="mono" style="font-size:12px">00:00–00:05</span></span>
+      <span class="row" style="gap:8px"><i style="width:14px;height:14px;border-radius:50%;border:2px solid var(--gold);border-top-color:transparent"></i>إزالة عنصر من المشهد <b class="mono" style="color:var(--gold);font-size:12px">58%</b></span>
+    </div>
+  </div>
+  <div class="foot"><div class="cmd"><span class="ph">قل التعديل التالي…</span><span class="go" style="color:var(--gold)"><i data-i="mic" data-s="20"></i></span><span class="go" style="background:var(--gold);color:#1A1306"><i data-i="send" data-s="20"></i></span></div></div>
+</section>
+
+<!-- 10 DUBBING -->
+<section class="screen" id="s10">
+  <div style="position:relative;height:430px;flex-shrink:0"><div data-scene="portrait" style="position:absolute;inset:0"></div><div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,#0B0B0C)"></div>
+    <div class="top" style="position:absolute;left:0;right:0;top:0"><span class="ib glass"><i data-i="back" data-s="20"></i></span><span style="flex:1"></span><span class="seg" style="background:rgba(0,0,0,.45)"><span>الأصلي</span><span class="on">المدبلج</span></span></div>
+    <p class="ltr" style="position:absolute;left:24px;right:24px;bottom:58px;text-align:center;font-size:17px;font-weight:700;text-shadow:0 2px 8px #000">Hola a todos, bienvenidos.</p>
+    <span class="tc" style="bottom:28px;right:18px;font-family:'Almarai';letter-spacing:0;font-size:12px;color:var(--gold)">بصوتك الأصلي · الإسبانية</span>
+  </div>
+  <div class="body" style="gap:18px;padding-top:4px">
+    <div><span class="cap">اللغات</span>
+      <div style="display:flex;gap:8px;margin-top:12px;overflow:hidden;margin-inline:-18px;padding-inline:18px">
+        <span class="pill on" style="height:54px;padding:0 16px;flex-direction:column;justify-content:center;gap:0;line-height:1.2"><b class="mono" style="font-size:14px">ES</b><small style="font-size:11px">جاهزة</small></span>
+        <span class="pill" style="height:54px;padding:0 16px;flex-direction:column;justify-content:center;gap:0;line-height:1.2;color:var(--tx)"><b class="mono" style="font-size:14px">EN</b><small style="font-size:11px;color:var(--tx3)">جاهزة</small></span>
+        <span class="pill" style="height:54px;padding:0 16px;flex-direction:column;justify-content:center;gap:0;line-height:1.2"><b class="mono" style="font-size:14px">FR</b><small style="font-size:11px;color:var(--gold)">64%</small></span>
+        <span class="pill" style="height:54px;padding:0 18px;border-style:dashed"><i data-i="plus" data-s="18"></i>لغة</span>
+      </div>
+    </div>
+    <div style="background:var(--s1);border-radius:18px;padding:0 16px;border:1px solid var(--hair)">
+      <div class="opt"><span style="flex:1">الصوت</span><span class="v">صوتي الأصلي</span></div>
+      <div class="opt"><span style="flex:1">النبرة</span><span class="v">طبيعية · 15 خيارًا</span></div>
+    </div>
+  </div>
+  <div class="foot row" style="gap:10px"><span class="btn line" style="flex:1">النص</span><span class="btn" style="flex:1.6">تصدير 3 لغات</span></div>
+</section>
+
+<!-- 11 VOICE -->
+<section class="screen" id="s11" style="background:#050505">
+  <div class="top"><span class="ib"><i data-i="down" data-s="20"></i></span><span style="flex:1;display:flex;justify-content:center"><span class="seg"><span class="on"><span class="ltr">Agent</span></span><span><span class="ltr">Chat</span></span></span></span><span style="width:44px"></span></div>
+  <div style="padding:34px 26px 0;display:flex;flex-direction:column;gap:14px">
+    <span class="row" style="gap:10px"><span class="tc rec" style="position:static;font-family:'Almarai';letter-spacing:0;font-size:13px;color:var(--tx2)">يستمع</span><span class="mono" style="font-size:12px;color:var(--tx3)">00:07</span></span>
+    <p style="font-size:15px;color:var(--tx3);line-height:1.7">«اكتمل المونتاج. أدبلجه قبل النشر؟»</p>
+    <h1 style="font-size:30px;font-weight:700;line-height:1.5">نعم، للإسبانية بصوتي <span style="color:var(--tx3)">وأرسله لي</span></h1>
+  </div>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 26px" data-meter></div>
+  <div style="padding:0 18px"><div class="row" style="padding:14px 16px;border-radius:16px;border:1px solid rgba(232,182,90,.35);background:rgba(232,182,90,.06);gap:12px"><i data-i="dubbing" data-s="22" style="color:var(--gold)"></i><span style="flex:1;font-size:14.5px">سأدبلج «الطريق إلى الشمال» للإسبانية</span><span style="font-size:12px;color:var(--gold)">قل «نعم»</span></div></div>
+  <div class="row" style="justify-content:center;gap:40px;padding:26px 0 34px">
+    <span class="ib" style="width:56px;height:56px"><i data-i="keyboard" data-s="22"></i></span>
+    <span class="shutter" style="width:88px;height:88px;margin:0"><i style="width:68px;height:68px;background:var(--rec);color:#fff;display:flex;align-items:center;justify-content:center"><svg class="i" width="28" height="28" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></i></span>
+    <span class="ib" style="width:56px;height:56px"><i data-i="x" data-s="22"></i></span>
+  </div>
+</section>
+
+<!-- 12 LIBRARY -->
+<section class="screen" id="s12">
+  <div class="top"><h1 style="flex:1;font-size:26px;font-weight:800">المكتبة</h1><span class="ib"><i data-i="search" data-s="20"></i></span></div>
+  <div class="body" style="padding-top:12px;gap:14px">
+    <div class="row" style="gap:6px"><span class="pill on">الكل</span><span class="pill">فيديو</span><span class="pill">صوت</span><span class="pill">قيد الإنتاج</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 10px" data-lib></div>
+  </div>
+  <i data-tabs="lib"></i>
+</section>
+
+<script src="../agent-v2/base.js"></script>
+<script>
+document.querySelectorAll('[data-mark]').forEach(e=>{const s=e.dataset.mark;e.outerHTML=`<svg width="${s}" height="${s}" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14.5" fill="none" stroke="#E8B65A" stroke-width="1.6"/><circle cx="16" cy="16" r="6" fill="#E8B65A"/><circle cx="16" cy="16" r="2" fill="#0B0B0C"/><path d="M16 1.5v4M16 26.5v4M1.5 16h4M26.5 16h4" stroke="#E8B65A" stroke-width="1.6" stroke-linecap="round"/></svg>`;});
+function scene(t,o={}){let h='';
+if(t==='desert')h=`<svg width="100%" height="100%" viewBox="0 0 390 470" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0"><defs><linearGradient id="sk${o.k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#160F0B"/><stop offset=".45" stop-color="#6B3A1C"/><stop offset=".62" stop-color="#E08A3C"/></linearGradient><radialGradient id="sn${o.k}"><stop offset="0" stop-color="#FFE3A3"/><stop offset=".4" stop-color="#F6B451" stop-opacity=".9"/><stop offset="1" stop-color="#F6B451" stop-opacity="0"/></radialGradient></defs><rect width="390" height="470" fill="url(#sk${o.k})"/><circle cx="250" cy="270" r="110" fill="url(#sn${o.k})"/><circle cx="250" cy="270" r="26" fill="#FFE8B5"/><path d="M0 300 C90 262 160 300 240 280 S360 262 390 274 V470 H0z" fill="#2B1709"/><path d="M0 340 C70 312 150 352 230 330 S350 312 390 328 V470 H0z" fill="#170C05"/><path d="M180 470 L196 330 L204 330 L240 470z" fill="#3A2412" opacity=".8"/><circle cx="200" cy="336" r="3" fill="#FFD27A"/></svg>`;
+else if(t==='portrait')h=`<div style="position:absolute;inset:0;background:radial-gradient(70% 60% at 70% 30%,#3B2A20,#120D0B 70%)"></div><div style="position:absolute;inset:0;background:radial-gradient(40% 50% at 15% 20%,rgba(255,170,90,.25),transparent 70%)"></div><svg width="100%" height="100%" viewBox="0 0 390 470" preserveAspectRatio="xMidYMax slice" style="position:absolute;inset:0"><defs><linearGradient id="rim${o.k}" x1="0" x2="1"><stop offset="0" stop-color="#F2A65A"/><stop offset=".25" stop-color="#2A1C15"/><stop offset="1" stop-color="#140E0B"/></linearGradient></defs><ellipse cx="190" cy="215" rx="62" ry="76" fill="url(#rim${o.k})"/><path d="M60 470 C70 360 120 312 190 306 C260 312 310 360 320 470z" fill="url(#rim${o.k})"/>${o.remove?'<g opacity=".35"><ellipse cx="335" cy="250" rx="14" ry="17" fill="#8A7360"/><rect x="318" y="268" width="34" height="90" rx="14" fill="#8A7360"/></g><rect x="306" y="226" width="58" height="146" rx="12" fill="none" stroke="#E8B65A" stroke-width="2" stroke-dasharray="7 5"/><text x="335" y="214" fill="#E8B65A" font-size="13" text-anchor="middle" font-family="Almarai" font-weight="700">إزالة</text>':''}</svg>`;
+else if(t==='studio')h=`<div style="position:absolute;inset:0;background:#0C0A09"></div><div style="position:absolute;inset:0;background:radial-gradient(40% 70% at 50% 0%,rgba(232,182,90,.35),transparent 70%)"></div><div style="position:absolute;left:50%;top:0;width:260px;height:100%;margin-left:-130px;background:linear-gradient(180deg,rgba(255,220,150,.18),transparent 75%);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%)"></div><svg width="100%" height="100%" viewBox="0 0 390 470" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0"><rect x="166" y="120" width="58" height="120" rx="29" fill="#2A2420" stroke="#E8B65A" stroke-width="2"/><path d="M178 140h34M178 156h34M178 172h34M178 188h34M178 204h34" stroke="#5C4B2C" stroke-width="2"/><path d="M150 210a45 45 0 0 0 90 0" fill="none" stroke="#8A7360" stroke-width="4"/><path d="M195 255v70M160 325h70" stroke="#8A7360" stroke-width="4" stroke-linecap="round"/><g fill="#E8B65A" opacity=".8">${Array.from({length:28},(_,k)=>`<rect x="${52+k*10}" y="${390-Math.round(Math.abs(Math.sin(k*1.3))*40)}" width="4" height="${Math.round(Math.abs(Math.sin(k*1.3))*80)+6}" rx="2"/>`).join('')}</g></svg>`;
+else if(t==='streaks'){h=`<div style="position:absolute;inset:0;background:radial-gradient(80% 60% at 50% 50%,#1C1610,#060505)"></div>`;for(let k=0;k<7;k++)h+=`<i style="position:absolute;left:-20%;width:140%;top:${18+k*11}%;height:${k%3?1:2}px;background:linear-gradient(90deg,transparent,rgba(232,182,90,${.25+k%3*.25}),transparent);transform:rotate(-${10+k*2}deg)"></i>`;for(let k=0;k<16;k++)h+=`<i style="position:absolute;left:${(k*37)%100}%;top:${(k*53)%100}%;width:${2+k%3}px;height:${2+k%3}px;border-radius:50%;background:#F5D9A0;box-shadow:0 0 8px #E8B65A;opacity:.7"></i>`;if(o.title)h+=`<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center"><b class="k" style="font-size:${o.big?40:30}px;font-weight:800;letter-spacing:-.5px;background:linear-gradient(180deg,#FFF3D6,#E8B65A);-webkit-background-clip:text;color:transparent">${o.title}</b>${o.sub?`<small style="font-size:13px;letter-spacing:3px;color:var(--tx2)">${o.sub}</small>`:''}</div>`;}
+return h+'<div class="vig"></div>';}
+let K=0;document.querySelectorAll('[data-scene]').forEach(e=>{K++;e.classList.add('scn','grain');e.innerHTML=scene(e.dataset.scene,{k:K,title:e.dataset.title,sub:e.dataset.sub,remove:e.hasAttribute('data-remove'),big:e.offsetHeight>450});});
+document.querySelectorAll('[data-tl]').forEach(e=>{const[t,n,sc]=e.dataset.tl.split('|');K++;e.outerHTML=`<div style="flex-shrink:0;width:150px;display:flex;flex-direction:column;gap:8px"><div class="scn grain" style="height:200px;border-radius:16px">${scene(sc,{k:K})}<span style="position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:10px;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;color:var(--gold)">${svg(t,18)}</span></div><b style="font-size:15px">${n}</b></div>`;});
+const TL=[['dubbing','دبلجة','portrait','بصوتك بأي لغة',1],['autoedit','مونتاج','desert','لقطاتك إلى فيلم'],['podcast','بودكاست','studio','كتاب إلى حلقة'],['motion','موشن','streaks','من وصف'],['videoedit','تعديل بالكلام','portrait','قص، إزالة، إضافة'],['voice','صوتي مباشر','studio','تحدّث مع الوكيل']];
+const gr=document.querySelector('[data-grid]');gr.innerHTML=TL.map(([t,n,sc,s,on])=>{K++;return `<div style="display:flex;flex-direction:column;gap:8px"><div class="scn grain" style="height:${on?150:118}px;border-radius:16px;${on?'outline:2px solid var(--gold);outline-offset:2px':''}">${scene(sc,{k:K})}<span style="position:absolute;bottom:10px;right:10px;color:var(--gold)">${svg(t,22)}</span></div><span><b style="font-size:15px;display:block">${n}</b><small style="font-size:12px;color:var(--tx3)">${s}</small></span></div>`;}).join('');
+document.querySelectorAll('[data-tabs]').forEach(e=>{const on=e.dataset.tabs;e.outerHTML=`<nav class="tabbar"><a class="${on==='home'?'on':''}">${svg('home',22)}الاستوديو</a><a class="${on==='lib'?'on':''}">${svg('film',22)}المكتبة</a><span class="shutter"><i>${svg('mic',22,'stroke-width:2')}</i></span><a>${svg('voice',22)}الأصوات</a><a>${svg('user',22)}حسابي</a></nav>`;});
+const rl=document.querySelector('[data-reel]');let h='';const cs=['#5A341A','#2A1C15','#1C1610'];for(let k=0;k<16;k++){const sel=[1,2,4,6,7,9,11,12,13,14,15].includes(k);h+=`<i style="flex:1;border-radius:4px;background:${cs[k%3]};${sel?'box-shadow:inset 0 -3px 0 #E8B65A':'opacity:.3'}"></i>`;}rl.innerHTML=h;
+const st=document.querySelector('[data-strip]');h='';for(let k=0;k<18;k++)h+=`<i style="flex:1;border-radius:3px;background:${cs[k%3]}"></i>`;st.innerHTML=h+`<i style="position:absolute;inset-block:0;right:0;width:12%;background:repeating-linear-gradient(135deg,rgba(255,59,48,.55) 0 4px,rgba(0,0,0,.5) 4px 8px);border-radius:3px"></i><i style="position:absolute;top:-4px;bottom:-4px;right:26%;width:2px;background:#E8B65A"></i>`;
+const mt=document.querySelector('[data-meter]');h='';for(let k=0;k<34;k++){const v=10+Math.round(Math.abs(Math.sin(k*.9)*Math.cos(k*.31))*120);h+=`<i style="width:4px;height:${v}px;border-radius:2px;background:${v>90?'#E8B65A':'rgba(232,182,90,.45)'}"></i>`;}mt.innerHTML=h;
+const LB=[['desert','الطريق إلى الشمال','01:00','مونتاج'],['portrait','مقابلة البودكاست','04:12','دبلجة · 3'],['streaks','قوة العادات','00:15','موشن'],['studio','الحلقة 1','18:42','بودكاست']];
+document.querySelector('[data-lib]').innerHTML=LB.map(([sc,n,d,t])=>{K++;return `<div style="display:flex;flex-direction:column;gap:8px"><div class="scn grain" style="height:210px;border-radius:14px">${scene(sc,{k:K})}<span class="tc" style="bottom:8px;left:8px">${d}</span></div><span><b style="font-size:14.5px;display:block">${n}</b><small style="font-size:12px;color:var(--gold)">${t}</small></span></div>`;}).join('');
+</script>
+</body>
+</html>
