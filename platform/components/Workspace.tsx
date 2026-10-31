@@ -15,9 +15,28 @@ import {
   type Message,
   type Project,
 } from "@/lib/storage";
-import { Logo } from "./Logo";
+import { Logo, LogoMark } from "./Logo";
+import {
+  IconAlert,
+  IconCloud,
+  IconCode,
+  IconDownload,
+  IconExternal,
+  IconEye,
+  IconGlobe,
+  IconHistory,
+  IconLoader,
+  IconMonitor,
+  IconPhone,
+  IconPlus,
+  IconRocket,
+  IconSparkles,
+  IconTablet,
+  IconWand,
+} from "./icons";
 import { ChatPanel } from "./ChatPanel";
 import { CodePane } from "./CodePane";
+import { PENDING_IMAGES, PENDING_PROMPT } from "./HeroPrompt";
 import { PublishDialog } from "./PublishDialog";
 import { UserMenu } from "./UserMenu";
 
@@ -38,6 +57,7 @@ export function Workspace() {
   const [provider, setProvider] = useState<string>("");
   const [showVersions, setShowVersions] = useState(false);
   const [showPublish, setShowPublish] = useState(false);
+  const [mobileView, setMobileView] = useState<"chat" | "preview">("chat");
   const [me, setMe] = useState<Me | null>(null);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [saveError, setSaveError] = useState("");
@@ -63,7 +83,7 @@ export function Workspace() {
       if (r.publishedSlug !== (p.publishedSlug ?? null)) setProject((cur) => (cur ? { ...cur, publishedSlug: r.publishedSlug } : cur));
     } catch (e) {
       setSaveState("error");
-      setSaveError(e instanceof Error ? e.message : "تعذّر الحفظ");
+      setSaveError(e instanceof Error ? e.message : "Couldn't save");
     }
   }, []);
 
@@ -160,14 +180,14 @@ export function Workspace() {
         });
         if (res.status === 401 && (await res.clone().json().catch(() => ({}))).needLogin) {
           window.location.href = `/login?next=${encodeURIComponent(location.pathname + location.search)}`;
-          throw new Error("سجّل الدخول للمتابعة");
+          throw new Error("Log in to continue");
         }
         if (res.status === 401) {
-          const code = window.prompt("هذه المنصة محمية. أدخل رمز الدخول:");
+          const code = window.prompt("This workspace is protected. Enter the access code:");
           if (code) localStorage.setItem("bannaa:access-code", code);
-          throw new Error("رمز الدخول مطلوب — أعد المحاولة بعد إدخاله");
+          throw new Error("An access code is required — try again after entering it.");
         }
-        if (!res.ok || !res.body) throw new Error((await res.json().catch(() => ({}))).error || `خطأ ${res.status}`);
+        if (!res.ok || !res.body) throw new Error((await res.json().catch(() => ({}))).error || `Error ${res.status}`);
         const reader = res.body.getReader();
         const dec = new TextDecoder();
         let last = 0;
@@ -199,11 +219,11 @@ export function Workspace() {
       const nextFiles: FileMap = isEdit ? applyChanges(baseFiles, parsed) : parsed.files;
       const failed = status.stop === "error" || (!changed.length && status.stop !== "demo");
       let content = [parsed.plan, parsed.notes].filter(Boolean).join("\n\n");
-      if (status.stop === "max_tokens") content += "\n\n⚠️ توقف التوليد لأن الناتج طويل جداً. اطلب «أكمل» أو قسّم الطلب.";
-      if (status.stop === "refusal") content += "\n\n⚠️ تعذّر تنفيذ هذا الطلب.";
-      if (status.stop === "aborted") content += "\n\n⏹️ تم الإيقاف.";
-      if (status.error) content += `\n\n❌ ${status.error}`;
-      if (!content.trim()) content = "لم أتمكن من توليد ملفات. حاول إعادة صياغة الطلب.";
+      if (status.stop === "max_tokens") content += "\n\nGeneration stopped because the output got too long. Ask me to “continue”, or split the request into smaller steps.";
+      if (status.stop === "refusal") content += "\n\nI can't help with that request.";
+      if (status.stop === "aborted") content += "\n\nStopped.";
+      if (status.error) content += `\n\n${status.error}`;
+      if (!content.trim()) content = "I couldn't generate any files. Try rephrasing your request.";
 
       update((pr) => ({
         ...pr,
@@ -221,6 +241,7 @@ export function Workspace() {
       abortRef.current = null;
       if (changed.length) {
         setTab("preview");
+        setMobileView("preview");
         autoFixRef.current.armed = true;
       }
     },
@@ -259,10 +280,15 @@ export function Workspace() {
       if (who.user) await cloud.save(p).catch(() => {});
       else saveProject(p);
       router.replace(`/build?id=${p.id}`);
-      const pending = sessionStorage.getItem("bannaa:pending-prompt");
+      const pending = sessionStorage.getItem(PENDING_PROMPT);
       if (pending) {
-        sessionStorage.removeItem("bannaa:pending-prompt");
-        setTimeout(() => send(pending), 0);
+        let images: PendingImage[] = [];
+        try {
+          images = JSON.parse(sessionStorage.getItem(PENDING_IMAGES) || "[]");
+        } catch {}
+        sessionStorage.removeItem(PENDING_PROMPT);
+        sessionStorage.removeItem(PENDING_IMAGES);
+        setTimeout(() => send(pending, { images }), 0);
       }
     })();
   }, [params, router, send]);
@@ -289,7 +315,7 @@ export function Workspace() {
     const t = setTimeout(() => {
       autoFixRef.current.used += 1;
       autoFixRef.current.armed = false;
-      send(`🩺 إصلاح تلقائي: ظهرت هذه الأخطاء عند تشغيل الصفحة «${page}». أصلح السبب الجذري:\n- ${errors.join("\n- ")}`, { isFix: true });
+      send(`Auto-fix: these errors appeared while running “${page}”. Fix the root cause:\n- ${errors.join("\n- ")}`, { isFix: true });
     }, 1500);
     return () => clearTimeout(t);
   }, [errors, busy, page, send]);
@@ -315,7 +341,7 @@ export function Workspace() {
     for (const [p, url] of Object.entries(project.assets ?? {})) folder.file(p, dataUrlToBytes(url));
     folder.file(
       "README.md",
-      `# ${project.name}\n\nتم إنشاؤه بواسطة بنّاء.\n\n## التشغيل\nافتح index.html في المتصفح.\n\n## النشر\n- Netlify Drop: اسحب المجلد إلى https://app.netlify.com/drop\n- GitHub Pages / Vercel / Cloudflare Pages: ارفع الملفات كما هي (لا يحتاج بناء).\n`,
+      `# ${project.name}\n\nBuilt with Bannaa.\n\n## Run\nOpen index.html in your browser.\n\n## Deploy\n- Netlify Drop: drag this folder to https://app.netlify.com/drop\n- GitHub Pages / Vercel / Cloudflare Pages: upload the files as-is (no build step).\n`,
     );
     const blob = await zip.generateAsync({ type: "blob" });
     const a = document.createElement("a");
@@ -334,37 +360,48 @@ export function Workspace() {
     window.open(url, "_blank", "noopener");
   };
 
-  if (!project) return <div className="h-screen grid place-items-center text-white/50">جارٍ التحميل…</div>;
+  if (!project)
+    return (
+      <div className="h-screen grid place-items-center aurora">
+        <IconLoader size={22} className="text-white/50" />
+      </div>
+    );
+
+  const pageCount = pages.length;
 
   return (
     <div className="h-screen flex flex-col bg-ink-950">
-      {/* top bar */}
-      <header className="flex items-center gap-3 border-b border-ink-700 px-4 h-14 shrink-0">
+      {/* ---------------- top bar ---------------- */}
+      <header className="flex items-center gap-1.5 sm:gap-2 border-b hairline px-3 h-14 shrink-0 bg-ink-900/80">
         <Logo small />
-        <span className="text-white/20">/</span>
+        <span className="hidden sm:inline text-white/15 text-lg font-light">/</span>
         <input
           value={project.name}
           onChange={(e) => update((p) => ({ ...p, name: e.target.value }))}
-          className="bg-transparent outline-none font-semibold min-w-0 w-48 focus:bg-ink-800 rounded px-2 py-1"
-          aria-label="اسم المشروع"
+          className="hidden sm:block bg-transparent outline-none text-sm font-medium min-w-0 w-52 rounded-lg px-2 py-1.5 hover:bg-white/5 focus:bg-white/5"
+          aria-label="Project name"
         />
+        <SaveBadge loggedIn={!!me?.user} state={saveState} error={saveError} />
         {provider === "demo" && (
-          <span className="hidden md:inline text-xs rounded-full bg-amber-500/15 text-amber-300 px-3 py-1">
-            وضع تجريبي — أضف مفتاح AI لتفعيل التوليد الحقيقي
+          <span className="hidden lg:inline-flex items-center gap-1.5 rounded-full border border-amber-400/20 bg-amber-400/10 px-2.5 py-1 text-[11px] text-amber-200">
+            Demo mode · add an AI key to generate for real
           </span>
         )}
-        <SaveBadge loggedIn={!!me?.user} state={saveState} error={saveError} />
         <div className="flex-1" />
+
         <div className="relative">
           <button
             onClick={() => setShowVersions((v) => !v)}
             disabled={!project.versions.length}
-            className="text-sm rounded-lg px-3 py-1.5 hover:bg-ink-800 disabled:opacity-30"
+            className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-white/65 hover:text-white hover:bg-white/5 disabled:opacity-30"
+            title="Version history"
           >
-            🕘 النسخ ({project.versions.length})
+            <IconHistory size={16} /> <span className="hidden md:inline">History</span>
+            <span className="rounded-md bg-white/10 px-1.5 text-[11px]">{project.versions.length}</span>
           </button>
           {showVersions && (
-            <div className="absolute left-0 top-10 z-20 w-72 panel rounded-xl p-2 max-h-80 overflow-auto scroll-thin shadow-2xl">
+            <div className="absolute right-0 top-11 z-30 w-80 glass rounded-2xl p-1.5 max-h-96 overflow-auto scroll-thin shadow-2xl animate-fade-up">
+              <div className="px-3 py-2 text-xs font-medium uppercase tracking-wider text-white/40">Version history</div>
               {[...project.versions].reverse().map((v, i) => (
                 <button
                   key={v.id}
@@ -372,35 +409,74 @@ export function Workspace() {
                     update((p) => ({
                       ...p,
                       files: v.files,
-                      versions: [...p.versions, { id: uid(), at: Date.now(), label: `استعادة: ${v.label}`, files: v.files }],
+                      versions: [...p.versions, { id: uid(), at: Date.now(), label: `Restored: ${v.label}`, files: v.files }],
                     }));
                     setShowVersions(false);
                     setPage("index.html");
                   }}
-                  className="w-full text-right rounded-lg px-3 py-2 hover:bg-ink-700"
+                  className="w-full text-left rounded-xl px-3 py-2.5 hover:bg-white/5 flex gap-3"
                 >
-                  <div className="text-sm truncate">{i === 0 ? "● " : ""}{v.label}</div>
-                  <div className="text-xs text-white/40">{new Date(v.at).toLocaleString("ar")}</div>
+                  <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${i === 0 ? "bg-emerald-400" : "bg-white/20"}`} />
+                  <span className="min-w-0">
+                    <span className="block text-sm truncate">{v.label}</span>
+                    <span className="block text-xs text-white/40">
+                      {i === 0 ? "Current · " : ""}
+                      {new Date(v.at).toLocaleString("en", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+                    </span>
+                  </span>
                 </button>
               ))}
             </div>
           )}
         </div>
-        <button onClick={downloadZip} disabled={!hasFiles || busy} className="text-sm rounded-lg px-3 py-1.5 hover:bg-ink-800 disabled:opacity-30">
-          ⬇️ تحميل ZIP
+        <button
+          onClick={downloadZip}
+          disabled={!hasFiles || busy}
+          className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm text-white/65 hover:text-white hover:bg-white/5 disabled:opacity-30"
+          title="Download ZIP"
+        >
+          <IconDownload size={16} /> <span className="hidden md:inline">Export</span>
+        </button>
+        <button
+          onClick={() => router.push("/")}
+          className="grid h-8 w-8 place-items-center rounded-lg text-white/65 hover:text-white hover:bg-white/5"
+          title="New project"
+          aria-label="New project"
+        >
+          <IconPlus size={17} />
         </button>
         <button
           onClick={() => setShowPublish(true)}
           disabled={!project.files["index.html"] || busy}
-          className="text-sm rounded-lg btn-primary px-4 py-1.5 font-semibold disabled:opacity-30"
+          className="btn-primary flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold disabled:opacity-30 disabled:shadow-none"
         >
-          🚀 {project.publishedSlug ? "منشور" : "نشر"}
+          {project.publishedSlug ? (
+            <>
+              <span className="h-1.5 w-1.5 rounded-full bg-white shadow-[0_0_8px_#fff]" /> Live
+            </>
+          ) : (
+            <>
+              <IconRocket size={15} /> Publish
+            </>
+          )}
         </button>
-        <button onClick={() => router.push("/")} className="text-sm rounded-lg px-3 py-1.5 hover:bg-ink-800" title="مشروع جديد">
-          + جديد
-        </button>
-        <UserMenu compact />
+        <div className="ml-1">
+          <UserMenu compact />
+        </div>
       </header>
+
+      {/* phone-sized screens: switch between chat and preview */}
+      <div className="md:hidden flex border-b hairline">
+        {(["chat", "preview"] as const).map((v) => (
+          <button
+            key={v}
+            onClick={() => setMobileView(v)}
+            className={`flex-1 py-2.5 text-sm ${mobileView === v ? "text-white border-b-2 border-brand-400" : "text-white/45"}`}
+          >
+            {v === "chat" ? "Chat" : "Preview"}
+          </button>
+        ))}
+      </div>
 
       {showPublish && (
         <PublishDialog
@@ -420,60 +496,92 @@ export function Workspace() {
           onSend={(t, images) => send(t, { images })}
           onStop={() => abortRef.current?.abort()}
           live={live}
+          className={mobileView === "chat" ? "flex" : "hidden md:flex"}
         />
 
-        {/* preview / code */}
-        <section className="flex-1 flex flex-col min-w-0">
-          <div className="flex items-center gap-2 border-b border-ink-700 px-3 h-12 shrink-0">
-            <div className="flex rounded-lg bg-ink-800 p-0.5 text-sm">
+        {/* ---------------- preview / code ---------------- */}
+        <section className={`flex-1 flex-col min-w-0 ${mobileView === "preview" ? "flex" : "hidden md:flex"}`}>
+          <div className="flex items-center gap-2 border-b hairline px-3 h-12 shrink-0">
+            <div className="flex rounded-lg bg-white/5 p-0.5 text-sm">
               {(["preview", "code"] as const).map((t) => (
-                <button key={t} onClick={() => setTab(t)} className={`rounded-md px-3 py-1 ${tab === t ? "bg-ink-600" : "text-white/60"}`}>
-                  {t === "preview" ? "👁️ معاينة" : "</> الكود"}
+                <button
+                  key={t}
+                  onClick={() => setTab(t)}
+                  className={`flex items-center gap-1.5 rounded-md px-3 py-1 transition ${tab === t ? "bg-white/10 text-white" : "text-white/50 hover:text-white/80"}`}
+                >
+                  {t === "preview" ? <IconEye size={15} /> : <IconCode size={15} />}
+                  {t === "preview" ? "Preview" : "Code"}
                 </button>
               ))}
             </div>
+
             {tab === "preview" && (
               <>
-                <div className="flex rounded-lg bg-ink-800 p-0.5 text-sm">
-                  {(["desktop", "tablet", "mobile"] as const).map((d) => (
+                {/* fake address bar with page switcher */}
+                <div className="mx-auto hidden sm:flex min-w-0 max-w-md flex-1 items-center gap-2 rounded-lg bg-white/5 px-3 py-1.5 text-xs text-white/45">
+                  <IconGlobe size={13} className="shrink-0" />
+                  <span className="truncate">{project.publishedSlug ? `/s/${project.publishedSlug}/` : "preview"}</span>
+                  <span className="text-white/20">/</span>
+                  {pageCount > 1 ? (
+                    <select
+                      value={page}
+                      onChange={(e) => setPage(e.target.value)}
+                      className="min-w-0 bg-transparent text-white/80 outline-none"
+                      aria-label="Page"
+                    >
+                      {pages.map((p) => (
+                        <option key={p} value={p} className="bg-ink-800">
+                          {p}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <span className="text-white/80">{page}</span>
+                  )}
+                </div>
+                <div className="ml-auto sm:ml-0 hidden md:flex rounded-lg bg-white/5 p-0.5">
+                  {(
+                    [
+                      ["desktop", IconMonitor, "Desktop"],
+                      ["tablet", IconTablet, "Tablet"],
+                      ["mobile", IconPhone, "Phone"],
+                    ] as const
+                  ).map(([d, Icon, label]) => (
                     <button
                       key={d}
                       onClick={() => setDevice(d)}
-                      title={d}
-                      className={`rounded-md px-2.5 py-1 ${device === d ? "bg-ink-600" : "text-white/60"}`}
+                      title={label}
+                      aria-label={label}
+                      className={`rounded-md px-2 py-1 transition ${device === d ? "bg-white/10 text-white" : "text-white/45 hover:text-white/80"}`}
                     >
-                      {d === "desktop" ? "🖥️" : d === "tablet" ? "📱" : "📲"}
+                      <Icon size={15} />
                     </button>
                   ))}
                 </div>
-                {pages.length > 1 && (
-                  <select
-                    value={page}
-                    onChange={(e) => setPage(e.target.value)}
-                    className="bg-ink-800 rounded-lg px-2 py-1 text-sm outline-none"
-                    aria-label="الصفحة"
-                  >
-                    {pages.map((p) => (
-                      <option key={p} value={p}>{p}</option>
-                    ))}
-                  </select>
-                )}
-                <div className="flex-1" />
-                <button onClick={openNewTab} disabled={!hasFiles} className="text-sm rounded-lg px-3 py-1 hover:bg-ink-800 disabled:opacity-30">
-                  ↗ فتح في نافذة
+                <button
+                  onClick={openNewTab}
+                  disabled={!hasFiles}
+                  className="grid h-8 w-8 place-items-center rounded-lg text-white/50 hover:text-white hover:bg-white/5 disabled:opacity-30"
+                  title="Open preview in a new tab"
+                  aria-label="Open preview in a new tab"
+                >
+                  <IconExternal size={15} />
                 </button>
               </>
             )}
           </div>
 
           {errors.length > 0 && !busy && (
-            <div className="flex items-center gap-3 bg-red-500/10 border-b border-red-500/30 px-4 py-2 text-sm">
-              <span className="text-red-300 truncate flex-1">⚠️ {errors.length} خطأ في المعاينة: {errors[0]}</span>
+            <div className="flex items-center gap-3 border-b border-rose-500/20 bg-rose-500/[0.08] px-4 py-2 text-sm">
+              <IconAlert size={16} className="shrink-0 text-rose-300" />
+              <span className="truncate flex-1 text-rose-200/90">
+                {errors.length} error{errors.length > 1 ? "s" : ""} in the preview: <span className="font-mono text-xs">{errors[0]}</span>
+              </span>
               <button
-                onClick={() => send(`أصلح هذه الأخطاء التي ظهرت في صفحة «${page}»:\n- ${errors.join("\n- ")}`, { isFix: true })}
-                className="rounded-lg bg-red-500/20 px-3 py-1 hover:bg-red-500/30 shrink-0"
+                onClick={() => send(`Fix these errors that appeared on “${page}”:\n- ${errors.join("\n- ")}`, { isFix: true })}
+                className="flex shrink-0 items-center gap-1.5 rounded-full bg-rose-500/20 px-3 py-1 text-xs font-medium text-rose-100 hover:bg-rose-500/30"
               >
-                🩺 أصلحها
+                <IconWand size={13} /> Fix it
               </button>
             </div>
           )}
@@ -481,14 +589,21 @@ export function Workspace() {
           <div className="flex-1 min-h-0 relative">
             {tab === "preview" ? (
               hasFiles ? (
-                <div className="h-full overflow-auto bg-ink-900 grid justify-items-center">
+                <div className={`h-full overflow-auto flex justify-center ${device === "desktop" ? "bg-ink-900" : "bg-ink-950"}`}>
                   <iframe
                     key={page}
-                    title="معاينة"
+                    title="Preview"
                     srcDoc={previewDoc}
                     sandbox="allow-scripts allow-forms allow-modals allow-popups"
-                    style={{ width: WIDTH[device] }}
-                    className={`h-full bg-white transition-all ${device !== "desktop" ? "my-4 rounded-2xl border-8 border-ink-700 shadow-2xl" : ""}`}
+                    style={{
+                      width: WIDTH[device],
+                      maxWidth: "100%",
+                      height: device === "desktop" ? "100%" : "calc(100% - 40px)",
+                      marginTop: device === "desktop" ? 0 : 20,
+                    }}
+                    className={`shrink-0 bg-white transition-[width] duration-300 ${
+                      device !== "desktop" ? "rounded-[28px] border-[10px] border-ink-600 shadow-[0_30px_80px_-20px_#000]" : ""
+                    }`}
                   />
                 </div>
               ) : (
@@ -503,9 +618,9 @@ export function Workspace() {
                 onChange={(path, content) => update((p) => ({ ...p, files: { ...p.files, [path]: content } }))}
               />
             )}
-            {busy && live?.writing && tab === "preview" && (
-              <div className="absolute bottom-4 left-4 panel rounded-xl px-4 py-2 text-sm shadow-xl">
-                ✍️ يكتب <span className="font-mono text-brand-300">{live.writing}</span>
+            {busy && live?.writing && tab === "preview" && hasFiles && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 glass rounded-full px-4 py-2 text-sm shadow-xl flex items-center gap-2 animate-fade-up">
+                <IconLoader size={14} className="text-brand-300" /> Writing <span className="font-mono text-brand-200">{live.writing}</span>
               </div>
             )}
           </div>
@@ -517,23 +632,36 @@ export function Workspace() {
 
 function EmptyPreview({ busy, writing }: { busy: boolean; writing: string | null }) {
   return (
-    <div className="h-full grid place-items-center glow-bg">
-      <div className="text-center">
+    <div className="relative h-full grid place-items-center overflow-hidden">
+      <div className="absolute inset-0 aurora opacity-60" />
+      <div className="absolute inset-0 grid-bg" />
+      <div className="relative text-center">
         {busy ? (
           <>
-            <div className="mx-auto mb-5 h-14 w-14 rounded-2xl btn-primary grid place-items-center text-2xl animate-pulse">ب</div>
-            <p className="text-white/70">بنّاء يصمّم مشروعك…</p>
-            {writing && <p className="mt-2 font-mono text-sm text-brand-300">{writing}</p>}
-            <div className="mt-6 space-y-2 w-72 mx-auto">
-              {[0, 1, 2].map((i) => (
-                <div key={i} className="h-3 rounded shimmer" style={{ width: `${90 - i * 20}%` }} />
+            <div className="mx-auto mb-6 w-fit animate-float"><LogoMark size={56} /></div>
+            <p className="text-lg font-medium">Building your project…</p>
+            <p className="mt-1 text-sm text-white/45">
+              {writing ? (
+                <>
+                  Writing <span className="font-mono text-brand-200">{writing}</span>
+                </>
+              ) : (
+                "Planning the structure and design"
+              )}
+            </p>
+            <div className="mt-8 space-y-2.5 w-80 mx-auto">
+              {[100, 80, 60].map((w) => (
+                <div key={w} className="h-2.5 rounded-full shimmer mx-auto" style={{ width: `${w}%` }} />
               ))}
             </div>
           </>
         ) : (
           <>
-            <div className="text-5xl mb-4">🧱</div>
-            <p className="text-white/60">صِف ما تريد بناءه في المحادثة وستظهر المعاينة هنا</p>
+            <div className="mx-auto mb-5 grid h-14 w-14 place-items-center rounded-2xl border hairline bg-white/5 text-brand-300">
+              <IconSparkles size={26} />
+            </div>
+            <p className="text-lg font-medium">Your preview will appear here</p>
+            <p className="mt-1 text-sm text-white/45">Describe what you want in the chat to get started.</p>
           </>
         )}
       </div>
@@ -544,17 +672,26 @@ function EmptyPreview({ busy, writing }: { busy: boolean; writing: string | null
 function SaveBadge({ loggedIn, state, error }: { loggedIn: boolean; state: string; error: string }) {
   if (!loggedIn) {
     return (
-      <a href="/login" className="hidden lg:inline text-xs text-white/40 hover:text-white" title="المشروع محفوظ في هذا المتصفح فقط">
-        💾 محفوظ في المتصفح — سجّل الدخول للحفظ السحابي
+      <a href="/login" className="hidden lg:inline text-xs text-white/35 hover:text-white" title="This project is only saved in this browser">
+        Saved locally · Log in to sync
       </a>
     );
   }
-  const map: Record<string, [string, string]> = {
-    idle: ["☁️ محفوظ", "text-white/40"],
-    saved: ["☁️ محفوظ", "text-white/40"],
-    saving: ["⏳ جارٍ الحفظ…", "text-white/50"],
-    error: [`⚠️ ${error || "تعذّر الحفظ"}`, "text-red-300"],
-  };
-  const [label, cls] = map[state] ?? map.idle;
-  return <span className={`hidden md:inline text-xs ${cls}`}>{label}</span>;
+  if (state === "saving")
+    return (
+      <span className="hidden md:inline-flex items-center gap-1.5 text-xs text-white/45">
+        <IconLoader size={12} /> Saving…
+      </span>
+    );
+  if (state === "error")
+    return (
+      <span className="hidden md:inline-flex items-center gap-1.5 text-xs text-rose-300" title={error}>
+        <IconAlert size={13} /> {error || "Couldn't save"}
+      </span>
+    );
+  return (
+    <span className="hidden md:inline-flex items-center gap-1.5 text-xs text-white/40">
+      <IconCloud size={13} /> Saved
+    </span>
+  );
 }

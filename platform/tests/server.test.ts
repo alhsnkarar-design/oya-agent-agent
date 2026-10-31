@@ -17,15 +17,15 @@ test("project ids", () => {
 });
 
 test("project body validation", () => {
-  const ok = parseProjectBody({ name: " موقعي ", files: { "index.html": "<h1>" }, assets: { "assets/a.png": PNG }, versions: Array(30).fill({}) });
+  const ok = parseProjectBody({ name: " My site ", files: { "index.html": "<h1>" }, assets: { "assets/a.png": PNG }, versions: Array(30).fill({}) });
   assert.ok(typeof ok !== "string");
   if (typeof ok !== "string") {
-    assert.equal(ok.name, "موقعي");
+    assert.equal(ok.name, "My site");
     assert.equal(ok.data.versions.length, 10);
   }
-  assert.match(parseProjectBody({ files: { a: 1 } }) as string, /غير صالحة/);
-  assert.match(parseProjectBody({ files: {}, assets: { "x.png": PNG } }) as string, /أصل غير صالح/);
-  assert.match(parseProjectBody({ files: {}, assets: { "assets/x.html": "data:text/html;base64,PHNjcmlwdD4=" } }) as string, /أصل غير صالح/);
+  assert.match(parseProjectBody({ files: { a: 1 } }) as string, /Invalid files/);
+  assert.match(parseProjectBody({ files: {}, assets: { "x.png": PNG } }) as string, /Invalid asset/);
+  assert.match(parseProjectBody({ files: {}, assets: { "assets/x.html": "data:text/html;base64,PHNjcmlwdD4=" } }) as string, /Invalid asset/);
   assert.match(parseProjectBody({ files: { "a.html": "x".repeat(6_100_000) } }) as string, /6MB/);
 });
 

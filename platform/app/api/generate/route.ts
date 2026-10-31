@@ -21,18 +21,18 @@ export async function GET() {
 export async function POST(req: Request) {
   const code = process.env.BANNAA_ACCESS_CODE;
   if (code && req.headers.get("x-access-code") !== code) {
-    return Response.json({ error: "رمز الدخول غير صحيح" }, { status: 401 });
+    return Response.json({ error: "Invalid access code" }, { status: 401 });
   }
 
   const user = await currentUser();
   if (process.env.REQUIRE_LOGIN === "true" && !user) {
-    return Response.json({ error: "سجّل الدخول لاستخدام المنصة", needLogin: true }, { status: 401 });
+    return Response.json({ error: "Log in to start building", needLogin: true }, { status: 401 });
   }
   const limit = Number(process.env.DAILY_LIMIT || 0);
   if (user && limit > 0) {
     const used = await (await getDb()).incrementUsage(user.id, new Date().toISOString().slice(0, 10));
     if (used > limit) {
-      return Response.json({ error: `وصلت إلى الحد اليومي (${limit} طلب). يتجدد الرصيد غداً.` }, { status: 429 });
+      return Response.json({ error: `You've reached today's limit of ${limit} generations. It resets tomorrow.` }, { status: 429 });
     }
   }
 
@@ -40,16 +40,16 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return Response.json({ error: "طلب غير صالح" }, { status: 400 });
+    return Response.json({ error: "Invalid request" }, { status: 400 });
   }
   const prompt = (body.prompt ?? "").trim();
-  if (!prompt) return Response.json({ error: "اكتب وصفاً لما تريد بناءه" }, { status: 400 });
-  if (prompt.length > MAX_PROMPT) return Response.json({ error: "الوصف طويل جداً" }, { status: 413 });
+  if (!prompt) return Response.json({ error: "Describe what you want to build" }, { status: 400 });
+  if (prompt.length > MAX_PROMPT) return Response.json({ error: "That description is too long" }, { status: 413 });
 
   const files: FileMap = {};
   for (const [k, v] of Object.entries(body.files ?? {})) if (typeof v === "string") files[k] = v;
   if (JSON.stringify(files).length > MAX_FILES_BYTES) {
-    return Response.json({ error: "حجم المشروع أكبر من الحد المسموح" }, { status: 413 });
+    return Response.json({ error: "The project is larger than the allowed size" }, { status: 413 });
   }
   const history = (body.history ?? []).filter((t) => t && (t.role === "user" || t.role === "assistant"));
   const isEdit = Object.keys(files).length > 0;

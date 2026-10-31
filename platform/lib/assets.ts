@@ -36,7 +36,7 @@ function readAsDataUrl(file: File): Promise<string> {
 
 const EXT: Record<string, string> = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/gif": "gif", "image/svg+xml": "svg" };
 
-/** "شعار الشركة.png" -> "assets/image-1.png" style unique, URL-safe paths. */
+/** "Company Logo.png" -> "assets/image-1.png" style unique, URL-safe paths. */
 export function assetPath(img: PendingImage, taken: Record<string, string>): string {
   const mime = img.dataUrl.slice(5, img.dataUrl.indexOf(";"));
   const ext = EXT[mime] ?? "png";

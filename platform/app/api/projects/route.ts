@@ -6,6 +6,6 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   const user = await currentUser();
-  if (!user) return jsonError("سجّل الدخول أولاً", 401);
+  if (!user) return jsonError("Please log in first", 401);
   return Response.json({ projects: await (await getDb()).listProjects(user.id) });
 }

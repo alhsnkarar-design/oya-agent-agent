@@ -59,7 +59,7 @@ export function serveSite(req: Request, site: Site | null, rel: string): Respons
   const found = site ? lookup(site, rel) : null;
   if (!found) {
     return new Response(
-      `<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><title>غير موجود</title><body style="font-family:system-ui;display:grid;place-items:center;height:100vh;margin:0;background:#0f0d1a;color:#ece9ff"><div style="text-align:center"><div style="font-size:64px">🧱</div><h1>الصفحة غير موجودة</h1><p style="opacity:.6">صُنعت المواقع على منصة بنّاء</p></div></body></html>`,
+      `<!doctype html><html lang="en"><meta charset="utf-8"><title>Not found</title><body style="font-family:system-ui;display:grid;place-items:center;height:100vh;margin:0;background:#0f0d1a;color:#ece9ff"><div style="text-align:center"><div style="font-size:64px">🧱</div><h1>Page not found</h1><p style="opacity:.6">This site may have been unpublished. Built with Bannaa.</p></div></body></html>`,
       { status: 404, headers: { ...headers, "Content-Type": MIME.html } },
     );
   }

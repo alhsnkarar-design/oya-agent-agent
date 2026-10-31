@@ -52,7 +52,7 @@ function inlineAssets(doc: string, assets: Record<string, string>): string {
 export function buildPreview(files: FileMap, page = "index.html", assets: Record<string, string> = {}): string {
   const html = files[page] ?? files["index.html"];
   if (html == null) {
-    return `<!doctype html><html dir="rtl"><body style="font-family:system-ui;display:grid;place-items:center;height:100vh;color:#64748b">لا توجد صفحة لعرضها بعد</body></html>`;
+    return `<!doctype html><html><body style="font-family:system-ui;display:grid;place-items:center;height:100vh;color:#64748b">Nothing to preview yet</body></html>`;
   }
   let doc = html.replace(/<link\b[^>]*\bhref=["']([^"']+\.css)["'][^>]*>/gi, (tag, href: string) => {
     const p = resolve(page, href);

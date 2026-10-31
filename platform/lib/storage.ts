@@ -80,12 +80,17 @@ export function deleteProject(id: string) {
   writeAll(all);
 }
 
-export function newProject(name = "مشروع جديد"): Project {
+export function newProject(name = "Untitled project"): Project {
   const now = Date.now();
   return { id: uid(), name, createdAt: now, updatedAt: now, files: {}, assets: {}, messages: [], versions: [] };
 }
 
 export function projectNameFrom(prompt: string): string {
-  const words = prompt.replace(/[^\p{L}\p{N}\s]/gu, " ").trim().split(/\s+/).slice(0, 5).join(" ");
-  return words || "مشروع جديد";
+  const core = prompt
+    .replace(/^build an? [^:]{1,30}:\s*/i, "") // "Build a website: …" prefix added by the home page
+    .replace(/^(an?|the)\s+/i, "")
+    .split(/[.,:;\n—–-]/)[0];
+  const words = core.replace(/[^\p{L}\p{N}\s&']/gu, " ").trim().split(/\s+/).slice(0, 6).join(" ");
+  if (!words) return "Untitled project";
+  return words.charAt(0).toUpperCase() + words.slice(1);
 }

@@ -183,8 +183,8 @@ export async function streamGeneration(opts: {
     if (provider === "openai-compatible") return await streamCompat(opts.system, opts.user, opts.images ?? [], opts.onText, opts.signal);
     return await streamDemo(opts.isEdit, opts.onText, opts.signal);
   } catch (e) {
-    if (e instanceof Anthropic.RateLimitError) return { stop: "error", error: "تم تجاوز حد الطلبات، حاول بعد قليل" };
-    if (e instanceof Anthropic.AuthenticationError) return { stop: "error", error: "مفتاح ANTHROPIC_API_KEY غير صالح" };
+    if (e instanceof Anthropic.RateLimitError) return { stop: "error", error: "Rate limit reached — please try again in a moment" };
+    if (e instanceof Anthropic.AuthenticationError) return { stop: "error", error: "ANTHROPIC_API_KEY is invalid" };
     if (e instanceof Anthropic.APIError) return { stop: "error", error: `${e.status ?? ""} ${e.message}`.trim() };
     if (opts.signal.aborted) return { stop: "aborted" };
     return { stop: "error", error: e instanceof Error ? e.message : String(e) };

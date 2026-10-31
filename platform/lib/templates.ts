@@ -1,75 +1,84 @@
 export interface Template {
   id: string;
   title: string;
-  emoji: string;
-  category: string;
+  category: "Website" | "Web app" | "Store" | "Landing page" | "Portfolio";
+  blurb: string;
+  /** two colors used for the template's card artwork */
+  colors: [string, string];
   prompt: string;
 }
 
-/** Starting points tailored to the Arabic-speaking market. */
 export const TEMPLATES: Template[] = [
   {
-    id: "restaurant",
-    title: "موقع مطعم",
-    emoji: "🍽️",
-    category: "أعمال",
+    id: "saas",
+    title: "SaaS landing page",
+    category: "Landing page",
+    blurb: "Hero, features, pricing toggle, FAQ",
+    colors: ["#7c3aed", "#06b6d4"],
     prompt:
-      "موقع لمطعم مأكولات شامية فاخر باسم «ياسمين الشام»: صفحة رئيسية بصورة كبيرة، قائمة طعام بتبويبات (مقبلات، مشاوي، حلويات) مع الأسعار بالريال، نموذج حجز طاولة بالتاريخ والوقت وعدد الأشخاص، آراء العملاء، موقعنا وساعات العمل، وزر واتساب عائم. ألوان ذهبية مع أخضر زيتوني داكن.",
+      "A landing page for 'Ledgerly', a cloud accounting app for small businesses: bold hero with a free-trial CTA and a product screenshot mockup, logo cloud, feature grid with icons, an animated stats band, pricing with a monthly/yearly toggle (3 tiers), testimonials carousel, FAQ accordion and a newsletter signup. Dark, modern, violet-to-cyan gradients.",
+  },
+  {
+    id: "restaurant",
+    title: "Restaurant",
+    category: "Website",
+    blurb: "Menu tabs, table booking, reviews",
+    colors: ["#b45309", "#14532d"],
+    prompt:
+      "A website for 'Olive & Ember', a Mediterranean restaurant: full-bleed hero, menu with tabs (starters, grill, desserts) and prices, a table reservation form with date, time and party size plus validation, chef's story, reviews, opening hours with a map, and a floating WhatsApp button. Warm palette of olive green, cream and gold.",
   },
   {
     id: "store",
-    title: "متجر إلكتروني",
-    emoji: "🛍️",
-    category: "تجارة",
+    title: "Online store",
+    category: "Store",
+    blurb: "Product grid, filters, working cart",
+    colors: ["#111827", "#d4a373"],
     prompt:
-      "متجر إلكتروني لعطور وبخور عربية باسم «دار العود»: عرض المنتجات بالبطاقات مع فلترة حسب الفئة والسعر، صفحة تفاصيل منتج، سلة مشتريات تعمل فعلياً وتحفظ في المتصفح، صفحة إتمام الطلب بنموذج الشحن، وكوبون خصم. تصميم فخم أسود وذهبي.",
+      "An e-commerce store for 'Oud House', a luxury fragrance brand: product cards with category and price filters, a product detail page, a fully working cart saved in the browser, a checkout page with a shipping form and coupon code, and a luxurious black-and-gold design.",
   },
   {
-    id: "clinic",
-    title: "حجز مواعيد عيادة",
-    emoji: "🩺",
-    category: "تطبيق",
+    id: "booking",
+    title: "Clinic booking app",
+    category: "Web app",
+    blurb: "Pick doctor, slot, manage bookings",
+    colors: ["#0ea5e9", "#22c55e"],
     prompt:
-      "تطبيق ويب لحجز مواعيد عيادة أسنان: صفحة تعريفية بالأطباء والخدمات، صفحة حجز تختار فيها الطبيب والخدمة واليوم والوقت المتاح، صفحة «مواعيدي» لعرض وإلغاء الحجوزات (تحفظ في المتصفح)، ولوحة إدارة بسيطة تعرض كل الحجوزات مع بحث وتصفية. ألوان أزرق سماوي وأبيض.",
+      "A web app for a dental clinic: doctors and services pages, a booking flow where you choose doctor, service, day and an available time slot, a 'My appointments' page to view and cancel bookings (saved in the browser), and a simple admin dashboard listing all bookings with search and filters. Clean sky-blue and white UI.",
+  },
+  {
+    id: "kanban",
+    title: "Task manager",
+    category: "Web app",
+    blurb: "Kanban board, drag & drop, stats",
+    colors: ["#f43f5e", "#f59e0b"],
+    prompt:
+      "A Kanban task manager: To do / In progress / Done columns with drag and drop, add and edit tasks with title, description, priority and due date, search and priority filters, a progress chart, dark/light mode, and everything persisted in the browser.",
   },
   {
     id: "portfolio",
-    title: "ملف أعمال شخصي",
-    emoji: "🎨",
-    category: "شخصي",
+    title: "Designer portfolio",
+    category: "Portfolio",
+    blurb: "Filterable gallery, lightbox, timeline",
+    colors: ["#e11d48", "#7c3aed"],
     prompt:
-      "موقع ملف أعمال لمصمم جرافيك: قسم تعريفي جذاب، معرض أعمال بفلترة حسب النوع مع نافذة عرض مكبّرة، المهارات بأشرطة تقدم متحركة، الخبرات بخط زمني، ونموذج تواصل. وضع داكن/فاتح قابل للتبديل.",
-  },
-  {
-    id: "quran-center",
-    title: "مركز تحفيظ قرآن",
-    emoji: "📖",
-    category: "تعليم",
-    prompt:
-      "موقع لمركز تحفيظ القرآن الكريم: الحلقات والمستويات والمعلمين، جدول الحلقات الأسبوعي، نموذج تسجيل طالب جديد، متابعة حفظ الطالب (السور المحفوظة ونسبة الإنجاز) تحفظ في المتصفح، والأخبار والإعلانات. تصميم هادئ بالأخضر والكريمي مع زخارف إسلامية خفيفة.",
-  },
-  {
-    id: "saas",
-    title: "صفحة هبوط لمنتج تقني",
-    emoji: "🚀",
-    category: "تسويق",
-    prompt:
-      "صفحة هبوط لتطبيق محاسبة سحابي للمشاريع الصغيرة باسم «دفتر»: عنوان قوي ودعوة للتجربة المجانية، المزايا بأيقونات، لقطات شاشة، خطط الأسعار شهري/سنوي بزر تبديل، الأسئلة الشائعة بأكورديون، شعارات العملاء، ونموذج اشتراك في النشرة. ألوان بنفسجي وأزرق متدرج.",
-  },
-  {
-    id: "tasks",
-    title: "تطبيق إدارة مهام",
-    emoji: "✅",
-    category: "تطبيق",
-    prompt:
-      "تطبيق إدارة مهام بنمط لوحة كانبان (للتنفيذ، قيد العمل، منجز) مع السحب والإفلات، إضافة مهمة بعنوان ووصف وأولوية وتاريخ استحقاق، بحث وتصفية، إحصائيات الإنجاز برسم بياني بسيط، وحفظ كل شيء في المتصفح.",
+      "A portfolio for a product designer: striking intro with a big editorial headline, filterable project gallery with a lightbox, case-study page, animated skills, experience timeline, and a contact form. Editorial typography, generous whitespace, subtle scroll animations.",
   },
   {
     id: "event",
-    title: "دعوة مناسبة / فعالية",
-    emoji: "🎉",
-    category: "مناسبات",
+    title: "Event & RSVP",
+    category: "Website",
+    blurb: "Countdown, schedule, RSVP form",
+    colors: ["#db2777", "#fbbf24"],
     prompt:
-      "صفحة دعوة لحفل زفاف أنيقة: أسماء العروسين، عدّاد تنازلي للموعد، تفاصيل المكان مع خريطة، برنامج الحفل، نموذج تأكيد الحضور (RSVP) مع عدد المرافقين، ومعرض صور. ألوان وردي هادئ وذهبي.",
+      "An elegant event page for a tech conference 'Build Summit 2026': countdown timer, speakers grid with bios in modals, a schedule with day tabs, venue with map, ticket tiers, and an RSVP form with guest count and confirmation message.",
+  },
+  {
+    id: "dashboard",
+    title: "Analytics dashboard",
+    category: "Web app",
+    blurb: "KPIs, charts, tables, filters",
+    colors: ["#2563eb", "#9333ea"],
+    prompt:
+      "A sales analytics dashboard: sidebar navigation, KPI cards with trends, line and bar charts drawn with SVG, a sortable and searchable orders table with pagination, date-range filter, and a dark theme with crisp data visualization.",
   },
 ];

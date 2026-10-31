@@ -14,19 +14,19 @@ const isStrMap = (v: unknown): v is Record<string, string> =>
 
 /** Validate a project document coming from the browser. Returns an error message or the clean data. */
 export function parseProjectBody(body: unknown): { name: string; data: ProjectData } | string {
-  if (!body || typeof body !== "object") return "طلب غير صالح";
+  if (!body || typeof body !== "object") return "Invalid request";
   const b = body as Record<string, unknown>;
-  const name = String(b.name ?? "").trim().slice(0, 120) || "مشروع";
+  const name = String(b.name ?? "").trim().slice(0, 120) || "Untitled project";
   const files = b.files ?? {};
   const assets = b.assets ?? {};
-  if (!isStrMap(files) || !isStrMap(assets)) return "ملفات غير صالحة";
+  if (!isStrMap(files) || !isStrMap(assets)) return "Invalid files";
   for (const [p, v] of Object.entries(assets)) {
-    if (!p.startsWith("assets/") || !/^data:image\/(png|jpe?g|webp|gif|svg\+xml);base64,/.test(v)) return `أصل غير صالح: ${p}`;
-    if (v.length > MAX_ASSET_BYTES * 1.4) return `الصورة كبيرة جداً: ${p}`;
+    if (!p.startsWith("assets/") || !/^data:image\/(png|jpe?g|webp|gif|svg\+xml);base64,/.test(v)) return `Invalid asset: ${p}`;
+    if (v.length > MAX_ASSET_BYTES * 1.4) return `Image is too large: ${p}`;
   }
   const messages = Array.isArray(b.messages) ? b.messages.slice(-200) : [];
   const versions = Array.isArray(b.versions) ? b.versions.slice(-10) : [];
   const data: ProjectData = { files, assets, messages, versions };
-  if (JSON.stringify(data).length > MAX_PROJECT_BYTES) return "حجم المشروع أكبر من الحد المسموح (6MB)";
+  if (JSON.stringify(data).length > MAX_PROJECT_BYTES) return "The project is larger than the 6MB limit";
   return { name, data };
 }

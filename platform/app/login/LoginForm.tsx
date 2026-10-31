@@ -2,6 +2,7 @@
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { auth, fetchMe, importLocalProjects } from "@/lib/cloud";
+import { IconLoader } from "@/components/icons";
 
 export function LoginForm() {
   const params = useSearchParams();
@@ -28,70 +29,79 @@ export function LoginForm() {
       await importLocalProjects();
       window.location.href = next;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "حدث خطأ");
+      setError(err instanceof Error ? err.message : "Something went wrong");
       setBusy(false);
     }
   };
 
-  const input = "w-full rounded-xl bg-ink-800 border border-ink-600 px-4 py-3 outline-none focus:border-brand-500";
+  const input =
+    "mt-1.5 w-full rounded-xl bg-ink-950 border border-white/10 px-4 py-3 text-[15px] outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-500/15";
 
   return (
-    <div className="panel rounded-3xl p-8 w-full max-w-md shadow-2xl">
-      <div className="flex rounded-xl bg-ink-800 p-1 mb-6 text-sm">
-        {(["login", "register"] as const).map((m) => (
-          <button
-            key={m}
-            type="button"
-            onClick={() => {
-              setMode(m);
-              setError("");
-            }}
-            className={`flex-1 rounded-lg py-2 ${mode === m ? "bg-ink-600 font-semibold" : "text-white/60"}`}
-          >
-            {m === "login" ? "تسجيل الدخول" : "حساب جديد"}
-          </button>
-        ))}
-      </div>
-      <form onSubmit={submit} className="space-y-4">
+    <div className="w-full max-w-sm">
+      <h1 className="text-3xl font-semibold tracking-tight">{mode === "login" ? "Welcome back" : "Create your account"}</h1>
+      <p className="mt-2 text-white/50">
+        {mode === "login" ? "Log in to keep building." : "Start building websites and apps by describing them."}
+      </p>
+
+      <form onSubmit={submit} className="mt-8 space-y-4">
         {mode === "register" && (
-          <label className="block text-sm">
-            الاسم
-            <input value={name} onChange={(e) => setName(e.target.value)} required className={`${input} mt-1`} autoComplete="name" />
+          <label className="block text-sm text-white/70">
+            Name
+            <input value={name} onChange={(e) => setName(e.target.value)} required className={input} autoComplete="name" placeholder="Jane Doe" />
           </label>
         )}
-        <label className="block text-sm">
-          البريد الإلكتروني
+        <label className="block text-sm text-white/70">
+          Email
           <input
             type="email"
-            dir="ltr"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className={`${input} mt-1 text-left`}
+            className={input}
             autoComplete="email"
+            placeholder="you@example.com"
           />
         </label>
-        <label className="block text-sm">
-          كلمة المرور
+        <label className="block text-sm text-white/70">
+          Password
           <input
             type="password"
-            dir="ltr"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={mode === "register" ? 8 : undefined}
-            className={`${input} mt-1 text-left`}
+            className={input}
             autoComplete={mode === "login" ? "current-password" : "new-password"}
+            placeholder={mode === "register" ? "At least 8 characters" : "••••••••"}
           />
-          {mode === "register" && <span className="text-xs text-white/40">8 أحرف على الأقل</span>}
         </label>
-        {error && <p className="text-sm text-red-300 bg-red-500/10 rounded-lg px-3 py-2" role="alert">{error}</p>}
-        <button disabled={busy} className="w-full btn-primary rounded-xl py-3 font-semibold disabled:opacity-50">
-          {busy ? "…" : mode === "login" ? "دخول" : "إنشاء الحساب"}
+        {error && (
+          <p className="text-sm text-rose-200 bg-rose-500/10 border border-rose-500/20 rounded-xl px-3 py-2" role="alert">
+            {error}
+          </p>
+        )}
+        <button disabled={busy} className="w-full btn-primary flex items-center justify-center gap-2 rounded-full py-3 font-semibold disabled:opacity-50">
+          {busy && <IconLoader size={16} />}
+          {mode === "login" ? "Log in" : "Create account"}
         </button>
       </form>
-      <p className="text-xs text-white/40 mt-6 leading-relaxed">
-        مشاريعك المحفوظة في هذا المتصفح ستنتقل تلقائياً إلى حسابك بعد الدخول، لتصل إليها من أي جهاز وتنشرها برابط.
+
+      <p className="mt-6 text-center text-sm text-white/50">
+        {mode === "login" ? "New to Bannaa? " : "Already have an account? "}
+        <button
+          type="button"
+          onClick={() => {
+            setMode(mode === "login" ? "register" : "login");
+            setError("");
+          }}
+          className="font-medium text-white hover:text-brand-300"
+        >
+          {mode === "login" ? "Create an account" : "Log in"}
+        </button>
+      </p>
+      <p className="mt-8 text-xs leading-relaxed text-white/35">
+        Projects you started in this browser move into your account automatically, so you can open them anywhere and publish them.
       </p>
     </div>
   );

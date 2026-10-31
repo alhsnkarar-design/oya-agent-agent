@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import type { FileMap } from "@/lib/parse";
+import { IconFile } from "./icons";
 
-const ICON: Record<string, string> = { html: "🌐", css: "🎨", js: "⚙️", json: "🧾", md: "📝", svg: "🖼️" };
+const DOT: Record<string, string> = { html: "#f97316", css: "#38bdf8", js: "#facc15", json: "#a3e635", md: "#e5e7eb", svg: "#f472b6" };
 
 export function CodePane(props: {
   files: FileMap;
@@ -27,27 +28,29 @@ export function CodePane(props: {
   const isWriting = selected === writing && writing != null;
   const content = selected ? (isWriting ? writingContent : files[selected] ?? "") : "";
 
-  if (!paths.length) return <div className="h-full grid place-items-center text-white/40">لا توجد ملفات بعد</div>;
+  if (!paths.length) return <div className="h-full grid place-items-center text-white/40">No files yet</div>;
 
   return (
-    <div className="h-full flex" dir="ltr">
-      <nav className="w-56 shrink-0 border-r border-ink-700 overflow-y-auto scroll-thin p-2 text-sm">
+    <div className="h-full flex bg-ink-950">
+      <nav className="w-60 shrink-0 border-r hairline overflow-y-auto scroll-thin p-2 text-[13px]">
+        <div className="px-2 pb-2 pt-1 text-[11px] font-medium uppercase tracking-wider text-white/35">Files</div>
         {paths.map((p) => (
           <button
             key={p}
             onClick={() => setSelected(p)}
-            className={`w-full text-left rounded-md px-2 py-1.5 font-mono truncate ${
-              selected === p ? "bg-ink-700 text-white" : "text-white/60 hover:bg-ink-800"
+            className={`flex w-full items-center gap-2 text-left rounded-lg px-2 py-1.5 font-mono truncate transition ${
+              selected === p ? "bg-white/10 text-white" : "text-white/55 hover:bg-white/5 hover:text-white/80"
             }`}
           >
-            {ICON[p.split(".").pop() ?? ""] ?? "📄"} {p}
-            {p === writing && <span className="ml-1 text-brand-300 animate-pulse">●</span>}
+            <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: DOT[p.split(".").pop() ?? ""] ?? "#9ca3af" }} />
+            <span className="truncate">{p}</span>
+            {p === writing && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-brand-300 animate-pulse" />}
           </button>
         ))}
       </nav>
       <div className="flex-1 min-w-0 flex flex-col">
-        <div className="px-4 py-2 text-xs text-white/40 border-b border-ink-700 font-mono flex justify-between">
-          <span>{selected}</span>
+        <div className="px-4 h-10 text-xs text-white/45 border-b hairline font-mono flex items-center justify-between">
+          <span className="flex items-center gap-2"><IconFile size={13} /> {selected}</span>
           <span>{content.split("\n").length} lines{readOnly ? "" : " · editable"}</span>
         </div>
         <textarea
@@ -55,8 +58,8 @@ export function CodePane(props: {
           readOnly={readOnly || isWriting}
           onChange={(e) => selected && onChange(selected, e.target.value)}
           spellCheck={false}
-          className="code-area flex-1 w-full resize-none bg-ink-950 text-[13px] leading-6 text-emerald-50/90 p-4 outline-none scroll-thin"
-          aria-label={`محتوى ${selected}`}
+          className="code-area flex-1 w-full resize-none bg-transparent text-[13px] leading-6 text-white/85 p-4 outline-none scroll-thin"
+          aria-label={`Contents of ${selected}`}
         />
       </div>
     </div>

@@ -29,7 +29,7 @@ export function fetchMe(force = false): Promise<Me> {
 async function api<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, { ...init, headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) } });
   const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw Object.assign(new Error(body.error || `خطأ ${res.status}`), { status: res.status });
+  if (!res.ok) throw Object.assign(new Error(body.error || `Error ${res.status}`), { status: res.status });
   return body as T;
 }
 
