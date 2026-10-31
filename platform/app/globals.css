@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans Arabic", "Inter", system-ui, sans-serif;
+  --color-brand-50: #f3f1ff;
+  --color-brand-100: #e9e5ff;
+  --color-brand-300: #b4a6ff;
+  --color-brand-400: #9278ff;
+  --color-brand-500: #7c5cff;
+  --color-brand-600: #6a3ff5;
+  --color-brand-700: #5a2fe0;
+  --color-ink-950: #08070f;
+  --color-ink-900: #0f0d1a;
+  --color-ink-800: #171427;
+  --color-ink-700: #221e37;
+  --color-ink-600: #2f2a4a;
+}
+
+html, body { height: 100%; }
+body { background: var(--color-ink-950); color: #ece9ff; -webkit-font-smoothing: antialiased; }
+
+.glow-bg {
+  background:
+    radial-gradient(60rem 30rem at 85% -10%, #7c5cff33, transparent 60%),
+    radial-gradient(40rem 25rem at 0% 10%, #00d4ff1f, transparent 60%),
+    var(--color-ink-950);
+}
+.text-gradient {
+  background: linear-gradient(90deg, #b4a6ff, #7c5cff 40%, #22d3ee);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.panel { background: color-mix(in oklab, var(--color-ink-900) 92%, transparent); border: 1px solid var(--color-ink-700); }
+.btn-primary {
+  background: linear-gradient(135deg, #7c5cff, #5a2fe0);
+  box-shadow: 0 10px 30px -12px #7c5cffaa, inset 0 1px 0 #ffffff30;
+}
+.btn-primary:hover { filter: brightness(1.1); }
+.scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+.scroll-thin::-webkit-scrollbar-thumb { background: var(--color-ink-600); border-radius: 8px; }
+.code-area { font-family: ui-monospace, "JetBrains Mono", Menlo, monospace; tab-size: 2; }
+@keyframes shimmer { 0% { background-position: -200% 0 } 100% { background-position: 200% 0 } }
+.shimmer { background: linear-gradient(90deg, #ffffff0a, #ffffff22, #ffffff0a); background-size: 200% 100%; animation: shimmer 1.6s linear infinite; }
