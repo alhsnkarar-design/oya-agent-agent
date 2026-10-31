@@ -1,5 +1,6 @@
 """
-build_website — يبني موقعاً إلكترونياً متكاملاً (HTML/CSS/JS) من وصف نصي.
+build_project — أداة واحدة تبني المواقع والتطبيقات المتكاملة بالذكاء الاصطناعي من وصف نصي:
+موقع ثابت متجاوب، أو تطبيق ويب (واجهة + خادم + قاعدة بيانات)، أو PWA، أو تطبيق جوال.
 
 وضعان للعمل:
   1) وضع التوليد: يُرسل الوصف إلى نموذج لغوي (OpenAI-compatible) ويستلم ملفات الموقع.
@@ -22,7 +23,7 @@ OUT_DIR = "/tmp/ai_builder"
 MAX_FILES = 60
 MAX_FILE_BYTES = 400_000
 
-SYSTEM_PROMPT = """You are a senior front-end engineer and UI/UX designer.
+WEBSITE_PROMPT = """You are a senior front-end engineer and UI/UX designer.
 Build a COMPLETE, production-quality, responsive static website from the user's description.
 
 Hard requirements:
@@ -44,6 +45,47 @@ Output format — STRICTLY, nothing outside these blocks except an optional fina
 (repeat for every file)
 === NOTES ===
 <2-5 short lines describing the site>
+"""
+
+
+STACKS = {
+    "website": "Static website: HTML5 + CSS3 + vanilla JS, no build step.",
+    "react": "React 18 + Vite + TypeScript + Tailwind CSS (frontend only, localStorage persistence).",
+    "fullstack-node": "Frontend: React + Vite + Tailwind in /client. Backend: Node.js + Express REST API in /server "
+                      "with SQLite (better-sqlite3), JWT auth (bcrypt), input validation, CORS. Root package.json with "
+                      "scripts to install/run both (concurrently).",
+    "nextjs": "Next.js 14 App Router + TypeScript + Tailwind, API route handlers, Prisma + SQLite, NextAuth credentials auth.",
+    "flask": "Python Flask + SQLAlchemy + SQLite, Jinja2 templates + Tailwind CDN, Flask-Login auth, requirements.txt.",
+    "fastapi": "Backend: FastAPI + SQLModel + SQLite + JWT auth in /backend (requirements.txt). "
+               "Frontend: React + Vite + Tailwind in /frontend calling the API.",
+    "pwa": "Installable Progressive Web App: HTML/CSS/vanilla JS, manifest.json, service worker with offline cache, "
+           "IndexedDB storage. No build step; index.html is the entry point.",
+    "mobile-expo": "React Native mobile app with Expo (SDK 51) + TypeScript + React Navigation + AsyncStorage.",
+    "flutter": "Flutter 3 mobile app (Dart), Material 3, Provider state management, shared_preferences persistence.",
+}
+
+APP_PROMPT = """You are a principal full-stack engineer. Build a COMPLETE, runnable application
+from the user's description using the requested stack. The project must run after following the README.
+
+Hard requirements:
+- Every file needed to install and run: manifests (package.json / requirements.txt / pubspec.yaml),
+  configs, source code, seed data, .env.example (never real secrets), .gitignore, and README.md with
+  exact setup/run/deploy commands.
+- Implement ALL requested features end-to-end (data model, API/business logic, UI, validation,
+  error/loading/empty states). No TODOs, no placeholders, no omitted code ("..." is forbidden).
+- Clean architecture, small focused modules, consistent naming, basic security (hashed passwords,
+  parameterized queries, input validation, CORS config, auth on protected routes).
+- Responsive, accessible, polished UI. Real content in the requested language; if Arabic/RTL, set
+  dir="rtl" and RTL-aware layout.
+- Pin realistic dependency versions. Keep the file count reasonable (<= 45 files).
+
+Output format — STRICTLY, nothing outside these blocks except a final NOTES block:
+=== FILE: relative/path.ext ===
+<full file content>
+=== END FILE ===
+(repeat for every file)
+=== NOTES ===
+<short summary: features, how to run, default demo credentials if any>
 """
 
 FILE_RE = re.compile(r"=== FILE:\s*(.+?)\s*===\s*\n(.*?)\n=== END FILE ===", re.S)
@@ -73,7 +115,7 @@ def call_llm(system, user, max_tokens=None, retries=2):
     if not cfg:
         raise RuntimeError("NO_LLM_KEY")
     base, key, model = cfg
-    max_tokens = max_tokens or int(os.environ.get("LLM_MAX_TOKENS", "32000"))
+    max_tokens = max_tokens or int(os.environ.get("LLM_MAX_TOKENS", "64000"))
     last = None
     for attempt in range(retries + 1):
         body = json.dumps({
@@ -166,6 +208,36 @@ def validate_site(files):
     return warnings
 
 
+
+def validate_app(files, stack):
+    warnings = []
+    for path, content in files.items():
+        if path.endswith(".json"):
+            try:
+                json.loads(content)
+            except ValueError:
+                warnings.append(f"{path}: invalid JSON")
+        if path.endswith(".py"):
+            try:
+                compile(content, path, "exec")
+            except SyntaxError as e:
+                warnings.append(f"{path}: Python syntax error line {e.lineno}")
+        if re.search(r"^\s*(//|#)\s*\.\.\.|TODO", content, re.M):
+            warnings.append(f"{path}: contains placeholder/TODO")
+    if not any(p.lower() == "readme.md" for p in files):
+        warnings.append("README.md missing")
+    expected = {"flask": "requirements.txt", "flutter": "pubspec.yaml", "fastapi": "backend/requirements.txt"}
+    need = expected.get(stack)
+    if need and need not in files:
+        warnings.append(f"{need} missing")
+    if stack in ("react", "nextjs", "mobile-expo", "fullstack-node") and not any(
+            p.endswith("package.json") for p in files):
+        warnings.append("package.json missing")
+    if stack == "pwa" and "index.html" not in files:
+        warnings.append("index.html missing")
+    return warnings
+
+
 def inline_preview(files):
     """Single self-contained HTML (CSS/JS inlined) for instant preview."""
     html = files["index.html"]
@@ -221,11 +293,14 @@ def zip_root(zip_path):
 
 
 # ---------------------------------------------------------------- main
-def build_prompt(inp):
-    lines = [f"Website description:\n{inp.get('description', '')}"]
-    for key, label in (("site_type", "Type"), ("language", "Language"),
-                       ("style", "Visual style"), ("colors", "Brand colors"),
-                       ("pages", "Pages/sections required")):
+def build_prompt(inp, stack):
+    kind = "Website" if stack == "website" else "Application"
+    lines = [f"{kind} description:\n{inp.get('description', '')}",
+             f"Stack: {STACKS.get(stack, stack)}"]
+    for key, label in (("language", "Language"), ("style", "Visual style"),
+                       ("colors", "Brand colors"), ("pages", "Pages/sections required"),
+                       ("features", "Required features"), ("entities", "Data entities"),
+                       ("auth", "Authentication")):
         if inp.get(key):
             val = inp[key]
             lines.append(f"{label}: {', '.join(val) if isinstance(val, list) else val}")
@@ -242,7 +317,11 @@ def main():
     inp = json.loads(os.environ.get("INPUT_JSON", "{}"))
     description = (inp.get("description") or "").strip()
     name = slugify(inp.get("project_name") or zip_root(inp.get("previous_zip"))
-                   or description[:30] or "site")
+                   or description[:30] or "project")
+    stack = inp.get("stack") or "website"
+    if stack not in STACKS:
+        print(json.dumps({"error": f"unknown stack '{stack}'", "stacks": sorted(STACKS)}, ensure_ascii=False))
+        return
     notes = ""
 
     if inp.get("files"):
@@ -253,13 +332,15 @@ def main():
             print(json.dumps({"error": "description is required (or pass files)"}, ensure_ascii=False))
             return
         try:
-            raw = call_llm(SYSTEM_PROMPT, build_prompt(inp))
+            prompt = WEBSITE_PROMPT if stack == "website" else APP_PROMPT
+            raw = call_llm(prompt, build_prompt(inp, stack),
+                           max_tokens=None if stack != "website" else int(os.environ.get("LLM_MAX_TOKENS", "32000")))
         except RuntimeError as e:
             if str(e) == "NO_LLM_KEY":
                 print(json.dumps({
                     "error": "no_llm_key",
                     "hint": ("No LLM API key configured. Generate the files yourself and call "
-                             "build_website again with files={path: content}, or set "
+                             "build_project again with files={path: content}, or set "
                              "GEMINI_API_KEY / OPENROUTER_API_KEY / OPENAI_API_KEY / LLM_API_KEY."),
                 }, ensure_ascii=False))
                 return
@@ -271,20 +352,28 @@ def main():
         print(json.dumps({"error": "no files produced"}, ensure_ascii=False))
         return
 
-    warnings = validate_site(files)
-    outputs = write_outputs(name, files, preview=inp.get("preview", True))
+    try:
+        warnings = validate_site(files) if stack == "website" else validate_app(files, stack)
+    except ValueError as e:
+        print(json.dumps({"error": str(e), "files": sorted(files)}, ensure_ascii=False))
+        return
+    static = stack in ("website", "pwa") and "index.html" in files
+    outputs = write_outputs(name, files, preview=static and inp.get("preview", True))
     for path in outputs:
         print(f"A2ABASEAI_FILE: {path}")
     print(json.dumps({
         "ok": True,
         "mode": mode,
         "project": name,
+        "stack": stack,
         "files": sorted(files),
         "zip": outputs[0],
         "preview": outputs[1] if len(outputs) > 1 else None,
         "notes": notes,
         "warnings": warnings,
-        "deploy_hint": "Unzip and upload the folder to Netlify Drop, Vercel, GitHub Pages or Cloudflare Pages.",
+        "next_steps": ("Unzip and upload the folder to Netlify Drop, Vercel, GitHub Pages or Cloudflare Pages."
+                       if stack == "website" else
+                       "Unzip, then follow README.md (install dependencies, copy .env.example to .env, run dev script)."),
     }, ensure_ascii=False))
 
 
