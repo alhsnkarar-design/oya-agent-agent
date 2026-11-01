@@ -1,0 +1,37 @@
+feature,area,priority,original,clone,notes
+Sign up with email or Google,onboarding,must,yes,no,providers to confirm on rork.com
+Start a project from a text prompt on the landing page,create,must,yes,no,
+AI agent generates a full Expo / React Native project,create,must,yes,no,core of the product
+Streaming chat showing AI steps and changed files,editor,must,yes,no,
+Iterate on the app by chat,editor,must,yes,no,
+Live web preview in a phone frame,preview,must,yes,no,
+Preview on a real phone via QR code and Expo Go,preview,must,yes,no,docs.rork.com confirms
+Show build and runtime errors,preview,must,yes,no,
+Fix build errors with AI,editor,must,yes,no,reviewers say it loops and charges credits - fix in ours
+Project list (dashboard),projects,must,yes,no,
+Projects saved with history of every change,projects,must,yes,no,
+Restore an earlier version,projects,should,yes,no,inferred from git commits per change
+View the generated code (file tree + editor),code,must,yes,no,edit vs read-only to confirm
+Download the code as a zip,code,should,yes,no,to confirm
+Connect GitHub with auto-commit and two-way sync,code,should,yes,no,seen in generated READMEs
+Free plan with a monthly credit allowance,billing,must,yes,no,35 or 50 credits - sources disagree
+Paid subscription tiers with monthly credits,billing,must,yes,no,Junior/Middle/Senior/Scale or Pro/Max - to confirm
+Credits charged per AI message with a visible meter,billing,must,yes,no,
+Stripe checkout and customer portal (cancel in one click),billing,must,yes,no,
+Out-of-credits state with upgrade prompt,billing,must,yes,no,
+Attach an image or screenshot to a prompt,create,should,yes,no,to confirm
+Example prompts / templates on the landing page,create,should,yes,no,
+Publish a web version to a public subdomain,publish,should,yes,no,their *.rork.app - ours on our own domain
+Guide and EAS commands to build for App Store and Play,publish,should,yes,no,
+Account settings and account deletion,account,should,yes,no,
+Choose AI model / mode,create,could,yes,no,Rork Pro vs Max
+Share a project link,sharing,could,yes,no,to confirm
+Team plans,billing,could,yes,no,higher tiers per reviews
+Backend / database for generated apps (e.g. Supabase),code,could,yes,no,to confirm
+Annual billing discount,billing,could,yes,no,to confirm
+Credits roll over or warning before they expire,billing,should,no,no,our fix: top complaint about losing unused credits
+Free AI fixes that really cost no credits,billing,should,no,no,our fix: top complaint
+Prices in local currency,billing,could,no,no,our fix: complaint from UK users
+Arabic and right-to-left interface,i18n,could,no,no,our addition - decide in /replica-entrepreneur
+Direct App Store submission from the browser,publish,could,yes,skip,reported broken and needs Apple accounts and a build farm - v2
+Rork Max native Swift apps,create,could,yes,skip,needs a macOS build farm - out of v1
