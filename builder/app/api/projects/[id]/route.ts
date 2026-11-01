@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getProject } from "@/lib/store";
+import { getProject } from "../../../../lib/store";
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

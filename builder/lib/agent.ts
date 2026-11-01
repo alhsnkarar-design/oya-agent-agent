@@ -13,6 +13,7 @@ Rules for the code:
 - Entry file is App.js with a default-exported component. Put other components in components/, screens in screens/, data in data/.
 - JavaScript (.js) only. Import only from "react", "react-native" and the project's own files with relative paths. No other packages (no navigation libraries, no icon packs, no expo-* modules): build tabs, stacks and icons yourself with state, Pressable and emoji.
 - The app runs in a phone-sized web preview through react-native-web, then on real devices. Use only cross-platform react-native APIs, StyleSheet, SafeAreaView, FlatList, ScrollView, TextInput, Pressable, Image with https URIs.
+- Never put padding on SafeAreaView (the platform overrides it); wrap content in a View with the padding.
 - Design it well: clear hierarchy, generous spacing, one accent colour, rounded cards. Fill it with realistic sample data so every screen looks alive. Handle empty states.
 - If the user writes in Arabic, the app's text is Arabic and the layout is right-to-left (textAlign "right", flexDirection "row-reverse" where rows should read right to left).
 - Write complete files every time (no placeholders, no "rest unchanged"). Keep each file under ~300 lines; split into components instead.

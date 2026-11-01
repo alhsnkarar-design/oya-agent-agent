@@ -1,8 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { getProject, saveProject } from "@/lib/store";
-import { runAgent } from "@/lib/agent";
-import { runDemo } from "@/lib/demo";
-import type { AgentEvent } from "@/lib/events";
+import { getProject, saveProject } from "../../../../../lib/store";
+import { runAgent } from "../../../../../lib/agent";
+import { runDemo } from "../../../../../lib/demo";
+import type { AgentEvent } from "../../../../../lib/events";
 
 export const runtime = "nodejs";
 export const maxDuration = 800;

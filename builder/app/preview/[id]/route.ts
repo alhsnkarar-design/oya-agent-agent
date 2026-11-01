@@ -1,5 +1,5 @@
-import { getProject } from "@/lib/store";
-import { previewHtml } from "@/lib/preview";
+import { getProject } from "../../../lib/store";
+import { previewHtml } from "../../../lib/preview";
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

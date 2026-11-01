@@ -3,7 +3,10 @@
 // react-native-web renders it. Errors are reported to the editor.
 
 function escapeForScript(json: string) {
-  return json.replace(/</g, "\\u003c").replace(/ /g, "\\u2028").replace(/ /g, "\\u2029");
+  return json
+    .split("<").join("\\u003c")
+    .split(String.fromCharCode(0x2028)).join("\\u2028")
+    .split(String.fromCharCode(0x2029)).join("\\u2029");
 }
 
 export function previewHtml(files: Record<string, string>): string {
@@ -49,6 +52,8 @@ export function previewHtml(files: Record<string, string>): string {
   function asModule(ns) { var m = Object.assign({ __esModule: true }, ns); if (!("default" in m)) m.default = ns; return m; }
   var builtins = {
     "react": asModule(RT.React),
+    "react/jsx-runtime": asModule(RT.JSXRuntime),
+    "react/jsx-dev-runtime": asModule(RT.JSXRuntime),
     "react-native": asModule(RT.RN),
     "react-native-web": asModule(RT.RN),
     "expo-status-bar": asModule({ StatusBar: function () { return null; } })
@@ -70,7 +75,7 @@ export function previewHtml(files: Record<string, string>): string {
     try {
       out = Babel.transform(files[path], {
         filename: path,
-        presets: [["env", { modules: "commonjs" }], "react", ["typescript", { allExtensions: true, isTSX: true }]]
+        presets: [["env", { modules: "commonjs" }], "react", "typescript"]
       }).code;
     } catch (e) { throw new Error(path + ": " + e.message); }
     var module = { exports: {} };

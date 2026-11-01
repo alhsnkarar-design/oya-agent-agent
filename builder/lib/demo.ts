@@ -26,7 +26,8 @@ export default function App() {
     setTasks(tasks.map((t) => (t.id === id ? { ...t, done: !t.done } : t)));
 
   return (
-    <SafeAreaView style={styles.screen}>
+    <SafeAreaView style={styles.safe}>
+      <View style={styles.screen}>
       <Text style={styles.title}>${safe}</Text>
       <Text style={styles.sub}>{tasks.filter((t) => !t.done).length} مهام متبقية</Text>
       <View style={styles.row}>
@@ -47,16 +48,18 @@ export default function App() {
         renderItem={({ item }) => <TaskRow task={item} onPress={() => toggle(item.id)} />}
         ListEmptyComponent={<Text style={styles.empty}>لا توجد مهام بعد</Text>}
       />
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: "#f6f7fb", padding: 20 },
+  safe: { flex: 1, backgroundColor: "#f6f7fb" },
+  screen: { flex: 1, padding: 20 },
   title: { fontSize: 28, fontWeight: "700", color: "#1d1b3a", textAlign: "right", marginTop: 12 },
   sub: { fontSize: 14, color: "#6b6a85", textAlign: "right", marginBottom: 16 },
   row: { flexDirection: "row-reverse", gap: 8, marginBottom: 16 },
-  input: { flex: 1, backgroundColor: "#fff", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 16, textAlign: "right", borderWidth: 1, borderColor: "#e3e3ef" },
+  input: { flex: 1, minWidth: 0, backgroundColor: "#fff", borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 16, textAlign: "right", borderWidth: 1, borderColor: "#e3e3ef" },
   button: { backgroundColor: "#5b4cf0", borderRadius: 12, paddingHorizontal: 18, justifyContent: "center" },
   buttonText: { color: "#fff", fontWeight: "700", fontSize: 16 },
   empty: { textAlign: "center", color: "#9a99b0", marginTop: 40 },

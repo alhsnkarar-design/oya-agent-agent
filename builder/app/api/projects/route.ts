@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createProject, listProjects } from "@/lib/store";
+import { createProject, listProjects } from "../../../lib/store";
 
 export async function GET() {
   return NextResponse.json(await listProjects());

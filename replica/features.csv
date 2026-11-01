@@ -17,7 +17,7 @@ Connect GitHub with auto-commit and two-way sync,code,should,yes,no,seen in gene
 Free plan with a monthly credit allowance,billing,must,yes,no,35 or 50 credits - sources disagree
 Paid subscription tiers with monthly credits,billing,must,yes,no,Junior/Middle/Senior/Scale or Pro/Max - to confirm
 Credits charged per AI message with a visible meter,billing,must,yes,no,
-Stripe checkout and customer portal (cancel in one click),billing,must,yes,no,
+Lemon Squeezy checkout and customer portal (cancel in one click),billing,must,yes,no,owner chose Lemon Squeezy instead of Stripe
 Out-of-credits state with upgrade prompt,billing,must,yes,no,
 Attach an image or screenshot to a prompt,create,should,yes,no,to confirm
 Example prompts / templates on the landing page,create,should,yes,no,

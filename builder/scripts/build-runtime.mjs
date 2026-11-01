@@ -8,8 +8,9 @@ writeFileSync(
   "scripts/.rt-entry.js",
   `import * as React from "react";
 import * as ReactDOMClient from "react-dom/client";
+import * as JSXRuntime from "react/jsx-runtime";
 import * as RN from "react-native-web";
-window.__RT = { React, ReactDOMClient, RN };`,
+window.__RT = { React, ReactDOMClient, JSXRuntime, RN };`,
 );
 await build({
   entryPoints: ["scripts/.rt-entry.js"],
