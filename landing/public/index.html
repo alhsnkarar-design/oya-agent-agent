@@ -1,0 +1,807 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>حركة — استوديو الفيديو العربي</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="قُل فكرتك بالعربي فتتحول إلى فيديو موشن جرافيكس أو ريلز جاهز، بدون موسيقى، وعدّله بصوتك. احجز مكانك في قائمة الانتظار.">
+<meta property="og:title" content="حركة — قُلها، تتحرّك">
+<meta property="og:description" content="استوديو فيديو عربي بالذكاء الاصطناعي: موشن من اليمين لليسار، كابشن باللهجات، تعديل بالصوت، وبدون موسيقى.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: an editing-room page — copy on the right, a live 9:16 preview + timeline on the left; the timeline motif (tracks, keyframes, timecodes) repeats as section rules. */
+:root {
+  --paper: #EEF2F1;        /* cool studio white, faint teal bias */
+  --panel: #FFFFFF;
+  --ink: #12222B;          /* deep blue-ink text */
+  --ink-soft: #4A5D66;
+  --line: #CBD6D6;
+  --signal: #D9901A;       /* amber: playhead / keyframe colour */
+  --signal-ink: #1B1405;   /* text on amber */
+  --teal: #11736F;         /* voice track */
+  --cut: #B23A3A;          /* removed track */
+  --screen: #0E1A20;       /* phone preview ground (dark in both themes) */
+  --screen-fg: #F3F6F5;
+  --f-display: "Reem Kufi", "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+  --f-body: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, "Noto Sans Arabic", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --step--1: 0.875rem;
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.6rem;
+  --step-3: clamp(1.9rem, 4vw, 2.6rem);
+  --step-4: clamp(2.6rem, 7vw, 4.6rem);
+  --radius: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0C161B; --panel: #13222A; --ink: #E6EEEE; --ink-soft: #9FB2B6;
+    --line: #26393F; --signal: #F0A92E; --signal-ink: #1B1405; --teal: #3FB9B2;
+    --cut: #E06A6A; --screen: #050B0E; --screen-fg: #F3F6F5; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0C161B; --panel: #13222A; --ink: #E6EEEE; --ink-soft: #9FB2B6;
+  --line: #26393F; --signal: #F0A92E; --signal-ink: #1B1405; --teal: #3FB9B2;
+  --cut: #E06A6A; --screen: #050B0E; --screen-fg: #F3F6F5; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: var(--step-0);
+  line-height: 1.75;
+}
+.wrap {
+  max-width: 1140px;
+  margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.25; text-wrap: balance; margin: 0; font-weight: 700; }
+p { margin: 0; }
+a { color: inherit; }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; border-radius: 6px; }
+
+/* ---------- header ---------- */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-size: var(--step-1); font-weight: 700; text-decoration: none; }
+.brand-mark { width: 28px; height: 28px; border-radius: 8px; background: var(--ink); position: relative; flex: none; }
+.brand-mark::after { content: ""; position: absolute; inset: 8px 7px 8px 10px; background: var(--signal); clip-path: polygon(100% 0, 100% 100%, 0 50%); }
+.top nav { display: flex; gap: 20px; font-size: var(--step--1); color: var(--ink-soft); }
+.top nav a { text-decoration: none; }
+.top nav a:hover { color: var(--ink); }
+@media (max-width: 720px) { .top nav { display: none; } }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font: 700 var(--step-0)/1 var(--f-body);
+  padding: 14px 22px; border-radius: 999px; border: 1.5px solid transparent;
+  cursor: pointer; text-decoration: none; transition: transform .15s ease, background .15s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--signal); color: var(--signal-ink); }
+.btn-primary:hover { background: color-mix(in srgb, var(--signal) 85%, var(--ink)); }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn-ghost:hover { border-color: var(--ink-soft); }
+.btn-small { padding: 10px 16px; font-size: var(--step--1); }
+
+/* ---------- hero ---------- */
+.hero .wrap { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center; padding-block: 56px 40px; }
+@media (max-width: 900px) { .hero .wrap { grid-template-columns: 1fr; gap: 36px; padding-block: 36px 28px; } }
+.hero-copy { display: grid; gap: 22px; min-width: 0; }
+.eyebrow { font-size: var(--step--1); color: var(--teal); font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.eyebrow::before { content: ""; width: 10px; height: 10px; background: var(--signal); transform: rotate(45deg); flex: none; }
+.hero h1 { font-size: var(--step-4); letter-spacing: 0; }
+.hero h1 em { font-style: normal; color: var(--signal); }
+.lede { font-size: var(--step-1); color: var(--ink-soft); max-width: 34ch; line-height: 1.7; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.no-music {
+  display: inline-flex; align-items: center; gap: 10px; font-size: var(--step--1); color: var(--ink-soft);
+  border: 1px dashed var(--line); padding: 8px 14px; border-radius: 999px; width: fit-content;
+}
+.no-music svg { flex: none; }
+
+/* ---------- demo ---------- */
+.demo { display: grid; gap: 14px; min-width: 0; }
+.demo-head { display: flex; justify-content: space-between; align-items: center; font-size: var(--step--1); color: var(--ink-soft); gap: 12px; flex-wrap: wrap; }
+.rec { display: inline-flex; align-items: center; gap: 8px; }
+.rec i { width: 8px; height: 8px; border-radius: 50%; background: var(--cut); display: block; animation: blink 1.4s infinite; }
+@keyframes blink { 50% { opacity: .25; } }
+.demo-body { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: stretch; }
+@media (max-width: 520px) { .demo-body { grid-template-columns: 1fr; justify-items: center; } }
+
+.phone {
+  width: 210px; max-width: 100%; aspect-ratio: 9 / 16; background: var(--screen); color: var(--screen-fg);
+  border-radius: 26px; padding: 10px; position: relative; overflow: hidden;
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--ink) 90%, transparent), 0 24px 50px -24px rgba(0,0,0,.5);
+}
+.screen { position: absolute; inset: 0; display: grid; align-content: center; justify-items: center; padding: 22px 16px; text-align: center; gap: 10px; }
+.screen::before {
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 82% 16%, color-mix(in srgb, var(--signal) 22%, transparent) 0 9%, transparent 9.5%),
+    repeating-linear-gradient(-30deg, transparent 0 22px, rgba(255,255,255,.035) 22px 23px);
+}
+.st-title { position: relative; font-family: var(--f-display); font-size: 1.45rem; line-height: 1.3; transition: transform .7s cubic-bezier(.2,.8,.2,1), opacity .5s, color .4s, font-size .4s; }
+.st-title.big { font-size: 1.85rem; color: var(--signal); }
+.st-title.off { transform: translateX(120%); opacity: 0; }
+.st-sub { position: relative; font-size: .85rem; background: var(--screen-fg); color: var(--screen); padding: 4px 12px; border-radius: 6px; font-weight: 700; transition: opacity .4s, transform .5s; }
+.st-sub.off { opacity: 0; transform: translateY(10px); }
+.st-cap { position: absolute; bottom: 44px; inset-inline: 12px; font-size: .78rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+.st-cap span { background: rgba(0,0,0,.55); padding: 1px 6px; border-radius: 4px; transition: background .2s, color .2s; }
+.st-cap span.on { background: var(--signal); color: var(--signal-ink); }
+.st-meta { position: absolute; top: 12px; inset-inline: 14px; display: flex; justify-content: space-between; font-size: .62rem; opacity: .7; }
+.st-export { position: absolute; bottom: 16px; inset-inline: 16px; height: 4px; border-radius: 4px; background: rgba(255,255,255,.15); overflow: hidden; }
+.st-export i { display: block; height: 100%; width: 0; background: var(--signal); transition: width 1.6s linear; }
+
+.console { display: grid; gap: 12px; align-content: start; min-width: 0; width: 100%; }
+.say {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 14px 16px; display: grid; gap: 8px; min-height: 104px;
+}
+.say-label { display: flex; align-items: center; gap: 8px; font-size: .78rem; color: var(--teal); font-weight: 700; }
+.say-text { font-size: var(--step-0); font-weight: 500; min-height: 3.4em; }
+.say-text::after { content: ""; display: inline-block; width: 2px; height: 1.1em; background: var(--signal); vertical-align: -0.2em; margin-inline-start: 2px; animation: blink 1s infinite; }
+.done { font-size: .78rem; color: var(--ink-soft); display: flex; gap: 6px; align-items: center; }
+.done b { color: var(--teal); }
+
+.timeline { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; display: grid; gap: 7px; position: relative; overflow: hidden; }
+.tc-row { display: flex; justify-content: space-between; font-size: .7rem; color: var(--ink-soft); }
+.track { display: grid; grid-template-columns: 64px 1fr; gap: 10px; align-items: center; font-size: .72rem; color: var(--ink-soft); }
+.lane { height: 18px; border-radius: 5px; background: color-mix(in srgb, var(--line) 45%, transparent); position: relative; overflow: hidden; display: flex; align-items: center; }
+.wave { display: flex; gap: 2px; align-items: center; height: 100%; padding-inline: 4px; width: 100%; }
+.wave i { flex: 1; background: var(--teal); border-radius: 2px; min-width: 1px; }
+.clip { position: absolute; top: 3px; bottom: 3px; border-radius: 4px; background: color-mix(in srgb, var(--ink) 75%, transparent); }
+.key { position: absolute; top: 50%; width: 9px; height: 9px; background: var(--signal); transform: translate(50%, -50%) rotate(45deg); }
+.lane.music { background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--cut) 14%, transparent) 0 6px, transparent 6px 12px); }
+.lane.music .strike { position: absolute; inset-inline: 0; top: 50%; height: 2px; background: var(--cut); transform-origin: right; transition: transform .6s; }
+.lane.music b { position: relative; margin-inline: auto; font-size: .68rem; color: var(--cut); font-weight: 700; background: var(--panel); padding: 0 6px; border-radius: 4px; }
+.lane.music.live .strike { transform: scaleX(0); }
+.lane.music.live b { visibility: hidden; }
+.playhead { position: absolute; top: 28px; bottom: 8px; width: 2px; background: var(--signal); inset-inline-start: calc(14px + 74px + 0.62 * (100% - 102px)); transition: inset-inline-start .25s linear; pointer-events: none; }
+.demo-note { font-size: .75rem; color: var(--ink-soft); }
+
+/* ---------- section rule (timeline ruler) ---------- */
+.ruler { height: 22px; border-top: 1px solid var(--line); background: repeating-linear-gradient(to left, var(--line) 0 1px, transparent 1px 24px) top / 100% 7px no-repeat, repeating-linear-gradient(to left, var(--line) 0 1px, transparent 1px 120px) top / 100% 13px no-repeat; }
+
+section { padding-block: 64px; }
+@media (max-width: 700px) { section { padding-block: 44px; } }
+.sec-head { display: grid; gap: 10px; margin-bottom: 32px; max-width: 640px; }
+.sec-head h2 { font-size: var(--step-3); }
+.sec-head p { color: var(--ink-soft); font-size: var(--step-1); }
+.tc { font-size: .78rem; color: var(--signal); font-weight: 500; }
+
+/* features */
+.features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+@media (max-width: 900px) { .features { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .features { grid-template-columns: 1fr; } }
+.feat { background: var(--panel); padding: 24px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.feat h3 { font-size: var(--step-1); }
+.feat p { color: var(--ink-soft); }
+.feat .ic { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in srgb, var(--teal) 14%, transparent); color: var(--teal); }
+.feat.hl { background: var(--ink); color: var(--paper); }
+.feat.hl p { color: color-mix(in srgb, var(--paper) 78%, transparent); }
+.feat.hl .ic { background: var(--signal); color: var(--signal-ink); }
+
+/* audience */
+.aud { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+@media (max-width: 800px) { .aud { grid-template-columns: 1fr; } }
+.aud > div { border-top: 3px solid var(--ink); padding-top: 16px; display: grid; gap: 8px; align-content: start; }
+.aud h3 { font-size: var(--step-1); }
+.aud p { color: var(--ink-soft); }
+.aud .ex { font-size: var(--step--1); color: var(--teal); font-weight: 500; }
+
+/* steps */
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: s; }
+@media (max-width: 800px) { .steps { grid-template-columns: 1fr; } }
+.step { display: grid; gap: 8px; align-content: start; }
+.step .n { font-family: var(--f-mono); font-size: .8rem; color: var(--ink-soft); direction: ltr; text-align: right; }
+.step h3 { font-size: var(--step-1); }
+.step p { color: var(--ink-soft); }
+
+/* pricing */
+.pricing { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; align-items: stretch; }
+@media (max-width: 1000px) { .pricing { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .pricing { grid-template-columns: 1fr; } }
+.plan { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; display: grid; grid-template-rows: auto auto auto 1fr auto; gap: 14px; min-width: 0; }
+.plan.pro { border: 2px solid var(--signal); position: relative; }
+.plan .tag { position: absolute; top: -12px; inset-inline-start: 18px; background: var(--signal); color: var(--signal-ink); font-size: .75rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+.plan h3 { font-size: var(--step-1); }
+.price { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.price strong { font-family: var(--f-display); font-size: var(--step-3); line-height: 1; }
+.price span { color: var(--ink-soft); font-size: var(--step--1); }
+.usd { font-size: var(--step--1); color: var(--ink-soft); }
+.points { font-size: var(--step--1); background: color-mix(in srgb, var(--teal) 12%, transparent); color: var(--teal); padding: 6px 10px; border-radius: 8px; font-weight: 700; }
+.plan ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; font-size: var(--step--1); align-content: start; }
+.plan li { display: grid; grid-template-columns: 18px 1fr; gap: 8px; align-items: start; }
+.plan li::before { content: ""; width: 10px; height: 10px; margin-top: .55em; background: var(--teal); transform: rotate(45deg); }
+.plan li.no { color: var(--ink-soft); }
+.plan li.no::before { background: transparent; border: 1.5px solid var(--line); }
+.plan .btn { width: 100%; }
+.price-note { margin-top: 18px; color: var(--ink-soft); font-size: var(--step--1); }
+
+/* waitlist */
+.join { background: var(--ink); color: var(--paper); border-radius: 22px; padding: clamp(24px, 5vw, 48px); display: grid; grid-template-columns: 1fr 1.1fr; gap: 40px; }
+@media (max-width: 860px) { .join { grid-template-columns: 1fr; gap: 28px; } }
+.join h2 { font-size: var(--step-3); }
+.join .perks { display: grid; gap: 12px; margin-top: 18px; }
+.join .perks div { display: grid; grid-template-columns: 16px 1fr; gap: 10px; color: color-mix(in srgb, var(--paper) 82%, transparent); }
+.join .perks div::before { content: ""; width: 10px; height: 10px; margin-top: .6em; background: var(--signal); transform: rotate(45deg); }
+form { display: grid; gap: 14px; min-width: 0; }
+.field { display: grid; gap: 6px; }
+.field label, .field legend { font-size: var(--step--1); font-weight: 700; }
+.field .opt { font-weight: 400; opacity: .7; }
+input[type="text"], input[type="email"], select {
+  width: 100%; font: inherit; padding: 12px 14px; border-radius: 10px;
+  border: 1.5px solid color-mix(in srgb, var(--paper) 25%, transparent);
+  background: color-mix(in srgb, var(--paper) 7%, transparent); color: var(--paper);
+}
+select option { color: #12222B; background: #FFFFFF; }
+input::placeholder { color: color-mix(in srgb, var(--paper) 50%, transparent); }
+input:focus, select:focus { outline: none; border-color: var(--signal); }
+fieldset { border: 0; padding: 0; margin: 0; }
+.choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.choices label { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 999px; border: 1.5px solid color-mix(in srgb, var(--paper) 25%, transparent); cursor: pointer; font-size: var(--step--1); font-weight: 500; }
+.choices input { accent-color: var(--signal); margin: 0; }
+.choices label:has(input:checked) { border-color: var(--signal); background: color-mix(in srgb, var(--signal) 16%, transparent); }
+.hp { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.form-msg { font-size: var(--step--1); min-height: 1.5em; }
+.form-msg.err { color: #FFB4A8; }
+.success { display: grid; gap: 12px; align-content: center; text-align: center; padding: 24px; border: 1.5px dashed var(--signal); border-radius: 16px; }
+.success h3 { font-size: var(--step-2); color: var(--signal); }
+.privacy { font-size: .78rem; color: color-mix(in srgb, var(--paper) 65%, transparent); }
+
+/* faq */
+.faq { display: grid; gap: 0; border-top: 1px solid var(--line); max-width: 820px; }
+.faq details { border-bottom: 1px solid var(--line); padding-block: 18px; }
+.faq summary { cursor: pointer; font-weight: 700; font-size: var(--step-1); list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font-family: var(--f-mono); color: var(--signal); font-size: 1.4rem; line-height: 1; }
+.faq details[open] summary::after { content: "−"; }
+.faq p { color: var(--ink-soft); margin-top: 10px; max-width: 65ch; }
+
+footer { border-top: 1px solid var(--line); padding-block: 28px; color: var(--ink-soft); font-size: var(--step--1); }
+footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="حركة">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>حركة</span>
+    </a>
+    <nav aria-label="أقسام الصفحة">
+      <a href="#features">المميزات</a>
+      <a href="#who">لمن؟</a>
+      <a href="#pricing">الأسعار</a>
+      <a href="#faq">أسئلة</a>
+    </nav>
+    <a class="btn btn-primary btn-small" href="#join">احجز مكانك</a>
+  </div>
+</header>
+
+<main id="top">
+  <!-- HERO -->
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero-copy">
+        <span class="eyebrow">استوديو فيديو عربي بالذكاء الاصطناعي</span>
+        <h1>قُلها…<br><em>تتحرّك.</em></h1>
+        <p class="lede">قل فكرتك بالعربي أو ارفع فيديو خام، فيتحول إلى موشن جرافيكس أو ريلز جاهز للنشر. وعدّله بصوتك وأنت تشاهده.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#join">احجز مكانك مجانًا</a>
+          <a class="btn btn-ghost" href="#pricing">شاهد الأسعار</a>
+        </div>
+        <span class="no-music">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18V6l10-2v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" stroke="currentColor" stroke-width="2"/><path d="M3 3l18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          بدون موسيقى نهائيًا، ويزيل الموسيقى من فيديوهاتك
+        </span>
+      </div>
+
+      <div class="demo" aria-label="عرض توضيحي لطريقة العمل">
+        <div class="demo-head">
+          <span class="rec"><i aria-hidden="true"></i> تعديل بالصوت</span>
+          <span class="mono" id="tc">00:00:12:04</span>
+        </div>
+        <div class="demo-body">
+          <div class="phone" aria-hidden="true">
+            <div class="screen">
+              <div class="st-meta mono"><span>9:16</span><span>1080×1920 · 30fps</span></div>
+              <div class="st-title big" id="stTitle">افتتاح فرعنا الجديد</div>
+              <div class="st-sub" id="stSub">خصم 20% أول أسبوع</div>
+              <div class="st-cap" id="stCap"><span>نستناكم</span><span>يوم</span><span class="on">الخميس</span><span>في</span><span>مدينة</span><span>نصر</span></div>
+              <div class="st-export"><i id="stExport" style="width:100%"></i></div>
+            </div>
+          </div>
+          <div class="console">
+            <div class="say">
+              <span class="say-label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" stroke-width="2"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                أنت تقول
+              </span>
+              <p class="say-text" id="sayText" aria-live="polite">صدّره ريلز 9:16</p>
+              <span class="done" id="done"><b>✓</b> تم التنفيذ في <span class="mono" id="ms">0.8s</span></span>
+            </div>
+            <div class="timeline" aria-hidden="true">
+              <div class="tc-row mono"><span>00:00</span><span>00:05</span><span>00:10</span><span>00:15</span></div>
+              <div class="track"><span>الكلام</span><div class="lane"><div class="wave" id="wave"></div></div></div>
+              <div class="track"><span>النص</span><div class="lane"><span class="clip" style="right:4%;width:38%"></span><span class="clip" style="right:46%;width:30%"></span></div></div>
+              <div class="track"><span>الحركة</span><div class="lane"><span class="key" style="right:6%"></span><span class="key" style="right:30%"></span><span class="key" style="right:52%"></span><span class="key" style="right:78%"></span></div></div>
+              <div class="track"><span>الموسيقى</span><div class="lane music" id="musicLane"><span class="strike"></span><b>محذوفة</b></div></div>
+              <span class="playhead" id="playhead"></span>
+            </div>
+          </div>
+        </div>
+        <p class="demo-note">عرض توضيحي لطريقة العمل. المنتج ما زال قيد البناء.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap"><div class="ruler" aria-hidden="true"></div></div>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tc mono">00:00:15:00</span>
+        <h2>كل اللي تحتاجه للفيديو، بالعربي</h2>
+        <p>من فكرة مكتوبة أو فيديو خام، إلى فيديو جاهز للنشر خلال دقائق.</p>
+      </div>
+      <div class="features">
+        <div class="feat hl">
+          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" stroke-width="2"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+          <h3>عدّل بصوتك</h3>
+          <p>«كبّر العنوان»، «احذف المشهد التاني»، «خلّي الخلفية أغمق». تقولها فتراها أمامك فورًا.</p>
+        </div>
+        <div class="feat">
+          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 7H8m12 5H4m16 5H10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+          <h3>موشن عربي حقيقي</h3>
+          <p>نصوص تتحرك من اليمين لليسار بخطوط عربية جميلة، مش ترجمة لقوالب إنجليزية.</p>
+        </div>
+        <div class="feat">
+          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M7 14h4m3 0h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+          <h3>كابشن باللهجات</h3>
+          <p>مصري وخليجي وشامي وفصحى. كابشن متحرك كلمة بكلمة على توقيت الكلام.</p>
+        </div>
+        <div class="feat">
+          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18V6l10-2v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" stroke="currentColor" stroke-width="2"/><path d="M3 3l18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+          <h3>إزالة الموسيقى</h3>
+          <p>ارفع أي فيديو فيه موسيقى، فيرجع لك بالكلام فقط بنفس الجودة والتوقيت.</p>
+        </div>
+        <div class="feat">
+          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 4l4 8-4 8M14 4l4 8-4 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <h3>مونتاج تلقائي</h3>
+          <p>يقص السكتات والتكرار والأخطاء، ويختار أفضل اللقطات من الفيديو الخام.</p>
+        </div>
+        <div class="feat">
+          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 18c3-6 5-6 8-2s5 4 8-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 8h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+          <h3>تعليق صوتي</h3>
+          <p>اكتب النص فيقرأه صوت عربي طبيعي بلهجتك، بدون استوديو ولا ميكروفون.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap"><div class="ruler" aria-hidden="true"></div></div>
+
+  <!-- AUDIENCE -->
+  <section id="who">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tc mono">00:00:30:00</span>
+        <h2>معمول لمين؟</h2>
+        <p>لأي حد عايز فيديو احترافي بالعربي بدون مونتير وبدون موسيقى.</p>
+      </div>
+      <div class="aud">
+        <div>
+          <h3>صناع المحتوى الديني والتعليمي</h3>
+          <p>دروس ومقاطع قصيرة ومواعظ بشكل احترافي، بدون موسيقى من الأساس.</p>
+          <span class="ex">مثال: مقطع تفسير آية في دقيقة بكابشن متحرك</span>
+        </div>
+        <div>
+          <h3>المشاريع والمحلات</h3>
+          <p>إعلان لمنتجك أو عرضك في دقيقة، بهويتك وألوانك، وجاهز لفيسبوك وتيك توك.</p>
+          <span class="ex">مثال: إعلان افتتاح فرع بعرض خاص</span>
+        </div>
+        <div>
+          <h3>المسوقين وصناع المحتوى</h3>
+          <p>حوّل بودكاست أو فيديو طويل إلى عدة ريلز قصيرة بكابشن عربي دقيق.</p>
+          <span class="ex">مثال: 5 مقاطع قصيرة من حلقة ساعة</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap"><div class="ruler" aria-hidden="true"></div></div>
+
+  <!-- STEPS -->
+  <section id="how">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tc mono">00:00:45:00</span>
+        <h2>ثلاث خطوات</h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <span class="n">01</span>
+          <h3>قول أو اكتب أو ارفع</h3>
+          <p>اوصف الفيديو اللي في دماغك، أو ارفع الفيديو الخام من موبايلك.</p>
+        </div>
+        <div class="step">
+          <span class="n">02</span>
+          <h3>اتفرّج وعدّل بالكلام</h3>
+          <p>المعاينة تظهر فورًا. قل اللي عايز تغيّره وشوف التعديل لحظيًا.</p>
+        </div>
+        <div class="step">
+          <span class="n">03</span>
+          <h3>صدّر وانشر</h3>
+          <p>ريلز 9:16 أو يوتيوب 16:9 أو مربع 1:1، بجودة تصل إلى 4K.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap"><div class="ruler" aria-hidden="true"></div></div>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tc mono">00:01:00:00</span>
+        <h2>الأسعار المتوقعة عند الإطلاق</h2>
+        <p>نظام نقاط واضح: ريلز دقيقة = 4 نقاط، فيديو موشن 30 ثانية = 4 نقاط، إزالة الموسيقى = نقطة لكل دقيقة.</p>
+      </div>
+      <div class="pricing">
+        <div class="plan">
+          <h3>مجاني</h3>
+          <div class="price"><strong>0</strong><span>جنيه</span></div>
+          <span class="points">12 نقطة شهريًا · حوالي 3 ريلز</span>
+          <ul>
+            <li>مونتاج تلقائي وكابشن عربي</li>
+            <li>تعديل بالصوت والكتابة</li>
+            <li>إزالة الموسيقى حتى دقيقة</li>
+            <li>جودة 720p</li>
+            <li class="no">علامة مائية</li>
+          </ul>
+          <button class="btn btn-ghost" type="button" data-plan="free">ابدأ مجانًا</button>
+        </div>
+        <div class="plan">
+          <h3>مبتدئ</h3>
+          <div class="price"><strong>249</strong><span>جنيه / شهر</span></div>
+          <span class="usd">أو 12$ خارج مصر</span>
+          <span class="points">60 نقطة شهريًا · حوالي 15 ريلز</span>
+          <ul>
+            <li>كل مميزات المجاني</li>
+            <li>جودة 1080p بدون علامة مائية</li>
+            <li>تعليق صوتي عربي</li>
+            <li>هوية بصرية واحدة</li>
+          </ul>
+          <button class="btn btn-ghost" type="button" data-plan="starter">اشترك</button>
+        </div>
+        <div class="plan pro">
+          <span class="tag">الأنسب لأغلب الناس</span>
+          <h3>احترافي</h3>
+          <div class="price"><strong>599</strong><span>جنيه / شهر</span></div>
+          <span class="usd">أو 29$ خارج مصر</span>
+          <span class="points">160 نقطة شهريًا · حوالي 40 ريلز</span>
+          <ul>
+            <li>كل مميزات المبتدئ</li>
+            <li>محادثة صوتية مباشرة أثناء التعديل</li>
+            <li>دبلجة وترجمة صوتية</li>
+            <li>جودة حتى 4K وأولوية في التصدير</li>
+            <li>3 هويات بصرية</li>
+          </ul>
+          <button class="btn btn-primary" type="button" data-plan="pro">اشترك</button>
+        </div>
+        <div class="plan">
+          <h3>أعمال ووكالات</h3>
+          <div class="price"><strong>1,499</strong><span>جنيه / شهر</span></div>
+          <span class="usd">أو 79$ خارج مصر</span>
+          <span class="points">450 نقطة شهريًا · حوالي 110 ريلز</span>
+          <ul>
+            <li>كل مميزات الاحترافي</li>
+            <li>5 أعضاء في الفريق</li>
+            <li>هويات بصرية بلا حد</li>
+            <li>أسرع تصدير</li>
+          </ul>
+          <button class="btn btn-ghost" type="button" data-plan="business">اشترك</button>
+        </div>
+      </div>
+      <p class="price-note">أول 100 مشترك من قائمة الانتظار يحصلون على خصم 50% لمدة 3 شهور. الاشتراك السنوي بخصم 20%.</p>
+    </div>
+  </section>
+
+  <!-- WAITLIST -->
+  <section id="join">
+    <div class="wrap">
+      <div class="join">
+        <div>
+          <span class="tc mono">00:01:15:00</span>
+          <h2>احجز مكانك قبل الإطلاق</h2>
+          <div class="perks">
+            <div>تجربة النسخة الأولى قبل أي حد</div>
+            <div>خصم 50% لمدة 3 شهور لأول 100 مشترك</div>
+            <div>رأيك يحدد المميزات اللي نبنيها الأول</div>
+          </div>
+        </div>
+
+        <div>
+          <form id="waitlist" novalidate>
+            <div class="field">
+              <label for="f-name">الاسم <span class="opt">(اختياري)</span></label>
+              <input id="f-name" name="name" type="text" maxlength="80" autocomplete="name" placeholder="مثلًا: أحمد">
+            </div>
+            <div class="field">
+              <label for="f-email">الإيميل</label>
+              <input id="f-email" name="email" type="email" maxlength="160" autocomplete="email" required placeholder="name@example.com" dir="ltr">
+            </div>
+            <div class="field">
+              <label for="f-type">نوع المحتوى اللي بتعمله</label>
+              <select id="f-type" name="content_type" required>
+                <option value="">اختر…</option>
+                <option value="religious">ديني أو دعوي</option>
+                <option value="education">تعليمي</option>
+                <option value="business">إعلانات لمشروعي أو محلي</option>
+                <option value="marketing">تسويق لعملاء (فريلانسر أو وكالة)</option>
+                <option value="creator">صانع محتوى (ريلز، يوتيوب، بودكاست)</option>
+                <option value="other">حاجة تانية</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="f-plan">الباقة اللي تناسبك</label>
+              <select id="f-plan" name="plan">
+                <option value="">لسه مش متأكد</option>
+                <option value="free">مجاني</option>
+                <option value="starter">مبتدئ · 249 جنيه</option>
+                <option value="pro">احترافي · 599 جنيه</option>
+                <option value="business">أعمال · 1,499 جنيه</option>
+              </select>
+            </div>
+            <fieldset class="field">
+              <legend>لو فيه خصم 50%، تدفع أول شهر مقدمًا؟</legend>
+              <div class="choices">
+                <label><input type="radio" name="prepay" value="yes" id="pp-yes"> أيوه</label>
+                <label><input type="radio" name="prepay" value="maybe" id="pp-maybe"> ممكن</label>
+                <label><input type="radio" name="prepay" value="no" id="pp-no"> لأ</label>
+              </div>
+            </fieldset>
+            <div class="hp" aria-hidden="true">
+              <label for="f-website">اترك هذا الحقل فارغًا</label>
+              <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off">
+            </div>
+            <button class="btn btn-primary" type="submit" id="f-submit">احجز مكاني</button>
+            <p class="form-msg" id="formMsg" role="status"></p>
+            <p class="privacy">نستخدم إيميلك فقط لإبلاغك بالإطلاق. لا رسائل مزعجة، ولا نشارك بياناتك مع أحد.</p>
+          </form>
+          <div class="success" id="success" hidden>
+            <h3>تم حجز مكانك</h3>
+            <p>هنبعتلك إيميل أول ما النسخة التجريبية تجهز.</p>
+            <p class="privacy">شارك الصفحة مع صاحب محتوى يحتاجها.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tc mono">00:01:30:00</span>
+        <h2>أسئلة متكررة</h2>
+      </div>
+      <div class="faq">
+        <details>
+          <summary>هل فيه موسيقى في الفيديوهات؟</summary>
+          <p>لا. الموقع لا يضيف أي موسيقى نهائيًا، وفيه أداة تزيل الموسيقى من أي فيديو ترفعه وتحافظ على الكلام.</p>
+        </details>
+        <details>
+          <summary>إمتى الإطلاق؟</summary>
+          <p>نبني النسخة الأولى الآن. المسجلين في قائمة الانتظار هيجربوها قبل الإطلاق العام، وهيوصلهم إيميل أول ما تجهز.</p>
+        </details>
+        <details>
+          <summary>محتاج خبرة في المونتاج؟</summary>
+          <p>لا. لو تقدر تشرح اللي عايزه بالكلام، تقدر تعمل الفيديو.</p>
+        </details>
+        <details>
+          <summary>بيفهم لهجتي؟</summary>
+          <p>نستهدف المصري والخليجي والشامي والفصحى من البداية، وهنحسّن الدقة مع آراء المجربين الأوائل.</p>
+        </details>
+        <details>
+          <summary>فيديوهاتي آمنة؟</summary>
+          <p>فيديوهاتك ملكك. الفيديوهات الخام تتحذف تلقائيًا بعد فترة قصيرة، ولا نستخدم محتواك لأي غرض غير تنفيذ طلبك.</p>
+        </details>
+        <details>
+          <summary>أدفع إزاي؟</summary>
+          <p>داخل مصر بالبطاقات والمحافظ الإلكترونية، وخارج مصر بالبطاقات الدولية. الدفع لن يبدأ إلا بعد الإطلاق.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>حركة · استوديو الفيديو العربي</span>
+    <span>قيد البناء · 2026</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- tiny helpers ---------- */
+  var $ = function (id) { return document.getElementById(id); };
+  var params = new URLSearchParams(location.search);
+  var utm = {
+    source: params.get("utm_source") || "",
+    medium: params.get("utm_medium") || "",
+    campaign: params.get("utm_campaign") || ""
+  };
+  function post(path, body) {
+    return fetch(path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+  }
+
+  /* ---------- waveform bars ---------- */
+  var wave = $("wave");
+  for (var i = 0; i < 46; i++) {
+    var bar = document.createElement("i");
+    var h = 25 + Math.abs(Math.sin(i * 1.7) * 55) + (i % 5) * 4;
+    bar.style.height = Math.min(h, 95) + "%";
+    wave.appendChild(bar);
+  }
+
+  /* ---------- demo loop ---------- */
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var title = $("stTitle"), sub = $("stSub"), cap = $("stCap"), exp = $("stExport");
+  var say = $("sayText"), done = $("done"), ms = $("ms"), music = $("musicLane");
+  var tc = $("tc"), playhead = $("playhead");
+  var capWords = cap.querySelectorAll("span");
+
+  function reset() {
+    title.className = "st-title off";
+    sub.classList.add("off");
+    music.classList.add("live");
+    exp.style.transition = "none"; exp.style.width = "0";
+    capWords.forEach(function (w) { w.classList.remove("on"); });
+  }
+  var steps = [
+    { text: "اكتب «افتتاح فرعنا الجديد» وخلّيه يدخل من اليمين", run: function () { title.className = "st-title"; } },
+    { text: "كبّر العنوان وخلّيه أصفر", run: function () { title.className = "st-title big"; } },
+    { text: "ضيف تحته: خصم 20% أول أسبوع", run: function () { sub.classList.remove("off"); } },
+    { text: "شيل الموسيقى من الخلفية", run: function () { music.classList.remove("live"); } },
+    { text: "صدّره ريلز 9:16", run: function () { exp.style.transition = ""; requestAnimationFrame(function () { exp.style.width = "100%"; }); } }
+  ];
+
+  function typeText(str, cb) {
+    var n = 0;
+    say.textContent = "";
+    done.style.visibility = "hidden";
+    var t = setInterval(function () {
+      n++;
+      say.textContent = str.slice(0, n);
+      if (n >= str.length) { clearInterval(t); setTimeout(cb, 380); }
+    }, 42);
+  }
+
+  var frame = 0, pos = 0;
+  function tick() {
+    frame = (frame + 1) % 30;
+    pos = (pos + 0.6) % 100;
+    var sec = Math.floor(pos / 100 * 15);
+    tc.textContent = "00:00:" + String(sec).padStart(2, "0") + ":" + String(frame).padStart(2, "0");
+    playhead.style.insetInlineStart = "calc(14px + 74px + " + (pos * 0.01).toFixed(3) + " * (100% - 102px))";
+    var wi = Math.floor(pos / 100 * capWords.length);
+    capWords.forEach(function (w, k) { w.classList.toggle("on", k === wi); });
+  }
+
+  if (!reduce) {
+    var k = 0;
+    var loop = function () {
+      if (k === 0) reset();
+      var s = steps[k];
+      typeText(s.text, function () {
+        s.run();
+        ms.textContent = (0.5 + Math.random() * 0.7).toFixed(1) + "s";
+        done.style.visibility = "visible";
+        k = (k + 1) % steps.length;
+        setTimeout(loop, k === 0 ? 3200 : 1700);
+      });
+    };
+    setTimeout(loop, 1800);
+    setInterval(tick, 1000 / 12);
+  }
+
+  /* ---------- pricing intent tracking ---------- */
+  document.querySelectorAll("[data-plan]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var plan = btn.getAttribute("data-plan");
+      post("/api/event", { name: "pricing_click", plan: plan, utm: utm }).catch(function () {});
+      $("f-plan").value = plan;
+      $("formMsg").className = "form-msg";
+      $("formMsg").textContent = "لم نطلق بعد. احجز مكانك وهتوصلك الباقة دي بخصم 50% أول 3 شهور.";
+      $("join").scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+      setTimeout(function () { $("f-email").focus({ preventScroll: true }); }, reduce ? 0 : 500);
+    });
+  });
+
+  /* ---------- waitlist form ---------- */
+  var form = $("waitlist"), msg = $("formMsg"), submit = $("f-submit");
+  var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var data = new FormData(form);
+    var email = String(data.get("email") || "").trim();
+    var type = String(data.get("content_type") || "");
+    msg.className = "form-msg err";
+    if (!emailRe.test(email)) { msg.textContent = "اكتب إيميل صحيح، مثل name@example.com"; $("f-email").focus(); return; }
+    if (!type) { msg.textContent = "اختر نوع المحتوى اللي بتعمله."; $("f-type").focus(); return; }
+
+    submit.disabled = true;
+    submit.textContent = "جاري الحجز…";
+    msg.className = "form-msg"; msg.textContent = "";
+
+    post("/api/waitlist", {
+      name: String(data.get("name") || "").trim(),
+      email: email,
+      content_type: type,
+      plan: String(data.get("plan") || ""),
+      prepay: String(data.get("prepay") || ""),
+      website: String(data.get("website") || ""),
+      utm: utm,
+      referrer: document.referrer.slice(0, 300)
+    }).then(function (res) {
+      if (res.ok) {
+        form.hidden = true;
+        $("success").hidden = false;
+        return;
+      }
+      if (res.status === 404 || res.status === 405) throw new Error("preview");
+      return res.json().catch(function () { return {}; }).then(function (j) { throw new Error(j.error || "server"); });
+    }).catch(function (err) {
+      msg.className = "form-msg err";
+      if (err.message === "preview" || err.name === "TypeError") {
+        msg.textContent = "هذه نسخة معاينة، والتسجيل يعمل بعد نشر الصفحة على الدومين.";
+      } else if (err.message === "invalid_email") {
+        msg.textContent = "اكتب إيميل صحيح، مثل name@example.com";
+      } else {
+        msg.textContent = "حصلت مشكلة في الحجز. جرّب تاني بعد دقيقة.";
+      }
+    }).finally(function () {
+      submit.disabled = false;
+      submit.textContent = "احجز مكاني";
+    });
+  });
+})();
+</script>
+</body>
+</html>
