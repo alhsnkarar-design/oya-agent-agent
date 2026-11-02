@@ -10,7 +10,7 @@
 <meta property="og:description" content="استوديو فيديو عربي بالذكاء الاصطناعي: موشن عربي، كابشن بلهجتك، ومونتاج تعدّله بصوتك.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alexandria:wght@200..900&family=Aref+Ruqaa:wght@400;700&family=Readex+Pro:wght@300..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@100..900&family=Readex+Pro:wght@300..700&display=swap">
 <style>
 /* World: Egyptian blue (the ancient pigment) as the stage, Arabic letters as the moving material.
    Layout: a full-bleed blue stage where the headline itself performs; below it, editorial rows where
@@ -30,9 +30,9 @@
   --err: #B3261E;
   --night: #0A1030;          /* caption stage, dark in both themes */
   --mark: #1D3FA8;          /* emphasis on paper */
-  --f-display: "Alexandria", "Readex Pro", "Segoe UI", Tahoma, sans-serif;
+  --f-display: "Noto Kufi Arabic", "Readex Pro", "Segoe UI", Tahoma, sans-serif;
   --f-body: "Readex Pro", "Segoe UI", Tahoma, "Noto Sans Arabic", sans-serif;
-  --f-voice: "Aref Ruqaa", "Readex Pro", serif;
+  --f-voice: "Noto Kufi Arabic", "Readex Pro", "Segoe UI", Tahoma, sans-serif;
   --s-0: 1rem; --s-1: 1.2rem; --s-2: 1.5rem; --s-3: clamp(1.9rem, 3.6vw, 2.9rem);
   --s-hero: clamp(3.6rem, 13.5vw, 11rem);
   --ease-out: cubic-bezier(.16, 1, .3, 1);
@@ -98,10 +98,10 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .logo { font: 800 1.6rem/1 var(--f-display); text-decoration: none; display: inline-flex; align-items: baseline; gap: 2px; }
 .logo i { width: .32em; height: .32em; background: var(--gold); border-radius: 50%; display: inline-block; font-style: normal; }
 .bar nav { display: flex; align-items: center; gap: 26px; font-size: .95rem; }
-.bar nav a { color: var(--on-lapis-soft); text-decoration: none; transition: color .2s; }
-.bar nav a:hover { color: var(--on-lapis); }
+.bar nav a:not(.btn) { color: var(--on-lapis-soft); text-decoration: none; transition: color .2s; }
+.bar nav a:not(.btn):hover { color: var(--on-lapis); }
 .bar .btn { padding: 12px 20px; font-size: .95rem; }
-@media (max-width: 640px) { .bar nav a { display: none; } }
+@media (max-width: 640px) { .bar nav a:not(.btn) { display: none; } }
 
 .hero { padding-block: clamp(28px, 6vw, 64px) clamp(40px, 7vw, 88px); display: grid; gap: clamp(22px, 3vw, 34px); }
 .kin {
@@ -113,7 +113,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 
 .voice { display: flex; align-items: center; gap: 18px; min-height: 64px; }
 .voice canvas { width: 132px; height: 44px; flex: none; }
-.said { font: 700 clamp(1.4rem, 3vw, 2rem)/1.4 var(--f-voice); color: var(--on-lapis); min-width: 0; }
+.said { font: 500 clamp(1.25rem, 2.6vw, 1.75rem)/1.5 var(--f-voice); color: var(--on-lapis); min-width: 0; }
 .said .q { color: var(--on-lapis-soft); }
 .lede { font-size: var(--s-1); color: var(--on-lapis-soft); max-width: 40ch; line-height: 1.75; }
 
@@ -150,7 +150,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 }
 .cmds { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
 .cmd {
-  font: 700 1.1rem/1 var(--f-voice); color: var(--ink); background: var(--raised);
+  font: 600 .98rem/1.2 var(--f-voice); color: var(--ink); background: var(--raised);
   border: 1.5px solid var(--hair); padding: 12px 16px; border-radius: 999px; cursor: pointer;
   transition: border-color .2s, transform .2s var(--ease-out), background .2s;
 }
@@ -392,34 +392,34 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     <div class="plans">
       <div class="plan">
         <h3>مجاني</h3>
-        <p class="amt num">0<small>جنيه</small></p>
+        <p class="amt num"><bdi dir="ltr">$0</bdi><small>دائمًا</small></p>
         <p class="pts">12 نقطة في الشهر</p>
         <ul><li>حوالي 3 ريلز</li><li>كابشن عربي وتعديل بالصوت</li><li>720p بعلامة مائية</li></ul>
         <button class="btn btn-line" type="button" data-plan="free">ابدأ مجانًا</button>
       </div>
       <div class="plan">
         <h3>مبتدئ</h3>
-        <p class="amt num">249<small>جنيه / شهر</small></p>
-        <p class="pts">60 نقطة · <span class="alt">12$ خارج مصر</span></p>
+        <p class="amt num"><bdi dir="ltr">$12</bdi><small>/ شهر</small></p>
+        <p class="pts">60 نقطة في الشهر</p>
         <ul><li>حوالي 15 ريلز</li><li>1080p من غير علامة مائية</li><li>تعليق صوتي عربي</li></ul>
         <button class="btn btn-line" type="button" data-plan="starter">اشترك</button>
       </div>
       <div class="plan pro">
         <h3>احترافي <span class="ribbon">· الأنسب لأغلب الناس</span></h3>
-        <p class="amt num">599<small>جنيه / شهر</small></p>
-        <p class="pts">160 نقطة · <span class="alt">29$ خارج مصر</span></p>
+        <p class="amt num"><bdi dir="ltr">$29</bdi><small>/ شهر</small></p>
+        <p class="pts">160 نقطة في الشهر</p>
         <ul><li>حوالي 40 ريلز</li><li>محادثة صوتية مباشرة</li><li>دبلجة وترجمة صوتية</li><li>حتى 4K وأولوية في التصدير</li></ul>
         <button class="btn btn-gold" type="button" data-plan="pro">اشترك</button>
       </div>
       <div class="plan">
         <h3>أعمال</h3>
-        <p class="amt num">1,499<small>جنيه / شهر</small></p>
-        <p class="pts">450 نقطة · <span class="alt">79$ خارج مصر</span></p>
+        <p class="amt num"><bdi dir="ltr">$79</bdi><small>/ شهر</small></p>
+        <p class="pts">450 نقطة في الشهر</p>
         <ul><li>حوالي 110 ريلز</li><li>5 أعضاء في الفريق</li><li>هويات بصرية بلا حد</li></ul>
         <button class="btn btn-line" type="button" data-plan="business">اشترك</button>
       </div>
     </div>
-    <p class="offer"><b>لسه ما أطلقناش.</b> اللي يحجز دلوقتي ياخد خصم 50% لمدة 3 شهور على أي باقة.</p>
+    <p class="offer"><b>لسه ما أطلقناش.</b> اللي يحجز دلوقتي ياخد خصم 50% لمدة 3 شهور على أي باقة. الدفع بالدولار من أي دولة، بالبطاقات الدولية أو PayPal.</p>
   </section>
 
   <section class="join" id="join" aria-labelledby="t-join">
@@ -452,9 +452,9 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             <select id="f-plan" name="plan">
               <option value="">لسه مش متأكد</option>
               <option value="free">مجاني</option>
-              <option value="starter">مبتدئ · 249 جنيه</option>
-              <option value="pro">احترافي · 599 جنيه</option>
-              <option value="business">أعمال · 1,499 جنيه</option>
+              <option value="starter">مبتدئ · $12</option>
+              <option value="pro">احترافي · $29</option>
+              <option value="business">أعمال · $79</option>
             </select>
           </div>
           <fieldset>
@@ -541,7 +541,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           { transform: "translateX(0)", filter: "blur(0)", opacity: 1 }
         ], { duration: 1100, easing: EASE, fill: "both" }).finished; } },
     { text: "تقّل الخط", run: function () {
-        return w1.animate([{ fontWeight: 200 }, { fontWeight: 900 }], { duration: 1200, easing: EASE, fill: "both" }).finished; } },
+        return w1.animate([{ fontWeight: 150 }, { fontWeight: 900 }], { duration: 1200, easing: EASE, fill: "both" }).finished; } },
     { text: "لوّنها دهبي", run: function () {
         return w1.animate([{ color: css("--on-lapis") }, { color: css("--gold") }], { duration: 700, easing: EASE, fill: "both" }).finished; } },
     { text: "رجّعها زي ما كانت", run: function () {
