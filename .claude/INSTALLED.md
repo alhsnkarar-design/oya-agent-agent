@@ -9,6 +9,7 @@ removed or refused in a session on this repository.
 | --- | --- | --- | --- |
 | Replica | https://github.com/Jakeschincariol/replica-skill (MIT) | replica-recon, replica-architect, replica-design, replica-build, replica-backend, replica-test, replica-diff, replica-entrepreneur, replica-brand, replica-launch, replica-deploy | 2026-11-01 |
 | Instagram | https://github.com/Jakeschincariol/instagram-agent-skill (MIT) | ig-reel, ig-viral, ig-caption, ig-carousel, ig-story, ig-profile, ig-plan, ig-human, ig-comment, ig-reply, ig-dm, ig-repurpose, ig-audit (voice template: `.claude/instagram/voice.template.md`) | 2026-11-02 |
+| Impeccable | https://github.com/pbakaus/impeccable v4.8.0 (Apache-2.0) | impeccable (frontend design: shape, audit, critique, polish, animate, typeset, colorize, ... 24 commands) + agents in `.claude/agents/`: impeccable-asset-producer, impeccable-documenter, impeccable-finish-reviewer, impeccable-manual-edit-applier. Plugin hooks NOT installed (they auto-run and download a binary engine after every edit). | 2026-11-02 |
 
 ## Account skills (enabled in the owner's Claude account, synced into every session)
 
