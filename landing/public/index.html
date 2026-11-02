@@ -65,6 +65,9 @@ h2 { font: 800 clamp(1.9rem, 3.6vw, 2.9rem)/1.25 var(--f-display); text-wrap: ba
 .btn-primary:active { transform: none; }
 .btn-ghost { background: rgba(255, 255, 255, .06); color: var(--fg); box-shadow: inset 0 0 0 1px var(--line); }
 .btn-ghost:hover { background: rgba(255, 255, 255, .1); }
+.btn-primary { position: relative; overflow: hidden; }
+.btn-primary::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.55) 50%, transparent 70%); transform: translateX(120%); }
+.btn-primary:hover::after { transform: translateX(-120%); transition: transform .8s var(--ease-out); }
 .btn:disabled { opacity: .6; cursor: progress; }
 
 /* ================= top bar ================= */
@@ -97,7 +100,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 @media (max-width: 920px) {
   .hero { grid-template-columns: 1fr; gap: 22px; }
   .hero .hero-copy { display: contents; }       /* lets the booking card sit right under the headline */
-  .hero .kin { order: 1; } .hero .voice { order: 2; } .hero .book { order: 3; } .hero .lede { order: 4; } .hero .chips { order: 5; }
+  .hero .kin { order: 1; } .hero .voice { order: 2; } .hero .book { order: 3; } .hero .lede { order: 4; }
   .stage::after { background: linear-gradient(to bottom, rgba(14, 10, 36, .45), rgba(14, 10, 36, .6) 50%, var(--bg)); }
 }
 .hero-copy { display: grid; gap: clamp(18px, 2.4vw, 28px); min-width: 0; }
@@ -109,9 +112,6 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .said { font: 500 clamp(1.15rem, 2.2vw, 1.6rem)/1.5 var(--f-display); min-width: 0; }
 .said .q { color: var(--fg-soft); }
 .lede { font-size: clamp(1.05rem, 1.6vw, 1.25rem); color: var(--fg-soft); max-width: 38ch; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chips span { font-size: .85rem; padding: 6px 12px; border-radius: 999px; background: rgba(255, 255, 255, .07); box-shadow: inset 0 0 0 1px var(--line); display: inline-flex; align-items: center; gap: 8px; }
-.chips i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 
 /* booking card */
 .book {
@@ -127,6 +127,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 }
 .book-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .book h2 { font-size: clamp(1.6rem, 2.6vw, 2rem); }
+.picked { font: 700 .85rem/1 var(--f-body); color: var(--ink-on-bright); background: var(--rose); padding: 7px 12px; border-radius: 999px; }
 .badge { font: 700 .85rem/1 var(--f-body); color: var(--ink-on-bright); background: var(--mint); padding: 7px 12px; border-radius: 999px; }
 form { display: grid; gap: 14px; min-width: 0; }
 .field { display: grid; gap: 7px; }
@@ -139,8 +140,6 @@ input[type="email"], select {
 input::placeholder { color: #8E87B3; }
 input:focus, select:focus { outline: none; border-color: var(--saffron); background: rgba(255, 255, 255, .09); }
 select option { color: #160F2E; background: #FFFFFF; }
-.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-@media (max-width: 420px) { .row2 { grid-template-columns: 1fr; } }
 fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
 legend { padding: 0; margin-bottom: 7px; }
 .pills { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -153,9 +152,19 @@ legend { padding: 0; margin-bottom: 7px; }
 form .btn { width: 100%; padding-block: 17px; font-size: 1.05rem; }
 .msg { min-height: 1.5em; font-size: .92rem; }
 .msg.err { color: #FFB3B5; }
+#confetti { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; border-radius: inherit; }
 .thanks { display: grid; gap: 10px; text-align: center; padding-block: 28px; }
 .thanks h3 { font: 800 clamp(1.8rem, 3vw, 2.4rem)/1.2 var(--f-display); color: var(--mint); }
 .thanks p { color: var(--fg-soft); }
+
+/* ================= command marquee ================= */
+.marquee { overflow: hidden; padding-block: 22px; border-block: 1px solid var(--line); mask: linear-gradient(to left, transparent, #000 8%, #000 92%, transparent); }
+.mq-track { display: flex; gap: 14px; width: max-content; animation: mq 38s linear infinite; }
+.marquee:hover .mq-track { animation-play-state: paused; }
+@keyframes mq { to { transform: translateX(50%); } }
+.mq-track span { font: 600 clamp(1.05rem, 2vw, 1.4rem)/1 var(--f-display); padding: 14px 22px; border-radius: 999px; white-space: nowrap; background: color-mix(in srgb, var(--k) 14%, transparent); color: var(--k); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--k) 40%, transparent); }
+.k-coral { --k: var(--coral); } .k-saffron { --k: var(--saffron); } .k-mint { --k: var(--mint); }
+.k-azure { --k: var(--azure); } .k-violet { --k: var(--violet); } .k-rose { --k: var(--rose); }
 
 /* ================= editor window you scroll through ================= */
 .show { padding-block: clamp(56px, 8vw, 110px) 0; }
@@ -284,17 +293,12 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         <p class="said" id="said"><span class="q">«</span>لوّنها<span class="q">»</span></p>
       </div>
       <p class="lede">قول فكرتك بالعربي أو ارفع فيديو خام، يطلع لك موشن جرافيكس أو ريلز جاهز. وعدّل عليه بصوتك وأنت بتتفرّج.</p>
-      <div class="chips" aria-label="المميزات">
-        <span><i style="background:var(--coral)"></i>تعديل بالصوت</span>
-        <span><i style="background:var(--saffron)"></i>كابشن بلهجتك</span>
-        <span><i style="background:var(--mint)"></i>مونتاج تلقائي</span>
-        <span><i style="background:var(--azure)"></i>موشن عربي</span>
-      </div>
     </div>
 
     <section class="book" id="book" aria-labelledby="t-book">
       <div class="book-head">
         <h2 id="t-book">احجز مكانك</h2>
+        <span class="picked" id="picked" hidden></span>
         <span class="badge">خصم 50% لأول 100</span>
       </div>
       <form id="waitlist" novalidate>
@@ -302,8 +306,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
           <label for="f-email">الإيميل</label>
           <input id="f-email" name="email" type="email" maxlength="160" autocomplete="email" required placeholder="name@example.com" dir="ltr">
         </div>
-        <div class="row2">
-          <div class="field">
+        <div class="field">
             <label for="f-type">بتعمل محتوى إيه؟</label>
             <select id="f-type" name="content_type" required>
               <option value="">اختار…</option>
@@ -315,17 +318,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
               <option value="other">حاجة تانية</option>
             </select>
           </div>
-          <div class="field">
-            <label for="f-plan">الباقة</label>
-            <select id="f-plan" name="plan">
-              <option value="">لسه مش متأكد</option>
-              <option value="free">مجاني</option>
-              <option value="starter">مبتدئ · $12</option>
-              <option value="pro">احترافي · $29</option>
-              <option value="business">أعمال · $79</option>
-            </select>
-          </div>
-        </div>
+          <input type="hidden" name="plan" id="f-plan" value="">
         <fieldset>
           <legend>تدفع أول شهر مقدّمًا بالخصم؟</legend>
           <div class="pills">
@@ -341,6 +334,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         <button class="btn btn-primary" type="submit" id="f-submit">احجز مكاني</button>
         <p class="msg" id="msg" role="status"></p>
       </form>
+      <canvas id="confetti" aria-hidden="true"></canvas>
       <div class="thanks" id="thanks" hidden>
         <h3>مكانك محجوز</h3>
         <p>هيوصلك إيميل أول ما النسخة التجريبية تجهز.</p>
@@ -350,6 +344,13 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 </div>
 
 <main>
+  <div class="marquee" aria-hidden="true">
+    <div class="mq-track" id="mq">
+      <span class="k-coral">«كبّرها»</span><span class="k-saffron">«لوّنها دهبي»</span><span class="k-mint">«احذف المشهد التاني»</span>
+      <span class="k-azure">«ضيف كابشن»</span><span class="k-violet">«سرّع الانتقال»</span><span class="k-rose">«خلّي الخلفية أغمق»</span>
+      <span class="k-coral">«دخّلها من اليمين»</span><span class="k-saffron">«قصّ السكتات»</span><span class="k-mint">«صدّرها ريلز»</span>
+    </div>
+  </div>
   <section class="show" id="show" aria-label="إزاي بتشتغل">
     <div class="wrap show-grid">
       <div class="device-col">
@@ -384,15 +385,15 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       <div class="chapters">
         <article class="chapter on">
           <h2>عدّل <span class="c-coral">بصوتك</span></h2>
-          <p>«دخّلها من اليمين»، «تقّل الخط»، «لوّنها دهبي». تقولها، والتعديل يحصل قدامك في نفس اللحظة.</p>
+          <p>تقول، والتعديل يحصل قدامك في نفس اللحظة.</p>
         </article>
         <article class="chapter">
           <h2>كابشن <span class="c-saffron">بلهجتك</span></h2>
-          <p>كلمة بكلمة على توقيت الكلام، بالمصري والخليجي والشامي والفصحى.</p>
+          <p>كلمة بكلمة، بالمصري والخليجي والشامي والفصحى.</p>
         </article>
         <article class="chapter">
           <h2>مونتاج <span class="c-mint">من غير مونتير</span></h2>
-          <p>يشيل السكتات والتكرار والغلطات من الفيديو الخام، ويسيب لك الكلام المهم بس.</p>
+          <p>السكتات والتكرار والغلطات بتتشال لوحدها.</p>
         </article>
       </div>
     </div>
@@ -401,7 +402,6 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   <section class="wrap pricing" id="pricing" aria-labelledby="t-price">
     <div class="pricing-head">
       <h2 id="t-price">الأسعار</h2>
-      <p>المعاينة والتعديل مجانًا دايمًا. النقاط للتصدير بس: ريلز دقيقة بـ 4 نقاط.</p>
     </div>
     <div class="plans">
       <div class="plan">
@@ -432,7 +432,6 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   </section>
 </main>
 
-<footer><div class="wrap"><span>حركة</span><span>2026</span></div></footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
@@ -449,6 +448,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   var utm = { source: params.get("utm_source") || "", medium: params.get("utm_medium") || "", campaign: params.get("utm_campaign") || "" };
   function post(path, body) { return fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }); }
 
+  var mq = $("mq"); mq.innerHTML += mq.innerHTML; // two copies → seamless loop
+
   /* ================= top bar ================= */
   var topbar = $("topbar");
   function onTop() { topbar.classList.toggle("scrolled", scrollY > 20); }
@@ -460,7 +461,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (!gl) { cv.remove(); return; }
     var vs = "attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}";
     var fs = [
-      "precision mediump float;uniform vec2 r;uniform float t;",
+      "precision mediump float;uniform vec2 r;uniform float t;uniform vec2 m;",
       "float b(vec2 p,vec2 c,float s){vec2 d=p-c;return exp(-dot(d,d)/s);}",
       "void main(){vec2 p=gl_FragCoord.xy/r.y;float a=r.x/r.y;",
       "vec3 col=vec3(.055,.039,.141);",
@@ -469,6 +470,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       "col+=vec3(.17,.85,.71)*b(p,vec2(a*(.28+.10*sin(t*.21+1.)),.30+.12*cos(t*.25)),.06)*.55;", // mint
       "col+=vec3(.30,.55,1.)*b(p,vec2(a*(.10+.08*cos(t*.18)),.80+.10*sin(t*.22)),.09)*.70;",   // azure
       "col+=vec3(.63,.42,1.)*b(p,vec2(a*(.55+.15*sin(t*.15+2.)),.18+.08*cos(t*.2)),.10)*.70;", // violet
+      "col+=vec3(1.,.35,.68)*b(p,vec2(m.x*a,m.y),.035)*.55;",  // rose: follows the pointer
       "float n=fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453);",
       "col+=(n-.5)*.035;gl_FragColor=vec4(col,1.);}"
     ].join("");
@@ -480,7 +482,9 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     var buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
     var loc = gl.getAttribLocation(pr, "p"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    var uR = gl.getUniformLocation(pr, "r"), uT = gl.getUniformLocation(pr, "t");
+    var uR = gl.getUniformLocation(pr, "r"), uT = gl.getUniformLocation(pr, "t"), uM = gl.getUniformLocation(pr, "m");
+    var mx = .7, my = .6, tx = .7, ty = .6;
+    addEventListener("pointermove", function (e) { var r = cv.getBoundingClientRect(); tx = (e.clientX - r.left) / r.width; ty = 1 - (e.clientY - r.top) / r.height; }, { passive: true });
     var scale = 0.5, visible = true, t0 = performance.now();
     function size() {
       var w = Math.max(1, Math.round(cv.clientWidth * scale)), h = Math.max(1, Math.round(cv.clientHeight * scale));
@@ -488,7 +492,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     }
     function frame(now) {
       size();
-      gl.uniform2f(uR, cv.width, cv.height); gl.uniform1f(uT, (now - t0) / 1000 + 8);
+      mx += (tx - mx) * .05; my += (ty - my) * .05;
+      gl.uniform2f(uR, cv.width, cv.height); gl.uniform1f(uT, (now - t0) / 1000 + 8); gl.uniform2f(uM, mx, my);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       if (!reduce && visible) requestAnimationFrame(frame);
     }
@@ -648,10 +653,26 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       var plan = btn.getAttribute("data-plan");
       post("/api/event", { name: "pricing_click", plan: plan, utm: utm }).catch(function () {});
       $("f-plan").value = plan;
+      var names = { free: "مجاني", starter: "مبتدئ", pro: "احترافي", business: "أعمال" };
+      $("picked").textContent = "باقة " + names[plan]; $("picked").hidden = false;
       $("book").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
       setTimeout(function () { $("f-email").focus({ preventScroll: true }); }, reduce ? 0 : 650);
     });
   });
+
+  /* ================= confetti in the five gels ================= */
+  function confetti() {
+    if (reduce) return;
+    var cv = $("confetti"), c = cv.getContext("2d"), W = cv.width = cv.clientWidth, H = cv.height = cv.clientHeight;
+    var cols = gels.map(css), parts = [];
+    for (var i = 0; i < 140; i++) parts.push({ x: W / 2, y: H * .35, vx: (Math.random() - .5) * 9, vy: -Math.random() * 9 - 3, s: 4 + Math.random() * 6, r: Math.random() * 6, vr: (Math.random() - .5) * .3, c: cols[i % 5] });
+    var start = performance.now();
+    (function tick(now) {
+      c.clearRect(0, 0, W, H);
+      parts.forEach(function (p) { p.vy += .25; p.x += p.vx; p.y += p.vy; p.r += p.vr; c.save(); c.translate(p.x, p.y); c.rotate(p.r); c.fillStyle = p.c; c.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); c.restore(); });
+      if (now - start < 2600) requestAnimationFrame(tick); else c.clearRect(0, 0, W, H);
+    })(start);
+  }
 
   /* ================= waitlist ================= */
   var form = $("waitlist"), msg = $("msg"), submit = $("f-submit"), emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -666,7 +687,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       email: email, content_type: type, plan: String(data.get("plan") || ""), prepay: String(data.get("prepay") || ""),
       website: String(data.get("website") || ""), utm: utm, referrer: document.referrer.slice(0, 300)
     }).then(function (res) {
-      if (res.ok) { form.hidden = true; $("thanks").hidden = false; return; }
+      if (res.ok) { form.hidden = true; $("thanks").hidden = false; confetti(); return; }
       if (res.status === 404 || res.status === 405) throw new Error("preview");
       return res.json().catch(function () { return {}; }).then(function (j) { throw new Error(j.error || "server"); });
     }).catch(function (err) {
