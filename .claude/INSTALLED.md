@@ -10,6 +10,30 @@ removed or refused in a session on this repository.
 | Replica | https://github.com/Jakeschincariol/replica-skill (MIT) | replica-recon, replica-architect, replica-design, replica-build, replica-backend, replica-test, replica-diff, replica-entrepreneur, replica-brand, replica-launch, replica-deploy | 2026-11-01 |
 | Instagram | https://github.com/Jakeschincariol/instagram-agent-skill (MIT) | ig-reel, ig-viral, ig-caption, ig-carousel, ig-story, ig-profile, ig-plan, ig-human, ig-comment, ig-reply, ig-dm, ig-repurpose, ig-audit (voice template: `.claude/instagram/voice.template.md`) | 2026-11-02 |
 
+## Account skills (enabled in the owner's Claude account, synced into every session)
+
+Not copied here (Anthropic proprietary licenses); they are already present in
+every session. Invoke them with the Skill tool as `anthropic-skills:<name>`.
+
+| skill | what it does |
+| --- | --- |
+| docx | Word documents: create, read, edit |
+| pdf | PDF: read, merge, split, fill forms, OCR |
+| pptx | PowerPoint decks |
+| xlsx | Excel / CSV spreadsheets |
+| docs | Editable, shareable Claude docs |
+| google-workspace | Edit Google Docs, Sheets, Slides |
+| deep-research | Multi-source research with a written report |
+| skill-creator | Create, improve and test skills |
+| web-artifacts-builder | Advanced interactive web pages (React, Tailwind) |
+| morning | Daily morning brief |
+| import-memory | Import memory from another assistant |
+| built-in-browser | The browser pane in the Claude app |
+| chrome-browser | Claude in Chrome (the person's own Chrome) |
+| computer-use | Control apps on the person's computer (needs the desktop app with Computer use on and the computer linked) |
+
+Account plugin: `servicenow-sdk` (skill `servicenow-sdk:now-sdk`).
+
 ## Tools tried and removed
 
 | tool | what happened | date |
