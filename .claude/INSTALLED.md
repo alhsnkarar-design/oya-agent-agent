@@ -28,3 +28,10 @@ removed or refused in a session on this repository.
 | --- | --- |
 | `builder/` | Bannaa (placeholder name): AI mobile-app builder, phase 1 done. Next: Supabase auth/db, Lemon Squeezy billing (not Stripe). |
 | `replica/` | Recon map and feature matrix for the Rork-style builder |
+
+## Account-level copy
+
+`.claude/my-skills.zip` packs this registry plus full copies of every
+installed skill as one skill named `my-skills`. Uploaded in claude.ai under
+Customize, Skills, it syncs into every session in every repository. Rebuild
+and re-upload it whenever this registry changes.
