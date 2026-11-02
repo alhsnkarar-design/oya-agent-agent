@@ -33,8 +33,8 @@ export async function onRequestPost({ request, env }) {
   const email = clean(body.email, 160).toLowerCase();
   if (!EMAIL_RE.test(email)) return json({ error: "invalid_email" }, 400);
 
+  // Optional: the current page only asks for the email.
   const contentType = pick(body.content_type, CONTENT_TYPES);
-  if (!contentType) return json({ error: "invalid_content_type" }, 400);
 
   const utm = body.utm && typeof body.utm === "object" ? body.utm : {};
   const data = {

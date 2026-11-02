@@ -279,26 +279,6 @@ form .btn { width: 100%; padding-block: 17px; font-size: 1.05rem; }
           <label for="f-email">الإيميل</label>
           <input id="f-email" name="email" type="email" maxlength="160" autocomplete="email" required placeholder="name@example.com" dir="ltr">
         </div>
-        <div class="field">
-            <label for="f-type">بتعمل محتوى إيه؟</label>
-            <select id="f-type" name="content_type" required>
-              <option value="">اختار…</option>
-              <option value="religious">ديني أو دعوي</option>
-              <option value="education">تعليمي</option>
-              <option value="business">إعلانات لمشروعي</option>
-              <option value="marketing">تسويق لعملاء</option>
-              <option value="creator">صانع محتوى</option>
-              <option value="other">حاجة تانية</option>
-            </select>
-          </div>
-        <fieldset>
-          <legend>تدفع أول شهر مقدّمًا بالخصم؟</legend>
-          <div class="pills">
-            <label><input type="radio" name="prepay" value="yes" id="pp-yes">أيوه</label>
-            <label><input type="radio" name="prepay" value="maybe" id="pp-maybe">ممكن</label>
-            <label><input type="radio" name="prepay" value="no" id="pp-no">لأ</label>
-          </div>
-        </fieldset>
         <div class="sr" aria-hidden="true">
           <label for="f-website">سيب الخانة دي فاضية</label>
           <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off">
@@ -609,13 +589,12 @@ form .btn { width: 100%; padding-block: 17px; font-size: 1.05rem; }
   var form = $("waitlist"), msg = $("msg"), submit = $("f-submit"), emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   form.addEventListener("submit", function (e) {
     e.preventDefault();
-    var data = new FormData(form), email = String(data.get("email") || "").trim(), type = String(data.get("content_type") || "");
+    var data = new FormData(form), email = String(data.get("email") || "").trim();
     msg.className = "msg err";
     if (!emailRe.test(email)) { msg.textContent = "اكتب إيميل صحيح، زي name@example.com"; $("f-email").focus(); return; }
-    if (!type) { msg.textContent = "اختار نوع المحتوى اللي بتعمله."; $("f-type").focus(); return; }
     submit.disabled = true; submit.textContent = "بنحجز…"; msg.className = "msg"; msg.textContent = "";
     post("/api/waitlist", {
-      email: email, content_type: type, prepay: String(data.get("prepay") || ""),
+      email: email,
       website: String(data.get("website") || ""), utm: utm, referrer: document.referrer.slice(0, 300)
     }).then(function (res) {
       if (res.ok) { form.hidden = true; $("thanks").hidden = false; confetti(); return; }
