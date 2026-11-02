@@ -1,9 +1,10 @@
 ---
-// Email-only booking form (hero card). The script wires every instance on the page.
-interface Props { id: string; tone?: "light" | "dark"; }
-const { id, tone = "light" } = Astro.props;
+// Email-only booking form. Used at the top and the bottom of the page;
+// the script wires every instance.
+interface Props { id: string; }
+const { id } = Astro.props;
 ---
-<div class:list={["book-form", tone]} data-book>
+<div class="book-form" data-book>
   <form novalidate>
     <label class="sr" for={`${id}-email`}>الإيميل</label>
     <input id={`${id}-email`} name="email" type="email" maxlength="160" autocomplete="email" required placeholder="اكتب إيميلك" dir="auto" />
@@ -18,28 +19,25 @@ const { id, tone = "light" } = Astro.props;
 </div>
 
 <style>
-  form { display: flex; gap: 8px; flex-wrap: wrap; }
+  .book-form { width: 100%; max-width: 480px; margin-inline: auto; }
+  form { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
   input[type="email"] {
-    flex: 1 1 240px; min-width: 0; height: 56px; padding: 0 18px; border-radius: 14px;
-    font: 500 1.05rem/1 var(--f-body); border: 2px solid transparent;
+    flex: 1 1 250px; min-width: 0; height: 54px; padding: 0 20px; border-radius: 999px;
+    font: 400 1.02rem/1 var(--f-body); color: var(--ink); background: var(--tint);
+    border: 1px solid transparent;
   }
+  input::placeholder { color: var(--ink-3); }
+  input:focus { outline: none; border-color: var(--ink); background: var(--page); }
   button {
-    height: 56px; padding: 0 26px; border-radius: 14px; border: 0; cursor: pointer;
-    font: 700 1.05rem/1 var(--f-body); white-space: nowrap;
+    height: 54px; padding: 0 28px; border-radius: 999px; border: 0; cursor: pointer;
+    font: 600 1.02rem/1 var(--f-body); white-space: nowrap; background: var(--btn); color: var(--btn-ink);
   }
-  button:disabled { opacity: .6; cursor: progress; }
-  .msg { font-size: .92rem; margin-top: 10px; }
+  button:hover { opacity: .85; }
+  button:disabled { opacity: .5; cursor: progress; }
+  .msg { font-size: .92rem; margin-top: 12px; text-align: center; }
   .msg:empty { display: none; }
-  .done { font: 600 1.1rem/1.6 var(--f-body); padding-block: 6px; }
-
-  /* on the saffron card */
-  .light input { background: #fff; color: #0c0c0d; }
-  .light input::placeholder { color: #8a7a5c; }
-  .light input:focus { outline: none; border-color: #0c0c0d; }
-  .light button { background: #0c0c0d; color: #fff; }
-  .light button:hover { background: #2a2a2d; }
-  .light .msg.err { color: #7a1410; }
-
+  .msg.err { color: var(--danger); }
+  .done { font: 500 1.1rem/1.6 var(--f-body); text-align: center; padding-block: 12px; }
 </style>
 
 <script>

@@ -1,12 +1,7 @@
 <header class="top">
   <div class="wrap">
     <a class="mark" href="#top" aria-label="حركة">حركة<span>.</span></a>
-    <nav aria-label="القائمة">
-      <a class="btn" href="#book">احجز مكانك</a>
-      <a href="#how">إزاي بيشتغل</a>
-      <a href="#features">المميزات</a>
-      <a href="#faq">أسئلة</a>
-    </nav>
+    <a class="cta" href="#book">احجز مكانك</a>
   </div>
 </header>
 
@@ -17,16 +12,14 @@
   }
   .top {
     position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
-    background: var(--page); border-bottom: 1px solid var(--line);
+    background: color-mix(in srgb, var(--page) 92%, transparent);
+    backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--line);
   }
-  .wrap { display: flex; align-items: center; gap: 40px; height: 68px; }
-  nav { display: flex; align-items: center; gap: 26px; font-size: .92rem; }
-  nav a:not(.btn) { text-decoration: none; color: var(--ink-2); }
-  nav a:not(.btn):hover { color: var(--ink); }
-  .btn { height: 40px; padding: 0 18px; font-size: .9rem; background: var(--accent); color: var(--accent-ink); }
-  .btn:hover { opacity: 1; background: #f6b955; }
-  @media (max-width: 700px) {
-    .wrap { justify-content: space-between; gap: 16px; }
-    nav a:not(.btn) { display: none; }
+  .wrap { display: flex; align-items: center; justify-content: space-between; height: 56px; }
+  .cta {
+    font: 600 .88rem/1 var(--f-body); text-decoration: none; color: var(--btn-ink); background: var(--btn);
+    padding: 9px 16px; border-radius: 999px;
   }
+  .cta:hover { opacity: .85; }
 </style>

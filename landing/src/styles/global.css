@@ -1,36 +1,30 @@
-/* Haraka landing — design tokens and base.
-   White page, black type, one saffron accent; dark theme follows the system. */
+/* Haraka landing — minimal luxe.
+   Wide white space, one large sentence per section, black type with grey second lines,
+   saffron only on the logo dot. Dark theme follows the system. */
 :root {
   --page: #ffffff;
-  --tint: #f5f5f3;
-  --ink: #0c0c0d;
-  --ink-2: #55575e;
-  --ink-3: #8a8c93;
-  --line: #e7e7e4;
+  --tint: #f5f5f7;
+  --ink: #1d1d1f;
+  --ink-2: #6e6e73;
+  --ink-3: #8e8e93;
+  --line: #e5e5ea;
   --accent: #f2a72b;
-  --accent-ink: #1a1204;
-  --btn: #0c0c0d;
+  --btn: #1d1d1f;
   --btn-ink: #ffffff;
   --danger: #c7342b;
-  /* editor chrome stays dark in both themes, like real editing software */
-  --app: #16171b;
-  --app-2: #1e2025;
-  --app-3: #2a2d33;
-  --app-ink: #e9eaed;
-  --app-ink-2: #9a9da6;
   --f-display: "Noto Kufi Arabic Variable", "Noto Kufi Arabic", "Segoe UI", Tahoma, sans-serif;
   --f-body: "Readex Pro Variable", "Readex Pro", "Segoe UI", Tahoma, sans-serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --page: #0d0d0f; --tint: #151518; --ink: #f2f2f3; --ink-2: #a6a8af; --ink-3: #75777e; --line: #26272b;
-    --btn: #f2f2f3; --btn-ink: #0d0d0f; --danger: #ff8a80; color-scheme: dark;
+    --page: #000000; --tint: #161617; --ink: #f5f5f7; --ink-2: #a1a1a6; --ink-3: #6e6e73; --line: #2c2c2e;
+    --btn: #f5f5f7; --btn-ink: #000000; --danger: #ff8a80; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --page: #0d0d0f; --tint: #151518; --ink: #f2f2f3; --ink-2: #a6a8af; --ink-3: #75777e; --line: #26272b;
-  --btn: #f2f2f3; --btn-ink: #0d0d0f; --danger: #ff8a80; color-scheme: dark;
+  --page: #000000; --tint: #161617; --ink: #f5f5f7; --ink-2: #a1a1a6; --ink-3: #6e6e73; --line: #2c2c2e;
+  --btn: #f5f5f7; --btn-ink: #000000; --danger: #ff8a80; color-scheme: dark;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -41,28 +35,24 @@ body {
   font: 400 1rem/1.75 var(--f-body);
   -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
 }
-::selection { background: var(--accent); color: var(--accent-ink); }
+::selection { background: var(--ink); color: var(--page); }
 a { color: inherit; }
-h1, h2, h3, h4, p, ul { margin: 0; }
-img, svg { display: block; max-width: 100%; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+h1, h2, h3, p, ul { margin: 0; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 6px; }
 
 .wrap {
-  max-width: 1180px; margin-inline: auto;
+  max-width: 1080px; margin-inline: auto;
   padding-left: max(24px, env(safe-area-inset-left, 0px));
   padding-right: max(24px, env(safe-area-inset-right, 0px));
 }
-.sr {
-  position: absolute; width: 1px; height: 1px; overflow: hidden;
-  clip-path: inset(50%); white-space: nowrap;
-}
-.btn {
-  font: 600 .95rem/1 var(--f-body); border: 0; cursor: pointer; text-decoration: none; white-space: nowrap;
-  padding: 0 20px; height: 46px; border-radius: 10px;
-  display: inline-flex; align-items: center; justify-content: center;
-  background: var(--btn); color: var(--btn-ink);
-}
-.btn:hover { opacity: .88; }
-.btn:disabled { opacity: .55; cursor: progress; }
-.mark { font: 800 1.35rem/1 var(--f-display); text-decoration: none; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.mark { font: 800 1.3rem/1 var(--f-display); text-decoration: none; }
 .mark span { color: var(--accent); }
+
+/* one statement per section */
+.statement { text-align: center; display: grid; justify-items: center; gap: 22px; }
+.statement h2 {
+  font: 800 clamp(2.2rem, 6vw, 4.6rem)/1.25 var(--f-display); text-wrap: balance; max-width: 16ch;
+}
+.statement h2 span { display: block; color: var(--ink-3); font-weight: 700; }
+.statement p { font-size: clamp(1.05rem, 1.6vw, 1.25rem); color: var(--ink-2); max-width: 40ch; }
