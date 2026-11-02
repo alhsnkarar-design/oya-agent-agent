@@ -9,7 +9,7 @@
 | الملف | وظيفته |
 |---|---|
 | `src/pages/index.astro` | الصفحة، وتجمع الأقسام بالترتيب |
-| `src/components/` | أقسام الصفحة: `Header`، و`Hero` (العنوان وبطاقة الحجز)، و`Features`، و`Closing` (حجز ثاني آخر الصفحة)، و`Footer`، و`BookForm` (نموذج الحجز المستخدم في المكانين) |
+| `src/components/` | أقسام الصفحة: `Header`، و`Hero` (العنوان وبطاقة الحجز)، و`Features`، و`Footer`، و`BookForm` (نموذج الحجز) |
 | `src/layouts/Base.astro` | رأس الصفحة: العنوان والوصف وبيانات المشاركة وبيانات محركات البحث |
 | `src/styles/global.css` | الألوان والخطوط والأساسيات |
 | `public/` | ملفات ثابتة: الأيقونة، وصورة المشاركة `og.png`، و`robots.txt`، و`_headers` (إعدادات أمان وتخزين مؤقت لـ Cloudflare) |

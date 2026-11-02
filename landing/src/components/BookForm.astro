@@ -1,6 +1,5 @@
 ---
-// Email-only booking form. Used in the hero card and in the closing band;
-// the script below wires every instance on the page.
+// Email-only booking form (hero card). The script wires every instance on the page.
 interface Props { id: string; tone?: "light" | "dark"; }
 const { id, tone = "light" } = Astro.props;
 ---
@@ -41,13 +40,6 @@ const { id, tone = "light" } = Astro.props;
   .light button:hover { background: #2a2a2d; }
   .light .msg.err { color: #7a1410; }
 
-  /* on the black band */
-  .dark input { background: #1c1c1f; color: #fff; border-color: #2e2e33; }
-  .dark input::placeholder { color: #8a8c93; }
-  .dark input:focus { outline: none; border-color: var(--accent); }
-  .dark button { background: var(--accent); color: var(--accent-ink); }
-  .dark button:hover { background: #f6b955; }
-  .dark .msg.err { color: #ff9a92; }
 </style>
 
 <script>
