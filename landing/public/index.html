@@ -3,803 +3,706 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>حركة — استوديو الفيديو العربي</title>
+<title>حركة</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="قُل فكرتك بالعربي فتتحول إلى فيديو موشن جرافيكس أو ريلز جاهز، بدون موسيقى، وعدّله بصوتك. احجز مكانك في قائمة الانتظار.">
-<meta property="og:title" content="حركة — قُلها، تتحرّك">
-<meta property="og:description" content="استوديو فيديو عربي بالذكاء الاصطناعي: موشن من اليمين لليسار، كابشن باللهجات، تعديل بالصوت، وبدون موسيقى.">
+<meta name="description" content="قُل فكرتك بالعربي فتتحول إلى فيديو موشن جرافيكس أو ريلز جاهز، وعدّله بصوتك وأنت تشاهده. احجز مكانك قبل الإطلاق.">
+<meta property="og:title" content="حركة · قُلها، تتحرّك">
+<meta property="og:description" content="استوديو فيديو عربي بالذكاء الاصطناعي: موشن عربي، كابشن بلهجتك، ومونتاج تعدّله بصوتك.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alexandria:wght@200..900&family=Aref+Ruqaa:wght@400;700&family=Readex+Pro:wght@300..700&display=swap">
 <style>
-/* Layout: an editing-room page — copy on the right, a live 9:16 preview + timeline on the left; the timeline motif (tracks, keyframes, timecodes) repeats as section rules. */
+/* World: Egyptian blue (the ancient pigment) as the stage, Arabic letters as the moving material.
+   Layout: a full-bleed blue stage where the headline itself performs; below it, editorial rows where
+   the visitor drives three live demos; then a ruled price comparison and the sign-up. */
 :root {
-  --paper: #EEF2F1;        /* cool studio white, faint teal bias */
-  --panel: #FFFFFF;
-  --ink: #12222B;          /* deep blue-ink text */
-  --ink-soft: #4A5D66;
-  --line: #CBD6D6;
-  --signal: #D9901A;       /* amber: playhead / keyframe colour */
-  --signal-ink: #1B1405;   /* text on amber */
-  --teal: #11736F;         /* voice track */
-  --cut: #B23A3A;          /* removed track */
-  --screen: #0E1A20;       /* phone preview ground (dark in both themes) */
-  --screen-fg: #F3F6F5;
-  --f-display: "Reem Kufi", "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
-  --f-body: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, "Noto Sans Arabic", sans-serif;
-  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-  --step--1: 0.875rem;
-  --step-0: 1rem;
-  --step-1: 1.25rem;
-  --step-2: 1.6rem;
-  --step-3: clamp(1.9rem, 4vw, 2.6rem);
-  --step-4: clamp(2.6rem, 7vw, 4.6rem);
-  --radius: 14px;
+  --lapis: #1D3FA8;          /* Egyptian blue: the stage */
+  --lapis-deep: #10236B;
+  --on-lapis: #F2F4FC;
+  --on-lapis-soft: #B9C4EC;
+  --gold: #F0BE3C;           /* the one accent: what the voice changes */
+  --gold-ink: #241A02;
+  --paper: #F3F5FB;          /* cool white, blue-biased */
+  --raised: #FFFFFF;
+  --ink: #0D1433;
+  --ink-soft: #4B557A;
+  --hair: #D3D9EC;
+  --err: #B3261E;
+  --night: #0A1030;          /* caption stage, dark in both themes */
+  --mark: #1D3FA8;          /* emphasis on paper */
+  --f-display: "Alexandria", "Readex Pro", "Segoe UI", Tahoma, sans-serif;
+  --f-body: "Readex Pro", "Segoe UI", Tahoma, "Noto Sans Arabic", sans-serif;
+  --f-voice: "Aref Ruqaa", "Readex Pro", serif;
+  --s-0: 1rem; --s-1: 1.2rem; --s-2: 1.5rem; --s-3: clamp(1.9rem, 3.6vw, 2.9rem);
+  --s-hero: clamp(3.6rem, 13.5vw, 11rem);
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #0C161B; --panel: #13222A; --ink: #E6EEEE; --ink-soft: #9FB2B6;
-    --line: #26393F; --signal: #F0A92E; --signal-ink: #1B1405; --teal: #3FB9B2;
-    --cut: #E06A6A; --screen: #050B0E; --screen-fg: #F3F6F5; color-scheme: dark;
+    --lapis: #1D3FA8; --lapis-deep: #0B1A55; --on-lapis: #F2F4FC; --on-lapis-soft: #B9C4EC;
+    --gold: #F3C651; --gold-ink: #241A02;
+    --paper: #080D22; --raised: #10183A; --ink: #E7EBF8; --ink-soft: #A2ACCF; --hair: #222C55; --err: #FF8A80; --mark: #F3C651;
+    color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --paper: #0C161B; --panel: #13222A; --ink: #E6EEEE; --ink-soft: #9FB2B6;
-  --line: #26393F; --signal: #F0A92E; --signal-ink: #1B1405; --teal: #3FB9B2;
-  --cut: #E06A6A; --screen: #050B0E; --screen-fg: #F3F6F5; color-scheme: dark;
+  --lapis: #1D3FA8; --lapis-deep: #0B1A55; --on-lapis: #F2F4FC; --on-lapis-soft: #B9C4EC;
+  --gold: #F3C651; --gold-ink: #241A02;
+  --paper: #080D22; --raised: #10183A; --ink: #E7EBF8; --ink-soft: #A2ACCF; --hair: #222C55; --err: #FF8A80; --mark: #F3C651;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; scrollbar-color: var(--lapis) var(--paper); }
 body {
-  margin: 0;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--f-body);
-  font-size: var(--step-0);
-  line-height: 1.75;
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 400 var(--s-0)/1.8 var(--f-body);
+  caret-color: var(--gold);
 }
+::selection { background: var(--gold); color: var(--gold-ink); }
+a { color: inherit; text-underline-offset: .3em; }
+h1, h2, h3, p { margin: 0; }
+h2 { font: 800 var(--s-3)/1.2 var(--f-display); text-wrap: balance; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
 .wrap {
-  max-width: 1140px;
-  margin-inline: auto;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  max-width: 1200px; margin-inline: auto;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
 }
-h1, h2, h3 { font-family: var(--f-display); line-height: 1.25; text-wrap: balance; margin: 0; font-weight: 700; }
-p { margin: 0; }
-a { color: inherit; }
-.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
-:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; border-radius: 6px; }
+.num { font-variant-numeric: tabular-nums; }
 
-/* ---------- header ---------- */
-body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
-.top {
-  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
-  background: color-mix(in srgb, var(--paper) 88%, transparent);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--line);
-}
-.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
-.brand { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-size: var(--step-1); font-weight: 700; text-decoration: none; }
-.brand-mark { width: 28px; height: 28px; border-radius: 8px; background: var(--ink); position: relative; flex: none; }
-.brand-mark::after { content: ""; position: absolute; inset: 8px 7px 8px 10px; background: var(--signal); clip-path: polygon(100% 0, 100% 100%, 0 50%); }
-.top nav { display: flex; gap: 20px; font-size: var(--step--1); color: var(--ink-soft); }
-.top nav a { text-decoration: none; }
-.top nav a:hover { color: var(--ink); }
-@media (max-width: 720px) { .top nav { display: none; } }
-
+/* ---------- buttons ---------- */
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  font: 700 var(--step-0)/1 var(--f-body);
-  padding: 14px 22px; border-radius: 999px; border: 1.5px solid transparent;
-  cursor: pointer; text-decoration: none; transition: transform .15s ease, background .15s ease;
+  font: 600 var(--s-0)/1 var(--f-body); border: 0; cursor: pointer; text-decoration: none;
+  padding: 16px 26px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out), background .2s;
 }
-.btn:active { transform: translateY(1px); }
-.btn-primary { background: var(--signal); color: var(--signal-ink); }
-.btn-primary:hover { background: color-mix(in srgb, var(--signal) 85%, var(--ink)); }
-.btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
-.btn-ghost:hover { border-color: var(--ink-soft); }
-.btn-small { padding: 10px 16px; font-size: var(--step--1); }
+.btn-gold { background: var(--gold); color: var(--gold-ink); box-shadow: 0 10px 24px -12px rgba(240, 190, 60, .7); }
+.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 16px 30px -14px rgba(240, 190, 60, .8); }
+.btn-gold:active { transform: translateY(0); }
+.btn-line { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--hair); }
+.btn-line:hover { box-shadow: inset 0 0 0 1.5px var(--ink-soft); }
+.btn:disabled { opacity: .6; cursor: progress; }
 
-/* ---------- hero ---------- */
-.hero .wrap { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center; padding-block: 56px 40px; }
-@media (max-width: 900px) { .hero .wrap { grid-template-columns: 1fr; gap: 36px; padding-block: 36px 28px; } }
-.hero-copy { display: grid; gap: 22px; min-width: 0; }
-.eyebrow { font-size: var(--step--1); color: var(--teal); font-weight: 700; display: flex; align-items: center; gap: 10px; }
-.eyebrow::before { content: ""; width: 10px; height: 10px; background: var(--signal); transform: rotate(45deg); flex: none; }
-.hero h1 { font-size: var(--step-4); letter-spacing: 0; }
-.hero h1 em { font-style: normal; color: var(--signal); }
-.lede { font-size: var(--step-1); color: var(--ink-soft); max-width: 34ch; line-height: 1.7; }
-.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-.no-music {
-  display: inline-flex; align-items: center; gap: 10px; font-size: var(--step--1); color: var(--ink-soft);
-  border: 1px dashed var(--line); padding: 8px 14px; border-radius: 999px; width: fit-content;
+/* ---------- stage (hero) ---------- */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--lapis); }
+.stage {
+  background: var(--lapis); color: var(--on-lapis); position: relative; overflow: hidden; isolation: isolate;
 }
-.no-music svg { flex: none; }
-
-/* ---------- demo ---------- */
-.demo { display: grid; gap: 14px; min-width: 0; }
-.demo-head { display: flex; justify-content: space-between; align-items: center; font-size: var(--step--1); color: var(--ink-soft); gap: 12px; flex-wrap: wrap; }
-.rec { display: inline-flex; align-items: center; gap: 8px; }
-.rec i { width: 8px; height: 8px; border-radius: 50%; background: var(--cut); display: block; animation: blink 1.4s infinite; }
-@keyframes blink { 50% { opacity: .25; } }
-.demo-body { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: stretch; }
-@media (max-width: 520px) { .demo-body { grid-template-columns: 1fr; justify-items: center; } }
-
-.phone {
-  width: 210px; max-width: 100%; aspect-ratio: 9 / 16; background: var(--screen); color: var(--screen-fg);
-  border-radius: 26px; padding: 10px; position: relative; overflow: hidden;
-  box-shadow: 0 0 0 6px color-mix(in srgb, var(--ink) 90%, transparent), 0 24px 50px -24px rgba(0,0,0,.5);
+.stage::after { /* soft vignette: depth toward the edges */
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: radial-gradient(120% 90% at 70% 35%, transparent 40%, var(--lapis-deep) 100%);
 }
-.screen { position: absolute; inset: 0; display: grid; align-content: center; justify-items: center; padding: 22px 16px; text-align: center; gap: 10px; }
-.screen::before {
+.bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 20px; }
+.logo { font: 800 1.6rem/1 var(--f-display); text-decoration: none; display: inline-flex; align-items: baseline; gap: 2px; }
+.logo i { width: .32em; height: .32em; background: var(--gold); border-radius: 50%; display: inline-block; font-style: normal; }
+.bar nav { display: flex; align-items: center; gap: 26px; font-size: .95rem; }
+.bar nav a { color: var(--on-lapis-soft); text-decoration: none; transition: color .2s; }
+.bar nav a:hover { color: var(--on-lapis); }
+.bar .btn { padding: 12px 20px; font-size: .95rem; }
+@media (max-width: 640px) { .bar nav a { display: none; } }
+
+.hero { padding-block: clamp(28px, 6vw, 64px) clamp(40px, 7vw, 88px); display: grid; gap: clamp(22px, 3vw, 34px); }
+.kin {
+  font-family: var(--f-display); font-size: var(--s-hero); line-height: 1.05; font-weight: 800;
+  letter-spacing: 0; display: flex; flex-wrap: wrap; column-gap: .22em; row-gap: 0;
+}
+.kin .w { display: inline-block; will-change: transform, filter; }
+#w2 { color: var(--gold); }
+
+.voice { display: flex; align-items: center; gap: 18px; min-height: 64px; }
+.voice canvas { width: 132px; height: 44px; flex: none; }
+.said { font: 700 clamp(1.4rem, 3vw, 2rem)/1.4 var(--f-voice); color: var(--on-lapis); min-width: 0; }
+.said .q { color: var(--on-lapis-soft); }
+.lede { font-size: var(--s-1); color: var(--on-lapis-soft); max-width: 40ch; line-height: 1.75; }
+
+.quick { display: flex; gap: 10px; flex-wrap: wrap; max-width: 560px; }
+.quick input {
+  flex: 1 1 240px; min-width: 0; font: 500 var(--s-0)/1 var(--f-body); color: var(--on-lapis);
+  background: rgba(255, 255, 255, .08); border: 1.5px solid rgba(255, 255, 255, .22);
+  padding: 16px 20px; border-radius: 999px; transition: border-color .2s, background .2s;
+}
+.quick input::placeholder { color: var(--on-lapis-soft); }
+.quick input:focus { outline: none; border-color: var(--gold); background: rgba(255, 255, 255, .12); }
+.quick-note { font-size: .9rem; color: var(--on-lapis-soft); }
+
+/* ---------- demo rows ---------- */
+.rows { padding-block: clamp(56px, 9vw, 120px); display: grid; gap: clamp(72px, 10vw, 140px); }
+.row { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(28px, 5vw, 72px); align-items: center; }
+.row:nth-child(even) { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+.row:nth-child(even) .copy { order: 2; }
+@media (max-width: 860px) { .row, .row:nth-child(even) { grid-template-columns: 1fr; } .row:nth-child(even) .copy { order: 0; } }
+.copy { display: grid; gap: 16px; align-content: start; }
+.copy p { color: var(--ink-soft); font-size: var(--s-1); max-width: 34ch; }
+
+/* demo 1: drive the word */
+.screen {
+  background: var(--lapis); color: var(--on-lapis); border-radius: 22px; aspect-ratio: 16 / 10; max-width: 100%;
+  display: grid; place-items: center; align-content: center; gap: 14px; padding: 24px; position: relative; overflow: hidden;
+  box-shadow: 0 30px 60px -30px rgba(16, 35, 107, .55);
+}
+.screen::after { content: ""; position: absolute; inset: 0; background: radial-gradient(100% 80% at 50% 40%, transparent 50%, var(--lapis-deep) 100%); pointer-events: none; }
+.sw { font: 300 clamp(2rem, 6vw, 3.6rem)/1.15 var(--f-display); position: relative; z-index: 1; text-align: center; }
+.ss {
+  position: relative; z-index: 1; font: 700 clamp(.95rem, 2vw, 1.15rem)/1 var(--f-body);
+  background: var(--on-lapis); color: var(--lapis-deep); padding: 8px 16px; border-radius: 8px;
+}
+.cmds { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.cmd {
+  font: 700 1.1rem/1 var(--f-voice); color: var(--ink); background: var(--raised);
+  border: 1.5px solid var(--hair); padding: 12px 16px; border-radius: 999px; cursor: pointer;
+  transition: border-color .2s, transform .2s var(--ease-out), background .2s;
+}
+.cmd:hover { border-color: var(--lapis); transform: translateY(-1px); }
+.cmd.on { background: var(--gold); color: var(--gold-ink); border-color: var(--gold); }
+.cmd-reset { font-family: var(--f-body); font-weight: 500; font-size: .9rem; color: var(--ink-soft); }
+
+/* demo 2: dialect captions */
+.cap-stage {
+  background: var(--night); color: var(--on-lapis); border-radius: 22px; aspect-ratio: 16 / 10; max-width: 100%;
+  display: grid; align-content: end; padding: clamp(18px, 4vw, 36px); position: relative; overflow: hidden;
+}
+.cap-stage::before { /* a speaker silhouette suggested by light, not drawn */
   content: ""; position: absolute; inset: 0;
-  background:
-    radial-gradient(circle at 82% 16%, color-mix(in srgb, var(--signal) 22%, transparent) 0 9%, transparent 9.5%),
-    repeating-linear-gradient(-30deg, transparent 0 22px, rgba(255,255,255,.035) 22px 23px);
+  background: radial-gradient(38% 55% at 50% 38%, color-mix(in srgb, var(--lapis) 70%, transparent), transparent 70%);
 }
-.st-title { position: relative; font-family: var(--f-display); font-size: 1.45rem; line-height: 1.3; transition: transform .7s cubic-bezier(.2,.8,.2,1), opacity .5s, color .4s, font-size .4s; }
-.st-title.big { font-size: 1.85rem; color: var(--signal); }
-.st-title.off { transform: translateX(120%); opacity: 0; }
-.st-sub { position: relative; font-size: .85rem; background: var(--screen-fg); color: var(--screen); padding: 4px 12px; border-radius: 6px; font-weight: 700; transition: opacity .4s, transform .5s; }
-.st-sub.off { opacity: 0; transform: translateY(10px); }
-.st-cap { position: absolute; bottom: 44px; inset-inline: 12px; font-size: .78rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
-.st-cap span { background: rgba(0,0,0,.55); padding: 1px 6px; border-radius: 4px; transition: background .2s, color .2s; }
-.st-cap span.on { background: var(--signal); color: var(--signal-ink); }
-.st-meta { position: absolute; top: 12px; inset-inline: 14px; display: flex; justify-content: space-between; font-size: .62rem; opacity: .7; }
-.st-export { position: absolute; bottom: 16px; inset-inline: 16px; height: 4px; border-radius: 4px; background: rgba(255,255,255,.15); overflow: hidden; }
-.st-export i { display: block; height: 100%; width: 0; background: var(--signal); transition: width 1.6s linear; }
-
-.console { display: grid; gap: 12px; align-content: start; min-width: 0; width: 100%; }
-.say {
-  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 14px 16px; display: grid; gap: 8px; min-height: 104px;
+.cap { position: relative; display: flex; flex-wrap: wrap; justify-content: center; gap: .25em .35em; font: 700 clamp(1.25rem, 3.2vw, 2rem)/1.5 var(--f-display); }
+.cap span { padding: 0 .2em; border-radius: .25em; transition: background .15s, color .15s, transform .25s var(--ease-out); }
+.cap span.on { background: var(--gold); color: var(--gold-ink); transform: translateY(-3px) scale(1.06); }
+.dialects { display: flex; flex-wrap: wrap; gap: 8px; }
+.dialects button {
+  font: 600 .95rem/1 var(--f-body); color: var(--ink-soft); background: transparent; border: 0; cursor: pointer;
+  padding: 10px 2px; border-bottom: 2px solid transparent; margin-inline-end: 14px;
 }
-.say-label { display: flex; align-items: center; gap: 8px; font-size: .78rem; color: var(--teal); font-weight: 700; }
-.say-text { font-size: var(--step-0); font-weight: 500; min-height: 3.4em; }
-.say-text::after { content: ""; display: inline-block; width: 2px; height: 1.1em; background: var(--signal); vertical-align: -0.2em; margin-inline-start: 2px; animation: blink 1s infinite; }
-.done { font-size: .78rem; color: var(--ink-soft); display: flex; gap: 6px; align-items: center; }
-.done b { color: var(--teal); }
+.dialects button[aria-pressed="true"] { color: var(--ink); border-color: var(--gold); }
 
-.timeline { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; display: grid; gap: 7px; position: relative; overflow: hidden; }
-.tc-row { display: flex; justify-content: space-between; font-size: .7rem; color: var(--ink-soft); }
-.track { display: grid; grid-template-columns: 64px 1fr; gap: 10px; align-items: center; font-size: .72rem; color: var(--ink-soft); }
-.lane { height: 18px; border-radius: 5px; background: color-mix(in srgb, var(--line) 45%, transparent); position: relative; overflow: hidden; display: flex; align-items: center; }
-.wave { display: flex; gap: 2px; align-items: center; height: 100%; padding-inline: 4px; width: 100%; }
-.wave i { flex: 1; background: var(--teal); border-radius: 2px; min-width: 1px; }
-.clip { position: absolute; top: 3px; bottom: 3px; border-radius: 4px; background: color-mix(in srgb, var(--ink) 75%, transparent); }
-.key { position: absolute; top: 50%; width: 9px; height: 9px; background: var(--signal); transform: translate(50%, -50%) rotate(45deg); }
-.lane.music { background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--cut) 14%, transparent) 0 6px, transparent 6px 12px); }
-.lane.music .strike { position: absolute; inset-inline: 0; top: 50%; height: 2px; background: var(--cut); transform-origin: right; transition: transform .6s; }
-.lane.music b { position: relative; margin-inline: auto; font-size: .68rem; color: var(--cut); font-weight: 700; background: var(--panel); padding: 0 6px; border-radius: 4px; }
-.lane.music.live .strike { transform: scaleX(0); }
-.lane.music.live b { visibility: hidden; }
-.playhead { position: absolute; top: 28px; bottom: 8px; width: 2px; background: var(--signal); inset-inline-start: calc(14px + 74px + 0.62 * (100% - 102px)); transition: inset-inline-start .25s linear; pointer-events: none; }
-.demo-note { font-size: .75rem; color: var(--ink-soft); }
+/* demo 3: auto cut */
+.cut { display: grid; gap: 18px; }
+.track { display: flex; height: 76px; border-radius: 14px; overflow: hidden; background: var(--raised); box-shadow: inset 0 0 0 1.5px var(--hair); }
+.seg { flex: var(--w) 1 0; background: var(--lapis); position: relative; }
+.seg + .seg { box-shadow: inset -1px 0 0 rgba(255, 255, 255, .25); }
+.seg::before { /* speech energy */
+  content: ""; position: absolute; inset: 24% 6%;
+  background: repeating-linear-gradient(to left, var(--on-lapis-soft) 0 2px, transparent 2px 6px);
+  mask: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+  opacity: .55;
+}
+.gap {
+  flex: var(--w) 1 0;
+  background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--ink-soft) 22%, transparent) 0 5px, transparent 5px 10px);
+  transition: flex-grow .9s var(--ease-out);
+}
+.cut.done .gap { flex-grow: 0; }
+.cut-meta { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.dur { font: 800 clamp(2rem, 5vw, 3rem)/1 var(--f-display); }
+.dur small { font: 500 1rem/1 var(--f-body); color: var(--ink-soft); margin-inline-start: 8px; }
+.legend { display: flex; gap: 18px; font-size: .9rem; color: var(--ink-soft); }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.legend i { width: 14px; height: 14px; border-radius: 4px; background: var(--lapis); display: inline-block; }
+.legend i.g { background: repeating-linear-gradient(-45deg, var(--ink-soft) 0 2px, transparent 2px 5px); }
 
-/* ---------- section rule (timeline ruler) ---------- */
-.ruler { height: 22px; border-top: 1px solid var(--line); background: repeating-linear-gradient(to left, var(--line) 0 1px, transparent 1px 24px) top / 100% 7px no-repeat, repeating-linear-gradient(to left, var(--line) 0 1px, transparent 1px 120px) top / 100% 13px no-repeat; }
+/* ---------- who ---------- */
+.who { border-block: 1px solid var(--hair); padding-block: clamp(48px, 7vw, 90px); }
+.who p { font: 700 clamp(1.6rem, 4vw, 3rem)/1.45 var(--f-display); max-width: 24ch; text-wrap: balance; }
+.who p b { color: var(--mark); font-weight: 800; }
 
-section { padding-block: 64px; }
-@media (max-width: 700px) { section { padding-block: 44px; } }
-.sec-head { display: grid; gap: 10px; margin-bottom: 32px; max-width: 640px; }
-.sec-head h2 { font-size: var(--step-3); }
-.sec-head p { color: var(--ink-soft); font-size: var(--step-1); }
-.tc { font-size: .78rem; color: var(--signal); font-weight: 500; }
-
-/* features */
-.features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
-@media (max-width: 900px) { .features { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .features { grid-template-columns: 1fr; } }
-.feat { background: var(--panel); padding: 24px; display: grid; gap: 10px; align-content: start; min-width: 0; }
-.feat h3 { font-size: var(--step-1); }
-.feat p { color: var(--ink-soft); }
-.feat .ic { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in srgb, var(--teal) 14%, transparent); color: var(--teal); }
-.feat.hl { background: var(--ink); color: var(--paper); }
-.feat.hl p { color: color-mix(in srgb, var(--paper) 78%, transparent); }
-.feat.hl .ic { background: var(--signal); color: var(--signal-ink); }
-
-/* audience */
-.aud { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-@media (max-width: 800px) { .aud { grid-template-columns: 1fr; } }
-.aud > div { border-top: 3px solid var(--ink); padding-top: 16px; display: grid; gap: 8px; align-content: start; }
-.aud h3 { font-size: var(--step-1); }
-.aud p { color: var(--ink-soft); }
-.aud .ex { font-size: var(--step--1); color: var(--teal); font-weight: 500; }
-
-/* steps */
-.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: s; }
-@media (max-width: 800px) { .steps { grid-template-columns: 1fr; } }
-.step { display: grid; gap: 8px; align-content: start; }
-.step .n { font-family: var(--f-mono); font-size: .8rem; color: var(--ink-soft); direction: ltr; text-align: right; }
-.step h3 { font-size: var(--step-1); }
-.step p { color: var(--ink-soft); }
-
-/* pricing */
-.pricing { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; align-items: stretch; }
-@media (max-width: 1000px) { .pricing { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .pricing { grid-template-columns: 1fr; } }
-.plan { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; display: grid; grid-template-rows: auto auto auto 1fr auto; gap: 14px; min-width: 0; }
-.plan.pro { border: 2px solid var(--signal); position: relative; }
-.plan .tag { position: absolute; top: -12px; inset-inline-start: 18px; background: var(--signal); color: var(--signal-ink); font-size: .75rem; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
-.plan h3 { font-size: var(--step-1); }
-.price { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
-.price strong { font-family: var(--f-display); font-size: var(--step-3); line-height: 1; }
-.price span { color: var(--ink-soft); font-size: var(--step--1); }
-.usd { font-size: var(--step--1); color: var(--ink-soft); }
-.points { font-size: var(--step--1); background: color-mix(in srgb, var(--teal) 12%, transparent); color: var(--teal); padding: 6px 10px; border-radius: 8px; font-weight: 700; }
-.plan ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; font-size: var(--step--1); align-content: start; }
-.plan li { display: grid; grid-template-columns: 18px 1fr; gap: 8px; align-items: start; }
-.plan li::before { content: ""; width: 10px; height: 10px; margin-top: .55em; background: var(--teal); transform: rotate(45deg); }
-.plan li.no { color: var(--ink-soft); }
-.plan li.no::before { background: transparent; border: 1.5px solid var(--line); }
+/* ---------- pricing ---------- */
+.pricing { padding-block: clamp(56px, 9vw, 120px); display: grid; gap: 36px; }
+.pricing-head { display: flex; justify-content: space-between; align-items: end; gap: 20px; flex-wrap: wrap; }
+.pricing-head p { color: var(--ink-soft); max-width: 46ch; }
+.plans { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 1000px) { .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 28px; } }
+@media (max-width: 560px) { .plans { grid-template-columns: 1fr; } }
+.plan { padding: 28px 24px; display: grid; grid-template-rows: auto auto auto 1fr auto; gap: 16px; border-inline-start: 1px solid var(--hair); min-width: 0; }
+.plan:first-child { border-inline-start: 0; }
+@media (max-width: 1000px) { .plan:nth-child(odd) { border-inline-start: 0; } }
+@media (max-width: 560px) { .plan { border-inline-start: 0; border-top: 1px solid var(--hair); } }
+.plan h3 { font: 700 var(--s-1)/1.3 var(--f-display); }
+.amt { font: 800 clamp(2.4rem, 4vw, 3.2rem)/1 var(--f-display); display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.amt small { font: 400 .95rem/1.2 var(--f-body); color: var(--ink-soft); }
+.alt { font-size: .9rem; color: var(--ink-soft); }
+.pts { font-weight: 600; font-size: .95rem; }
+.plan ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font-size: .95rem; color: var(--ink-soft); align-content: start; }
+.plan li { padding-inline-start: 18px; position: relative; }
+.plan li::before { content: ""; position: absolute; inset-inline-start: 0; top: .78em; width: 7px; height: 7px; border-radius: 50%; background: var(--lapis); }
 .plan .btn { width: 100%; }
-.price-note { margin-top: 18px; color: var(--ink-soft); font-size: var(--step--1); }
+.plan.pro { background: var(--lapis); color: var(--on-lapis); border-radius: 22px; border: 0; box-shadow: 0 30px 60px -32px rgba(16, 35, 107, .6); }
+.plan.pro + .plan { border-inline-start: 0; }
+.plan.pro .alt, .plan.pro ul, .plan.pro .amt small { color: var(--on-lapis-soft); }
+.plan.pro li::before { background: var(--gold); }
+.plan.pro .ribbon { font: 600 .9rem/1 var(--f-body); color: var(--gold); }
+.offer { font-size: .95rem; color: var(--ink-soft); }
+.offer b { color: var(--ink); }
 
-/* waitlist */
-.join { background: var(--ink); color: var(--paper); border-radius: 22px; padding: clamp(24px, 5vw, 48px); display: grid; grid-template-columns: 1fr 1.1fr; gap: 40px; }
-@media (max-width: 860px) { .join { grid-template-columns: 1fr; gap: 28px; } }
-.join h2 { font-size: var(--step-3); }
-.join .perks { display: grid; gap: 12px; margin-top: 18px; }
-.join .perks div { display: grid; grid-template-columns: 16px 1fr; gap: 10px; color: color-mix(in srgb, var(--paper) 82%, transparent); }
-.join .perks div::before { content: ""; width: 10px; height: 10px; margin-top: .6em; background: var(--signal); transform: rotate(45deg); }
-form { display: grid; gap: 14px; min-width: 0; }
-.field { display: grid; gap: 6px; }
-.field label, .field legend { font-size: var(--step--1); font-weight: 700; }
-.field .opt { font-weight: 400; opacity: .7; }
-input[type="text"], input[type="email"], select {
-  width: 100%; font: inherit; padding: 12px 14px; border-radius: 10px;
-  border: 1.5px solid color-mix(in srgb, var(--paper) 25%, transparent);
-  background: color-mix(in srgb, var(--paper) 7%, transparent); color: var(--paper);
+/* ---------- join ---------- */
+.join { background: var(--lapis); color: var(--on-lapis); }
+.join .wrap { padding-block: clamp(56px, 9vw, 110px); display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(32px, 6vw, 80px); }
+@media (max-width: 860px) { .join .wrap { grid-template-columns: 1fr; } }
+.join h2 { font-size: clamp(2.2rem, 5vw, 3.8rem); }
+.join .intro { display: grid; gap: 18px; align-content: start; }
+.join .intro p { color: var(--on-lapis-soft); font-size: var(--s-1); max-width: 34ch; }
+form { display: grid; gap: 18px; min-width: 0; }
+.field { display: grid; gap: 8px; }
+.field > label, legend { font-weight: 600; font-size: .95rem; }
+.opt { font-weight: 400; color: var(--on-lapis-soft); }
+.join input[type="text"], .join input[type="email"], .join select {
+  width: 100%; font: 500 var(--s-0)/1.3 var(--f-body); color: var(--on-lapis);
+  background: rgba(255, 255, 255, .08); border: 1.5px solid rgba(255, 255, 255, .22);
+  padding: 14px 16px; border-radius: 12px; transition: border-color .2s, background .2s;
 }
-select option { color: #12222B; background: #FFFFFF; }
-input::placeholder { color: color-mix(in srgb, var(--paper) 50%, transparent); }
-input:focus, select:focus { outline: none; border-color: var(--signal); }
-fieldset { border: 0; padding: 0; margin: 0; }
-.choices { display: flex; flex-wrap: wrap; gap: 8px; }
-.choices label { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 999px; border: 1.5px solid color-mix(in srgb, var(--paper) 25%, transparent); cursor: pointer; font-size: var(--step--1); font-weight: 500; }
-.choices input { accent-color: var(--signal); margin: 0; }
-.choices label:has(input:checked) { border-color: var(--signal); background: color-mix(in srgb, var(--signal) 16%, transparent); }
+.join input::placeholder { color: var(--on-lapis-soft); }
+.join input:focus, .join select:focus { outline: none; border-color: var(--gold); background: rgba(255, 255, 255, .12); }
+.join select option { color: #0D1433; background: #FFFFFF; }
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+legend { padding: 0; margin-bottom: 8px; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pills label {
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;
+  padding: 10px 18px; border-radius: 999px; border: 1.5px solid rgba(255, 255, 255, .22); transition: border-color .2s, background .2s;
+}
+.pills input { position: absolute; opacity: 0; pointer-events: none; }
+.pills label:has(input:checked) { background: var(--gold); color: var(--gold-ink); border-color: var(--gold); }
+.pills label:has(input:focus-visible) { outline: 3px solid var(--gold); outline-offset: 3px; }
 .hp { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.form-msg { font-size: var(--step--1); min-height: 1.5em; }
-.form-msg.err { color: #FFB4A8; }
-.success { display: grid; gap: 12px; align-content: center; text-align: center; padding: 24px; border: 1.5px dashed var(--signal); border-radius: 16px; }
-.success h3 { font-size: var(--step-2); color: var(--signal); }
-.privacy { font-size: .78rem; color: color-mix(in srgb, var(--paper) 65%, transparent); }
+.msg { min-height: 1.6em; font-size: .95rem; }
+.msg.err { color: #FFC2BC; }
+.fine { font-size: .85rem; color: var(--on-lapis-soft); }
+.thanks { display: grid; gap: 12px; align-content: center; }
+.thanks h3 { font: 800 clamp(2rem, 4vw, 3rem)/1.2 var(--f-display); color: var(--gold); }
+.thanks p { color: var(--on-lapis-soft); font-size: var(--s-1); }
 
-/* faq */
-.faq { display: grid; gap: 0; border-top: 1px solid var(--line); max-width: 820px; }
-.faq details { border-bottom: 1px solid var(--line); padding-block: 18px; }
-.faq summary { cursor: pointer; font-weight: 700; font-size: var(--step-1); list-style: none; display: flex; justify-content: space-between; gap: 16px; }
-.faq summary::-webkit-details-marker { display: none; }
-.faq summary::after { content: "+"; font-family: var(--f-mono); color: var(--signal); font-size: 1.4rem; line-height: 1; }
-.faq details[open] summary::after { content: "−"; }
-.faq p { color: var(--ink-soft); margin-top: 10px; max-width: 65ch; }
-
-footer { border-top: 1px solid var(--line); padding-block: 28px; color: var(--ink-soft); font-size: var(--step--1); }
+footer { padding-block: 28px; font-size: .9rem; color: var(--ink-soft); }
 footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; transition: none !important; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
   html { scroll-behavior: auto; }
 }
 </style>
 </head>
 <body>
 
-<header class="top">
+<header class="stage" id="top">
   <div class="wrap">
-    <a class="brand" href="#top" aria-label="حركة">
-      <span class="brand-mark" aria-hidden="true"></span>
-      <span>حركة</span>
-    </a>
-    <nav aria-label="أقسام الصفحة">
-      <a href="#features">المميزات</a>
-      <a href="#who">لمن؟</a>
-      <a href="#pricing">الأسعار</a>
-      <a href="#faq">أسئلة</a>
-    </nav>
-    <a class="btn btn-primary btn-small" href="#join">احجز مكانك</a>
+    <div class="bar">
+      <a class="logo" href="#top" aria-label="حركة، الصفحة الرئيسية">حركة<i aria-hidden="true"></i></a>
+      <nav aria-label="أقسام الصفحة">
+        <a href="#try">جرّبها</a>
+        <a href="#pricing">الأسعار</a>
+        <a class="btn btn-gold" href="#join">احجز مكانك</a>
+      </nav>
+    </div>
+
+    <div class="hero">
+      <h1 class="kin" aria-label="قُلها، تتحرّك">
+        <span class="w" id="w1" aria-hidden="true">قُلها</span>
+        <span class="w" id="w2" aria-hidden="true">تتحرّك.</span>
+      </h1>
+
+      <div class="voice" aria-hidden="true">
+        <canvas id="wave" width="264" height="88"></canvas>
+        <p class="said" id="said"><span class="q">«</span>لوّنها دهبي<span class="q">»</span></p>
+      </div>
+
+      <p class="lede">قول فكرتك بالعربي أو ارفع فيديو خام، يطلع لك موشن جرافيكس أو ريلز جاهز. وعدّل عليه بصوتك وأنت بتتفرّج.</p>
+
+      <form class="quick" id="quick" novalidate>
+        <label class="hp" for="q-email">الإيميل</label>
+        <input id="q-email" type="email" inputmode="email" autocomplete="email" placeholder="إيميلك" dir="auto" aria-label="إيميلك">
+        <button class="btn btn-gold" type="submit">احجز مكانك</button>
+      </form>
+      <p class="quick-note">أول 100 مشترك: خصم 50% لمدة 3 شهور.</p>
+    </div>
   </div>
 </header>
 
-<main id="top">
-  <!-- HERO -->
-  <div class="hero">
-    <div class="wrap">
-      <div class="hero-copy">
-        <span class="eyebrow">استوديو فيديو عربي بالذكاء الاصطناعي</span>
-        <h1>قُلها…<br><em>تتحرّك.</em></h1>
-        <p class="lede">قل فكرتك بالعربي أو ارفع فيديو خام، فيتحول إلى موشن جرافيكس أو ريلز جاهز للنشر. وعدّله بصوتك وأنت تشاهده.</p>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="#join">احجز مكانك مجانًا</a>
-          <a class="btn btn-ghost" href="#pricing">شاهد الأسعار</a>
-        </div>
-        <span class="no-music">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18V6l10-2v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" stroke="currentColor" stroke-width="2"/><path d="M3 3l18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          بدون موسيقى نهائيًا، ويزيل الموسيقى من فيديوهاتك
-        </span>
-      </div>
+<main>
+  <div class="wrap rows">
 
-      <div class="demo" aria-label="عرض توضيحي لطريقة العمل">
-        <div class="demo-head">
-          <span class="rec"><i aria-hidden="true"></i> تعديل بالصوت</span>
-          <span class="mono" id="tc">00:00:12:04</span>
+    <section class="row" id="try" aria-labelledby="t-try">
+      <div class="copy">
+        <h2 id="t-try">عدّل بصوتك</h2>
+        <p>اضغط على أي أمر كأنك قلته. ده بالظبط اللي هيحصل وأنت بتتكلم.</p>
+        <div class="cmds" role="group" aria-label="أوامر تجريبية">
+          <button class="cmd" type="button" data-cmd="enter">«دخّلها من اليمين»</button>
+          <button class="cmd" type="button" data-cmd="bold">«تقّل الخط»</button>
+          <button class="cmd" type="button" data-cmd="gold">«لوّنها دهبي»</button>
+          <button class="cmd" type="button" data-cmd="big">«كبّرها»</button>
+          <button class="cmd" type="button" data-cmd="sub">«ضيف تحتها الخصم»</button>
+          <button class="cmd cmd-reset" type="button" data-cmd="reset">ابدأ من الأول</button>
         </div>
-        <div class="demo-body">
-          <div class="phone" aria-hidden="true">
-            <div class="screen">
-              <div class="st-meta mono"><span>9:16</span><span>1080×1920 · 30fps</span></div>
-              <div class="st-title big" id="stTitle">افتتاح فرعنا الجديد</div>
-              <div class="st-sub" id="stSub">خصم 20% أول أسبوع</div>
-              <div class="st-cap" id="stCap"><span>نستناكم</span><span>يوم</span><span class="on">الخميس</span><span>في</span><span>مدينة</span><span>نصر</span></div>
-              <div class="st-export"><i id="stExport" style="width:100%"></i></div>
-            </div>
-          </div>
-          <div class="console">
-            <div class="say">
-              <span class="say-label">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" stroke-width="2"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                أنت تقول
-              </span>
-              <p class="say-text" id="sayText" aria-live="polite">صدّره ريلز 9:16</p>
-              <span class="done" id="done"><b>✓</b> تم التنفيذ في <span class="mono" id="ms">0.8s</span></span>
-            </div>
-            <div class="timeline" aria-hidden="true">
-              <div class="tc-row mono"><span>00:00</span><span>00:05</span><span>00:10</span><span>00:15</span></div>
-              <div class="track"><span>الكلام</span><div class="lane"><div class="wave" id="wave"></div></div></div>
-              <div class="track"><span>النص</span><div class="lane"><span class="clip" style="right:4%;width:38%"></span><span class="clip" style="right:46%;width:30%"></span></div></div>
-              <div class="track"><span>الحركة</span><div class="lane"><span class="key" style="right:6%"></span><span class="key" style="right:30%"></span><span class="key" style="right:52%"></span><span class="key" style="right:78%"></span></div></div>
-              <div class="track"><span>الموسيقى</span><div class="lane music" id="musicLane"><span class="strike"></span><b>محذوفة</b></div></div>
-              <span class="playhead" id="playhead"></span>
-            </div>
-          </div>
-        </div>
-        <p class="demo-note">عرض توضيحي لطريقة العمل. المنتج ما زال قيد البناء.</p>
       </div>
-    </div>
+      <div class="screen" aria-live="polite">
+        <div class="sw" id="sw">عرض الجمعة</div>
+        <div class="ss" id="ss" hidden>خصم 20% على كل المنيو</div>
+      </div>
+    </section>
+
+    <section class="row" aria-labelledby="t-cap">
+      <div class="copy">
+        <h2 id="t-cap">كابشن بلهجتك</h2>
+        <p>كلمة بكلمة على توقيت الكلام، بالمصري والخليجي والشامي والفصحى.</p>
+        <div class="dialects" role="group" aria-label="اختر اللهجة">
+          <button type="button" data-d="eg" aria-pressed="true">مصري</button>
+          <button type="button" data-d="gulf" aria-pressed="false">خليجي</button>
+          <button type="button" data-d="lev" aria-pressed="false">شامي</button>
+          <button type="button" data-d="fus" aria-pressed="false">فصحى</button>
+        </div>
+      </div>
+      <div class="cap-stage">
+        <p class="cap" id="cap" aria-live="off"></p>
+      </div>
+    </section>
+
+    <section class="row" aria-labelledby="t-cut">
+      <div class="copy">
+        <h2 id="t-cut">مونتاج من غير مونتير</h2>
+        <p>يشيل السكتات والتكرار والغلطات من الفيديو الخام، ويسيب لك الكلام المهم بس.</p>
+        <div><button class="btn btn-line" type="button" id="cutBtn">قصّ السكتات</button></div>
+      </div>
+      <div class="cut" id="cut">
+        <div class="track" aria-hidden="true">
+          <span class="seg" style="--w:9"></span><span class="gap" style="--w:4"></span>
+          <span class="seg" style="--w:13"></span><span class="gap" style="--w:6"></span>
+          <span class="seg" style="--w:7"></span><span class="gap" style="--w:3"></span>
+          <span class="seg" style="--w:15"></span><span class="gap" style="--w:7"></span>
+          <span class="seg" style="--w:11"></span><span class="gap" style="--w:5"></span>
+          <span class="seg" style="--w:8"></span>
+        </div>
+        <div class="cut-meta">
+          <p class="dur num" aria-live="polite"><span id="dur">4:12</span><small id="durNote">مدة الفيديو الخام</small></p>
+          <div class="legend"><span><i></i>كلام</span><span><i class="g"></i>سكتات</span></div>
+        </div>
+      </div>
+    </section>
   </div>
 
-  <div class="wrap"><div class="ruler" aria-hidden="true"></div></div>
-
-  <!-- FEATURES -->
-  <section id="features">
+  <section class="who" aria-label="لمين">
     <div class="wrap">
-      <div class="sec-head">
-        <span class="tc mono">00:00:15:00</span>
-        <h2>كل اللي تحتاجه للفيديو، بالعربي</h2>
-        <p>من فكرة مكتوبة أو فيديو خام، إلى فيديو جاهز للنشر خلال دقائق.</p>
-      </div>
-      <div class="features">
-        <div class="feat hl">
-          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" stroke-width="2"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-          <h3>عدّل بصوتك</h3>
-          <p>«كبّر العنوان»، «احذف المشهد التاني»، «خلّي الخلفية أغمق». تقولها فتراها أمامك فورًا.</p>
-        </div>
-        <div class="feat">
-          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 7H8m12 5H4m16 5H10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-          <h3>موشن عربي حقيقي</h3>
-          <p>نصوص تتحرك من اليمين لليسار بخطوط عربية جميلة، مش ترجمة لقوالب إنجليزية.</p>
-        </div>
-        <div class="feat">
-          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M7 14h4m3 0h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-          <h3>كابشن باللهجات</h3>
-          <p>مصري وخليجي وشامي وفصحى. كابشن متحرك كلمة بكلمة على توقيت الكلام.</p>
-        </div>
-        <div class="feat">
-          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18V6l10-2v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" stroke="currentColor" stroke-width="2"/><path d="M3 3l18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-          <h3>إزالة الموسيقى</h3>
-          <p>ارفع أي فيديو فيه موسيقى، فيرجع لك بالكلام فقط بنفس الجودة والتوقيت.</p>
-        </div>
-        <div class="feat">
-          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 4l4 8-4 8M14 4l4 8-4 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          <h3>مونتاج تلقائي</h3>
-          <p>يقص السكتات والتكرار والأخطاء، ويختار أفضل اللقطات من الفيديو الخام.</p>
-        </div>
-        <div class="feat">
-          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 18c3-6 5-6 8-2s5 4 8-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 8h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-          <h3>تعليق صوتي</h3>
-          <p>اكتب النص فيقرأه صوت عربي طبيعي بلهجتك، بدون استوديو ولا ميكروفون.</p>
-        </div>
-      </div>
+      <p>معمول <b>للدعاة والمعلّمين</b>، و<b>لأصحاب المحلات والمشاريع</b>، و<b>للمسوّقين وصنّاع المحتوى</b> اللي عايزين فيديو محترف بالعربي من غير مونتير.</p>
     </div>
   </section>
 
-  <div class="wrap"><div class="ruler" aria-hidden="true"></div></div>
-
-  <!-- AUDIENCE -->
-  <section id="who">
-    <div class="wrap">
-      <div class="sec-head">
-        <span class="tc mono">00:00:30:00</span>
-        <h2>معمول لمين؟</h2>
-        <p>لأي حد عايز فيديو احترافي بالعربي بدون مونتير وبدون موسيقى.</p>
+  <section class="wrap pricing" id="pricing" aria-labelledby="t-price">
+    <div class="pricing-head">
+      <h2 id="t-price">الأسعار عند الإطلاق</h2>
+      <p>بالنقاط: ريلز دقيقة بـ 4 نقاط، وفيديو موشن 30 ثانية بـ 4 نقاط. المعاينة والتعديل مجانًا دايمًا.</p>
+    </div>
+    <div class="plans">
+      <div class="plan">
+        <h3>مجاني</h3>
+        <p class="amt num">0<small>جنيه</small></p>
+        <p class="pts">12 نقطة في الشهر</p>
+        <ul><li>حوالي 3 ريلز</li><li>كابشن عربي وتعديل بالصوت</li><li>720p بعلامة مائية</li></ul>
+        <button class="btn btn-line" type="button" data-plan="free">ابدأ مجانًا</button>
       </div>
-      <div class="aud">
-        <div>
-          <h3>صناع المحتوى الديني والتعليمي</h3>
-          <p>دروس ومقاطع قصيرة ومواعظ بشكل احترافي، بدون موسيقى من الأساس.</p>
-          <span class="ex">مثال: مقطع تفسير آية في دقيقة بكابشن متحرك</span>
-        </div>
-        <div>
-          <h3>المشاريع والمحلات</h3>
-          <p>إعلان لمنتجك أو عرضك في دقيقة، بهويتك وألوانك، وجاهز لفيسبوك وتيك توك.</p>
-          <span class="ex">مثال: إعلان افتتاح فرع بعرض خاص</span>
-        </div>
-        <div>
-          <h3>المسوقين وصناع المحتوى</h3>
-          <p>حوّل بودكاست أو فيديو طويل إلى عدة ريلز قصيرة بكابشن عربي دقيق.</p>
-          <span class="ex">مثال: 5 مقاطع قصيرة من حلقة ساعة</span>
-        </div>
+      <div class="plan">
+        <h3>مبتدئ</h3>
+        <p class="amt num">249<small>جنيه / شهر</small></p>
+        <p class="pts">60 نقطة · <span class="alt">12$ خارج مصر</span></p>
+        <ul><li>حوالي 15 ريلز</li><li>1080p من غير علامة مائية</li><li>تعليق صوتي عربي</li></ul>
+        <button class="btn btn-line" type="button" data-plan="starter">اشترك</button>
+      </div>
+      <div class="plan pro">
+        <h3>احترافي <span class="ribbon">· الأنسب لأغلب الناس</span></h3>
+        <p class="amt num">599<small>جنيه / شهر</small></p>
+        <p class="pts">160 نقطة · <span class="alt">29$ خارج مصر</span></p>
+        <ul><li>حوالي 40 ريلز</li><li>محادثة صوتية مباشرة</li><li>دبلجة وترجمة صوتية</li><li>حتى 4K وأولوية في التصدير</li></ul>
+        <button class="btn btn-gold" type="button" data-plan="pro">اشترك</button>
+      </div>
+      <div class="plan">
+        <h3>أعمال</h3>
+        <p class="amt num">1,499<small>جنيه / شهر</small></p>
+        <p class="pts">450 نقطة · <span class="alt">79$ خارج مصر</span></p>
+        <ul><li>حوالي 110 ريلز</li><li>5 أعضاء في الفريق</li><li>هويات بصرية بلا حد</li></ul>
+        <button class="btn btn-line" type="button" data-plan="business">اشترك</button>
       </div>
     </div>
+    <p class="offer"><b>لسه ما أطلقناش.</b> اللي يحجز دلوقتي ياخد خصم 50% لمدة 3 شهور على أي باقة.</p>
   </section>
 
-  <div class="wrap"><div class="ruler" aria-hidden="true"></div></div>
-
-  <!-- STEPS -->
-  <section id="how">
+  <section class="join" id="join" aria-labelledby="t-join">
     <div class="wrap">
-      <div class="sec-head">
-        <span class="tc mono">00:00:45:00</span>
-        <h2>ثلاث خطوات</h2>
+      <div class="intro">
+        <h2 id="t-join">احجز مكانك</h2>
+        <p>جرّب النسخة الأولى قبل أي حد، وخد خصم 50% لمدة 3 شهور، ورأيك يحدد إيه اللي نبنيه الأول.</p>
       </div>
-      <div class="steps">
-        <div class="step">
-          <span class="n">01</span>
-          <h3>قول أو اكتب أو ارفع</h3>
-          <p>اوصف الفيديو اللي في دماغك، أو ارفع الفيديو الخام من موبايلك.</p>
-        </div>
-        <div class="step">
-          <span class="n">02</span>
-          <h3>اتفرّج وعدّل بالكلام</h3>
-          <p>المعاينة تظهر فورًا. قل اللي عايز تغيّره وشوف التعديل لحظيًا.</p>
-        </div>
-        <div class="step">
-          <span class="n">03</span>
-          <h3>صدّر وانشر</h3>
-          <p>ريلز 9:16 أو يوتيوب 16:9 أو مربع 1:1، بجودة تصل إلى 4K.</p>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <div class="wrap"><div class="ruler" aria-hidden="true"></div></div>
-
-  <!-- PRICING -->
-  <section id="pricing">
-    <div class="wrap">
-      <div class="sec-head">
-        <span class="tc mono">00:01:00:00</span>
-        <h2>الأسعار المتوقعة عند الإطلاق</h2>
-        <p>نظام نقاط واضح: ريلز دقيقة = 4 نقاط، فيديو موشن 30 ثانية = 4 نقاط، إزالة الموسيقى = نقطة لكل دقيقة.</p>
-      </div>
-      <div class="pricing">
-        <div class="plan">
-          <h3>مجاني</h3>
-          <div class="price"><strong>0</strong><span>جنيه</span></div>
-          <span class="points">12 نقطة شهريًا · حوالي 3 ريلز</span>
-          <ul>
-            <li>مونتاج تلقائي وكابشن عربي</li>
-            <li>تعديل بالصوت والكتابة</li>
-            <li>إزالة الموسيقى حتى دقيقة</li>
-            <li>جودة 720p</li>
-            <li class="no">علامة مائية</li>
-          </ul>
-          <button class="btn btn-ghost" type="button" data-plan="free">ابدأ مجانًا</button>
-        </div>
-        <div class="plan">
-          <h3>مبتدئ</h3>
-          <div class="price"><strong>249</strong><span>جنيه / شهر</span></div>
-          <span class="usd">أو 12$ خارج مصر</span>
-          <span class="points">60 نقطة شهريًا · حوالي 15 ريلز</span>
-          <ul>
-            <li>كل مميزات المجاني</li>
-            <li>جودة 1080p بدون علامة مائية</li>
-            <li>تعليق صوتي عربي</li>
-            <li>هوية بصرية واحدة</li>
-          </ul>
-          <button class="btn btn-ghost" type="button" data-plan="starter">اشترك</button>
-        </div>
-        <div class="plan pro">
-          <span class="tag">الأنسب لأغلب الناس</span>
-          <h3>احترافي</h3>
-          <div class="price"><strong>599</strong><span>جنيه / شهر</span></div>
-          <span class="usd">أو 29$ خارج مصر</span>
-          <span class="points">160 نقطة شهريًا · حوالي 40 ريلز</span>
-          <ul>
-            <li>كل مميزات المبتدئ</li>
-            <li>محادثة صوتية مباشرة أثناء التعديل</li>
-            <li>دبلجة وترجمة صوتية</li>
-            <li>جودة حتى 4K وأولوية في التصدير</li>
-            <li>3 هويات بصرية</li>
-          </ul>
-          <button class="btn btn-primary" type="button" data-plan="pro">اشترك</button>
-        </div>
-        <div class="plan">
-          <h3>أعمال ووكالات</h3>
-          <div class="price"><strong>1,499</strong><span>جنيه / شهر</span></div>
-          <span class="usd">أو 79$ خارج مصر</span>
-          <span class="points">450 نقطة شهريًا · حوالي 110 ريلز</span>
-          <ul>
-            <li>كل مميزات الاحترافي</li>
-            <li>5 أعضاء في الفريق</li>
-            <li>هويات بصرية بلا حد</li>
-            <li>أسرع تصدير</li>
-          </ul>
-          <button class="btn btn-ghost" type="button" data-plan="business">اشترك</button>
-        </div>
-      </div>
-      <p class="price-note">أول 100 مشترك من قائمة الانتظار يحصلون على خصم 50% لمدة 3 شهور. الاشتراك السنوي بخصم 20%.</p>
-    </div>
-  </section>
-
-  <!-- WAITLIST -->
-  <section id="join">
-    <div class="wrap">
-      <div class="join">
-        <div>
-          <span class="tc mono">00:01:15:00</span>
-          <h2>احجز مكانك قبل الإطلاق</h2>
-          <div class="perks">
-            <div>تجربة النسخة الأولى قبل أي حد</div>
-            <div>خصم 50% لمدة 3 شهور لأول 100 مشترك</div>
-            <div>رأيك يحدد المميزات اللي نبنيها الأول</div>
+      <div>
+        <form id="waitlist" novalidate>
+          <div class="field">
+            <label for="f-email">الإيميل</label>
+            <input id="f-email" name="email" type="email" maxlength="160" autocomplete="email" required placeholder="name@example.com" dir="ltr">
           </div>
-        </div>
-
-        <div>
-          <form id="waitlist" novalidate>
-            <div class="field">
-              <label for="f-name">الاسم <span class="opt">(اختياري)</span></label>
-              <input id="f-name" name="name" type="text" maxlength="80" autocomplete="name" placeholder="مثلًا: أحمد">
-            </div>
-            <div class="field">
-              <label for="f-email">الإيميل</label>
-              <input id="f-email" name="email" type="email" maxlength="160" autocomplete="email" required placeholder="name@example.com" dir="ltr">
-            </div>
-            <div class="field">
-              <label for="f-type">نوع المحتوى اللي بتعمله</label>
-              <select id="f-type" name="content_type" required>
-                <option value="">اختر…</option>
-                <option value="religious">ديني أو دعوي</option>
-                <option value="education">تعليمي</option>
-                <option value="business">إعلانات لمشروعي أو محلي</option>
-                <option value="marketing">تسويق لعملاء (فريلانسر أو وكالة)</option>
-                <option value="creator">صانع محتوى (ريلز، يوتيوب، بودكاست)</option>
-                <option value="other">حاجة تانية</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="f-plan">الباقة اللي تناسبك</label>
-              <select id="f-plan" name="plan">
-                <option value="">لسه مش متأكد</option>
-                <option value="free">مجاني</option>
-                <option value="starter">مبتدئ · 249 جنيه</option>
-                <option value="pro">احترافي · 599 جنيه</option>
-                <option value="business">أعمال · 1,499 جنيه</option>
-              </select>
-            </div>
-            <fieldset class="field">
-              <legend>لو فيه خصم 50%، تدفع أول شهر مقدمًا؟</legend>
-              <div class="choices">
-                <label><input type="radio" name="prepay" value="yes" id="pp-yes"> أيوه</label>
-                <label><input type="radio" name="prepay" value="maybe" id="pp-maybe"> ممكن</label>
-                <label><input type="radio" name="prepay" value="no" id="pp-no"> لأ</label>
-              </div>
-            </fieldset>
-            <div class="hp" aria-hidden="true">
-              <label for="f-website">اترك هذا الحقل فارغًا</label>
-              <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off">
-            </div>
-            <button class="btn btn-primary" type="submit" id="f-submit">احجز مكاني</button>
-            <p class="form-msg" id="formMsg" role="status"></p>
-            <p class="privacy">نستخدم إيميلك فقط لإبلاغك بالإطلاق. لا رسائل مزعجة، ولا نشارك بياناتك مع أحد.</p>
-          </form>
-          <div class="success" id="success" hidden>
-            <h3>تم حجز مكانك</h3>
-            <p>هنبعتلك إيميل أول ما النسخة التجريبية تجهز.</p>
-            <p class="privacy">شارك الصفحة مع صاحب محتوى يحتاجها.</p>
+          <div class="field">
+            <label for="f-type">بتعمل محتوى إيه؟</label>
+            <select id="f-type" name="content_type" required>
+              <option value="">اختار…</option>
+              <option value="religious">ديني أو دعوي</option>
+              <option value="education">تعليمي</option>
+              <option value="business">إعلانات لمشروعي أو محلي</option>
+              <option value="marketing">تسويق لعملاء (فريلانسر أو وكالة)</option>
+              <option value="creator">صانع محتوى (ريلز، يوتيوب، بودكاست)</option>
+              <option value="other">حاجة تانية</option>
+            </select>
           </div>
+          <div class="field">
+            <label for="f-plan">الباقة اللي تناسبك</label>
+            <select id="f-plan" name="plan">
+              <option value="">لسه مش متأكد</option>
+              <option value="free">مجاني</option>
+              <option value="starter">مبتدئ · 249 جنيه</option>
+              <option value="pro">احترافي · 599 جنيه</option>
+              <option value="business">أعمال · 1,499 جنيه</option>
+            </select>
+          </div>
+          <fieldset>
+            <legend>لو فيه خصم 50%، تدفع أول شهر مقدّمًا؟</legend>
+            <div class="pills">
+              <label><input type="radio" name="prepay" value="yes" id="pp-yes">أيوه</label>
+              <label><input type="radio" name="prepay" value="maybe" id="pp-maybe">ممكن</label>
+              <label><input type="radio" name="prepay" value="no" id="pp-no">لأ</label>
+            </div>
+          </fieldset>
+          <div class="field">
+            <label for="f-name">الاسم <span class="opt">(اختياري)</span></label>
+            <input id="f-name" name="name" type="text" maxlength="80" autocomplete="name">
+          </div>
+          <div class="hp" aria-hidden="true">
+            <label for="f-website">سيب الخانة دي فاضية</label>
+            <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off">
+          </div>
+          <div><button class="btn btn-gold" type="submit" id="f-submit">احجز مكاني</button></div>
+          <p class="msg" id="msg" role="status"></p>
+          <p class="fine">هنستخدم إيميلك علشان نبلّغك بالإطلاق بس، ومش هنشاركه مع حد.</p>
+        </form>
+        <div class="thanks" id="thanks" hidden>
+          <h3>مكانك محجوز</h3>
+          <p>هيوصلك إيميل أول ما النسخة التجريبية تجهز. لو تعرف حد محتاجها، ابعتله الصفحة.</p>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section id="faq">
-    <div class="wrap">
-      <div class="sec-head">
-        <span class="tc mono">00:01:30:00</span>
-        <h2>أسئلة متكررة</h2>
-      </div>
-      <div class="faq">
-        <details>
-          <summary>هل فيه موسيقى في الفيديوهات؟</summary>
-          <p>لا. الموقع لا يضيف أي موسيقى نهائيًا، وفيه أداة تزيل الموسيقى من أي فيديو ترفعه وتحافظ على الكلام.</p>
-        </details>
-        <details>
-          <summary>إمتى الإطلاق؟</summary>
-          <p>نبني النسخة الأولى الآن. المسجلين في قائمة الانتظار هيجربوها قبل الإطلاق العام، وهيوصلهم إيميل أول ما تجهز.</p>
-        </details>
-        <details>
-          <summary>محتاج خبرة في المونتاج؟</summary>
-          <p>لا. لو تقدر تشرح اللي عايزه بالكلام، تقدر تعمل الفيديو.</p>
-        </details>
-        <details>
-          <summary>بيفهم لهجتي؟</summary>
-          <p>نستهدف المصري والخليجي والشامي والفصحى من البداية، وهنحسّن الدقة مع آراء المجربين الأوائل.</p>
-        </details>
-        <details>
-          <summary>فيديوهاتي آمنة؟</summary>
-          <p>فيديوهاتك ملكك. الفيديوهات الخام تتحذف تلقائيًا بعد فترة قصيرة، ولا نستخدم محتواك لأي غرض غير تنفيذ طلبك.</p>
-        </details>
-        <details>
-          <summary>أدفع إزاي؟</summary>
-          <p>داخل مصر بالبطاقات والمحافظ الإلكترونية، وخارج مصر بالبطاقات الدولية. الدفع لن يبدأ إلا بعد الإطلاق.</p>
-        </details>
       </div>
     </div>
   </section>
 </main>
 
 <footer>
-  <div class="wrap">
-    <span>حركة · استوديو الفيديو العربي</span>
-    <span>قيد البناء · 2026</span>
-  </div>
+  <div class="wrap"><span>حركة</span><span>قيد البناء · 2026</span></div>
 </footer>
 
 <script>
 (function () {
   "use strict";
-
-  /* ---------- tiny helpers ---------- */
   var $ = function (id) { return document.getElementById(id); };
-  var params = new URLSearchParams(location.search);
-  var utm = {
-    source: params.get("utm_source") || "",
-    medium: params.get("utm_medium") || "",
-    campaign: params.get("utm_campaign") || ""
-  };
-  function post(path, body) {
-    return fetch(path, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-  }
-
-  /* ---------- waveform bars ---------- */
-  var wave = $("wave");
-  for (var i = 0; i < 46; i++) {
-    var bar = document.createElement("i");
-    var h = 25 + Math.abs(Math.sin(i * 1.7) * 55) + (i % 5) * 4;
-    bar.style.height = Math.min(h, 95) + "%";
-    wave.appendChild(bar);
-  }
-
-  /* ---------- demo loop ---------- */
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var title = $("stTitle"), sub = $("stSub"), cap = $("stCap"), exp = $("stExport");
-  var say = $("sayText"), done = $("done"), ms = $("ms"), music = $("musicLane");
-  var tc = $("tc"), playhead = $("playhead");
-  var capWords = cap.querySelectorAll("span");
-
-  function reset() {
-    title.className = "st-title off";
-    sub.classList.add("off");
-    music.classList.add("live");
-    exp.style.transition = "none"; exp.style.width = "0";
-    capWords.forEach(function (w) { w.classList.remove("on"); });
+  var EASE = "cubic-bezier(.16, 1, .3, 1)";
+  var sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+  var css = function (name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); };
+  var params = new URLSearchParams(location.search);
+  var utm = { source: params.get("utm_source") || "", medium: params.get("utm_medium") || "", campaign: params.get("utm_campaign") || "" };
+  function post(path, body) {
+    return fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   }
-  var steps = [
-    { text: "اكتب «افتتاح فرعنا الجديد» وخلّيه يدخل من اليمين", run: function () { title.className = "st-title"; } },
-    { text: "كبّر العنوان وخلّيه أصفر", run: function () { title.className = "st-title big"; } },
-    { text: "ضيف تحته: خصم 20% أول أسبوع", run: function () { sub.classList.remove("off"); } },
-    { text: "شيل الموسيقى من الخلفية", run: function () { music.classList.remove("live"); } },
-    { text: "صدّره ريلز 9:16", run: function () { exp.style.transition = ""; requestAnimationFrame(function () { exp.style.width = "100%"; }); } }
+
+  /* ================= hero: the headline performs the voice commands ================= */
+  var canvas = $("wave"), ctx = canvas.getContext("2d");
+  var listening = false, level = 0, t = 0;
+  function drawWave() {
+    var w = canvas.width, h = canvas.height, bars = 22, gap = 4;
+    var bw = (w - gap * (bars - 1)) / bars;
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = listening ? css("--gold") : css("--on-lapis-soft");
+    level += ((listening ? 1 : 0.12) - level) * 0.12;
+    for (var i = 0; i < bars; i++) {
+      var n = Math.sin(t * 0.18 + i * 0.9) * 0.5 + Math.sin(t * 0.31 + i * 1.7) * 0.5;
+      var bh = Math.max(6, (0.25 + Math.abs(n) * 0.75) * h * level);
+      var x = w - (i + 1) * bw - i * gap;
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(x, (h - bh) / 2, bw, bh, bw / 2) : ctx.rect(x, (h - bh) / 2, bw, bh);
+      ctx.fill();
+    }
+    t++;
+    if (!reduce) requestAnimationFrame(drawWave);
+  }
+  drawWave();
+
+  var w1 = $("w1"), w2 = $("w2"), said = $("said");
+  function say(text) {
+    said.innerHTML = '<span class="q">«</span>' + text + '<span class="q">»</span>';
+    return said.animate(
+      [{ clipPath: "inset(0 0 0 100%)" }, { clipPath: "inset(0 0 0 0)" }],
+      { duration: 900, easing: "cubic-bezier(.45,0,.2,1)", fill: "both" }
+    ).finished;
+  }
+  var script = [
+    { text: "دخّلها من اليمين", run: function () {
+        return w2.animate([
+          { transform: "translateX(70%)", filter: "blur(18px)", opacity: 0 },
+          { transform: "translateX(0)", filter: "blur(0)", opacity: 1 }
+        ], { duration: 1100, easing: EASE, fill: "both" }).finished; } },
+    { text: "تقّل الخط", run: function () {
+        return w1.animate([{ fontWeight: 200 }, { fontWeight: 900 }], { duration: 1200, easing: EASE, fill: "both" }).finished; } },
+    { text: "لوّنها دهبي", run: function () {
+        return w1.animate([{ color: css("--on-lapis") }, { color: css("--gold") }], { duration: 700, easing: EASE, fill: "both" }).finished; } },
+    { text: "رجّعها زي ما كانت", run: function () {
+        return Promise.all([
+          w1.animate([{ color: css("--gold"), fontWeight: 900 }, { color: css("--on-lapis"), fontWeight: 800 }], { duration: 900, easing: EASE, fill: "both" }).finished,
+          w2.animate([{ transform: "scale(1)" }, { transform: "scale(1.08)" }, { transform: "scale(1)" }], { duration: 900, easing: EASE }).finished
+        ]); } }
   ];
-
-  function typeText(str, cb) {
-    var n = 0;
-    say.textContent = "";
-    done.style.visibility = "hidden";
-    var t = setInterval(function () {
-      n++;
-      say.textContent = str.slice(0, n);
-      if (n >= str.length) { clearInterval(t); setTimeout(cb, 380); }
-    }, 42);
+  async function perform() {
+    await sleep(1600);
+    while (true) {
+      for (var i = 0; i < script.length; i++) {
+        listening = true;
+        await sleep(650);
+        await say(script[i].text);
+        listening = false;
+        await sleep(250);
+        await script[i].run();
+        await sleep(1500);
+      }
+    }
   }
+  if (!reduce) perform();
 
-  var frame = 0, pos = 0;
-  function tick() {
-    frame = (frame + 1) % 30;
-    pos = (pos + 0.6) % 100;
-    var sec = Math.floor(pos / 100 * 15);
-    tc.textContent = "00:00:" + String(sec).padStart(2, "0") + ":" + String(frame).padStart(2, "0");
-    playhead.style.insetInlineStart = "calc(14px + 74px + " + (pos * 0.01).toFixed(3) + " * (100% - 102px))";
-    var wi = Math.floor(pos / 100 * capWords.length);
-    capWords.forEach(function (w, k) { w.classList.toggle("on", k === wi); });
+  /* quick email in the hero hands off to the full form */
+  $("quick").addEventListener("submit", function (e) {
+    e.preventDefault();
+    $("f-email").value = $("q-email").value.trim();
+    $("join").scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+    setTimeout(function () { $("f-type").focus({ preventScroll: true }); }, reduce ? 0 : 600);
+  });
+
+  /* ================= demo 1: visitor drives the word ================= */
+  var sw = $("sw"), ss = $("ss"), state = { bold: false, gold: false, big: false };
+  function apply(cmd, btn) {
+    if (cmd === "reset") {
+      state = { bold: false, gold: false, big: false };
+      sw.getAnimations().forEach(function (a) { a.cancel(); });
+      sw.style.cssText = ""; ss.hidden = true;
+      document.querySelectorAll(".cmd.on").forEach(function (b) { b.classList.remove("on"); });
+      return;
+    }
+    btn.classList.add("on");
+    var d = reduce ? 0 : 1;
+    if (cmd === "enter") {
+      sw.animate([{ transform: "translateX(60%)", filter: "blur(14px)", opacity: 0 }, { transform: "none", filter: "blur(0)", opacity: 1 }],
+        { duration: 1000 * d, easing: EASE });
+    } else if (cmd === "bold") {
+      state.bold = !state.bold; btn.classList.toggle("on", state.bold);
+      var from = state.bold ? 300 : 900, to = state.bold ? 900 : 300;
+      sw.animate([{ fontWeight: from }, { fontWeight: to }], { duration: 900 * d, easing: EASE });
+      sw.style.fontWeight = to;
+    } else if (cmd === "gold") {
+      state.gold = !state.gold; btn.classList.toggle("on", state.gold);
+      sw.style.transition = "color .5s"; sw.style.color = state.gold ? "var(--gold)" : "";
+    } else if (cmd === "big") {
+      state.big = !state.big; btn.classList.toggle("on", state.big);
+      sw.style.transition = "font-size .7s " + EASE + ", color .5s";
+      sw.style.fontSize = state.big ? "clamp(2.8rem, 8.5vw, 5.2rem)" : "";
+    } else if (cmd === "sub") {
+      ss.hidden = false;
+      ss.animate([{ transform: "translateY(16px)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 700 * d, easing: EASE });
+    }
   }
+  document.querySelectorAll("[data-cmd]").forEach(function (b) {
+    b.addEventListener("click", function () { apply(b.getAttribute("data-cmd"), b); });
+  });
 
+  /* ================= demo 2: dialect captions ================= */
+  var lines = {
+    eg: "النهارده هقولكم على تلات حاجات هتفرق معاكم في التسويق",
+    gulf: "اليوم بقولكم ثلاث أشياء بتفرق معكم وايد في التسويق",
+    lev: "اليوم رح احكيلكن عن تلات شغلات بتفرق معكن بالتسويق",
+    fus: "سأحدثكم اليوم عن ثلاثة أمور تصنع فرقًا في التسويق"
+  };
+  var cap = $("cap"), words = [], wi = 0;
+  function setLine(key) {
+    cap.innerHTML = "";
+    words = lines[key].split(" ").map(function (txt) {
+      var s = document.createElement("span"); s.textContent = txt; cap.appendChild(s); return s;
+    });
+    wi = 0;
+    if (reduce) words.forEach(function (s, i) { s.classList.toggle("on", i === 3); });
+  }
+  setLine("eg");
+  document.querySelectorAll("[data-d]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll("[data-d]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      setLine(b.getAttribute("data-d"));
+    });
+  });
   if (!reduce) {
-    var k = 0;
-    var loop = function () {
-      if (k === 0) reset();
-      var s = steps[k];
-      typeText(s.text, function () {
-        s.run();
-        ms.textContent = (0.5 + Math.random() * 0.7).toFixed(1) + "s";
-        done.style.visibility = "visible";
-        k = (k + 1) % steps.length;
-        setTimeout(loop, k === 0 ? 3200 : 1700);
-      });
-    };
-    setTimeout(loop, 1800);
-    setInterval(tick, 1000 / 12);
+    setInterval(function () {
+      words.forEach(function (s, i) { s.classList.toggle("on", i === wi); });
+      wi = (wi + 1) % (words.length + 3);
+    }, 420);
   }
 
-  /* ---------- pricing intent tracking ---------- */
+  /* ================= demo 3: auto cut ================= */
+  var cut = $("cut"), dur = $("dur"), durNote = $("durNote"), cutBtn = $("cutBtn");
+  var RAW = 252, CLEAN = 167; // seconds: 4:12 → 2:47
+  function fmt(s) { s = Math.round(s); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
+  function runCut() {
+    var doing = !cut.classList.contains("done");
+    cut.classList.toggle("done", doing);
+    cutBtn.textContent = doing ? "رجّع الفيديو الخام" : "قصّ السكتات";
+    durNote.textContent = doing ? "بعد القصّ التلقائي" : "مدة الفيديو الخام";
+    var a = doing ? RAW : CLEAN, b = doing ? CLEAN : RAW, start = performance.now(), len = reduce ? 1 : 900;
+    (function step(now) {
+      var p = Math.min(1, (now - start) / len), e = 1 - Math.pow(1 - p, 4);
+      dur.textContent = fmt(a + (b - a) * e);
+      if (p < 1) requestAnimationFrame(step);
+    })(start);
+  }
+  cutBtn.addEventListener("click", runCut);
+  if (!reduce && "IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (es) {
+      if (es[0].isIntersecting) { io.disconnect(); setTimeout(runCut, 500); }
+    }, { threshold: 0.6 });
+    io.observe(cut);
+  }
+
+  /* ================= pricing intent ================= */
   document.querySelectorAll("[data-plan]").forEach(function (btn) {
     btn.addEventListener("click", function () {
       var plan = btn.getAttribute("data-plan");
       post("/api/event", { name: "pricing_click", plan: plan, utm: utm }).catch(function () {});
       $("f-plan").value = plan;
-      $("formMsg").className = "form-msg";
-      $("formMsg").textContent = "لم نطلق بعد. احجز مكانك وهتوصلك الباقة دي بخصم 50% أول 3 شهور.";
+      $("msg").className = "msg";
+      $("msg").textContent = "لسه ما أطلقناش. احجز وهتاخد الباقة دي بخصم 50% أول 3 شهور.";
       $("join").scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
-      setTimeout(function () { $("f-email").focus({ preventScroll: true }); }, reduce ? 0 : 500);
+      setTimeout(function () { $("f-email").focus({ preventScroll: true }); }, reduce ? 0 : 600);
     });
   });
 
-  /* ---------- waitlist form ---------- */
-  var form = $("waitlist"), msg = $("formMsg"), submit = $("f-submit");
+  /* ================= waitlist ================= */
+  var form = $("waitlist"), msg = $("msg"), submit = $("f-submit");
   var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     var data = new FormData(form);
     var email = String(data.get("email") || "").trim();
     var type = String(data.get("content_type") || "");
-    msg.className = "form-msg err";
-    if (!emailRe.test(email)) { msg.textContent = "اكتب إيميل صحيح، مثل name@example.com"; $("f-email").focus(); return; }
-    if (!type) { msg.textContent = "اختر نوع المحتوى اللي بتعمله."; $("f-type").focus(); return; }
-
-    submit.disabled = true;
-    submit.textContent = "جاري الحجز…";
-    msg.className = "form-msg"; msg.textContent = "";
-
+    msg.className = "msg err";
+    if (!emailRe.test(email)) { msg.textContent = "اكتب إيميل صحيح، زي name@example.com"; $("f-email").focus(); return; }
+    if (!type) { msg.textContent = "اختار نوع المحتوى اللي بتعمله."; $("f-type").focus(); return; }
+    submit.disabled = true; submit.textContent = "بنحجز…"; msg.className = "msg"; msg.textContent = "";
     post("/api/waitlist", {
-      name: String(data.get("name") || "").trim(),
-      email: email,
-      content_type: type,
-      plan: String(data.get("plan") || ""),
-      prepay: String(data.get("prepay") || ""),
-      website: String(data.get("website") || ""),
-      utm: utm,
-      referrer: document.referrer.slice(0, 300)
+      name: String(data.get("name") || "").trim(), email: email, content_type: type,
+      plan: String(data.get("plan") || ""), prepay: String(data.get("prepay") || ""),
+      website: String(data.get("website") || ""), utm: utm, referrer: document.referrer.slice(0, 300)
     }).then(function (res) {
-      if (res.ok) {
-        form.hidden = true;
-        $("success").hidden = false;
-        return;
-      }
+      if (res.ok) { form.hidden = true; $("thanks").hidden = false; return; }
       if (res.status === 404 || res.status === 405) throw new Error("preview");
       return res.json().catch(function () { return {}; }).then(function (j) { throw new Error(j.error || "server"); });
     }).catch(function (err) {
-      msg.className = "form-msg err";
-      if (err.message === "preview" || err.name === "TypeError") {
-        msg.textContent = "هذه نسخة معاينة، والتسجيل يعمل بعد نشر الصفحة على الدومين.";
-      } else if (err.message === "invalid_email") {
-        msg.textContent = "اكتب إيميل صحيح، مثل name@example.com";
-      } else {
-        msg.textContent = "حصلت مشكلة في الحجز. جرّب تاني بعد دقيقة.";
-      }
-    }).finally(function () {
-      submit.disabled = false;
-      submit.textContent = "احجز مكاني";
-    });
+      msg.className = "msg err";
+      if (err.message === "preview" || err.name === "TypeError") msg.textContent = "دي نسخة معاينة. الحجز هيشتغل بعد ما الصفحة تتنشر على الدومين.";
+      else if (err.message === "invalid_email") msg.textContent = "اكتب إيميل صحيح، زي name@example.com";
+      else msg.textContent = "الحجز ما تمّش. جرّب تاني بعد دقيقة.";
+    }).finally(function () { submit.disabled = false; submit.textContent = "احجز مكاني"; });
   });
 })();
 </script>
