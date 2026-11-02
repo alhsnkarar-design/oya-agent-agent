@@ -16,7 +16,7 @@
 /* World: a colour-graded edit suite at night. A live WebGL light field (five studio gels) sits behind
    the stage; each capability owns one gel colour, so colour also tells you where you are.
    Layout: booking card in the first screen beside the performing headline → one sticky editor window
-   that plays as you scroll → colour-coded plans. Deliberately single (dark) theme. */
+   that plays as you scroll → one closing call to book. Deliberately single (dark) theme. */
 :root {
   color-scheme: dark;
   --bg: #0E0A24;
@@ -127,7 +127,6 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 }
 .book-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .book h2 { font-size: clamp(1.6rem, 2.6vw, 2rem); }
-.picked { font: 700 .85rem/1 var(--f-body); color: var(--ink-on-bright); background: var(--rose); padding: 7px 12px; border-radius: 999px; }
 .badge { font: 700 .85rem/1 var(--f-body); color: var(--ink-on-bright); background: var(--mint); padding: 7px 12px; border-radius: 999px; }
 form { display: grid; gap: 14px; min-width: 0; }
 .field { display: grid; gap: 7px; }
@@ -156,6 +155,11 @@ form .btn { width: 100%; padding-block: 17px; font-size: 1.05rem; }
 .thanks { display: grid; gap: 10px; text-align: center; padding-block: 28px; }
 .thanks h3 { font: 800 clamp(1.8rem, 3vw, 2.4rem)/1.2 var(--f-display); color: var(--mint); }
 .thanks p { color: var(--fg-soft); }
+
+/* ================= closing call ================= */
+.end { padding-block: clamp(90px, 14vw, 180px); display: grid; justify-items: center; gap: 28px; text-align: center; }
+.end h2 { font-size: clamp(2.4rem, 7vw, 5rem); }
+.end .btn { padding: 18px 34px; font-size: 1.1rem; }
 
 /* ================= command marquee ================= */
 .marquee { overflow: hidden; padding-block: 22px; border-block: 1px solid var(--line); mask: linear-gradient(to left, transparent, #000 8%, #000 92%, transparent); }
@@ -228,35 +232,6 @@ form .btn { width: 100%; padding-block: 17px; font-size: 1.05rem; }
   .chapter { min-height: 70vh; }
 }
 
-/* ================= plans ================= */
-.pricing { padding-block: clamp(80px, 10vw, 140px); display: grid; gap: 36px; }
-.pricing-head { display: flex; justify-content: space-between; align-items: end; gap: 20px; flex-wrap: wrap; }
-.pricing-head p { color: var(--fg-soft); max-width: 40ch; }
-.plans { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
-@media (max-width: 1000px) { .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 560px) { .plans { grid-template-columns: 1fr; } }
-.plan {
-  --tone: var(--mint);
-  background: var(--bg-2); border-radius: 22px; padding: 26px 22px; display: grid; grid-template-rows: auto auto 1fr auto; gap: 18px; min-width: 0;
-  box-shadow: inset 0 0 0 1px var(--line); position: relative; overflow: hidden;
-}
-.plan::before { content: ""; position: absolute; inset: 0 0 auto; height: 4px; background: var(--tone); }
-.plan::after { content: ""; position: absolute; inset: -40% -40% auto auto; width: 70%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--tone) 22%, transparent), transparent); pointer-events: none; }
-.plan.t-azure { --tone: var(--azure); } .plan.t-saffron { --tone: var(--saffron); }
-.plan h3 { font: 700 1.2rem/1.3 var(--f-display); color: var(--tone); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: baseline; }
-.amt { font: 800 clamp(2.4rem, 4vw, 3.2rem)/1 var(--f-display); display: flex; align-items: baseline; gap: 8px; }
-.amt small { font: 400 .95rem/1.2 var(--f-body); color: var(--fg-soft); }
-.plan ul { list-style: none; padding: 0; display: grid; gap: 10px; font-size: .95rem; color: var(--fg-soft); align-content: start; }
-.plan li { padding-inline-start: 18px; position: relative; }
-.plan li::before { content: ""; position: absolute; inset-inline-start: 0; top: .75em; width: 7px; height: 7px; border-radius: 2px; background: var(--tone); transform: rotate(45deg); }
-.plan .btn { width: 100%; }
-.plan.pro { background: linear-gradient(160deg, #3A1D6E, #24124F 55%, #1A1040); box-shadow: inset 0 0 0 1.5px rgba(160, 107, 255, .7), 0 30px 70px -30px rgba(160, 107, 255, .6); }
-.plan.pro { --tone: var(--rose); }
-.plan.pro::before { background: linear-gradient(to left, var(--coral), var(--rose), var(--violet)); }
-.plan.pro h3 span { font: 700 .8rem/1 var(--f-body); color: var(--ink-on-bright); background: var(--rose); padding: 5px 10px; border-radius: 999px; }
-
-footer { padding-block: 26px; font-size: .9rem; color: var(--fg-soft); border-top: 1px solid var(--line); }
-footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
@@ -274,7 +249,6 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     </a>
     <nav aria-label="القائمة">
       <a class="btn btn-primary" href="#book">احجز مكانك</a>
-      <a href="#pricing">الأسعار</a>
       <a href="#show">إزاي بتشتغل</a>
     </nav>
   </div>
@@ -298,7 +272,6 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     <section class="book" id="book" aria-labelledby="t-book">
       <div class="book-head">
         <h2 id="t-book">احجز مكانك</h2>
-        <span class="picked" id="picked" hidden></span>
         <span class="badge">خصم 50% لأول 100</span>
       </div>
       <form id="waitlist" novalidate>
@@ -318,7 +291,6 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
               <option value="other">حاجة تانية</option>
             </select>
           </div>
-          <input type="hidden" name="plan" id="f-plan" value="">
         <fieldset>
           <legend>تدفع أول شهر مقدّمًا بالخصم؟</legend>
           <div class="pills">
@@ -399,36 +371,9 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     </div>
   </section>
 
-  <section class="wrap pricing" id="pricing" aria-labelledby="t-price">
-    <div class="pricing-head">
-      <h2 id="t-price">الأسعار</h2>
-    </div>
-    <div class="plans">
-      <div class="plan">
-        <h3>مجاني</h3>
-        <p class="amt num"><bdi dir="ltr">$0</bdi></p>
-        <ul><li>12 نقطة في الشهر</li><li>كابشن عربي وتعديل بالصوت</li><li>720p بعلامة مائية</li></ul>
-        <button class="btn btn-ghost" type="button" data-plan="free">ابدأ مجانًا</button>
-      </div>
-      <div class="plan t-azure">
-        <h3>مبتدئ</h3>
-        <p class="amt num"><bdi dir="ltr">$12</bdi><small>/ شهر</small></p>
-        <ul><li>60 نقطة في الشهر</li><li>1080p من غير علامة مائية</li><li>تعليق صوتي عربي</li></ul>
-        <button class="btn btn-ghost" type="button" data-plan="starter">احجز الباقة</button>
-      </div>
-      <div class="plan pro">
-        <h3>احترافي <span>الأنسب لأغلب الناس</span></h3>
-        <p class="amt num"><bdi dir="ltr">$29</bdi><small>/ شهر</small></p>
-        <ul><li>160 نقطة في الشهر</li><li>محادثة صوتية مباشرة</li><li>دبلجة وترجمة صوتية</li><li>حتى 4K</li></ul>
-        <button class="btn btn-primary" type="button" data-plan="pro">احجز الباقة</button>
-      </div>
-      <div class="plan t-saffron">
-        <h3>أعمال</h3>
-        <p class="amt num"><bdi dir="ltr">$79</bdi><small>/ شهر</small></p>
-        <ul><li>450 نقطة في الشهر</li><li>5 أعضاء في الفريق</li><li>هويات بصرية بلا حد</li></ul>
-        <button class="btn btn-ghost" type="button" data-plan="business">احجز الباقة</button>
-      </div>
-    </div>
+  <section class="end wrap" aria-label="احجز">
+    <h2>جاهز <span class="c-saffron">تتحرّك</span>؟</h2>
+    <a class="btn btn-primary" href="#book">احجز مكانك</a>
   </section>
 </main>
 
@@ -634,7 +579,6 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       });
     });
     if (!reduce) {
-      gsap.from(".plan", { y: 48, opacity: 0, duration: 1, ease: "expo.out", stagger: 0.09, scrollTrigger: { trigger: ".plans", start: "top 85%", once: true } });
       gsap.from(".book", { y: 30, opacity: 0, duration: 1.1, ease: "expo.out", delay: 0.2 });
     }
   } else {
@@ -646,19 +590,6 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       });
     }, { passive: true });
   }
-
-  /* ================= plans → booking card ================= */
-  document.querySelectorAll("[data-plan]").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var plan = btn.getAttribute("data-plan");
-      post("/api/event", { name: "pricing_click", plan: plan, utm: utm }).catch(function () {});
-      $("f-plan").value = plan;
-      var names = { free: "مجاني", starter: "مبتدئ", pro: "احترافي", business: "أعمال" };
-      $("picked").textContent = "باقة " + names[plan]; $("picked").hidden = false;
-      $("book").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
-      setTimeout(function () { $("f-email").focus({ preventScroll: true }); }, reduce ? 0 : 650);
-    });
-  });
 
   /* ================= confetti in the five gels ================= */
   function confetti() {
@@ -684,7 +615,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     if (!type) { msg.textContent = "اختار نوع المحتوى اللي بتعمله."; $("f-type").focus(); return; }
     submit.disabled = true; submit.textContent = "بنحجز…"; msg.className = "msg"; msg.textContent = "";
     post("/api/waitlist", {
-      email: email, content_type: type, plan: String(data.get("plan") || ""), prepay: String(data.get("prepay") || ""),
+      email: email, content_type: type, prepay: String(data.get("prepay") || ""),
       website: String(data.get("website") || ""), utm: utm, referrer: document.referrer.slice(0, 300)
     }).then(function (res) {
       if (res.ok) { form.hidden = true; $("thanks").hidden = false; confetti(); return; }
