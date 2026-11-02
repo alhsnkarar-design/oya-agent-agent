@@ -12,58 +12,51 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@100..900&family=Readex+Pro:wght@300..700&display=swap">
 <style>
-/* World: Egyptian blue (the ancient pigment) as the stage, Arabic letters as the moving material.
-   Layout: a full-bleed blue stage where the headline itself performs; below it, editorial rows where
-   the visitor drives three live demos; then a ruled price comparison and the sign-up. */
+/* World: Egyptian blue as the stage, upright Kufi letters as the moving material.
+   Layout: a blue stage where the headline performs; one pinned editor window that the visitor
+   scrolls through (voice edit → captions → auto-cut); a ruled price comparison; the sign-up. */
 :root {
-  --lapis: #1D3FA8;          /* Egyptian blue: the stage */
+  --lapis: #1D3FA8;
   --lapis-deep: #10236B;
   --on-lapis: #F2F4FC;
   --on-lapis-soft: #B9C4EC;
-  --gold: #F0BE3C;           /* the one accent: what the voice changes */
+  --gold: #F0BE3C;
   --gold-ink: #241A02;
-  --paper: #F3F5FB;          /* cool white, blue-biased */
+  --night: #0A1030;
+  --paper: #F3F5FB;
   --raised: #FFFFFF;
   --ink: #0D1433;
   --ink-soft: #4B557A;
   --hair: #D3D9EC;
-  --err: #B3261E;
-  --night: #0A1030;          /* caption stage, dark in both themes */
-  --mark: #1D3FA8;          /* emphasis on paper */
+  --mark: #1D3FA8;
   --f-display: "Noto Kufi Arabic", "Readex Pro", "Segoe UI", Tahoma, sans-serif;
   --f-body: "Readex Pro", "Segoe UI", Tahoma, "Noto Sans Arabic", sans-serif;
-  --f-voice: "Noto Kufi Arabic", "Readex Pro", "Segoe UI", Tahoma, sans-serif;
-  --s-0: 1rem; --s-1: 1.2rem; --s-2: 1.5rem; --s-3: clamp(1.9rem, 3.6vw, 2.9rem);
-  --s-hero: clamp(3.6rem, 13.5vw, 11rem);
+  --s-1: 1.2rem;
+  --s-3: clamp(1.9rem, 3.6vw, 2.9rem);
+  --s-hero: clamp(3.4rem, 12.5vw, 10.5rem);
   --ease-out: cubic-bezier(.16, 1, .3, 1);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --lapis: #1D3FA8; --lapis-deep: #0B1A55; --on-lapis: #F2F4FC; --on-lapis-soft: #B9C4EC;
-    --gold: #F3C651; --gold-ink: #241A02;
-    --paper: #080D22; --raised: #10183A; --ink: #E7EBF8; --ink-soft: #A2ACCF; --hair: #222C55; --err: #FF8A80; --mark: #F3C651;
+    --lapis-deep: #0B1A55; --gold: #F3C651; --night: #050A22;
+    --paper: #080D22; --raised: #10183A; --ink: #E7EBF8; --ink-soft: #A2ACCF; --hair: #222C55; --mark: #F3C651;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --lapis: #1D3FA8; --lapis-deep: #0B1A55; --on-lapis: #F2F4FC; --on-lapis-soft: #B9C4EC;
-  --gold: #F3C651; --gold-ink: #241A02;
-  --paper: #080D22; --raised: #10183A; --ink: #E7EBF8; --ink-soft: #A2ACCF; --hair: #222C55; --err: #FF8A80; --mark: #F3C651;
+  --lapis-deep: #0B1A55; --gold: #F3C651; --night: #050A22;
+  --paper: #080D22; --raised: #10183A; --ink: #E7EBF8; --ink-soft: #A2ACCF; --hair: #222C55; --mark: #F3C651;
   color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html { scroll-behavior: smooth; scrollbar-color: var(--lapis) var(--paper); }
-body {
-  margin: 0; background: var(--paper); color: var(--ink);
-  font: 400 var(--s-0)/1.8 var(--f-body);
-  caret-color: var(--gold);
-}
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 1rem/1.8 var(--f-body); caret-color: var(--gold); }
 ::selection { background: var(--gold); color: var(--gold-ink); }
-a { color: inherit; text-underline-offset: .3em; }
-h1, h2, h3, p { margin: 0; }
-h2 { font: 800 var(--s-3)/1.2 var(--f-display); text-wrap: balance; }
+a { color: inherit; }
+h1, h2, h3, p, ul { margin: 0; }
+h2 { font: 800 var(--s-3)/1.25 var(--f-display); text-wrap: balance; }
 :focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
 .wrap {
   max-width: 1200px; margin-inline: auto;
@@ -72,182 +65,155 @@ h2 { font: 800 var(--s-3)/1.2 var(--f-display); text-wrap: balance; }
 }
 .num { font-variant-numeric: tabular-nums; }
 
-/* ---------- buttons ---------- */
 .btn {
-  font: 600 var(--s-0)/1 var(--f-body); border: 0; cursor: pointer; text-decoration: none;
-  padding: 16px 26px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-  transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out), background .2s;
+  font: 600 1rem/1 var(--f-body); border: 0; cursor: pointer; text-decoration: none;
+  padding: 16px 26px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center;
+  transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out);
 }
 .btn-gold { background: var(--gold); color: var(--gold-ink); box-shadow: 0 10px 24px -12px rgba(240, 190, 60, .7); }
-.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 16px 30px -14px rgba(240, 190, 60, .8); }
-.btn-gold:active { transform: translateY(0); }
+.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 16px 30px -14px rgba(240, 190, 60, .85); }
 .btn-line { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--hair); }
 .btn-line:hover { box-shadow: inset 0 0 0 1.5px var(--ink-soft); }
 .btn:disabled { opacity: .6; cursor: progress; }
 
-/* ---------- stage (hero) ---------- */
+/* ================= stage ================= */
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--lapis); }
-.stage {
-  background: var(--lapis); color: var(--on-lapis); position: relative; overflow: hidden; isolation: isolate;
-}
-.stage::after { /* soft vignette: depth toward the edges */
-  content: ""; position: absolute; inset: 0; z-index: -1;
-  background: radial-gradient(120% 90% at 70% 35%, transparent 40%, var(--lapis-deep) 100%);
-}
+.stage { background: var(--lapis); color: var(--on-lapis); position: relative; overflow: hidden; isolation: isolate; }
+.stage::after { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(120% 90% at 70% 35%, transparent 40%, var(--lapis-deep) 100%); }
 .bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 20px; }
-.logo { font: 800 1.6rem/1 var(--f-display); text-decoration: none; display: inline-flex; align-items: baseline; gap: 2px; }
-.logo i { width: .32em; height: .32em; background: var(--gold); border-radius: 50%; display: inline-block; font-style: normal; }
+.logo { font: 800 1.55rem/1 var(--f-display); text-decoration: none; display: inline-flex; align-items: baseline; gap: 3px; }
+.logo i { width: .3em; height: .3em; background: var(--gold); border-radius: 50%; display: inline-block; }
 .bar nav { display: flex; align-items: center; gap: 26px; font-size: .95rem; }
 .bar nav a:not(.btn) { color: var(--on-lapis-soft); text-decoration: none; transition: color .2s; }
 .bar nav a:not(.btn):hover { color: var(--on-lapis); }
 .bar .btn { padding: 12px 20px; font-size: .95rem; }
 @media (max-width: 640px) { .bar nav a:not(.btn) { display: none; } }
 
-.hero { padding-block: clamp(28px, 6vw, 64px) clamp(40px, 7vw, 88px); display: grid; gap: clamp(22px, 3vw, 34px); }
-.kin {
-  font-family: var(--f-display); font-size: var(--s-hero); line-height: 1.05; font-weight: 800;
-  letter-spacing: 0; display: flex; flex-wrap: wrap; column-gap: .22em; row-gap: 0;
-}
+.hero { padding-block: clamp(24px, 5vw, 56px) clamp(48px, 8vw, 96px); display: grid; gap: clamp(22px, 3vw, 32px); }
+.kin { font: 800 var(--s-hero)/1.1 var(--f-display); display: flex; flex-wrap: wrap; column-gap: .22em; }
 .kin .w { display: inline-block; will-change: transform, filter; }
 #w2 { color: var(--gold); }
-
-.voice { display: flex; align-items: center; gap: 18px; min-height: 64px; }
+.voice { display: flex; align-items: center; gap: 18px; min-height: 56px; }
 .voice canvas { width: 132px; height: 44px; flex: none; }
-.said { font: 500 clamp(1.25rem, 2.6vw, 1.75rem)/1.5 var(--f-voice); color: var(--on-lapis); min-width: 0; }
+.said { font: 500 clamp(1.2rem, 2.5vw, 1.7rem)/1.5 var(--f-display); min-width: 0; }
 .said .q { color: var(--on-lapis-soft); }
-.lede { font-size: var(--s-1); color: var(--on-lapis-soft); max-width: 40ch; line-height: 1.75; }
-
+.lede { font-size: var(--s-1); color: var(--on-lapis-soft); max-width: 40ch; }
 .quick { display: flex; gap: 10px; flex-wrap: wrap; max-width: 560px; }
 .quick input {
-  flex: 1 1 240px; min-width: 0; font: 500 var(--s-0)/1 var(--f-body); color: var(--on-lapis);
+  flex: 1 1 240px; min-width: 0; font: 500 1rem/1 var(--f-body); color: var(--on-lapis);
   background: rgba(255, 255, 255, .08); border: 1.5px solid rgba(255, 255, 255, .22);
   padding: 16px 20px; border-radius: 999px; transition: border-color .2s, background .2s;
 }
 .quick input::placeholder { color: var(--on-lapis-soft); }
 .quick input:focus { outline: none; border-color: var(--gold); background: rgba(255, 255, 255, .12); }
-.quick-note { font-size: .9rem; color: var(--on-lapis-soft); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-/* ---------- demo rows ---------- */
-.rows { padding-block: clamp(56px, 9vw, 120px); display: grid; gap: clamp(72px, 10vw, 140px); }
-.row { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(28px, 5vw, 72px); align-items: center; }
-.row:nth-child(even) { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
-.row:nth-child(even) .copy { order: 2; }
-@media (max-width: 860px) { .row, .row:nth-child(even) { grid-template-columns: 1fr; } .row:nth-child(even) .copy { order: 0; } }
-.copy { display: grid; gap: 16px; align-content: start; }
-.copy p { color: var(--ink-soft); font-size: var(--s-1); max-width: 34ch; }
+/* ================= the editor window you scroll through ================= */
+.show { padding-block: clamp(56px, 8vw, 110px) 0; }
+.show-grid { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: clamp(32px, 6vw, 88px); }
+.device-col { order: 2; }
+.device {
+  position: sticky; top: calc(50vh - 230px);
+  background: var(--night); color: var(--on-lapis); border-radius: 22px; overflow: hidden;
+  box-shadow: 0 40px 80px -40px rgba(16, 35, 107, .6), 0 0 0 1px rgba(255, 255, 255, .06) inset;
+}
+.dev-top { display: flex; align-items: center; gap: 10px; padding: 12px 16px; font-size: .85rem; color: var(--on-lapis-soft); border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.dev-top .dot { width: 8px; height: 8px; border-radius: 50%; background: #E5484D; animation: pulse 1.6s infinite; }
+@keyframes pulse { 50% { opacity: .3; } }
+.dev-top .tc { margin-inline-start: auto; direction: ltr; }
+.canvas { position: relative; aspect-ratio: 16 / 10; }
+.scene {
+  position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 14px; padding: 24px;
+  opacity: 0; transform: scale(.97); transition: opacity .5s var(--ease-out), transform .6s var(--ease-out); pointer-events: none;
+}
+.scene.on { opacity: 1; transform: none; }
+.scene-voice { background: radial-gradient(100% 80% at 50% 45%, var(--lapis) 0%, var(--lapis-deep) 100%); }
+.sw {
+  font: 300 clamp(1.8rem, 4.4vw, 3.2rem)/1.2 var(--f-display); text-align: center;
+  opacity: .2; transform: translateX(30%); filter: blur(10px);
+  transition: opacity .8s var(--ease-out), transform .9s var(--ease-out), filter .8s var(--ease-out), font-weight .9s var(--ease-out), color .5s, font-size .7s var(--ease-out);
+}
+.ss { font: 700 clamp(.85rem, 1.6vw, 1.05rem)/1 var(--f-body); background: var(--on-lapis); color: var(--lapis-deep); padding: 8px 16px; border-radius: 8px; opacity: 0; transform: translateY(14px); transition: opacity .5s, transform .6s var(--ease-out); }
+.scene-voice.s1 .sw { opacity: 1; transform: none; filter: none; }
+.scene-voice.s2 .sw { font-weight: 900; }
+.scene-voice.s3 .sw { color: var(--gold); }
+.scene-voice.s4 .sw { font-size: clamp(2.4rem, 6vw, 4.4rem); }
+.scene-voice.s5 .ss { opacity: 1; transform: none; }
+.cmdline {
+  position: absolute; bottom: 14px; inset-inline-start: 14px; display: flex; align-items: center; gap: 10px;
+  font: 500 .95rem/1.3 var(--f-display); background: rgba(5, 10, 34, .55); backdrop-filter: blur(6px);
+  padding: 9px 14px; border-radius: 999px;
+}
+.cmdline svg { flex: none; color: var(--gold); }
 
-/* demo 1: drive the word */
-.screen {
-  background: var(--lapis); color: var(--on-lapis); border-radius: 22px; aspect-ratio: 16 / 10; max-width: 100%;
-  display: grid; place-items: center; align-content: center; gap: 14px; padding: 24px; position: relative; overflow: hidden;
-  box-shadow: 0 30px 60px -30px rgba(16, 35, 107, .55);
-}
-.screen::after { content: ""; position: absolute; inset: 0; background: radial-gradient(100% 80% at 50% 40%, transparent 50%, var(--lapis-deep) 100%); pointer-events: none; }
-.sw { font: 300 clamp(2rem, 6vw, 3.6rem)/1.15 var(--f-display); position: relative; z-index: 1; text-align: center; }
-.ss {
-  position: relative; z-index: 1; font: 700 clamp(.95rem, 2vw, 1.15rem)/1 var(--f-body);
-  background: var(--on-lapis); color: var(--lapis-deep); padding: 8px 16px; border-radius: 8px;
-}
-.cmds { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
-.cmd {
-  font: 600 .98rem/1.2 var(--f-voice); color: var(--ink); background: var(--raised);
-  border: 1.5px solid var(--hair); padding: 12px 16px; border-radius: 999px; cursor: pointer;
-  transition: border-color .2s, transform .2s var(--ease-out), background .2s;
-}
-.cmd:hover { border-color: var(--lapis); transform: translateY(-1px); }
-.cmd.on { background: var(--gold); color: var(--gold-ink); border-color: var(--gold); }
-.cmd-reset { font-family: var(--f-body); font-weight: 500; font-size: .9rem; color: var(--ink-soft); }
-
-/* demo 2: dialect captions */
-.cap-stage {
-  background: var(--night); color: var(--on-lapis); border-radius: 22px; aspect-ratio: 16 / 10; max-width: 100%;
-  display: grid; align-content: end; padding: clamp(18px, 4vw, 36px); position: relative; overflow: hidden;
-}
-.cap-stage::before { /* a speaker silhouette suggested by light, not drawn */
-  content: ""; position: absolute; inset: 0;
-  background: radial-gradient(38% 55% at 50% 38%, color-mix(in srgb, var(--lapis) 70%, transparent), transparent 70%);
-}
-.cap { position: relative; display: flex; flex-wrap: wrap; justify-content: center; gap: .25em .35em; font: 700 clamp(1.25rem, 3.2vw, 2rem)/1.5 var(--f-display); }
+.scene-cap { align-content: end; padding-bottom: 28px; background: radial-gradient(40% 60% at 50% 35%, color-mix(in srgb, var(--lapis) 65%, transparent), transparent 70%); }
+.cap { display: flex; flex-wrap: wrap; justify-content: center; gap: .2em .3em; font: 700 clamp(1.1rem, 2.4vw, 1.7rem)/1.55 var(--f-display); max-width: 92%; }
 .cap span { padding: 0 .2em; border-radius: .25em; transition: background .15s, color .15s, transform .25s var(--ease-out); }
-.cap span.on { background: var(--gold); color: var(--gold-ink); transform: translateY(-3px) scale(1.06); }
-.dialects { display: flex; flex-wrap: wrap; gap: 8px; }
-.dialects button {
-  font: 600 .95rem/1 var(--f-body); color: var(--ink-soft); background: transparent; border: 0; cursor: pointer;
-  padding: 10px 2px; border-bottom: 2px solid transparent; margin-inline-end: 14px;
-}
-.dialects button[aria-pressed="true"] { color: var(--ink); border-color: var(--gold); }
+.cap span.on { background: var(--gold); color: var(--gold-ink); transform: translateY(-2px); }
+.dial { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+.dial span { font: 500 .78rem/1 var(--f-body); color: var(--on-lapis-soft); padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .14); transition: background .3s, color .3s; }
+.dial span.on { background: var(--on-lapis); color: var(--night); border-color: transparent; }
 
-/* demo 3: auto cut */
-.cut { display: grid; gap: 18px; }
-.track { display: flex; height: 76px; border-radius: 14px; overflow: hidden; background: var(--raised); box-shadow: inset 0 0 0 1.5px var(--hair); }
+.scene-cut { align-content: center; gap: 20px; padding-inline: 28px; }
+.track { display: flex; width: 100%; height: 64px; border-radius: 12px; overflow: hidden; background: rgba(255, 255, 255, .05); }
 .seg { flex: var(--w) 1 0; background: var(--lapis); position: relative; }
-.seg + .seg { box-shadow: inset -1px 0 0 rgba(255, 255, 255, .25); }
-.seg::before { /* speech energy */
-  content: ""; position: absolute; inset: 24% 6%;
-  background: repeating-linear-gradient(to left, var(--on-lapis-soft) 0 2px, transparent 2px 6px);
-  mask: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
-  opacity: .55;
-}
-.gap {
-  flex: var(--w) 1 0;
-  background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--ink-soft) 22%, transparent) 0 5px, transparent 5px 10px);
-  transition: flex-grow .9s var(--ease-out);
-}
-.cut.done .gap { flex-grow: 0; }
-.cut-meta { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
-.dur { font: 800 clamp(2rem, 5vw, 3rem)/1 var(--f-display); }
-.dur small { font: 500 1rem/1 var(--f-body); color: var(--ink-soft); margin-inline-start: 8px; }
-.legend { display: flex; gap: 18px; font-size: .9rem; color: var(--ink-soft); }
-.legend span { display: inline-flex; align-items: center; gap: 8px; }
-.legend i { width: 14px; height: 14px; border-radius: 4px; background: var(--lapis); display: inline-block; }
-.legend i.g { background: repeating-linear-gradient(-45deg, var(--ink-soft) 0 2px, transparent 2px 5px); }
+.seg + .seg { box-shadow: inset -1px 0 0 rgba(255, 255, 255, .22); }
+.seg::before { content: ""; position: absolute; inset: 24% 6%; background: repeating-linear-gradient(to left, var(--on-lapis-soft) 0 2px, transparent 2px 6px); opacity: .5; }
+.gap { flex: calc(var(--w) * var(--keep, 1)) 1 0; background: repeating-linear-gradient(-45deg, rgba(229, 72, 77, .55) 0 4px, transparent 4px 9px); }
+.cut-meta { width: 100%; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.dur { font: 800 clamp(1.8rem, 4vw, 2.8rem)/1 var(--f-display); direction: ltr; }
+.cut-meta small { font-size: .85rem; color: var(--on-lapis-soft); }
 
-/* ---------- who ---------- */
-.who { border-block: 1px solid var(--hair); padding-block: clamp(48px, 7vw, 90px); }
-.who p { font: 700 clamp(1.6rem, 4vw, 3rem)/1.45 var(--f-display); max-width: 24ch; text-wrap: balance; }
-.who p b { color: var(--mark); font-weight: 800; }
+.dev-bar { height: 3px; background: rgba(255, 255, 255, .08); }
+.dev-bar i { display: block; height: 100%; width: 0; background: var(--gold); }
 
-/* ---------- pricing ---------- */
-.pricing { padding-block: clamp(56px, 9vw, 120px); display: grid; gap: 36px; }
+.chapters { display: grid; }
+.chapter { min-height: 82vh; display: grid; align-content: center; gap: 14px; padding-block: 24px; opacity: .28; transition: opacity .5s var(--ease-out); }
+.chapter.on { opacity: 1; }
+.chapter p { color: var(--ink-soft); font-size: var(--s-1); max-width: 30ch; }
+
+@media (max-width: 860px) {
+  .show-grid { grid-template-columns: 1fr; gap: 0; }
+  .device-col { order: 0; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; padding-block: 12px; background: var(--paper); }
+  .device { position: static; }
+  .chapter { min-height: 70vh; }
+}
+
+/* ================= pricing ================= */
+.pricing { padding-block: clamp(80px, 10vw, 140px); display: grid; gap: 40px; }
 .pricing-head { display: flex; justify-content: space-between; align-items: end; gap: 20px; flex-wrap: wrap; }
-.pricing-head p { color: var(--ink-soft); max-width: 46ch; }
-.plans { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.pricing-head p { color: var(--ink-soft); max-width: 40ch; }
+.plans { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch; }
 @media (max-width: 1000px) { .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 28px; } }
 @media (max-width: 560px) { .plans { grid-template-columns: 1fr; } }
-.plan { padding: 28px 24px; display: grid; grid-template-rows: auto auto auto 1fr auto; gap: 16px; border-inline-start: 1px solid var(--hair); min-width: 0; }
-.plan:first-child { border-inline-start: 0; }
+.plan { padding: 28px 24px; display: grid; grid-template-rows: auto auto 1fr auto; gap: 18px; border-inline-start: 1px solid var(--hair); min-width: 0; }
+.plan:first-child, .plan.pro, .plan.pro + .plan { border-inline-start: 0; }
 @media (max-width: 1000px) { .plan:nth-child(odd) { border-inline-start: 0; } }
-@media (max-width: 560px) { .plan { border-inline-start: 0; border-top: 1px solid var(--hair); } }
-.plan h3 { font: 700 var(--s-1)/1.3 var(--f-display); }
-.amt { font: 800 clamp(2.4rem, 4vw, 3.2rem)/1 var(--f-display); display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+@media (max-width: 560px) { .plan { border-inline-start: 0; border-top: 1px solid var(--hair); } .plan.pro, .plan.pro + .plan { border-top: 0; } }
+.plan h3 { font: 700 var(--s-1)/1.3 var(--f-display); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: baseline; }
+.amt { font: 800 clamp(2.4rem, 4vw, 3.2rem)/1 var(--f-display); display: flex; align-items: baseline; gap: 8px; }
 .amt small { font: 400 .95rem/1.2 var(--f-body); color: var(--ink-soft); }
-.alt { font-size: .9rem; color: var(--ink-soft); }
-.pts { font-weight: 600; font-size: .95rem; }
-.plan ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font-size: .95rem; color: var(--ink-soft); align-content: start; }
+.plan ul { list-style: none; padding: 0; display: grid; gap: 10px; font-size: .95rem; color: var(--ink-soft); align-content: start; }
 .plan li { padding-inline-start: 18px; position: relative; }
 .plan li::before { content: ""; position: absolute; inset-inline-start: 0; top: .78em; width: 7px; height: 7px; border-radius: 50%; background: var(--lapis); }
 .plan .btn { width: 100%; }
-.plan.pro { background: var(--lapis); color: var(--on-lapis); border-radius: 22px; border: 0; box-shadow: 0 30px 60px -32px rgba(16, 35, 107, .6); }
-.plan.pro + .plan { border-inline-start: 0; }
-.plan.pro .alt, .plan.pro ul, .plan.pro .amt small { color: var(--on-lapis-soft); }
+.plan.pro { background: var(--lapis); color: var(--on-lapis); border-radius: 22px; box-shadow: 0 30px 60px -32px rgba(16, 35, 107, .6); }
+.plan.pro ul, .plan.pro .amt small { color: var(--on-lapis-soft); }
 .plan.pro li::before { background: var(--gold); }
-.plan.pro .ribbon { font: 600 .9rem/1 var(--f-body); color: var(--gold); }
-.offer { font-size: .95rem; color: var(--ink-soft); }
-.offer b { color: var(--ink); }
+.plan.pro h3 span { font: 600 .85rem/1 var(--f-body); color: var(--gold); }
 
-/* ---------- join ---------- */
+/* ================= join ================= */
 .join { background: var(--lapis); color: var(--on-lapis); }
 .join .wrap { padding-block: clamp(56px, 9vw, 110px); display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(32px, 6vw, 80px); }
 @media (max-width: 860px) { .join .wrap { grid-template-columns: 1fr; } }
 .join h2 { font-size: clamp(2.2rem, 5vw, 3.8rem); }
 .join .intro { display: grid; gap: 18px; align-content: start; }
-.join .intro p { color: var(--on-lapis-soft); font-size: var(--s-1); max-width: 34ch; }
+.join .intro p { color: var(--on-lapis-soft); font-size: var(--s-1); max-width: 32ch; }
 form { display: grid; gap: 18px; min-width: 0; }
 .field { display: grid; gap: 8px; }
 .field > label, legend { font-weight: 600; font-size: .95rem; }
-.opt { font-weight: 400; color: var(--on-lapis-soft); }
-.join input[type="text"], .join input[type="email"], .join select {
-  width: 100%; font: 500 var(--s-0)/1.3 var(--f-body); color: var(--on-lapis);
+.join input[type="email"], .join select {
+  width: 100%; font: 500 1rem/1.3 var(--f-body); color: var(--on-lapis);
   background: rgba(255, 255, 255, .08); border: 1.5px solid rgba(255, 255, 255, .22);
   padding: 14px 16px; border-radius: 12px; transition: border-color .2s, background .2s;
 }
@@ -257,22 +223,17 @@ form { display: grid; gap: 18px; min-width: 0; }
 fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
 legend { padding: 0; margin-bottom: 8px; }
 .pills { display: flex; flex-wrap: wrap; gap: 8px; }
-.pills label {
-  display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;
-  padding: 10px 18px; border-radius: 999px; border: 1.5px solid rgba(255, 255, 255, .22); transition: border-color .2s, background .2s;
-}
+.pills label { display: inline-flex; align-items: center; cursor: pointer; font-weight: 500; padding: 10px 20px; border-radius: 999px; border: 1.5px solid rgba(255, 255, 255, .22); transition: border-color .2s, background .2s; }
 .pills input { position: absolute; opacity: 0; pointer-events: none; }
 .pills label:has(input:checked) { background: var(--gold); color: var(--gold-ink); border-color: var(--gold); }
 .pills label:has(input:focus-visible) { outline: 3px solid var(--gold); outline-offset: 3px; }
-.hp { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .msg { min-height: 1.6em; font-size: .95rem; }
 .msg.err { color: #FFC2BC; }
-.fine { font-size: .85rem; color: var(--on-lapis-soft); }
 .thanks { display: grid; gap: 12px; align-content: center; }
 .thanks h3 { font: 800 clamp(2rem, 4vw, 3rem)/1.2 var(--f-display); color: var(--gold); }
 .thanks p { color: var(--on-lapis-soft); font-size: var(--s-1); }
 
-footer { padding-block: 28px; font-size: .9rem; color: var(--ink-soft); }
+footer { padding-block: 26px; font-size: .9rem; color: var(--ink-soft); }
 footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -288,7 +249,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     <div class="bar">
       <a class="logo" href="#top" aria-label="حركة، الصفحة الرئيسية">حركة<i aria-hidden="true"></i></a>
       <nav aria-label="أقسام الصفحة">
-        <a href="#try">جرّبها</a>
+        <a href="#show">إزاي بتشتغل</a>
         <a href="#pricing">الأسعار</a>
         <a class="btn btn-gold" href="#join">احجز مكانك</a>
       </nav>
@@ -299,136 +260,108 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         <span class="w" id="w1" aria-hidden="true">قُلها</span>
         <span class="w" id="w2" aria-hidden="true">تتحرّك.</span>
       </h1>
-
       <div class="voice" aria-hidden="true">
         <canvas id="wave" width="264" height="88"></canvas>
         <p class="said" id="said"><span class="q">«</span>لوّنها دهبي<span class="q">»</span></p>
       </div>
-
       <p class="lede">قول فكرتك بالعربي أو ارفع فيديو خام، يطلع لك موشن جرافيكس أو ريلز جاهز. وعدّل عليه بصوتك وأنت بتتفرّج.</p>
-
       <form class="quick" id="quick" novalidate>
-        <label class="hp" for="q-email">الإيميل</label>
-        <input id="q-email" type="email" inputmode="email" autocomplete="email" placeholder="إيميلك" dir="auto" aria-label="إيميلك">
+        <label class="sr" for="q-email">إيميلك</label>
+        <input id="q-email" type="email" inputmode="email" autocomplete="email" placeholder="إيميلك" dir="auto">
         <button class="btn btn-gold" type="submit">احجز مكانك</button>
       </form>
-      <p class="quick-note">أول 100 مشترك: خصم 50% لمدة 3 شهور.</p>
     </div>
   </div>
 </header>
 
 <main>
-  <div class="wrap rows">
-
-    <section class="row" id="try" aria-labelledby="t-try">
-      <div class="copy">
-        <h2 id="t-try">عدّل بصوتك</h2>
-        <p>اضغط على أي أمر كأنك قلته. ده بالظبط اللي هيحصل وأنت بتتكلم.</p>
-        <div class="cmds" role="group" aria-label="أوامر تجريبية">
-          <button class="cmd" type="button" data-cmd="enter">«دخّلها من اليمين»</button>
-          <button class="cmd" type="button" data-cmd="bold">«تقّل الخط»</button>
-          <button class="cmd" type="button" data-cmd="gold">«لوّنها دهبي»</button>
-          <button class="cmd" type="button" data-cmd="big">«كبّرها»</button>
-          <button class="cmd" type="button" data-cmd="sub">«ضيف تحتها الخصم»</button>
-          <button class="cmd cmd-reset" type="button" data-cmd="reset">ابدأ من الأول</button>
+  <section class="show" id="show" aria-label="إزاي بتشتغل">
+    <div class="wrap show-grid">
+      <div class="device-col">
+        <div class="device" aria-hidden="true">
+          <div class="dev-top"><span class="dot"></span><span id="devLabel">تعديل بالصوت</span><span class="tc num" id="tc">00:00</span></div>
+          <div class="canvas">
+            <div class="scene scene-voice on" id="sc0">
+              <div class="sw">عرض الجمعة</div>
+              <div class="ss">خصم 20% على كل المنيو</div>
+              <p class="cmdline"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" stroke-width="2"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span id="cmd">«دخّلها من اليمين»</span></p>
+            </div>
+            <div class="scene scene-cap" id="sc1">
+              <p class="cap" id="cap"></p>
+              <div class="dial" id="dial"><span class="on">مصري</span><span>خليجي</span><span>شامي</span><span>فصحى</span></div>
+            </div>
+            <div class="scene scene-cut" id="sc2">
+              <div class="track">
+                <span class="seg" style="--w:9"></span><span class="gap" style="--w:4"></span>
+                <span class="seg" style="--w:13"></span><span class="gap" style="--w:6"></span>
+                <span class="seg" style="--w:7"></span><span class="gap" style="--w:3"></span>
+                <span class="seg" style="--w:15"></span><span class="gap" style="--w:7"></span>
+                <span class="seg" style="--w:11"></span><span class="gap" style="--w:5"></span>
+                <span class="seg" style="--w:8"></span>
+              </div>
+              <div class="cut-meta"><span class="dur num" id="dur">4:12</span><small id="durNote">الفيديو الخام</small></div>
+            </div>
+          </div>
+          <div class="dev-bar"><i id="devBar"></i></div>
         </div>
       </div>
-      <div class="screen" aria-live="polite">
-        <div class="sw" id="sw">عرض الجمعة</div>
-        <div class="ss" id="ss" hidden>خصم 20% على كل المنيو</div>
-      </div>
-    </section>
 
-    <section class="row" aria-labelledby="t-cap">
-      <div class="copy">
-        <h2 id="t-cap">كابشن بلهجتك</h2>
-        <p>كلمة بكلمة على توقيت الكلام، بالمصري والخليجي والشامي والفصحى.</p>
-        <div class="dialects" role="group" aria-label="اختر اللهجة">
-          <button type="button" data-d="eg" aria-pressed="true">مصري</button>
-          <button type="button" data-d="gulf" aria-pressed="false">خليجي</button>
-          <button type="button" data-d="lev" aria-pressed="false">شامي</button>
-          <button type="button" data-d="fus" aria-pressed="false">فصحى</button>
-        </div>
+      <div class="chapters">
+        <article class="chapter on">
+          <h2>عدّل بصوتك</h2>
+          <p>«دخّلها من اليمين»، «تقّل الخط»، «لوّنها دهبي». تقولها، والتعديل يحصل قدامك في نفس اللحظة.</p>
+        </article>
+        <article class="chapter">
+          <h2>كابشن بلهجتك</h2>
+          <p>كلمة بكلمة على توقيت الكلام، بالمصري والخليجي والشامي والفصحى.</p>
+        </article>
+        <article class="chapter">
+          <h2>مونتاج من غير مونتير</h2>
+          <p>يشيل السكتات والتكرار والغلطات من الفيديو الخام، ويسيب لك الكلام المهم بس.</p>
+        </article>
       </div>
-      <div class="cap-stage">
-        <p class="cap" id="cap" aria-live="off"></p>
-      </div>
-    </section>
-
-    <section class="row" aria-labelledby="t-cut">
-      <div class="copy">
-        <h2 id="t-cut">مونتاج من غير مونتير</h2>
-        <p>يشيل السكتات والتكرار والغلطات من الفيديو الخام، ويسيب لك الكلام المهم بس.</p>
-        <div><button class="btn btn-line" type="button" id="cutBtn">قصّ السكتات</button></div>
-      </div>
-      <div class="cut" id="cut">
-        <div class="track" aria-hidden="true">
-          <span class="seg" style="--w:9"></span><span class="gap" style="--w:4"></span>
-          <span class="seg" style="--w:13"></span><span class="gap" style="--w:6"></span>
-          <span class="seg" style="--w:7"></span><span class="gap" style="--w:3"></span>
-          <span class="seg" style="--w:15"></span><span class="gap" style="--w:7"></span>
-          <span class="seg" style="--w:11"></span><span class="gap" style="--w:5"></span>
-          <span class="seg" style="--w:8"></span>
-        </div>
-        <div class="cut-meta">
-          <p class="dur num" aria-live="polite"><span id="dur">4:12</span><small id="durNote">مدة الفيديو الخام</small></p>
-          <div class="legend"><span><i></i>كلام</span><span><i class="g"></i>سكتات</span></div>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <section class="who" aria-label="لمين">
-    <div class="wrap">
-      <p>معمول <b>للدعاة والمعلّمين</b>، و<b>لأصحاب المحلات والمشاريع</b>، و<b>للمسوّقين وصنّاع المحتوى</b> اللي عايزين فيديو محترف بالعربي من غير مونتير.</p>
     </div>
   </section>
 
   <section class="wrap pricing" id="pricing" aria-labelledby="t-price">
     <div class="pricing-head">
-      <h2 id="t-price">الأسعار عند الإطلاق</h2>
-      <p>بالنقاط: ريلز دقيقة بـ 4 نقاط، وفيديو موشن 30 ثانية بـ 4 نقاط. المعاينة والتعديل مجانًا دايمًا.</p>
+      <h2 id="t-price">الأسعار</h2>
+      <p>المعاينة والتعديل مجانًا دايمًا. النقاط للتصدير بس: ريلز دقيقة بـ 4 نقاط.</p>
     </div>
     <div class="plans">
       <div class="plan">
         <h3>مجاني</h3>
-        <p class="amt num"><bdi dir="ltr">$0</bdi><small>دائمًا</small></p>
-        <p class="pts">12 نقطة في الشهر</p>
-        <ul><li>حوالي 3 ريلز</li><li>كابشن عربي وتعديل بالصوت</li><li>720p بعلامة مائية</li></ul>
+        <p class="amt num"><bdi dir="ltr">$0</bdi></p>
+        <ul><li>12 نقطة في الشهر</li><li>كابشن عربي وتعديل بالصوت</li><li>720p بعلامة مائية</li></ul>
         <button class="btn btn-line" type="button" data-plan="free">ابدأ مجانًا</button>
       </div>
       <div class="plan">
         <h3>مبتدئ</h3>
         <p class="amt num"><bdi dir="ltr">$12</bdi><small>/ شهر</small></p>
-        <p class="pts">60 نقطة في الشهر</p>
-        <ul><li>حوالي 15 ريلز</li><li>1080p من غير علامة مائية</li><li>تعليق صوتي عربي</li></ul>
+        <ul><li>60 نقطة في الشهر</li><li>1080p من غير علامة مائية</li><li>تعليق صوتي عربي</li></ul>
         <button class="btn btn-line" type="button" data-plan="starter">اشترك</button>
       </div>
       <div class="plan pro">
-        <h3>احترافي <span class="ribbon">· الأنسب لأغلب الناس</span></h3>
+        <h3>احترافي <span>الأنسب لأغلب الناس</span></h3>
         <p class="amt num"><bdi dir="ltr">$29</bdi><small>/ شهر</small></p>
-        <p class="pts">160 نقطة في الشهر</p>
-        <ul><li>حوالي 40 ريلز</li><li>محادثة صوتية مباشرة</li><li>دبلجة وترجمة صوتية</li><li>حتى 4K وأولوية في التصدير</li></ul>
+        <ul><li>160 نقطة في الشهر</li><li>محادثة صوتية مباشرة</li><li>دبلجة وترجمة صوتية</li><li>حتى 4K</li></ul>
         <button class="btn btn-gold" type="button" data-plan="pro">اشترك</button>
       </div>
       <div class="plan">
         <h3>أعمال</h3>
         <p class="amt num"><bdi dir="ltr">$79</bdi><small>/ شهر</small></p>
-        <p class="pts">450 نقطة في الشهر</p>
-        <ul><li>حوالي 110 ريلز</li><li>5 أعضاء في الفريق</li><li>هويات بصرية بلا حد</li></ul>
+        <ul><li>450 نقطة في الشهر</li><li>5 أعضاء في الفريق</li><li>هويات بصرية بلا حد</li></ul>
         <button class="btn btn-line" type="button" data-plan="business">اشترك</button>
       </div>
     </div>
-    <p class="offer"><b>لسه ما أطلقناش.</b> اللي يحجز دلوقتي ياخد خصم 50% لمدة 3 شهور على أي باقة. الدفع بالدولار من أي دولة، بالبطاقات الدولية أو PayPal.</p>
   </section>
 
   <section class="join" id="join" aria-labelledby="t-join">
     <div class="wrap">
       <div class="intro">
         <h2 id="t-join">احجز مكانك</h2>
-        <p>جرّب النسخة الأولى قبل أي حد، وخد خصم 50% لمدة 3 شهور، ورأيك يحدد إيه اللي نبنيه الأول.</p>
+        <p>جرّب النسخة الأولى قبل أي حد، وخد خصم 50% لمدة 3 شهور.</p>
       </div>
-
       <div>
         <form id="waitlist" novalidate>
           <div class="field">
@@ -441,14 +374,14 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
               <option value="">اختار…</option>
               <option value="religious">ديني أو دعوي</option>
               <option value="education">تعليمي</option>
-              <option value="business">إعلانات لمشروعي أو محلي</option>
-              <option value="marketing">تسويق لعملاء (فريلانسر أو وكالة)</option>
-              <option value="creator">صانع محتوى (ريلز، يوتيوب، بودكاست)</option>
+              <option value="business">إعلانات لمشروعي</option>
+              <option value="marketing">تسويق لعملاء</option>
+              <option value="creator">صانع محتوى</option>
               <option value="other">حاجة تانية</option>
             </select>
           </div>
           <div class="field">
-            <label for="f-plan">الباقة اللي تناسبك</label>
+            <label for="f-plan">الباقة</label>
             <select id="f-plan" name="plan">
               <option value="">لسه مش متأكد</option>
               <option value="free">مجاني</option>
@@ -458,38 +391,33 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
             </select>
           </div>
           <fieldset>
-            <legend>لو فيه خصم 50%، تدفع أول شهر مقدّمًا؟</legend>
+            <legend>تدفع أول شهر مقدّمًا بالخصم؟</legend>
             <div class="pills">
               <label><input type="radio" name="prepay" value="yes" id="pp-yes">أيوه</label>
               <label><input type="radio" name="prepay" value="maybe" id="pp-maybe">ممكن</label>
               <label><input type="radio" name="prepay" value="no" id="pp-no">لأ</label>
             </div>
           </fieldset>
-          <div class="field">
-            <label for="f-name">الاسم <span class="opt">(اختياري)</span></label>
-            <input id="f-name" name="name" type="text" maxlength="80" autocomplete="name">
-          </div>
-          <div class="hp" aria-hidden="true">
+          <div class="sr" aria-hidden="true">
             <label for="f-website">سيب الخانة دي فاضية</label>
             <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off">
           </div>
           <div><button class="btn btn-gold" type="submit" id="f-submit">احجز مكاني</button></div>
           <p class="msg" id="msg" role="status"></p>
-          <p class="fine">هنستخدم إيميلك علشان نبلّغك بالإطلاق بس، ومش هنشاركه مع حد.</p>
         </form>
         <div class="thanks" id="thanks" hidden>
           <h3>مكانك محجوز</h3>
-          <p>هيوصلك إيميل أول ما النسخة التجريبية تجهز. لو تعرف حد محتاجها، ابعتله الصفحة.</p>
+          <p>هيوصلك إيميل أول ما النسخة التجريبية تجهز.</p>
         </div>
       </div>
     </div>
   </section>
 </main>
 
-<footer>
-  <div class="wrap"><span>حركة</span><span>قيد البناء · 2026</span></div>
-</footer>
+<footer><div class="wrap"><span>حركة</span><span>2026</span></div></footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
 (function () {
   "use strict";
@@ -497,28 +425,24 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var EASE = "cubic-bezier(.16, 1, .3, 1)";
   var sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
-  var css = function (name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); };
+  var css = function (n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); };
   var params = new URLSearchParams(location.search);
   var utm = { source: params.get("utm_source") || "", medium: params.get("utm_medium") || "", campaign: params.get("utm_campaign") || "" };
-  function post(path, body) {
-    return fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  }
+  function post(path, body) { return fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }); }
+  var clamp = function (v) { return Math.max(0, Math.min(1, v)); };
 
-  /* ================= hero: the headline performs the voice commands ================= */
-  var canvas = $("wave"), ctx = canvas.getContext("2d");
-  var listening = false, level = 0, t = 0;
+  /* ================= hero: the headline performs voice commands ================= */
+  var canvas = $("wave"), ctx = canvas.getContext("2d"), listening = false, level = 0, t = 0;
   function drawWave() {
-    var w = canvas.width, h = canvas.height, bars = 22, gap = 4;
-    var bw = (w - gap * (bars - 1)) / bars;
+    var w = canvas.width, h = canvas.height, bars = 22, gap = 4, bw = (w - gap * (bars - 1)) / bars;
     ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = listening ? css("--gold") : css("--on-lapis-soft");
     level += ((listening ? 1 : 0.12) - level) * 0.12;
     for (var i = 0; i < bars; i++) {
       var n = Math.sin(t * 0.18 + i * 0.9) * 0.5 + Math.sin(t * 0.31 + i * 1.7) * 0.5;
-      var bh = Math.max(6, (0.25 + Math.abs(n) * 0.75) * h * level);
-      var x = w - (i + 1) * bw - i * gap;
+      var bh = Math.max(6, (0.25 + Math.abs(n) * 0.75) * h * level), x = w - (i + 1) * bw - i * gap;
       ctx.beginPath();
-      ctx.roundRect ? ctx.roundRect(x, (h - bh) / 2, bw, bh, bw / 2) : ctx.rect(x, (h - bh) / 2, bw, bh);
+      if (ctx.roundRect) ctx.roundRect(x, (h - bh) / 2, bw, bh, bw / 2); else ctx.rect(x, (h - bh) / 2, bw, bh);
       ctx.fill();
     }
     t++;
@@ -529,44 +453,31 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
   var w1 = $("w1"), w2 = $("w2"), said = $("said");
   function say(text) {
     said.innerHTML = '<span class="q">«</span>' + text + '<span class="q">»</span>';
-    return said.animate(
-      [{ clipPath: "inset(0 0 0 100%)" }, { clipPath: "inset(0 0 0 0)" }],
-      { duration: 900, easing: "cubic-bezier(.45,0,.2,1)", fill: "both" }
-    ).finished;
+    return said.animate([{ clipPath: "inset(0 0 0 100%)" }, { clipPath: "inset(0 0 0 0)" }],
+      { duration: 900, easing: "cubic-bezier(.45,0,.2,1)", fill: "both" }).finished;
   }
   var script = [
     { text: "دخّلها من اليمين", run: function () {
-        return w2.animate([
-          { transform: "translateX(70%)", filter: "blur(18px)", opacity: 0 },
-          { transform: "translateX(0)", filter: "blur(0)", opacity: 1 }
-        ], { duration: 1100, easing: EASE, fill: "both" }).finished; } },
+        return w2.animate([{ transform: "translateX(70%)", filter: "blur(18px)", opacity: 0 }, { transform: "none", filter: "blur(0)", opacity: 1 }],
+          { duration: 1100, easing: EASE, fill: "both" }).finished; } },
     { text: "تقّل الخط", run: function () {
         return w1.animate([{ fontWeight: 150 }, { fontWeight: 900 }], { duration: 1200, easing: EASE, fill: "both" }).finished; } },
     { text: "لوّنها دهبي", run: function () {
         return w1.animate([{ color: css("--on-lapis") }, { color: css("--gold") }], { duration: 700, easing: EASE, fill: "both" }).finished; } },
     { text: "رجّعها زي ما كانت", run: function () {
-        return Promise.all([
-          w1.animate([{ color: css("--gold"), fontWeight: 900 }, { color: css("--on-lapis"), fontWeight: 800 }], { duration: 900, easing: EASE, fill: "both" }).finished,
-          w2.animate([{ transform: "scale(1)" }, { transform: "scale(1.08)" }, { transform: "scale(1)" }], { duration: 900, easing: EASE }).finished
-        ]); } }
+        return w1.animate([{ color: css("--gold"), fontWeight: 900 }, { color: css("--on-lapis"), fontWeight: 800 }], { duration: 900, easing: EASE, fill: "both" }).finished; } }
   ];
   async function perform() {
     await sleep(1600);
-    while (true) {
+    for (;;) {
       for (var i = 0; i < script.length; i++) {
-        listening = true;
-        await sleep(650);
-        await say(script[i].text);
-        listening = false;
-        await sleep(250);
-        await script[i].run();
-        await sleep(1500);
+        listening = true; await sleep(650); await say(script[i].text);
+        listening = false; await sleep(250); await script[i].run(); await sleep(1500);
       }
     }
   }
   if (!reduce) perform();
 
-  /* quick email in the hero hands off to the full form */
   $("quick").addEventListener("submit", function (e) {
     e.preventDefault();
     $("f-email").value = $("q-email").value.trim();
@@ -574,94 +485,87 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
     setTimeout(function () { $("f-type").focus({ preventScroll: true }); }, reduce ? 0 : 600);
   });
 
-  /* ================= demo 1: visitor drives the word ================= */
-  var sw = $("sw"), ss = $("ss"), state = { bold: false, gold: false, big: false };
-  function apply(cmd, btn) {
-    if (cmd === "reset") {
-      state = { bold: false, gold: false, big: false };
-      sw.getAnimations().forEach(function (a) { a.cancel(); });
-      sw.style.cssText = ""; ss.hidden = true;
-      document.querySelectorAll(".cmd.on").forEach(function (b) { b.classList.remove("on"); });
-      return;
-    }
-    btn.classList.add("on");
-    var d = reduce ? 0 : 1;
-    if (cmd === "enter") {
-      sw.animate([{ transform: "translateX(60%)", filter: "blur(14px)", opacity: 0 }, { transform: "none", filter: "blur(0)", opacity: 1 }],
-        { duration: 1000 * d, easing: EASE });
-    } else if (cmd === "bold") {
-      state.bold = !state.bold; btn.classList.toggle("on", state.bold);
-      var from = state.bold ? 300 : 900, to = state.bold ? 900 : 300;
-      sw.animate([{ fontWeight: from }, { fontWeight: to }], { duration: 900 * d, easing: EASE });
-      sw.style.fontWeight = to;
-    } else if (cmd === "gold") {
-      state.gold = !state.gold; btn.classList.toggle("on", state.gold);
-      sw.style.transition = "color .5s"; sw.style.color = state.gold ? "var(--gold)" : "";
-    } else if (cmd === "big") {
-      state.big = !state.big; btn.classList.toggle("on", state.big);
-      sw.style.transition = "font-size .7s " + EASE + ", color .5s";
-      sw.style.fontSize = state.big ? "clamp(2.8rem, 8.5vw, 5.2rem)" : "";
-    } else if (cmd === "sub") {
-      ss.hidden = false;
-      ss.animate([{ transform: "translateY(16px)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 700 * d, easing: EASE });
-    }
-  }
-  document.querySelectorAll("[data-cmd]").forEach(function (b) {
-    b.addEventListener("click", function () { apply(b.getAttribute("data-cmd"), b); });
-  });
+  /* ================= the editor window, driven by scroll ================= */
+  var scenes = [$("sc0"), $("sc1"), $("sc2")];
+  var chapters = Array.prototype.slice.call(document.querySelectorAll(".chapter"));
+  var labels = ["تعديل بالصوت", "كابشن تلقائي", "مونتاج تلقائي"];
+  var devLabel = $("devLabel"), devBar = $("devBar"), tc = $("tc"), current = -1;
 
-  /* ================= demo 2: dialect captions ================= */
-  var lines = {
-    eg: "النهارده هقولكم على تلات حاجات هتفرق معاكم في التسويق",
-    gulf: "اليوم بقولكم ثلاث أشياء بتفرق معكم وايد في التسويق",
-    lev: "اليوم رح احكيلكن عن تلات شغلات بتفرق معكن بالتسويق",
-    fus: "سأحدثكم اليوم عن ثلاثة أمور تصنع فرقًا في التسويق"
-  };
-  var cap = $("cap"), words = [], wi = 0;
-  function setLine(key) {
-    cap.innerHTML = "";
-    words = lines[key].split(" ").map(function (txt) {
-      var s = document.createElement("span"); s.textContent = txt; cap.appendChild(s); return s;
-    });
-    wi = 0;
-    if (reduce) words.forEach(function (s, i) { s.classList.toggle("on", i === 3); });
-  }
-  setLine("eg");
-  document.querySelectorAll("[data-d]").forEach(function (b) {
-    b.addEventListener("click", function () {
-      document.querySelectorAll("[data-d]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
-      setLine(b.getAttribute("data-d"));
-    });
-  });
-  if (!reduce) {
-    setInterval(function () {
-      words.forEach(function (s, i) { s.classList.toggle("on", i === wi); });
-      wi = (wi + 1) % (words.length + 3);
-    }, 420);
+  var cmds = ["«دخّلها من اليمين»", "«تقّل الخط»", "«لوّنها دهبي»", "«كبّرها»", "«ضيف تحتها الخصم»"];
+  var cmdEl = $("cmd"), lastStep = -1;
+  function voice(p) {
+    var step = Math.min(5, Math.floor(p * 6));
+    if (step === lastStep) return;
+    lastStep = step;
+    for (var s = 1; s <= 5; s++) scenes[0].classList.toggle("s" + s, step >= s);
+    cmdEl.textContent = cmds[Math.max(0, Math.min(4, step - 1))];
   }
 
-  /* ================= demo 3: auto cut ================= */
-  var cut = $("cut"), dur = $("dur"), durNote = $("durNote"), cutBtn = $("cutBtn");
-  var RAW = 252, CLEAN = 167; // seconds: 4:12 → 2:47
+  var lines = [
+    "النهارده هقولكم على تلات حاجات هتفرق معاكم في التسويق",
+    "اليوم بقولكم ثلاث أشياء بتفرق معكم وايد في التسويق",
+    "اليوم رح احكيلكن عن تلات شغلات بتفرق معكن بالتسويق",
+    "سأحدثكم اليوم عن ثلاثة أمور تصنع فرقًا في التسويق"
+  ];
+  var cap = $("cap"), dialTags = $("dial").children, words = [], lineIdx = -1;
+  function caption(p) {
+    var li = Math.min(3, Math.floor(p * 4));
+    if (li !== lineIdx) {
+      lineIdx = li; cap.innerHTML = "";
+      words = lines[li].split(" ").map(function (w) { var s = document.createElement("span"); s.textContent = w; cap.appendChild(s); return s; });
+      for (var d = 0; d < dialTags.length; d++) dialTags[d].classList.toggle("on", d === li);
+    }
+    var wi = Math.min(words.length - 1, Math.floor((p * 4 - li) * words.length));
+    words.forEach(function (s, i) { s.classList.toggle("on", i === wi); });
+  }
+
+  var gaps = Array.prototype.slice.call(document.querySelectorAll(".gap"));
+  var dur = $("dur"), durNote = $("durNote"), RAW = 252, CLEAN = 167;
   function fmt(s) { s = Math.round(s); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
-  function runCut() {
-    var doing = !cut.classList.contains("done");
-    cut.classList.toggle("done", doing);
-    cutBtn.textContent = doing ? "رجّع الفيديو الخام" : "قصّ السكتات";
-    durNote.textContent = doing ? "بعد القصّ التلقائي" : "مدة الفيديو الخام";
-    var a = doing ? RAW : CLEAN, b = doing ? CLEAN : RAW, start = performance.now(), len = reduce ? 1 : 900;
-    (function step(now) {
-      var p = Math.min(1, (now - start) / len), e = 1 - Math.pow(1 - p, 4);
-      dur.textContent = fmt(a + (b - a) * e);
-      if (p < 1) requestAnimationFrame(step);
-    })(start);
+  function cut(p) {
+    var e = clamp((p - 0.15) / 0.6); e = 1 - Math.pow(1 - e, 3);
+    gaps.forEach(function (g) { g.style.setProperty("--keep", (1 - e).toFixed(3)); });
+    dur.textContent = fmt(RAW + (CLEAN - RAW) * e);
+    durNote.textContent = e > 0.98 ? "بعد القصّ التلقائي" : "الفيديو الخام";
   }
-  cutBtn.addEventListener("click", runCut);
-  if (!reduce && "IntersectionObserver" in window) {
-    var io = new IntersectionObserver(function (es) {
-      if (es[0].isIntersecting) { io.disconnect(); setTimeout(runCut, 500); }
-    }, { threshold: 0.6 });
-    io.observe(cut);
+
+  var renders = [voice, caption, cut];
+  function show(i, p) {
+    if (i !== current) {
+      current = i;
+      scenes.forEach(function (s, k) { s.classList.toggle("on", k === i); });
+      chapters.forEach(function (c, k) { c.classList.toggle("on", k === i); });
+      devLabel.textContent = labels[i];
+    }
+    renders[i](p);
+    devBar.style.width = ((i + p) / 3 * 100).toFixed(2) + "%";
+    tc.textContent = "00:" + String(Math.round((i + p) * 20)).padStart(2, "0");
+  }
+  show(0, 0.95); // rest state: a finished edit is visible before any scroll
+
+  if (window.gsap && window.ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
+    chapters.forEach(function (ch, i) {
+      ScrollTrigger.create({
+        trigger: ch, start: "top 62%", end: "bottom 38%",
+        onUpdate: function (self) { show(i, self.progress); },
+        onEnter: function () { show(i, 0); },
+        onEnterBack: function () { show(i, 1); }
+      });
+    });
+    if (!reduce) {
+      gsap.from(".plan", { y: 40, opacity: 0, duration: 0.9, ease: "expo.out", stagger: 0.08,
+        scrollTrigger: { trigger: ".plans", start: "top 85%", once: true } });
+    }
+  } else {
+    var onScroll = function () {
+      var mid = innerHeight * 0.5;
+      chapters.forEach(function (ch, i) {
+        var r = ch.getBoundingClientRect();
+        if (r.top < mid && r.bottom > mid) show(i, clamp((mid - r.top) / r.height));
+      });
+    };
+    addEventListener("scroll", onScroll, { passive: true });
   }
 
   /* ================= pricing intent ================= */
@@ -670,28 +574,22 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       var plan = btn.getAttribute("data-plan");
       post("/api/event", { name: "pricing_click", plan: plan, utm: utm }).catch(function () {});
       $("f-plan").value = plan;
-      $("msg").className = "msg";
-      $("msg").textContent = "لسه ما أطلقناش. احجز وهتاخد الباقة دي بخصم 50% أول 3 شهور.";
       $("join").scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
       setTimeout(function () { $("f-email").focus({ preventScroll: true }); }, reduce ? 0 : 600);
     });
   });
 
   /* ================= waitlist ================= */
-  var form = $("waitlist"), msg = $("msg"), submit = $("f-submit");
-  var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  var form = $("waitlist"), msg = $("msg"), submit = $("f-submit"), emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   form.addEventListener("submit", function (e) {
     e.preventDefault();
-    var data = new FormData(form);
-    var email = String(data.get("email") || "").trim();
-    var type = String(data.get("content_type") || "");
+    var data = new FormData(form), email = String(data.get("email") || "").trim(), type = String(data.get("content_type") || "");
     msg.className = "msg err";
     if (!emailRe.test(email)) { msg.textContent = "اكتب إيميل صحيح، زي name@example.com"; $("f-email").focus(); return; }
     if (!type) { msg.textContent = "اختار نوع المحتوى اللي بتعمله."; $("f-type").focus(); return; }
     submit.disabled = true; submit.textContent = "بنحجز…"; msg.className = "msg"; msg.textContent = "";
     post("/api/waitlist", {
-      name: String(data.get("name") || "").trim(), email: email, content_type: type,
-      plan: String(data.get("plan") || ""), prepay: String(data.get("prepay") || ""),
+      email: email, content_type: type, plan: String(data.get("plan") || ""), prepay: String(data.get("prepay") || ""),
       website: String(data.get("website") || ""), utm: utm, referrer: document.referrer.slice(0, 300)
     }).then(function (res) {
       if (res.ok) { form.hidden = true; $("thanks").hidden = false; return; }
