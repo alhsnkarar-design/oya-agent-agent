@@ -1,17 +1,30 @@
 # حركة: صفحة الهبوط وقائمة الانتظار
 
-صفحة عربية تعرض الفكرة، وتجمع إيميلات المهتمين، وتقيس استعدادهم للدفع (الضغط على أزرار الأسعار وسؤال الدفع المقدم).
+صفحة عربية تعرض الفكرة وتجمع إيميلات المهتمين. مبنية بـ **Astro**: تُبنى صفحة HTML ثابتة وسريعة، والخطوط محمّلة من الموقع نفسه، وفيها إعدادات SEO كاملة وصورة مشاركة.
 
-> **"حركة" اسم مؤقت.** لتغييره، ابحث عن كلمة `حركة` في `public/index.html` واستبدلها.
+> **"حركة" اسم مؤقت.** لتغييره، ابحث عن كلمة `حركة` داخل مجلد `src` واستبدلها.
 
 ## الملفات
 
 | الملف | وظيفته |
 |---|---|
-| `public/index.html` | الصفحة نفسها (HTML وCSS وJS في ملف واحد، بدون أي build) |
+| `src/pages/index.astro` | الصفحة، وتجمع الأقسام بالترتيب |
+| `src/components/` | أقسام الصفحة: `Header` و`Hero` (فيه نموذج الحجز) و`EditorShot` و`Features` و`Footer` |
+| `src/layouts/Base.astro` | رأس الصفحة: العنوان والوصف وبيانات المشاركة وبيانات محركات البحث |
+| `src/styles/global.css` | الألوان والخطوط والأساسيات |
+| `public/` | ملفات ثابتة: الأيقونة، وصورة المشاركة `og.png`، و`robots.txt`، و`_headers` (إعدادات أمان وتخزين مؤقت لـ Cloudflare) |
 | `functions/api/waitlist.js` | يستقبل التسجيل ويحفظه في Appwrite |
-| `functions/api/event.js` | يسجل الضغط على أزرار الأسعار |
+| `functions/api/event.js` | غير مستخدم حاليًا (كان لأزرار الأسعار) |
 | `lib/appwrite.js` | دوال مشتركة للاتصال بـ Appwrite |
+
+## التشغيل على جهازك
+
+```bash
+cd landing
+npm install
+npm run dev      # معاينة على http://localhost:4321
+npm run build    # يبني الموقع في مجلد dist
+```
 
 ## الإعداد خطوة بخطوة
 
@@ -44,8 +57,10 @@
 1. ادخل [dash.cloudflare.com](https://dash.cloudflare.com) ← **Workers & Pages** ← **Create** ← **Pages** ← **Connect to Git**.
 2. اختر هذا المستودع، ثم اضبط:
    - **Root directory:** `landing`
-   - **Build command:** اتركه فارغًا
-   - **Build output directory:** `public`
+   - **Framework preset:** Astro
+   - **Build command:** `npm run build`
+   - **Build output directory:** `dist`
+   - أضف متغير البيئة `NODE_VERSION` بقيمة `22`
 3. من **Settings ← Variables and Secrets** أضف هذه القيم (اختر **Encrypt** للمفتاح):
 
    | الاسم | القيمة |

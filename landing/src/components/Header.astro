@@ -1,0 +1,26 @@
+<header class="top">
+  <div class="wrap">
+    <a class="mark" href="#top" aria-label="حركة">حركة<span>.</span></a>
+    <nav aria-label="القائمة">
+      <a href="#features">المميزات</a>
+      <a class="btn" href="#book">احجز مكانك</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  body::before {
+    content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+    z-index: 30; background: var(--page);
+  }
+  .top {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+    background: var(--page); border-bottom: 1px solid var(--line);
+  }
+  .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  nav { display: flex; align-items: center; gap: 28px; font-size: .92rem; }
+  nav a:not(.btn) { text-decoration: none; color: var(--ink-2); }
+  nav a:not(.btn):hover { color: var(--ink); }
+  .btn { height: 38px; padding: 0 16px; font-size: .9rem; }
+  @media (max-width: 600px) { nav a:not(.btn) { display: none; } }
+</style>

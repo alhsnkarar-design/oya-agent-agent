@@ -1,0 +1,68 @@
+/* Haraka landing — design tokens and base.
+   White page, black type, one saffron accent; dark theme follows the system. */
+:root {
+  --page: #ffffff;
+  --tint: #f5f5f3;
+  --ink: #0c0c0d;
+  --ink-2: #55575e;
+  --ink-3: #8a8c93;
+  --line: #e7e7e4;
+  --accent: #f2a72b;
+  --accent-ink: #1a1204;
+  --btn: #0c0c0d;
+  --btn-ink: #ffffff;
+  --danger: #c7342b;
+  /* editor chrome stays dark in both themes, like real editing software */
+  --app: #16171b;
+  --app-2: #1e2025;
+  --app-3: #2a2d33;
+  --app-ink: #e9eaed;
+  --app-ink-2: #9a9da6;
+  --f-display: "Noto Kufi Arabic Variable", "Noto Kufi Arabic", "Segoe UI", Tahoma, sans-serif;
+  --f-body: "Readex Pro Variable", "Readex Pro", "Segoe UI", Tahoma, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #0d0d0f; --tint: #151518; --ink: #f2f2f3; --ink-2: #a6a8af; --ink-3: #75777e; --line: #26272b;
+    --btn: #f2f2f3; --btn-ink: #0d0d0f; --danger: #ff8a80; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --page: #0d0d0f; --tint: #151518; --ink: #f2f2f3; --ink-2: #a6a8af; --ink-3: #75777e; --line: #26272b;
+  --btn: #f2f2f3; --btn-ink: #0d0d0f; --danger: #ff8a80; color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--page); color: var(--ink);
+  font: 400 1rem/1.75 var(--f-body);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+::selection { background: var(--accent); color: var(--accent-ink); }
+a { color: inherit; }
+h1, h2, h3, h4, p, ul { margin: 0; }
+img, svg { display: block; max-width: 100%; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+.wrap {
+  max-width: 1180px; margin-inline: auto;
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+}
+.sr {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+.btn {
+  font: 600 .95rem/1 var(--f-body); border: 0; cursor: pointer; text-decoration: none; white-space: nowrap;
+  padding: 0 20px; height: 46px; border-radius: 10px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--btn); color: var(--btn-ink);
+}
+.btn:hover { opacity: .88; }
+.btn:disabled { opacity: .55; cursor: progress; }
+.mark { font: 800 1.35rem/1 var(--f-display); text-decoration: none; }
+.mark span { color: var(--accent); }

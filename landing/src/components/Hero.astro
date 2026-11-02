@@ -1,0 +1,93 @@
+<section class="wrap hero" id="book" aria-labelledby="t-hero">
+  <h1 id="t-hero">قُلها، والفيديو <span>يتحرّك</span>.</h1>
+  <p class="lede">محرر فيديو عربي. اكتب فكرتك أو ارفع فيديو خام، وعدّل عليه بصوتك وأنت بتتفرّج.</p>
+
+  <form id="waitlist" novalidate>
+    <label class="sr" for="f-email">الإيميل</label>
+    <input id="f-email" name="email" type="email" maxlength="160" autocomplete="email" required placeholder="الإيميل" dir="auto" />
+    <div class="sr" aria-hidden="true">
+      <label for="f-website">سيب الخانة دي فاضية</label>
+      <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+    <button class="btn" type="submit" id="f-submit">احجز مكانك</button>
+  </form>
+  <p class="thanks" id="thanks" hidden><b>تم الحجز.</b> هنبعتلك إيميل أول ما النسخة التجريبية تجهز.</p>
+  <p class="msg" id="msg" role="status"></p>
+  <p class="note">أول 100 مشترك ليهم خصم 50% لمدة 3 شهور.</p>
+</section>
+
+<style>
+  .hero { padding-block: clamp(56px, 9vw, 120px) clamp(40px, 6vw, 72px); display: grid; gap: 22px; justify-items: start; }
+  h1 { font: 800 clamp(2.6rem, 6.4vw, 5rem)/1.15 var(--f-display); text-wrap: balance; max-width: 13ch; }
+  h1 span { color: var(--accent); }
+  .lede { font-size: clamp(1.05rem, 1.7vw, 1.25rem); color: var(--ink-2); max-width: 44ch; }
+  form { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; width: 100%; max-width: 520px; }
+  input[type="email"] {
+    flex: 1 1 260px; min-width: 0; height: 46px; padding: 0 14px; border-radius: 10px;
+    font: 400 1rem/1 var(--f-body); color: var(--ink); background: var(--page); border: 1px solid var(--line);
+  }
+  input::placeholder { color: var(--ink-3); }
+  input:focus { outline: none; border-color: var(--ink); }
+  .note { font-size: .88rem; color: var(--ink-3); }
+  .msg { font-size: .9rem; }
+  .msg:empty { display: none; }
+  .msg.err { color: var(--danger); }
+  .thanks { font-size: 1.05rem; padding: 12px 0; }
+  .thanks b { font-weight: 600; }
+</style>
+
+<script>
+  const $ = (id: string) => document.getElementById(id)!;
+  const form = $("waitlist") as HTMLFormElement;
+  const msg = $("msg");
+  const submit = $("f-submit") as HTMLButtonElement;
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const params = new URLSearchParams(location.search);
+  const utm = {
+    source: params.get("utm_source") ?? "",
+    medium: params.get("utm_medium") ?? "",
+    campaign: params.get("utm_campaign") ?? "",
+  };
+
+  function fail(text: string) {
+    msg.className = "msg err";
+    msg.textContent = text;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const email = String(data.get("email") ?? "").trim();
+    if (!emailRe.test(email)) {
+      fail("اكتب إيميل صحيح، زي name@example.com");
+      ($("f-email") as HTMLInputElement).focus();
+      return;
+    }
+    submit.disabled = true;
+    msg.className = "msg";
+    msg.textContent = "";
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          website: String(data.get("website") ?? ""),
+          utm,
+          referrer: document.referrer.slice(0, 300),
+        }),
+      });
+      if (res.ok) {
+        form.hidden = true;
+        $("thanks").hidden = false;
+        return;
+      }
+      const body = await res.json().catch(() => ({}));
+      fail(body.error === "invalid_email" ? "اكتب إيميل صحيح، زي name@example.com" : "الحجز ما تمّش. جرّب تاني بعد دقيقة.");
+    } catch {
+      fail("مفيش اتصال. اتأكد من النت وجرّب تاني.");
+    } finally {
+      submit.disabled = false;
+    }
+  });
+</script>

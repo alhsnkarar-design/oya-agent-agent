@@ -1,0 +1,15 @@
+---
+const year = new Date().getFullYear();
+---
+<footer>
+  <div class="wrap">
+    <span class="mark">حركة<span>.</span></span>
+    <span>© {year} حركة</span>
+  </div>
+</footer>
+
+<style>
+  footer { border-top: 1px solid var(--line); }
+  .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-block: 28px; font-size: .85rem; color: var(--ink-3); }
+  .mark { font-size: 1.05rem; color: var(--ink); }
+</style>
