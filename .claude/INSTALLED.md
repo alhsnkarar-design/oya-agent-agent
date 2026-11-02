@@ -35,6 +35,12 @@ every session. Invoke them with the Skill tool as `anthropic-skills:<name>`.
 
 Account plugin: `servicenow-sdk` (skill `servicenow-sdk:now-sdk`).
 
+## Tools installed
+
+| tool | source | what it does | reinstall | installed |
+| --- | --- | --- | --- | --- |
+| Headroom (`headroom`, Python `headroom-ai` 0.42.0) | https://github.com/headroomlabs-ai/headroom (Apache-2.0) | Compresses what an AI agent reads (tool output, logs, files, history) before it reaches the model; tested here: 6,213 -> 2,372 tokens (62% saved) on a 300-line log, error line kept. Library `from headroom import compress`, CLI, proxy, MCP server. | `python3 -m venv ~/.venvs/headroom && ~/.venvs/headroom/bin/pip install headroom-ai` (add `[proxy]` for the proxy/MCP), then link `~/.venvs/headroom/bin/headroom` into PATH. Do NOT run `headroom wrap claude` or install its plugin hooks without the owner asking: they reroute all Claude traffic and run on every command. | 2026-11-02 |
+
 ## Tools tried and removed
 
 | tool | what happened | date |
