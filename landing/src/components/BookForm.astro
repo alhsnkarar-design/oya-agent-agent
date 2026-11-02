@@ -1,0 +1,92 @@
+---
+// Email-only booking form. Used in the hero card and in the closing band;
+// the script below wires every instance on the page.
+interface Props { id: string; tone?: "light" | "dark"; }
+const { id, tone = "light" } = Astro.props;
+---
+<div class:list={["book-form", tone]} data-book>
+  <form novalidate>
+    <label class="sr" for={`${id}-email`}>الإيميل</label>
+    <input id={`${id}-email`} name="email" type="email" maxlength="160" autocomplete="email" required placeholder="اكتب إيميلك" dir="auto" />
+    <div class="sr" aria-hidden="true">
+      <label for={`${id}-website`}>سيب الخانة دي فاضية</label>
+      <input id={`${id}-website`} name="website" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+    <button type="submit">احجز مكاني</button>
+  </form>
+  <p class="msg" role="status"></p>
+  <p class="done" hidden>تمام، مكانك محجوز. هنبعتلك أول ما النسخة الأولى تجهز.</p>
+</div>
+
+<style>
+  form { display: flex; gap: 8px; flex-wrap: wrap; }
+  input[type="email"] {
+    flex: 1 1 240px; min-width: 0; height: 56px; padding: 0 18px; border-radius: 14px;
+    font: 500 1.05rem/1 var(--f-body); border: 2px solid transparent;
+  }
+  button {
+    height: 56px; padding: 0 26px; border-radius: 14px; border: 0; cursor: pointer;
+    font: 700 1.05rem/1 var(--f-body); white-space: nowrap;
+  }
+  button:disabled { opacity: .6; cursor: progress; }
+  .msg { font-size: .92rem; margin-top: 10px; }
+  .msg:empty { display: none; }
+  .done { font: 600 1.1rem/1.6 var(--f-body); padding-block: 6px; }
+
+  /* on the saffron card */
+  .light input { background: #fff; color: #0c0c0d; }
+  .light input::placeholder { color: #8a7a5c; }
+  .light input:focus { outline: none; border-color: #0c0c0d; }
+  .light button { background: #0c0c0d; color: #fff; }
+  .light button:hover { background: #2a2a2d; }
+  .light .msg.err { color: #7a1410; }
+
+  /* on the black band */
+  .dark input { background: #1c1c1f; color: #fff; border-color: #2e2e33; }
+  .dark input::placeholder { color: #8a8c93; }
+  .dark input:focus { outline: none; border-color: var(--accent); }
+  .dark button { background: var(--accent); color: var(--accent-ink); }
+  .dark button:hover { background: #f6b955; }
+  .dark .msg.err { color: #ff9a92; }
+</style>
+
+<script>
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const params = new URLSearchParams(location.search);
+  const utm = {
+    source: params.get("utm_source") ?? "",
+    medium: params.get("utm_medium") ?? "",
+    campaign: params.get("utm_campaign") ?? "",
+  };
+
+  for (const box of document.querySelectorAll<HTMLElement>("[data-book]")) {
+    const form = box.querySelector("form")!;
+    const input = form.querySelector<HTMLInputElement>('input[type="email"]')!;
+    const button = form.querySelector("button")!;
+    const msg = box.querySelector<HTMLElement>(".msg")!;
+    const done = box.querySelector<HTMLElement>(".done")!;
+    const fail = (text: string) => { msg.className = "msg err"; msg.textContent = text; };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const email = String(data.get("email") ?? "").trim();
+      if (!emailRe.test(email)) { fail("اكتب إيميل صحيح، زي name@example.com"); input.focus(); return; }
+      button.disabled = true; msg.className = "msg"; msg.textContent = "";
+      try {
+        const res = await fetch("/api/waitlist", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, website: String(data.get("website") ?? ""), utm, referrer: document.referrer.slice(0, 300) }),
+        });
+        if (res.ok) { form.hidden = true; done.hidden = false; return; }
+        const body = await res.json().catch(() => ({}));
+        fail(body.error === "invalid_email" ? "اكتب إيميل صحيح، زي name@example.com" : "الحجز ما تمّش. جرّب تاني بعد دقيقة.");
+      } catch {
+        fail("مفيش اتصال. اتأكد من النت وجرّب تاني.");
+      } finally {
+        button.disabled = false;
+      }
+    });
+  }
+</script>
