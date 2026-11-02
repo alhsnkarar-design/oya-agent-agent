@@ -2,62 +2,47 @@
 import BookForm from "./BookForm.astro";
 ---
 <section class="wrap hero" aria-labelledby="t-hero">
-  <div class="copy">
-    <h1 id="t-hero">المونتاج والموشن جرافيكس، <span>بكلمة منك.</span></h1>
-    <p class="lede">ارفع الفيديو الخام أو اكتب فكرتك، وحركة بيعمل المونتاج والموشن جرافيكس والمؤثرات لوحده. ولو عايز تغيّر حاجة، قولها.</p>
-    <dl class="ways">
-      <div><dt>تلقائي</dt><dd>بيشتغل لوحده من أول ما ترفع</dd></div>
-      <div><dt>بالكتابة</dt><dd>اوصف اللي في دماغك</dd></div>
-      <div><dt>بالصوت</dt><dd>كلّمه وهو بيعدّل قدامك</dd></div>
-    </dl>
-  </div>
+  <h1 id="t-hero">المونتاج والموشن جرافيكس، <span>بكلمة منك.</span></h1>
 
   <section class="card" id="book" aria-labelledby="t-book">
-    <h2 id="t-book">احجز مكانك</h2>
+    <h2 id="t-book">احجز مكانك في النسخة الأولى</h2>
     <ul class="perks">
-      <li>تجرّب حركة قبل الإطلاق</li>
+      <li>تجرّب حركة قبل أي حد</li>
       <li>خصم 50% لمدة 3 شهور لأول 100</li>
       <li>رأيك بيحدد اللي هنبنيه الأول</li>
     </ul>
-    <BookForm id="hero" tone="light" />
+    <BookForm id="hero" />
     <p class="fine">إيميلك بس. من غير بطاقة دفع، ومن غير رسايل مزعجة.</p>
   </section>
+
+  <div class="copy">
+    <p class="lede">ارفع الفيديو الخام أو اكتب فكرتك، وحركة بيعمل المونتاج والموشن جرافيكس والمؤثرات لوحده. ولو عايز تغيّر حاجة، قولها.</p>
+    <p class="not">حركة مش بيولّد فيديو من العدم. هو المونتير والموشن ديزاينر اللي بيشتغل على الفيديو بتاعك.</p>
+  </div>
 </section>
 
 <style>
   .hero {
-    display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-    gap: clamp(32px, 6vw, 88px); align-items: center;
-    padding-block: clamp(48px, 8vw, 112px);
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    grid-template-areas: "title title" "copy card";
+    gap: clamp(28px, 4vw, 48px) clamp(32px, 6vw, 88px); align-items: start;
+    padding-block: clamp(44px, 7vw, 96px) clamp(56px, 8vw, 104px);
   }
-  @media (max-width: 940px) {
-    .hero { grid-template-columns: 1fr; gap: 26px; }
-    .hero .copy { display: contents; }   /* booking card sits right under the headline */
-    .hero h1 { order: 1; } .hero .card { order: 2; } .hero .lede { order: 3; } .hero .ways { order: 4; }
-  }
-  .copy { display: grid; gap: 26px; min-width: 0; }
-  h1 { font: 800 clamp(2.4rem, 5.4vw, 4.4rem)/1.2 var(--f-display); text-wrap: balance; }
-  h1 span { display: block; color: var(--ink-2); font-weight: 600; }
-  .lede { font-size: clamp(1.05rem, 1.6vw, 1.22rem); color: var(--ink-2); max-width: 46ch; }
-
-  .ways { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 6px 0 0; border-top: 2px solid var(--ink); }
-  .ways div { padding: 14px 0 0; padding-inline-end: 14px; }
-  .ways div + div { border-inline-start: 1px solid var(--line); padding-inline-start: 14px; }
-  dt { font: 800 1.15rem/1.3 var(--f-display); }
-  dd { margin: 4px 0 0; font-size: .9rem; color: var(--ink-2); line-height: 1.5; }
-  @media (max-width: 480px) {
-    .ways { grid-template-columns: 1fr; }
-    .ways div + div { border-inline-start: 0; padding-inline-start: 0; border-top: 1px solid var(--line); }
-    .ways div { padding-block: 12px; }
-  }
-
+  h1 { grid-area: title; font: 800 clamp(2.6rem, 7.4vw, 6.6rem)/1.12 var(--f-display); text-wrap: balance; max-width: 19ch; }
+  h1 span { color: var(--accent); }
+  .copy { grid-area: copy; display: grid; gap: 22px; align-content: start; padding-top: 6px; min-width: 0; }
+  .lede { font-size: clamp(1.1rem, 1.8vw, 1.35rem); line-height: 1.75; max-width: 34ch; }
+  .not { color: var(--ink-2); font-size: .98rem; max-width: 40ch; padding-inline-start: 16px; border-inline-start: 2px solid var(--line); }
   .card {
-    background: var(--accent); color: #1a1204; border-radius: 28px;
+    grid-area: card; background: var(--accent); color: #1a1204; border-radius: 28px;
     padding: clamp(26px, 4vw, 44px); display: grid; gap: 18px; min-width: 0;
   }
-  h2 { font: 800 clamp(2rem, 3.6vw, 2.9rem)/1.15 var(--f-display); }
+  h2 { font: 800 clamp(1.7rem, 3vw, 2.4rem)/1.25 var(--f-display); }
   .perks { list-style: none; padding: 0; display: grid; gap: 8px; font-weight: 500; }
   .perks li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; }
   .perks li::before { content: ""; width: 12px; height: 7px; margin-top: .5em; border: solid #1a1204; border-width: 0 0 2.5px 2.5px; transform: rotate(-45deg); }
   .fine { font-size: .85rem; color: #4d3a12; }
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; grid-template-areas: "title" "card" "copy"; }
+  }
 </style>

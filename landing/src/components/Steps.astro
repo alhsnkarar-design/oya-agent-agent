@@ -1,0 +1,38 @@
+---
+// A real sequence, so the numbers carry meaning.
+const steps = [
+  { title: "ارفع أو اوصف", text: "ارفع الفيديو الخام من موبايلك، أو اكتب الفكرة في سطر." },
+  { title: "حركة بيشتغل", text: "بيقصّ ويرتّب ويضيف الموشن جرافيكس والمؤثرات والكابشن." },
+  { title: "عدّل بصوتك وصدّر", text: "قول اللي عايز تغيّره، وصدّر بالمقاس اللي يناسب المنصة." },
+];
+---
+<section class="how" id="how" aria-labelledby="t-how">
+  <div class="wrap">
+    <h2 id="t-how">إزاي بيشتغل</h2>
+    <ol>
+      {steps.map((s, i) => (
+        <li>
+          <span class="n">{i + 1}</span>
+          <h3>{s.title}</h3>
+          <p>{s.text}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .how { border-top: 1px solid var(--line); padding-block: clamp(56px, 8vw, 104px); }
+  h2 { font: 800 clamp(1.8rem, 3.4vw, 2.6rem)/1.25 var(--f-display); margin-bottom: clamp(28px, 4vw, 44px); }
+  ol { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  li { display: grid; gap: 10px; align-content: start; padding-inline: 0 28px; }
+  li + li { border-inline-start: 1px solid var(--line); padding-inline-start: 28px; }
+  .n { font: 800 clamp(3.2rem, 6vw, 4.6rem)/1 var(--f-display); color: var(--accent); }
+  h3 { font: 800 1.3rem/1.35 var(--f-display); }
+  p { color: var(--ink-2); max-width: 30ch; }
+  @media (max-width: 760px) {
+    ol { grid-template-columns: 1fr; gap: 0; }
+    li, li + li { border-inline-start: 0; padding: 22px 0; border-top: 1px solid var(--line); grid-template-columns: auto 1fr; column-gap: 18px; }
+    .n { grid-row: span 2; font-size: 3rem; }
+  }
+</style>

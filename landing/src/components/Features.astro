@@ -1,50 +1,100 @@
 ---
-// Each feature names what it does and how you trigger it.
-const features = [
-  { title: "مونتاج تلقائي", text: "ارفع الفيديو الخام، يقصّ السكتات والتكرار والغلطات، ويرتّب اللقطات ويضيف الانتقالات.", how: "تلقائي" },
-  { title: "موشن جرافيكس من وصف", text: "اكتب «إعلان لعرض الجمعة، ألوان دافية»، يطلع لك عناوين ونصوص وأشكال متحركة جاهزة.", how: "بالكتابة" },
-  { title: "تعديل بالصوت المباشر", text: "«كبّر العنوان»، «احذف المشهد التاني»، «خلّي الانتقال أسرع». بتتكلم وهو بيعدّل في نفس اللحظة.", how: "بالصوت" },
-  { title: "مؤثرات على الإيقاع", text: "زووم وانتقالات ومؤثرات بتتظبط على إيقاع الكلام، من غير ما تحرّك ولا كيفريم.", how: "تلقائي" },
-  { title: "كابشن عربي متحرك", text: "كلمة بكلمة على توقيت الكلام، بالمصري والخليجي والشامي والفصحى، وبخطوط عربية.", how: "تلقائي" },
-  { title: "مقاس لكل منصة", text: "ريلز وتيك توك ويوتيوب وإنستجرام من نفس المشروع، والعناصر بتتظبط لوحدها.", how: "بضغطة" },
-];
+// Bento of flat colour blocks. Each block carries a typographic sample of what the feature produces.
 ---
 <section class="features" id="features" aria-labelledby="t-feat">
   <div class="wrap">
-    <div class="head">
-      <h2 id="t-feat">حركة بيعمل إيه؟</h2>
-      <p>كل اللي بياخد من المونتير ساعات، بيخلص في دقايق.</p>
+    <h2 id="t-feat">كل اللي بياخد من المونتير ساعات، بيخلص في دقايق.</h2>
+
+    <div class="bento">
+      <article class="b voice">
+        <h3>تعديل بالصوت المباشر</h3>
+        <p>بتتكلم وهو بيعدّل قدامك في نفس اللحظة، من غير ما تلمس الخط الزمني.</p>
+        <div class="sample" aria-hidden="true">
+          <q>كبّر العنوان</q>
+          <q>احذف المشهد التاني</q>
+          <q>خلّي الانتقال أسرع</q>
+        </div>
+      </article>
+
+      <article class="b montage">
+        <h3>مونتاج تلقائي</h3>
+        <p>يقصّ السكتات والتكرار والغلطات، ويرتّب اللقطات ويضيف الانتقالات.</p>
+        <div class="sample" aria-hidden="true"><s>4:12</s><b>2:47</b></div>
+      </article>
+
+      <article class="b motion">
+        <h3>موشن جرافيكس من وصف</h3>
+        <p>اكتب «إعلان لعرض الجمعة، ألوان دافية» يطلع لك عناوين ونصوص وأشكال جاهزة.</p>
+        <div class="sample" aria-hidden="true"><span>عرض</span><span>الجمعة</span></div>
+      </article>
+
+      <article class="b captions">
+        <h3>كابشن عربي بلهجتك</h3>
+        <p>كلمة بكلمة على توقيت الكلام: مصري، خليجي، شامي، فصحى.</p>
+        <div class="sample" aria-hidden="true">مستنيينكم <mark>يوم</mark> الجمعة</div>
+      </article>
+
+      <article class="b effects">
+        <h3>مؤثرات على الإيقاع</h3>
+        <p>زووم وانتقالات وظهور النصوص بتتظبط على إيقاع الكلام لوحدها.</p>
+        <div class="sample" aria-hidden="true">زووم · انتقال · ظهور · اهتزاز</div>
+      </article>
+
+      <article class="b formats">
+        <h3>مقاس لكل منصة</h3>
+        <p>ريلز وتيك توك ويوتيوب وإنستجرام من نفس المشروع.</p>
+        <div class="sample" aria-hidden="true"><span>9:16</span><span>16:9</span><span>1:1</span></div>
+      </article>
     </div>
-    <ol>
-      {features.map((f) => (
-        <li>
-          <h3>{f.title}</h3>
-          <p>{f.text}</p>
-          <span class="how">{f.how}</span>
-        </li>
-      ))}
-    </ol>
   </div>
 </section>
 
 <style>
   .features { background: var(--tint); padding-block: clamp(64px, 9vw, 120px); }
-  .head { display: flex; justify-content: space-between; align-items: end; gap: 16px 40px; flex-wrap: wrap; margin-bottom: clamp(28px, 4vw, 44px); }
-  h2 { font: 800 clamp(2rem, 4vw, 3.2rem)/1.2 var(--f-display); }
-  .head p { color: var(--ink-2); font-size: 1.05rem; max-width: 36ch; }
-  ol { list-style: none; padding: 0; margin: 0; border-top: 2px solid var(--ink); }
-  li {
-    display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) auto;
-    gap: 8px 28px; align-items: baseline; padding-block: 22px; border-bottom: 1px solid var(--line);
+  h2 { font: 800 clamp(1.8rem, 3.6vw, 2.8rem)/1.3 var(--f-display); max-width: 22ch; text-wrap: balance; margin-bottom: clamp(28px, 4vw, 48px); }
+
+  .bento { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 14px; }
+  .b { border-radius: 24px; padding: clamp(22px, 3vw, 32px); display: grid; gap: 10px; align-content: start; min-width: 0; }
+  .b h3 { font: 800 clamp(1.25rem, 2vw, 1.55rem)/1.35 var(--f-display); }
+  .b p { font-size: .98rem; line-height: 1.7; max-width: 40ch; opacity: .86; }
+  .sample { margin-top: auto; padding-top: 22px; font-family: var(--f-display); }
+
+  .voice { grid-column: span 7; grid-row: span 2; background: #2449e8; color: #fff; }
+  .voice .sample { display: grid; gap: 10px; justify-items: start; }
+  .voice q { quotes: "«" "»"; font: 700 clamp(1.4rem, 2.8vw, 2.2rem)/1.3 var(--f-display); background: rgba(255,255,255,.12); padding: 8px 16px; border-radius: 12px; }
+  .voice q:nth-child(2) { background: #fff; color: #2449e8; }
+
+  .montage { grid-column: span 5; background: #ff5c47; color: #1c0905; }
+  .montage .sample { display: flex; align-items: baseline; gap: 18px; direction: ltr; justify-content: flex-end; }
+  .montage s { font: 600 clamp(1.6rem, 3vw, 2.2rem)/1 var(--f-display); opacity: .55; text-decoration-thickness: 3px; }
+  .montage b { font: 800 clamp(2.8rem, 5.6vw, 4.4rem)/1 var(--f-display); }
+
+  .motion { grid-column: span 5; background: #121214; color: #fff; }
+  .motion .sample { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 14px; }
+  .motion span:first-child { font: 200 clamp(2.2rem, 4.4vw, 3.4rem)/1.1 var(--f-display); }
+  .motion span:last-child { font: 800 clamp(2.2rem, 4.4vw, 3.4rem)/1.1 var(--f-display); color: var(--accent); }
+
+  .captions { grid-column: span 4; background: #cfe6ff; color: #0b1a2e; }
+  .captions .sample { font: 700 clamp(1.1rem, 2vw, 1.35rem)/1.6 var(--f-display); }
+  .captions mark { background: #0b1a2e; color: #cfe6ff; padding: 0 .3em; border-radius: 6px; }
+
+  .effects { grid-column: span 4; background: #6b47ee; color: #fff; }
+  .effects .sample { font: 700 clamp(1.05rem, 1.8vw, 1.25rem)/1.7 var(--f-display); }
+
+  .formats { grid-column: span 4; background: #19c58f; color: #04241a; }
+  .formats .sample { display: flex; gap: 10px; align-items: end; direction: ltr; justify-content: flex-end; }
+  .formats span { font: 700 .9rem/1 var(--f-body); border: 2px solid currentColor; border-radius: 8px; display: grid; place-items: center; }
+  .formats span:nth-child(1) { width: 46px; height: 82px; }
+  .formats span:nth-child(2) { width: 112px; height: 63px; }
+  .formats span:nth-child(3) { width: 70px; height: 70px; }
+
+  @media (max-width: 980px) {
+    .voice { grid-column: span 12; grid-row: auto; }
+    .montage, .motion { grid-column: span 6; }
+    .captions, .effects, .formats { grid-column: span 6; }
+    .formats { grid-column: span 12; }
   }
-  h3 { font: 800 1.25rem/1.4 var(--f-display); }
-  li p { color: var(--ink-2); max-width: 58ch; }
-  .how {
-    font: 700 .8rem/1 var(--f-body); padding: 8px 12px; border-radius: 8px;
-    background: var(--page); border: 1px solid var(--line); white-space: nowrap; justify-self: start;
-  }
-  @media (max-width: 860px) {
-    li { grid-template-columns: minmax(0, 1fr) auto; }
-    li p { grid-column: 1 / -1; }
+  @media (max-width: 620px) {
+    .b, .voice, .montage, .motion, .captions, .effects, .formats { grid-column: span 12; }
   }
 </style>
