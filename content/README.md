@@ -16,3 +16,4 @@
 | الملف | الوصف |
 |---|---|
 | [series/github-treasure-30-days.md](series/github-treasure-30-days.md) | 💎 كنز GitHub: 30 يوم، مشروع مفتوح المصدر كل يوم، مع قالب الريل وأوامر التشغيل |
+| [series/free-alternative-30-days.md](series/free-alternative-30-days.md) | 🆓 البديل المجاني: 30 مواجهة بين أداة مدفوعة وبديل مفتوح المصدر، مع كارت تقييم وحكم صريح |
