@@ -1,0 +1,37 @@
+---
+const qs = [
+  { q: "إمتى الموقع هيفتح؟", a: "لسه بنبنيه. أول ما النسخة الأولى تجهز هنبعتلك رسالة على الإيميل اللي حجزت بيه، واللي حجزوا الأول هيدخلوا الأول." },
+  { q: "محتاج أنزّل برنامج؟", a: "لأ. Zifidit موقع بيشتغل من المتصفح، على الكمبيوتر أو الموبايل." },
+  { q: "بيفهم العربي واللهجات؟", a: "ده الأساس. الكابشن والتعديل بالصوت معمولين للعربي: مصري وخليجي وشامي وفصحى." },
+  { q: "هتعملوا إيه بإيميلي؟", a: "هنبعتلك عليه لما نفتح بس. مش هنبيعه لحد، ومش هنبعتلك رسايل كتير." },
+];
+---
+<section class="section" id="faq" aria-labelledby="t-faq">
+  <div class="wrap grid">
+    <h2 class="h2" id="t-faq">أسئلة سريعة</h2>
+    <div class="list">
+      {qs.map((x, i) => (
+        <details open={i === 0}>
+          <summary>{x.q}<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg></summary>
+          <p>{x.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .grid { display: grid; grid-template-columns: minmax(0, .7fr) minmax(0, 1.3fr); gap: 32px 64px; align-items: start; }
+  .list { border-top: 1px solid var(--line); }
+  details { border-bottom: 1px solid var(--line); }
+  summary {
+    list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    padding-block: 22px; font: 700 1.1rem/1.5 var(--f-display);
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary .ico { color: var(--ink-3); transition: transform .2s; }
+  details[open] summary .ico { transform: rotate(45deg); color: var(--accent); }
+  summary:hover { color: var(--accent); }
+  details p { color: var(--ink-2); padding-bottom: 22px; max-width: 60ch; }
+  @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+</style>

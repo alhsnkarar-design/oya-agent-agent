@@ -1,14 +1,22 @@
 ---
 import BookForm from "./BookForm.astro";
 ---
-<section class="closing" aria-labelledby="t-close">
-  <div class="wrap statement">
-    <h2 id="t-close">احجز مكانك.<span>قبل ما النسخة الأولى تفتح.</span></h2>
-    <p>إيميلك بس، من غير بطاقة دفع. و Zifidit مش بيولّد فيديو من العدم، هو بيشتغل على الفيديو بتاعك.</p>
-    <BookForm id="end" />
+<section class="section closing" aria-labelledby="t-close">
+  <div class="wrap panel">
+    <div>
+      <h2 class="h2" id="t-close">احجز مكانك <em>قبل ما نفتح.</em></h2>
+      <p class="lead">أول 100 يحجزوا ليهم خصم 50% لمدة 3 شهور.</p>
+    </div>
+    <BookForm id="end" size="md" />
   </div>
 </section>
 
 <style>
-  .closing { padding-block: clamp(96px, 14vw, 180px); }
+  .panel {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 56px; align-items: center;
+    padding-block: clamp(36px, 5vw, 56px); padding-inline: clamp(22px, 5vw, 56px) !important;
+    border: 1px solid var(--line-2); border-radius: 26px;
+    background: radial-gradient(120% 140% at 85% 0%, rgba(242,167,43,.13), transparent 55%), var(--surface);
+  }
+  @media (max-width: 860px) { .panel { grid-template-columns: 1fr; margin-inline: 20px; } }
 </style>

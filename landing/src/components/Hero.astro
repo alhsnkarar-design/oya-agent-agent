@@ -1,20 +1,91 @@
 ---
 import BookForm from "./BookForm.astro";
+// The suite on the left is built from CSS, not an image: a monitor, the spoken command, and a timeline
+// where the silences are already cut. It shows the one thing only Zifidit does: editing by a sentence.
+const clips = [
+  { w: 22, c: "var(--teal)" }, { w: 12, c: "var(--teal)" }, { w: 28, c: "var(--teal)" }, { w: 16, c: "var(--teal)" }, { w: 18, c: "var(--teal)" },
+];
 ---
 <section class="hero" id="book" aria-labelledby="t-hero">
-  <div class="wrap inner">
-    <h1 id="t-hero">المونتاج والموشن جرافيكس.<span>بكلمة منك.</span></h1>
-    <p class="lede">ارفع الفيديو الخام أو اكتب فكرتك، و Zifidit يعمل المونتاج والموشن جرافيكس والمؤثرات. وعدّل عليه بصوتك.</p>
-    <BookForm id="top" />
-    <p class="note">احجز مكانك في النسخة الأولى. أول 100 ليهم خصم 50% لمدة 3 شهور.</p>
+  <div class="wrap grid">
+    <div class="copy">
+      <p class="status"><span class="dot" aria-hidden="true"></span>بنبنيه دلوقتي · الحجز مفتوح</p>
+      <h1 id="t-hero">المونتاج والموشن جرافيكس… <em>بكلمة منك.</em></h1>
+      <p class="lede">ارمي الفيديو الخام أو اكتب فكرتك في سطر. Zifidit يعمل المونتاج والموشن جرافيكس والكابشن بلهجتك، وتعدّل عليه بصوتك.</p>
+      <BookForm id="top" />
+      <p class="offer">أول 100 يحجزوا ليهم خصم 50% لمدة 3 شهور.</p>
+    </div>
+
+    <div class="suite" aria-hidden="true">
+      <div class="monitor">
+        <div class="frame">
+          <span class="ttl">عرض الجمعة</span>
+          <span class="tag">خصم 20%</span>
+        </div>
+        <div class="meta"><span>9:16</span><span class="tc">00:00:12</span></div>
+      </div>
+      <div class="say">
+        <svg class="ico" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></svg>
+        <span>«خليه دهبي»</span>
+        <span class="wave"><i></i><i></i><i></i><i></i><i></i></span>
+      </div>
+      <div class="tl">
+        <div class="trk"><b>نص</b><div class="lane"><span class="clip" style="inline-size:34%;background:var(--accent)">عرض الجمعة</span><span class="clip" style="inline-size:20%;background:var(--azure)"></span></div></div>
+        <div class="trk"><b>فيديو</b><div class="lane">{clips.map((c) => <span class="clip" style={`inline-size:${c.w}%;background:${c.c}`}></span>)}</div></div>
+        <div class="trk"><b>صوت</b><div class="lane"><span class="audio"></span></div></div>
+        <span class="head"></span>
+      </div>
+      <p class="cap">السكتات اتشالت · العنوان بقى دهبي</p>
+    </div>
   </div>
 </section>
 
 <style>
-  .hero { min-height: min(88vh, 900px); display: grid; align-items: center; padding-block: 72px 96px; }
-  .inner { display: grid; justify-items: center; text-align: center; gap: 26px; }
-  h1 { font: 800 clamp(2.6rem, 8vw, 6.4rem)/1.2 var(--f-display); text-wrap: balance; }
-  h1 span { display: block; color: var(--ink-3); font-weight: 700; }
-  .lede { font-size: clamp(1.1rem, 1.9vw, 1.4rem); color: var(--ink-2); max-width: 38ch; margin-bottom: 8px; }
-  .note { font-size: .88rem; color: var(--ink-3); }
+  .hero { padding-block: clamp(48px, 8vw, 104px) clamp(72px, 10vw, 128px); overflow: hidden; position: relative; }
+  .hero::before {
+    content: ""; position: absolute; inset: -20% -10% auto auto; width: 70vw; height: 70vw; max-width: 900px; max-height: 900px; pointer-events: none;
+    background: radial-gradient(closest-side, rgba(242,167,43,.10), transparent 70%);
+  }
+  .grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); gap: clamp(32px, 6vw, 80px); align-items: center; position: relative; }
+  .copy { display: grid; gap: 22px; justify-items: start; }
+  .status { display: inline-flex; align-items: center; gap: 10px; font-size: .88rem; color: var(--ink-2); padding: 6px 14px 6px 12px; border: 1px solid var(--line-2); border-radius: 999px; background: var(--surface); }
+  .dot { width: 8px; height: 8px; border-radius: 99px; background: var(--teal); box-shadow: 0 0 0 4px rgba(43,217,180,.15); }
+  h1 { font: 800 clamp(2.2rem, 4.6vw, 3.7rem)/1.25 var(--f-display); text-wrap: balance; letter-spacing: -.01em; }
+  h1 em { font-style: normal; color: var(--accent); }
+  .lede { font-size: clamp(1.05rem, 1.6vw, 1.2rem); color: var(--ink-2); max-width: 46ch; margin-bottom: 6px; }
+  .offer { font-size: .9rem; color: var(--ink-2); padding-inline-start: 14px; border-inline-start: 1px solid var(--accent); }
+
+  /* the suite */
+  .suite {
+    background: linear-gradient(180deg, var(--surface-2), var(--surface)); border: 1px solid var(--line-2); border-radius: 22px; padding: 16px;
+    box-shadow: 0 40px 80px -40px rgba(0,0,0,.95), 0 1px 0 rgba(255,255,255,.05) inset; display: grid; gap: 14px;
+  }
+  .monitor { background: #07060b; border-radius: 14px; padding: 14px; border: 1px solid var(--line); }
+  .frame {
+    aspect-ratio: 16 / 9; border-radius: 10px; display: grid; place-content: center; justify-items: center; gap: 10px;
+    background: radial-gradient(120% 90% at 70% 20%, #3a2608, #120d06 70%);
+  }
+  .ttl { font: 800 clamp(1.5rem, 3vw, 2.2rem)/1.2 var(--f-display); color: var(--accent); text-shadow: 0 6px 30px rgba(242,167,43,.35); }
+  .tag { font: 800 .85rem/1 var(--f-display); color: #3a1a05; background: #fff3d6; padding: 7px 12px; border-radius: 8px; transform: rotate(-4deg); }
+  .meta { display: flex; justify-content: space-between; margin-top: 10px; font: 500 .78rem/1 var(--f-body); color: var(--ink-3); direction: ltr; font-variant-numeric: tabular-nums; }
+  .tc { color: var(--accent); }
+  .say { display: flex; align-items: center; gap: 10px; align-self: start; justify-self: start; padding: 10px 16px; border-radius: 12px; background: rgba(255,94,98,.1); border: 1px solid rgba(255,94,98,.4); color: var(--ink); font: 700 .95rem/1 var(--f-body); }
+  .say .ico { color: var(--coral); }
+  .wave { display: inline-flex; gap: 3px; align-items: center; height: 16px; }
+  .wave i { width: 3px; border-radius: 3px; background: var(--coral); }
+  .wave i:nth-child(1) { height: 6px; } .wave i:nth-child(2) { height: 14px; } .wave i:nth-child(3) { height: 9px; } .wave i:nth-child(4) { height: 16px; } .wave i:nth-child(5) { height: 7px; }
+  .tl { position: relative; display: grid; gap: 7px; padding: 12px; border-radius: 14px; background: #0e0c14; border: 1px solid var(--line); }
+  .trk { display: grid; grid-template-columns: 44px 1fr; align-items: center; gap: 10px; }
+  .trk b { font: 600 .74rem/1 var(--f-body); color: var(--ink-3); }
+  .lane { display: flex; gap: 4px; height: 26px; }
+  .clip { border-radius: 6px; display: flex; align-items: center; padding-inline: 8px; font: 700 .72rem/1 var(--f-display); color: var(--accent-ink); overflow: hidden; white-space: nowrap; }
+  .audio { flex: 1; border-radius: 6px; background: repeating-linear-gradient(90deg, rgba(43,217,180,.75) 0 2px, transparent 2px 5px); mask: linear-gradient(0deg, transparent 0 18%, #000 18% 82%, transparent 82%); opacity: .8; }
+  .head { position: absolute; top: 6px; bottom: 6px; inset-inline-start: 62%; width: 2px; background: var(--accent); border-radius: 2px; box-shadow: 0 0 12px rgba(242,167,43,.6); }
+  .head::before { content: ""; position: absolute; top: -5px; left: -5px; width: 12px; height: 8px; background: var(--accent); clip-path: polygon(0 0, 100% 0, 50% 100%); }
+  .cap { font-size: .8rem; color: var(--ink-3); text-align: center; }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+    .suite { max-width: 560px; }
+  }
 </style>

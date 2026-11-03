@@ -1,43 +1,87 @@
 ---
-// Email-only booking form. Used at the top and the bottom of the page;
+// Email-only booking form. Used in the hero and at the end of the page;
 // the script wires every instance.
-interface Props { id: string; }
-const { id } = Astro.props;
+interface Props { id: string; size?: "lg" | "md"; }
+const { id, size = "lg" } = Astro.props;
 ---
-<div class="book-form" data-book>
+<div class:list={["book", size]} data-book>
   <form novalidate>
     <label class="sr" for={`${id}-email`}>الإيميل</label>
-    <input id={`${id}-email`} name="email" type="email" maxlength="160" autocomplete="email" required placeholder="اكتب إيميلك" dir="auto" />
+    <div class="bar">
+      <svg class="ico mail" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5" /><path d="m4 7 8 6 8-6" /></svg>
+      <input id={`${id}-email`} name="email" type="email" maxlength="160" autocomplete="email" inputmode="email" required placeholder="اكتب إيميلك" dir="auto" />
+      <button type="submit">
+        <span class="lbl">احجز مكاني</span>
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6" /></svg>
+      </button>
+    </div>
     <div class="sr" aria-hidden="true">
       <label for={`${id}-website`}>سيب الخانة دي فاضية</label>
       <input id={`${id}-website`} name="website" type="text" tabindex="-1" autocomplete="off" />
     </div>
-    <button type="submit">احجز مكاني</button>
   </form>
-  <p class="msg" role="status"></p>
-  <p class="done" hidden>تمام، مكانك محجوز. هنبعتلك أول ما النسخة الأولى تجهز.</p>
+  <ul class="assure">
+    <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7" /></svg>إيميلك بس</li>
+    <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7" /></svg>من غير بطاقة دفع</li>
+    <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7" /></svg>رسالة واحدة لما نفتح</li>
+  </ul>
+  <p class="msg" role="status" aria-live="polite"></p>
+  <div class="done" hidden>
+    <span class="tick"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7" /></svg></span>
+    <div>
+      <p class="d1">مكانك اتحجز.</p>
+      <p class="d2">هنبعتلك أول ما النسخة الأولى تجهز. ولحد ما نفتح، تابع بنبنيه إزاي على <a href="https://instagram.com/zifidit" target="_blank" rel="noopener">@zifidit</a>.</p>
+    </div>
+  </div>
 </div>
 
 <style>
-  .book-form { width: 100%; max-width: 480px; margin-inline: auto; }
-  form { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .book { width: 100%; max-width: 560px; }
+  .bar {
+    display: flex; align-items: center; gap: 6px; padding: 6px; padding-inline-start: 18px;
+    background: var(--surface); border: 1px solid var(--line-2); border-radius: 18px;
+    box-shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 18px 40px -24px rgba(0,0,0,.9);
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .bar:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft), 0 18px 40px -24px rgba(0,0,0,.9); }
+  .mail { color: var(--ink-3); font-size: 1.1rem; }
   input[type="email"] {
-    flex: 1 1 250px; min-width: 0; height: 54px; padding: 0 20px; border-radius: 999px;
-    font: 400 1.02rem/1 var(--f-body); color: var(--ink); background: var(--tint);
-    border: 1px solid transparent;
+    flex: 1; min-width: 0; height: 52px; border: 0; background: transparent; outline: none;
+    font: 400 1.05rem/1 var(--f-body); color: var(--ink);
   }
   input::placeholder { color: var(--ink-3); }
-  input:focus { outline: none; border-color: var(--ink); background: var(--page); }
   button {
-    height: 54px; padding: 0 28px; border-radius: 999px; border: 0; cursor: pointer;
-    font: 600 1.02rem/1 var(--f-body); white-space: nowrap; background: var(--btn); color: var(--btn-ink);
+    display: inline-flex; align-items: center; gap: 10px; height: 52px; padding-inline: 22px 18px; border: 0; border-radius: 13px; cursor: pointer;
+    font: 700 1.02rem/1 var(--f-body); white-space: nowrap; background: var(--accent); color: var(--accent-ink);
+    box-shadow: 0 8px 22px -10px rgba(242,167,43,.7);
+    transition: transform .15s, filter .15s;
   }
-  button:hover { opacity: .85; }
-  button:disabled { opacity: .5; cursor: progress; }
-  .msg { font-size: .92rem; margin-top: 12px; text-align: center; }
+  button:hover { filter: brightness(1.08); }
+  button:active { transform: translateY(1px); }
+  button:disabled { filter: saturate(.4); cursor: progress; }
+  .md .bar { border-radius: 16px; }
+  .assure { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 14px; font-size: .88rem; color: var(--ink-3); }
+  .assure li { display: inline-flex; align-items: center; gap: 6px; }
+  .assure .ico { color: var(--teal); font-size: .95rem; }
+  .msg { font-size: .92rem; margin-top: 12px; }
   .msg:empty { display: none; }
   .msg.err { color: var(--danger); }
-  .done { font: 500 1.1rem/1.6 var(--f-body); text-align: center; padding-block: 12px; }
+  .done {
+    display: flex; gap: 16px; align-items: flex-start; padding: 20px 22px; border-radius: 18px;
+    background: var(--surface); border: 1px solid rgba(43,217,180,.45);
+  }
+  .tick { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: rgba(43,217,180,.14); color: var(--ok); flex: none; }
+  .d1 { font: 800 1.15rem/1.5 var(--f-display); }
+  .d2 { color: var(--ink-2); font-size: .95rem; margin-top: 4px; }
+  .d2 a { color: var(--accent); }
+  .book:has(.done:not([hidden])) .assure { display: none; }
+
+  @media (max-width: 460px) {
+    .bar { flex-wrap: wrap; padding: 8px; }
+    .mail { display: none; }
+    input[type="email"] { flex-basis: 100%; padding-inline: 10px; }
+    button { flex: 1; justify-content: center; }
+  }
 </style>
 
 <script>
@@ -53,6 +97,7 @@ const { id } = Astro.props;
     const form = box.querySelector("form")!;
     const input = form.querySelector<HTMLInputElement>('input[type="email"]')!;
     const button = form.querySelector("button")!;
+    const label = button.querySelector<HTMLElement>(".lbl")!;
     const msg = box.querySelector<HTMLElement>(".msg")!;
     const done = box.querySelector<HTMLElement>(".done")!;
     const fail = (text: string) => { msg.className = "msg err"; msg.textContent = text; };
@@ -62,7 +107,7 @@ const { id } = Astro.props;
       const data = new FormData(form);
       const email = String(data.get("email") ?? "").trim();
       if (!emailRe.test(email)) { fail("اكتب إيميل صحيح، زي name@example.com"); input.focus(); return; }
-      button.disabled = true; msg.className = "msg"; msg.textContent = "";
+      button.disabled = true; label.textContent = "بنحجزلك…"; msg.className = "msg"; msg.textContent = "";
       try {
         const res = await fetch("/api/waitlist", {
           method: "POST",
@@ -75,7 +120,7 @@ const { id } = Astro.props;
       } catch {
         fail("مفيش اتصال. اتأكد من النت وجرّب تاني.");
       } finally {
-        button.disabled = false;
+        button.disabled = false; label.textContent = "احجز مكاني";
       }
     });
   }

@@ -1,7 +1,11 @@
 <header class="top">
-  <div class="wrap">
-    <a class="mark" href="#top" aria-label="Zifidit">Zifidit<span>.</span></a>
-    <a class="cta" href="#book">احجز مكانك</a>
+  <div class="wrap row">
+    <a class="mark" href="#top" aria-label="Zifidit، أول الصفحة">Zifidit<span>.</span></a>
+    <nav aria-label="روابط الصفحة">
+      <a class="cta" href="#book">احجز مكانك</a>
+      <a class="lnk" href="#features">المميزات</a>
+      <a class="lnk" href="#faq">أسئلة</a>
+    </nav>
   </div>
 </header>
 
@@ -12,14 +16,18 @@
   }
   .top {
     position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
-    background: color-mix(in srgb, var(--page) 92%, transparent);
-    backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
+    background: rgba(11, 10, 16, .82);
+    backdrop-filter: saturate(160%) blur(16px); -webkit-backdrop-filter: saturate(160%) blur(16px);
     border-bottom: 1px solid var(--line);
   }
-  .wrap { display: flex; align-items: center; justify-content: space-between; height: 56px; }
+  .row { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  nav { display: flex; align-items: center; gap: 6px; }
+  .lnk { font-size: .92rem; color: var(--ink-2); text-decoration: none; padding: 8px 12px; border-radius: 10px; order: 1; }
+  .lnk:hover { color: var(--ink); background: var(--surface); }
   .cta {
-    font: 600 .88rem/1 var(--f-body); text-decoration: none; color: var(--btn-ink); background: var(--btn);
-    padding: 9px 16px; border-radius: 999px;
+    font: 700 .92rem/1 var(--f-body); text-decoration: none; color: var(--accent-ink); background: var(--accent);
+    padding: 11px 18px; border-radius: 12px; order: 0;
   }
-  .cta:hover { opacity: .85; }
+  .cta:hover { filter: brightness(1.08); }
+  @media (max-width: 560px) { .lnk { display: none; } }
 </style>
