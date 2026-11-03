@@ -10,3 +10,9 @@
 | [articles/03-ai-for-business.md](articles/03-ai-for-business.md) | 🟠 5 طرق صاحب البيزنس يكسب بيها من الـ AI |
 
 كل مقال في آخره خطة «إعادة تدوير» (كاروسيل + ريلز + بوستات).
+
+## سلاسل
+
+| الملف | الوصف |
+|---|---|
+| [series/github-treasure-30-days.md](series/github-treasure-30-days.md) | 💎 كنز GitHub: 30 يوم، مشروع مفتوح المصدر كل يوم، مع قالب الريل وأوامر التشغيل |
