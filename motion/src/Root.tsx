@@ -4,6 +4,7 @@ import { Build, Punch, Reveal } from "./styles";
 import { FPS, parse, Ratio, SIZES, Style, totalFrames } from "./text";
 import { COLORS, FONT, loadFonts } from "./theme";
 import { Promo, PROMO_FRAMES } from "./promo/Promo";
+import { Ep0, EP0_FRAMES } from "./ep0/Ep0";
 
 export type KineticProps = {
   sentence: string;
@@ -54,6 +55,7 @@ const calculateMetadata: CalculateMetadataFunction<KineticProps> = ({ props }) =
 export const Root: React.FC = () => (
   <>
   <Composition id="Promo" component={Promo} fps={FPS} width={1080} height={1920} durationInFrames={PROMO_FRAMES} />
+  <Composition id="Ep0" component={Ep0} fps={FPS} width={1080} height={1920} durationInFrames={EP0_FRAMES} />
   <Composition
     id="Kinetic"
     component={Kinetic}
