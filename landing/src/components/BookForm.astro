@@ -156,7 +156,7 @@ const { id } = Astro.props;
         if (res.ok) {
           const body = await res.json().catch(() => ({}));
           // The real queue number, when the server knows it.
-          if (Number.isInteger(body.position) && body.position > 0) { pos.textContent = `، ورقمك ${body.position} في الطابور`; pos.hidden = false; }
+          if (Number.isInteger(body.position) && body.position > 0) { pos.textContent = "، ورقمك " + body.position + " في الطابور"; pos.hidden = false; }
           form.hidden = true; done.hidden = false; return;
         }
         const body = await res.json().catch(() => ({}));
