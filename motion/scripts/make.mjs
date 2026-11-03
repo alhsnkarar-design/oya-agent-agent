@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Sentence in, motion-graphics MP4 out.
-//   npm run make -- "المونتاج الحلو *محدش* بياخد باله منه" --style build --ratio 9:16 --handle @haraka
+//   npm run make -- "المونتاج الحلو *محدش* بياخد باله منه" --style build --ratio 9:16 --handle @zifidit
 import { bundle } from "@remotion/bundler";
 import { renderMedia, selectComposition } from "@remotion/renderer";
 import { existsSync, mkdirSync } from "node:fs";
