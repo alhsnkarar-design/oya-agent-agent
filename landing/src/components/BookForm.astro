@@ -40,10 +40,10 @@ const { id, size = "lg" } = Astro.props;
   .bar {
     display: flex; align-items: center; gap: 6px; padding: 6px; padding-inline-start: 18px;
     background: var(--surface); border: 1px solid var(--line-2); border-radius: 18px;
-    box-shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 18px 40px -24px rgba(0,0,0,.9);
+    
     transition: border-color .2s, box-shadow .2s;
   }
-  .bar:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft), 0 18px 40px -24px rgba(0,0,0,.9); }
+  .bar:focus-within { border-color: var(--ink-2); }
   .mail { color: var(--ink-3); font-size: 1.1rem; }
   input[type="email"] {
     flex: 1; min-width: 0; height: 52px; border: 0; background: transparent; outline: none;
@@ -53,7 +53,6 @@ const { id, size = "lg" } = Astro.props;
   button {
     display: inline-flex; align-items: center; gap: 10px; height: 52px; padding-inline: 22px 18px; border: 0; border-radius: 13px; cursor: pointer;
     font: 700 1.02rem/1 var(--f-body); white-space: nowrap; background: var(--accent); color: var(--accent-ink);
-    box-shadow: 0 8px 22px -10px rgba(242,167,43,.7);
     transition: transform .15s, filter .15s;
   }
   button:hover { filter: brightness(1.08); }
@@ -62,18 +61,18 @@ const { id, size = "lg" } = Astro.props;
   .md .bar { border-radius: 16px; }
   .assure { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 14px; font-size: .88rem; color: var(--ink-3); }
   .assure li { display: inline-flex; align-items: center; gap: 6px; }
-  .assure .ico { color: var(--teal); font-size: .95rem; }
+  .assure .ico { color: var(--ink-3); font-size: .95rem; }
   .msg { font-size: .92rem; margin-top: 12px; }
   .msg:empty { display: none; }
   .msg.err { color: var(--danger); }
   .done {
     display: flex; gap: 16px; align-items: flex-start; padding: 20px 22px; border-radius: 18px;
-    background: var(--surface); border: 1px solid rgba(43,217,180,.45);
+    background: var(--surface); border: 1px solid var(--line-2);
   }
-  .tick { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: rgba(43,217,180,.14); color: var(--ok); flex: none; }
+  .tick { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--surface-2); color: var(--ink); flex: none; }
   .d1 { font: 800 1.15rem/1.5 var(--f-display); }
   .d2 { color: var(--ink-2); font-size: .95rem; margin-top: 4px; }
-  .d2 a { color: var(--accent); }
+  .d2 a { color: var(--ink); }
   .book:has(.done:not([hidden])) .assure { display: none; }
 
   @media (max-width: 460px) {
