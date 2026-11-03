@@ -7,7 +7,8 @@
     "studio": "remotion studio src/index.ts",
     "make": "node scripts/make.mjs",
     "promo": "node scripts/promo.mjs",
-    "ep0": "node scripts/promo.mjs --id Ep0"
+    "ep0": "node scripts/promo.mjs --id Ep0",
+    "promo3d": "node scripts/promo.mjs --id Promo3D"
   },
   "dependencies": {
     "@fontsource-variable/noto-kufi-arabic": "5.3.0",
@@ -15,6 +16,7 @@
     "@react-three/postprocessing": "^2.16.3",
     "@remotion/bundler": "4.0.536",
     "@remotion/cli": "4.0.536",
+    "@remotion/media-utils": "^4.0.536",
     "@remotion/renderer": "4.0.536",
     "@remotion/shapes": "4.0.536",
     "@remotion/three": "^4.0.536",
