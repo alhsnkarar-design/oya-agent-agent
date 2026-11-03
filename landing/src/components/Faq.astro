@@ -8,7 +8,7 @@ const qs = [
 ---
 <section class="section" id="faq" aria-labelledby="t-faq">
   <div class="wrap grid">
-    <h2 class="h2" id="t-faq">أسئلة سريعة</h2>
+    <div class="head"><h2 class="h2" id="t-faq">أسئلة سريعة</h2></div>
     <div class="list">
       {qs.map((x, i) => (
         <details open={i === 0}>
@@ -30,7 +30,7 @@ const qs = [
   }
   summary::-webkit-details-marker { display: none; }
   summary .ico { color: var(--ink-3); transition: transform .2s; }
-  details[open] summary .ico { transform: rotate(45deg); color: var(--ink); }
+  details[open] summary .ico { transform: rotate(45deg); color: var(--amber); }
   summary:hover { color: var(--ink-2); }
   details p { color: var(--ink-2); padding-bottom: 22px; max-width: 60ch; }
   @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }

@@ -57,7 +57,8 @@ export async function onRequestPost({ request, env }) {
         `INSERT OR IGNORE INTO waitlist (email, utm_source, utm_medium, utm_campaign, referrer, country, created_at)
          VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)`,
       ).bind(data.email, data.utm_source, data.utm_medium, data.utm_campaign, data.referrer, data.country, new Date().toISOString()).run();
-      return json({ ok: true, already: r.meta.changes === 0 });
+      const row = await env.DB.prepare("SELECT id FROM waitlist WHERE email = ?1").bind(data.email).first();
+      return json({ ok: true, already: r.meta.changes === 0, position: row?.id ?? null });
     } catch (err) {
       console.error("waitlist: d1 error", err);
       return json({ error: "storage_failed" }, 502);

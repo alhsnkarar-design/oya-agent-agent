@@ -2,20 +2,19 @@
 import BookForm from "./BookForm.astro";
 ---
 <section class="section closing" aria-labelledby="t-close">
-  <div class="wrap panel">
-    <div>
-      <h2 class="h2" id="t-close">احجز مكانك <em>قبل ما نفتح.</em></h2>
-      <p class="lead">أول 100 يحجزوا ليهم خصم 50% لمدة 3 شهور.</p>
+  <div class="wrap grid">
+    <div class="head">
+      <h2 class="h2" id="t-close">النسخة الأولى قربت. <em>احجز تذكرتك.</em></h2>
+      <p class="lead">اللي يحجزوا الأول يدخلوا الأول.</p>
     </div>
-    <BookForm id="end" size="md" />
+    <div class="slot"><BookForm id="end" /></div>
   </div>
 </section>
 
 <style>
-  .panel {
-    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 56px; align-items: center;
-    
-
-  }
-  @media (max-width: 860px) { .panel { grid-template-columns: 1fr; } }
+  .closing { border-top: 1px solid var(--line); background: radial-gradient(60% 80% at 20% 60%, rgba(142,162,255,.12), transparent 70%); }
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 72px; align-items: center; }
+  .head { margin: 0; }
+  .slot { display: flex; justify-content: center; }
+  @media (max-width: 920px) { .grid { grid-template-columns: 1fr; } }
 </style>

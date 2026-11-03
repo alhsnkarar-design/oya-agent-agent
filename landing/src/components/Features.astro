@@ -1,36 +1,100 @@
 ---
-// Five features, one plain row each.
-const items = [
-  { tag: "مونتاج تلقائي", h: "ارمي الخام، والمونتاج يخلص لوحده.", p: "السكتات والتكرار والغلطات بتتشال، واللقطات بتترتّب، والزووم والانتقالات بتمشي على إيقاع الكلام." },
-  { tag: "موشن من وصف", h: "اكتب فكرتك في سطر، يطلع لك موشن جرافيكس.", p: "عناوين ونصوص وأشكال متحركة جاهزة بالعربي، من غير ولا كيفريم." },
-  { tag: "تعديل بالصوت", h: "قولها، وهو يعدّل قدامك.", p: "«كبّر العنوان»، «خليه دهبي». في نفس اللحظة، من غير ما تلمس الخط الزمني." },
-  { tag: "كابشن بلهجتك", h: "كابشن بلهجتك، كلمة كلمة.", p: "مصري، خليجي، شامي، فصحى. على توقيت الكلام وبخطوط عربية." },
-  { tag: "مقاس لكل منصة", h: "نفس الفيديو لكل منصة، بدوسة.", p: "ريلز وتيك توك ويوتيوب وإنستجرام من نفس المشروع." },
-];
+// Five features in an uneven grid. Each tile carries one small, quiet product detail in periwinkle line work.
 ---
 <section class="section" id="features" aria-labelledby="t-feat">
   <div class="wrap">
-    <h2 class="h2" id="t-feat">كل اللي بياخد منك ساعات… <em>بكلمة.</em></h2>
-    <p class="lead">موقع واحد، من المتصفح، من غير ما تنزّل برنامج.</p>
-    <ol class="tracks">
-      {items.map((it) => (
-        <li class="row">
-          <span class="tag">{it.tag}</span>
-          <div class="txt">
-            <h3>{it.h}</h3>
-            <p>{it.p}</p>
-          </div>
-        </li>
-      ))}
-    </ol>
+    <div class="head">
+      <h2 class="h2" id="t-feat">كل اللي بياخد منك ساعات… <em>بكلمة.</em></h2>
+      <p class="lead">موقع واحد، من المتصفح، من غير ما تنزّل برنامج.</p>
+    </div>
+
+    <div class="bento">
+      <article class="tile wide">
+        <div class="txt">
+          <h3>مونتاج تلقائي</h3>
+          <p>ارمي الخام، والسكتات والتكرار والغلطات بتتشال لوحدها. اللقطات بتترتّب، والزووم والانتقالات بتمشي على إيقاع الكلام.</p>
+        </div>
+        <div class="viz cut" aria-hidden="true">
+          <div class="lane"><span style="flex:3"></span><i></i><span style="flex:2"></span><i></i><span style="flex:4"></span><i></i><span style="flex:2"></span></div>
+          <div class="lane after"><span style="flex:3"></span><span style="flex:2"></span><span style="flex:4"></span><span style="flex:2"></span></div>
+          <div class="lbls"><span>الخام</span><span>بعد القص</span></div>
+        </div>
+      </article>
+
+      <article class="tile">
+        <div class="txt">
+          <h3>موشن من وصف</h3>
+          <p>اكتب فكرتك في سطر، يطلع لك موشن جرافيكس بالعربي من غير ولا كيفريم.</p>
+        </div>
+        <p class="viz line" aria-hidden="true">إعلان لعرض الجمعة، ألوان دافية</p>
+      </article>
+
+      <article class="tile">
+        <div class="txt">
+          <h3>تعديل بالصوت</h3>
+          <p>قولها، وهو يعدّل قدامك في نفس اللحظة.</p>
+        </div>
+        <div class="viz says" aria-hidden="true"><span>«كبّر العنوان»</span><span>«خليه دهبي»</span></div>
+      </article>
+
+      <article class="tile">
+        <div class="txt">
+          <h3>كابشن بلهجتك</h3>
+          <p>كلمة كلمة على توقيت الكلام، وبخطوط عربية.</p>
+        </div>
+        <div class="viz seg" aria-hidden="true"><span class="on">مصري</span><span>خليجي</span><span>شامي</span><span>فصحى</span></div>
+      </article>
+
+      <article class="tile">
+        <div class="txt">
+          <h3>مقاس لكل منصة</h3>
+          <p>ريلز وتيك توك ويوتيوب وإنستجرام من نفس المشروع، بدوسة.</p>
+        </div>
+        <div class="viz ratios" aria-hidden="true"><span style="aspect-ratio:9/16"><b>9:16</b></span><span style="aspect-ratio:1"><b>1:1</b></span><span style="aspect-ratio:16/9"><b>16:9</b></span></div>
+      </article>
+    </div>
   </div>
 </section>
 
 <style>
-  .tracks { list-style: none; padding: 0; margin: clamp(40px, 6vw, 64px) 0 0; border-top: 1px solid var(--line); }
-  .row { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 8px 40px; align-items: baseline; padding-block: clamp(26px, 3.4vw, 38px); border-bottom: 1px solid var(--line); }
-  .tag { font: 600 .95rem/1.6 var(--f-body); color: var(--ink-3); }
-  h3 { font: 800 clamp(1.25rem, 2.3vw, 1.6rem)/1.45 var(--f-display); text-wrap: balance; }
-  .txt p { color: var(--ink-2); margin-top: 6px; max-width: 56ch; }
-  @media (max-width: 760px) { .row { grid-template-columns: 1fr; } }
+  .bento { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; }
+  .tile {
+    grid-column: span 2; display: flex; flex-direction: column; justify-content: space-between; gap: 28px; min-width: 0;
+    padding: clamp(22px, 2.6vw, 30px); border-radius: 20px; background: var(--surface); border: 1px solid var(--line);
+  }
+  .tile.wide { grid-column: span 4; grid-row: span 1; }
+  .tile:nth-child(2) { grid-column: span 2; }
+  .tile:nth-child(3), .tile:nth-child(4), .tile:nth-child(5) { grid-column: span 2; }
+  h3 { font: 700 1.3rem/1.4 var(--f-display); }
+  .txt p { color: var(--ink-2); margin-top: 8px; max-width: 44ch; }
+  .viz { color: var(--peri); }
+
+  .cut { display: grid; gap: 10px; }
+  .lane { display: flex; gap: 4px; height: 22px; }
+  .lane span { border-radius: 5px; border: 1.5px solid var(--peri); }
+  .lane i { flex: 1; border-radius: 5px; background: repeating-linear-gradient(135deg, rgba(255,122,107,.55) 0 4px, transparent 4px 8px); }
+  .lane.after { width: 74%; }
+  .lane.after span { background: rgba(142,162,255,.18); }
+  .lbls { display: flex; justify-content: space-between; font-size: .78rem; color: var(--ink-3); }
+
+  .line { font: 500 .95rem/1.5 var(--f-body); padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--peri); color: var(--ink); background: var(--bg-2); }
+  .line::after { content: ""; display: inline-block; width: 2px; height: 1.1em; margin-inline-start: 4px; vertical-align: -3px; background: var(--amber); }
+  .says { display: flex; flex-wrap: wrap; gap: 8px; }
+  .says span { font: 600 .92rem/1 var(--f-body); color: var(--ink); padding: 11px 14px; border-radius: 12px 12px 12px 4px; border: 1.5px solid var(--peri); background: var(--bg-2); }
+  .seg { display: flex; padding: 4px; border-radius: 12px; border: 1.5px solid var(--line-2); background: var(--bg-2); }
+  .seg span { flex: 1; text-align: center; font: 600 .86rem/1 var(--f-body); color: var(--ink-3); padding: 10px 4px; border-radius: 8px; }
+  .seg .on { background: var(--peri); color: #0b0f20; }
+  .ratios { display: flex; align-items: flex-end; gap: 10px; height: 92px; }
+  .ratios span { position: relative; height: 100%; max-width: 100%; border: 1.5px solid var(--peri); border-radius: 8px; display: grid; place-items: center; }
+  .ratios span:nth-child(2) { height: 66%; }
+  .ratios span:nth-child(3) { height: 48%; }
+  .ratios b { font: 600 .74rem/1 var(--f-body); color: var(--ink-2); direction: ltr; }
+
+  @media (max-width: 900px) {
+    .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .tile, .tile.wide, .tile:nth-child(n) { grid-column: span 2; }
+  }
+  @media (min-width: 901px) {
+    .tile:nth-child(2) { grid-column: span 2; }
+  }
 </style>
