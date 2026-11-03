@@ -226,8 +226,8 @@ const SceneLocal: React.FC<{ from: number; dur: number; i: number }> = ({ from, 
 const OverlayAt: React.FC<{ from: number; i: number }> = ({ from, i }) => {
   const f = useCurrentFrame() + from;
   // fade the scene's text out as the camera leaves, so pinned labels don't drift across the flight
-  const leave = i < STARTS.length - 1 ? STARTS[i + 1] - 14 : Infinity;
-  const o = interpolate(f, [leave - 2, leave + 6], [1, 0], clamp);
+  const leave = i < STARTS.length - 1 ? STARTS[i + 1] - 14 : null;
+  const o = leave === null ? 1 : interpolate(f, [leave - 2, leave + 6], [1, 0], clamp);
   return (
     <AbsoluteFill style={{ pointerEvents: "none", opacity: o, filter: "drop-shadow(0 6px 18px rgba(0,0,0,.85))" }}><Overlay f={f} i={i} /></AbsoluteFill>
   );
