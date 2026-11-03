@@ -1,3 +1,13 @@
+# صفحة الحجز: zifidit.com
+
+**الصفحة شغالة على zifidit.com** من Cloudflare Worker اسمه `zifidit`:
+- `deploy/index.html`: الصفحة كلها في ملف واحد (بتتعمل من `npm run build && npm run build:worker`).
+- `deploy/worker.js`: بيعرض الصفحة من المستودع (كاش 5 دقايق) وبيحفظ الحجوزات في قاعدة D1 اسمها `zifidit-waitlist` (الربط `DB`).
+- **لتحديث الصفحة:** عدّل، ثم `npm run build && npm run build:worker`، ثم ارفع على الفرع. الموقع بيتحدث لوحده خلال حوالي 5 دقايق.
+- **تشوف الحجوزات:** Cloudflare ← Storage & Databases ← D1 ← `zifidit-waitlist` ← جدول `waitlist`.
+
+---
+
 # Zifidit: صفحة الهبوط وقائمة الانتظار
 
 صفحة عربية تعرض الفكرة وتجمع إيميلات المهتمين. مبنية بـ **Astro**: تُبنى صفحة HTML ثابتة وسريعة، والخطوط محمّلة من الموقع نفسه، وفيها إعدادات SEO كاملة وصورة مشاركة.
