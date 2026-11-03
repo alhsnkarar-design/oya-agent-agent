@@ -9,7 +9,7 @@ const CLIP_COLORS = [PAL.azure, PAL.coral, PAL.teal, PAL.violet, PAL.accent, PAL
 export const Hook: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const snap = spring({ frame: frame - 34, fps, config: { damping: 13, stiffness: 120 } });
+  const snap = spring({ frame: frame - 84, fps, config: { damping: 13, stiffness: 120 } });
   const widths = [150, 90, 210, 120, 170, 100, 140, 190, 80, 160].map((w) => w * 0.55);
   const total = widths.reduce((a, b) => a + b + 8, -8);
   const lefts: number[] = [];
@@ -44,9 +44,9 @@ export const Hook: React.FC = () => {
         </div>
       </AbsoluteFill>
       <div style={{ position: "absolute", bottom: 420, insetInline: 60 }}>
-        <Words text="خليه دقايق." delay={52} size={T.title + 8} accentWords={["دقايق"]} />
+        <Words text="خليها دقايق." delay={90} size={T.title + 8} accentWords={["دقايق"]} />
       </div>
-      <Burst at={40} y="50%" seed="hook" count={26} spread={360} />
+      <Burst at={90} y="50%" seed="hook" count={26} spread={360} />
     </Stage>
   );
 };
@@ -74,7 +74,7 @@ export const Problem: React.FC = () => {
             <line x1="50" y1="50" x2="72" y2="50" stroke={PAL.accent} strokeWidth="5" strokeLinecap="round" transform={`rotate(${spin / 12} 50 50)`} />
           </svg>
           {jobs.map((j, i) => {
-            const s = useSpring(8 + i * 9, { damping: 10 });
+            const s = useSpring([8, 28, 50, 74][i], { damping: 10 });
             return (
               <div
                 key={i}
@@ -99,8 +99,8 @@ export const Problem: React.FC = () => {
 /* 3 · Reveal: the name with a light sweep and a burst */
 export const Reveal: React.FC = () => {
   const frame = useCurrentFrame();
-  const s = useSpring(4, { damping: 11, stiffness: 120 });
-  const sweep = interpolate(frame, [10, 40], [-30, 130], clamp);
+  const s = useSpring(46, { damping: 11, stiffness: 120 });
+  const sweep = interpolate(frame, [52, 84], [-30, 130], clamp);
   return (
     <Stage tintA={PAL.accent} tintB={PAL.azure}>
       <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", gap: 30, flexDirection: "column" }}>
@@ -115,9 +115,9 @@ export const Reveal: React.FC = () => {
         >
           Zifidit<span style={{ WebkitTextFillColor: PAL.accent }}>.</span>
         </div>
-        <Words text="المونتاج والموشن جرافيكس، بكلمة منك." delay={20} size={T.sub} weight={600} color={PAL.soft} accentWords={["بكلمة"]} />
+        <Words text="المونتاج والموشن جرافيكس، بكلمة منك." delay={92} size={T.sub} weight={600} color={PAL.soft} accentWords={["بكلمة"]} />
       </AbsoluteFill>
-      <Burst at={8} seed="rev" count={44} spread={520} />
+      <Burst at={50} seed="rev" count={44} spread={520} />
     </Stage>
   );
 };
@@ -210,16 +210,14 @@ export const FromText: React.FC = () => {
 export const Voice: React.FC = () => {
   const frame = useCurrentFrame();
   const cmds = [
-    { at: 8, t: "«كبّر العنوان»" },
-    { at: 56, t: "«لوّنه دهبي»" },
-    { at: 100, t: "«دخّله من اليمين»" },
+    { at: 92, t: "«كبّر العنوان»" },
+    { at: 124, t: "«خليه دهبي»" },
   ];
-  const active = [...cmds].reverse().find((c) => frame >= c.at) ?? cmds[0];
-  const big = interpolate(frame, [30, 44], [0, 1], clamp);
-  const gold = interpolate(frame, [78, 90], [0, 1], clamp);
-  const slide = interpolate(frame, [118, 136], [1, 0], { ...clamp, easing: Easing.out(Easing.back(1.4)) });
-  const reslide = frame >= 116 ? slide : 0;
-  const talking = cmds.some((c) => frame >= c.at && frame < c.at + 22);
+  const active = [...cmds].reverse().find((c) => frame >= c.at) ?? null;
+  const big = interpolate(frame, [100, 114], [0, 1], clamp);
+  const gold = interpolate(frame, [130, 142], [0, 1], clamp);
+    const reslide = 0;
+  const talking = (frame >= 8 && frame < 76) || cmds.some((c) => frame >= c.at && frame < c.at + 22);
   return (
     <Stage tintA={PAL.coral} tintB={PAL.violet}>
       <FeatureHead n="3" label="تعديل بالصوت" color={PAL.coral} line="قول، وهو بيعدّل قدامك." />
@@ -232,9 +230,11 @@ export const Voice: React.FC = () => {
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none"><rect x="9" y="3" width="6" height="11" rx="3" stroke="#160F2E" strokeWidth="2.2" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="#160F2E" strokeWidth="2.2" strokeLinecap="round" /></svg>
           </div>
         </div>
-        <div key={active.t} style={{ fontFamily: FONT, fontSize: T.sub, fontWeight: 700, color: PAL.ink, background: PAL.panel2, padding: "16px 28px", borderRadius: 22, transform: `scale(${0.86 + 0.14 * spring({ frame: frame - active.at, fps: 30, config: { damping: 11 } })})`, opacity: Math.min(1, 0.35 + spring({ frame: frame - active.at, fps: 30, config: { damping: 11 } })) }}>
-          {active.t}
-        </div>
+        {active && (
+          <div key={active.t} style={{ fontFamily: FONT, fontSize: T.sub, fontWeight: 700, color: PAL.ink, background: PAL.panel2, padding: "16px 28px", borderRadius: 22, transform: `scale(${0.86 + 0.14 * spring({ frame: frame - active.at, fps: 30, config: { damping: 11 } })})`, opacity: Math.min(1, 0.35 + spring({ frame: frame - active.at, fps: 30, config: { damping: 11 } })) }}>
+            {active.t}
+          </div>
+        )}
       </div>
       <AbsoluteFill style={{ justifyContent: "flex-end", alignItems: "center", paddingBottom: 200 }}>
         <Phone w={400}>
@@ -265,11 +265,13 @@ export const Captions: React.FC = () => {
     { d: "خليجي", t: "اليوم بقولكم ثلاث أشياء مهمة وايد", c: PAL.rose },
     { d: "شامي", t: "اليوم رح احكيلكن عن تلات شغلات مهمة", c: PAL.azure },
   ];
-  const per = 36;
-  const li = Math.min(lines.length - 1, Math.floor(Math.max(0, frame - 14) / per));
+  const starts = [0, 80, 107];
+  const ends = [80, 107, 170];
+  let li = 0;
+  starts.forEach((st, k) => { if (frame >= st) li = k; });
   const L = lines[li];
   const words = L.t.split(" ");
-  const wi = Math.floor(((Math.max(0, frame - 14) % per) / per) * (words.length + 1));
+  const wi = Math.floor(((frame - starts[li]) / (ends[li] - starts[li])) * (words.length + 1));
   return (
     <Stage tintA={PAL.accent} tintB={PAL.rose}>
       <FeatureHead n="4" label="كابشن بلهجتك" color={PAL.accent} line="كلمة بكلمة، على توقيت الكلام." />
@@ -328,8 +330,8 @@ export const Platforms: React.FC = () => {
 export const Cta: React.FC = () => {
   const frame = useCurrentFrame();
   const name = useSpring(4, { damping: 12 });
-  const btn = useSpring(26, { damping: 9 });
-  const pulse = 1 + Math.max(0, Math.sin((frame - 40) / 7)) * 0.04;
+  const btn = useSpring(72, { damping: 9 });
+  const pulse = 1 + Math.max(0, Math.sin((frame - 86) / 7)) * 0.04;
   return (
     <Stage tintA={PAL.accent} tintB={PAL.violet}>
       <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", flexDirection: "column", gap: 40 }}>
@@ -340,9 +342,9 @@ export const Cta: React.FC = () => {
         <div dir="rtl" style={{ fontFamily: FONT, fontWeight: 800, fontSize: T.sub, color: "#1A1204", background: PAL.accent, padding: "24px 56px", borderRadius: 999, transform: `scale(${btn * pulse})`, boxShadow: `0 20px 60px -15px ${PAL.accent}` }}>
           اكتب Zifidit في الكومنتات
         </div>
-        <Chip color={PAL.teal} delay={44}>أول 100: خصم 50% لمدة 3 شهور</Chip>
+        <Chip color={PAL.teal} delay={96}>أول 100: خصم 50% لمدة 3 شهور</Chip>
       </AbsoluteFill>
-      <Burst at={28} y="58%" seed="cta" count={50} spread={560} />
+      <Burst at={74} y="58%" seed="cta" count={50} spread={560} />
     </Stage>
   );
 };

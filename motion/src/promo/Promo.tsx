@@ -8,16 +8,18 @@ import { iris } from "@remotion/transitions/iris";
 import { loadFonts } from "../theme";
 import { Captions, Cta, FromText, Hook, Montage, Platforms, Problem, Reveal, Voice } from "./scenes";
 
+// Scene lengths are timed to the Egyptian voiceover (public/voiceover.wav):
+// each scene starts ~0.35s before its line; transitions overlap by T_LEN frames.
 export const SCENES = [
-  { C: Hook, d: 105 },
-  { C: Problem, d: 105 },
-  { C: Reveal, d: 90 },
-  { C: Montage, d: 135 },
-  { C: FromText, d: 150 },
-  { C: Voice, d: 165 },
-  { C: Captions, d: 135 },
-  { C: Platforms, d: 105 },
-  { C: Cta, d: 150 },
+  { C: Hook, d: 153 },
+  { C: Problem, d: 176 },
+  { C: Reveal, d: 158 },
+  { C: Montage, d: 152 },
+  { C: FromText, d: 144 },
+  { C: Voice, d: 173 },
+  { C: Captions, d: 191 },
+  { C: Platforms, d: 125 },
+  { C: Cta, d: 159 },
 ];
 export const T_LEN = 12;
 export const PROMO_FRAMES = SCENES.reduce((n, s) => n + s.d, 0) - T_LEN * (SCENES.length - 1);
