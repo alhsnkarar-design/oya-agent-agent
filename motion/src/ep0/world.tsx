@@ -271,7 +271,7 @@ const Project: React.FC<{ f: number }> = ({ f }) => {
       <group position={[0, SCREEN_Y - (1 - win) * 3, 0]}>
         <mesh>
           <planeGeometry args={[3.0, 1.7]} />
-          <meshStandardMaterial color={"#0b0916"} emissive={GOLD} emissiveIntensity={lit * 0.12} metalness={0.2} roughness={0.6} />
+          <meshStandardMaterial color={"#07060d"} emissive={"#2a1a05"} emissiveIntensity={lit} metalness={0.2} roughness={0.9} />
         </mesh>
         {[[0, 0.87, 3.1, 0.04], [0, -0.87, 3.1, 0.04], [1.52, 0, 0.04, 1.78], [-1.52, 0, 0.04, 1.78]].map(([px, py, w, h], k) => (
           <mesh key={k} position={[px, py, 0.01]}>
@@ -304,7 +304,7 @@ const Project: React.FC<{ f: number }> = ({ f }) => {
       )}
       <ShockRing f={l} at={96} color={GOLD} r0={0.4} r1={4} y={SCREEN_Y} z={0.05} />
       <BurstCloud f={l} at={96} seed="pj" n={300} pos={[0, SCREEN_Y, 0.2]} />
-      <pointLight position={[0, 1, 3]} intensity={40 + lit * 60} color={"#ffffff"} />
+      <pointLight position={[0, -1, 3]} intensity={30} color={"#ffffff"} />
     </group>
   );
 };
@@ -423,6 +423,7 @@ const Fork: React.FC<{ f: number }> = ({ f }) => {
       {[0, 1, 2].map((k) => {
         const s = sp(l - 58 - k * 4, { damping: 12 });
         const h = [0.35, 0.6, 0.9][k] * s;
+        if (s < 0.03) return null;
         return (
           <mesh key={k} position={[UP_END[0] + 0.55 + k * 0.28, UP_END[1] - 0.35 + h / 2, -0.2]}>
             <boxGeometry args={[0.18, Math.max(0.001, h), 0.18]} />
