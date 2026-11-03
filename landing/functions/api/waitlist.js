@@ -1,4 +1,5 @@
-// POST /api/waitlist — saves a waitlist sign-up to Appwrite.
+// POST /api/waitlist — saves a waitlist sign-up.
+// Storage: Cloudflare D1 when the project has a `DB` binding (no secrets needed), otherwise Appwrite.
 import { json, clean, pick, missingEnv, createDocument } from "../../lib/appwrite.js";
 
 const REQUIRED = [
@@ -14,7 +15,7 @@ const PREPAY = ["yes", "maybe", "no"];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export async function onRequestPost({ request, env }) {
-  const missing = missingEnv(env, REQUIRED);
+  const missing = env.DB ? [] : missingEnv(env, REQUIRED);
   if (missing.length) {
     console.error("waitlist: missing env", missing.join(","));
     return json({ error: "not_configured" }, 503);
@@ -49,6 +50,19 @@ export async function onRequestPost({ request, env }) {
     referrer: clean(body.referrer, 300),
     country: clean(request.cf?.country, 8),
   };
+
+  if (env.DB) {
+    try {
+      const r = await env.DB.prepare(
+        `INSERT OR IGNORE INTO waitlist (email, utm_source, utm_medium, utm_campaign, referrer, country, created_at)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)`,
+      ).bind(data.email, data.utm_source, data.utm_medium, data.utm_campaign, data.referrer, data.country, new Date().toISOString()).run();
+      return json({ ok: true, already: r.meta.changes === 0 });
+    } catch (err) {
+      console.error("waitlist: d1 error", err);
+      return json({ error: "storage_failed" }, 502);
+    }
+  }
 
   try {
     const result = await createDocument(env, env.APPWRITE_WAITLIST_COLLECTION_ID, data);
