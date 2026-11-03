@@ -3,6 +3,7 @@ import { AbsoluteFill, cancelRender, CalculateMetadataFunction, Composition, con
 import { Build, Punch, Reveal } from "./styles";
 import { FPS, parse, Ratio, SIZES, Style, totalFrames } from "./text";
 import { COLORS, FONT, loadFonts } from "./theme";
+import { Promo, PROMO_FRAMES } from "./promo/Promo";
 
 export type KineticProps = {
   sentence: string;
@@ -51,6 +52,8 @@ const calculateMetadata: CalculateMetadataFunction<KineticProps> = ({ props }) =
 };
 
 export const Root: React.FC = () => (
+  <>
+  <Composition id="Promo" component={Promo} fps={FPS} width={1080} height={1920} durationInFrames={PROMO_FRAMES} />
   <Composition
     id="Kinetic"
     component={Kinetic}
@@ -66,4 +69,5 @@ export const Root: React.FC = () => (
     }}
     calculateMetadata={calculateMetadata}
   />
+  </>
 );
