@@ -22,10 +22,7 @@ function bg(c, S, mode) {
   if (mode === 'transparent') return;
   if (mode === 'light') { const g = c.createRadialGradient(S / 2, S * .45, 10, S / 2, S / 2, S * .75); g.addColorStop(0, '#fffaf0'); g.addColorStop(1, '#efe3c8'); c.fillStyle = g; c.fillRect(0, 0, S, S); return; }
   const g = c.createRadialGradient(S / 2, S * .45, 10, S / 2, S / 2, S * .75); g.addColorStop(0, '#1d2a3f'); g.addColorStop(.6, '#0d1422'); g.addColorStop(1, '#070a12'); c.fillStyle = g; c.fillRect(0, 0, S, S);
-  // faint geometric pattern
-  c.save(); c.globalAlpha = .06; c.strokeStyle = '#e8be6e'; c.lineWidth = S / 900;
-  const sp = S / 5; for (let x = -1; x <= 6; x++) for (let y = -1; y <= 6; y++) { star8(c, x * sp, y * sp, sp * .42, Math.PI / 8); c.stroke(); }
-  c.restore();
+
 }
 function glowDot(c, x, y, r) { const g = c.createRadialGradient(x, y, 0, x, y, r * 4); g.addColorStop(0, 'rgba(255,230,160,.9)'); g.addColorStop(.3, 'rgba(255,200,110,.35)'); g.addColorStop(1, 'rgba(255,200,110,0)'); c.fillStyle = g; c.beginPath(); c.arc(x, y, r * 4, 0, Math.PI * 2); c.fill(); }
 
@@ -69,8 +66,39 @@ function finalLogo(c, S, mode = 'dark') {
   c.shadowColor = ink ? 'rgba(120,80,20,.25)' : 'rgba(255,190,90,.65)'; c.shadowBlur = S * .025;
   c.fillStyle = ink ? '#16233a' : goldGrad(c, cy - S * .2, cy + S * .2); c.fillText('أثر', cx, cy + S * .035); c.restore();
 }
+/* ---------- star-free concepts ---------- */
+function archPath(c, cx, top, bottom, w) { // pointed (mihrab) arch
+  const sp = top + (bottom - top) * .36; c.beginPath(); c.moveTo(cx - w / 2, bottom); c.lineTo(cx - w / 2, sp);
+  c.bezierCurveTo(cx - w / 2, sp - (sp - top) * .55, cx - w * .14, top + (sp - top) * .18, cx, top);
+  c.bezierCurveTo(cx + w * .14, top + (sp - top) * .18, cx + w / 2, sp - (sp - top) * .55, cx + w / 2, sp); c.lineTo(cx + w / 2, bottom); c.closePath(); }
+function word(c, S, cx, cy, size, mode) { const ink = mode === 'light'; c.save(); c.direction = 'rtl'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = `700 ${size}px Kufi`;
+  c.shadowColor = ink ? 'rgba(120,80,20,.25)' : 'rgba(255,190,90,.65)'; c.shadowBlur = S * .025; c.fillStyle = ink ? '#16233a' : goldGrad(c, cy - size * .55, cy + size * .55); c.fillText('أثر', cx, cy); c.restore(); }
+function halo(c, S, mode) { if (mode !== 'dark') return; const h = c.createRadialGradient(S / 2, S / 2, S * .05, S / 2, S / 2, S * .48); h.addColorStop(0, 'rgba(255,200,110,.16)'); h.addColorStop(1, 'rgba(255,200,110,0)'); c.fillStyle = h; c.fillRect(0, 0, S, S); }
+function goldStroke(c, S, mode) { c.strokeStyle = mode === 'light' ? '#b7862e' : goldGrad(c, S * .05, S * .95); c.shadowColor = mode === 'light' ? 'rgba(150,100,30,.25)' : 'rgba(255,190,90,.55)'; c.shadowBlur = S * .02; }
+/* G · mihrab arch */
+function conceptG(c, S, mode = 'dark') { bg(c, S, mode); halo(c, S, mode); const cx = S / 2;
+  c.save(); goldStroke(c, S, mode); c.lineWidth = S * .013; archPath(c, cx, S * .08, S * .9, S * .66); c.stroke(); c.lineWidth = S * .0045; archPath(c, cx, S * .13, S * .86, S * .58); c.stroke();
+  c.lineWidth = S * .008; c.beginPath(); c.moveTo(cx - S * .38, S * .9); c.lineTo(cx + S * .38, S * .9); c.stroke(); c.restore();
+  // small hanging lantern at the top of the arch
+  c.save(); goldStroke(c, S, mode); c.lineWidth = S * .004; c.beginPath(); c.moveTo(cx, S * .155); c.lineTo(cx, S * .205); c.stroke();
+  c.fillStyle = mode === 'light' ? '#b7862e' : goldGrad(c, S * .27, S * .33); c.beginPath(); c.moveTo(cx - S * .02, S * .205); c.lineTo(cx + S * .02, S * .205); c.lineTo(cx + S * .015, S * .255); c.lineTo(cx - S * .015, S * .255); c.fill(); c.restore();
+  word(c, S, cx, S * .6, S * .32, mode); }
+/* H · round seal with scalloped ornamental ring */
+function conceptH(c, S, mode = 'dark') { bg(c, S, mode); halo(c, S, mode); const cx = S / 2, cy = S / 2;
+  c.save(); goldStroke(c, S, mode); c.lineWidth = S * .012; c.beginPath(); c.arc(cx, cy, S * .43, 0, Math.PI * 2); c.stroke();
+  c.lineWidth = S * .005; const n = 28, r = S * .385; c.beginPath(); for (let i = 0; i < n; i++) { const a0 = i / n * Math.PI * 2, a1 = (i + 1) / n * Math.PI * 2, am = (a0 + a1) / 2; c.moveTo(cx + Math.cos(a0) * r, cy + Math.sin(a0) * r); c.quadraticCurveTo(cx + Math.cos(am) * r * 1.07, cy + Math.sin(am) * r * 1.07, cx + Math.cos(a1) * r, cy + Math.sin(a1) * r); } c.stroke();
+  c.beginPath(); c.arc(cx, cy, S * .35, 0, Math.PI * 2); c.stroke(); c.restore();
+  word(c, S, cx, cy + S * .035, S * .34, mode); }
+/* I · crescent embracing the word, with a trail of light (the "trace") */
+function conceptI(c, S, mode = 'dark') { bg(c, S, mode); halo(c, S, mode); const cx = S / 2, cy = S / 2;
+  const m = document.createElement('canvas'); m.width = m.height = S; const mc = m.getContext('2d');
+  mc.fillStyle = mode === 'light' ? '#b7862e' : goldGrad(mc, cy - S * .42, cy + S * .42); mc.beginPath(); mc.arc(cx, cy, S * .42, 0, Math.PI * 2); mc.fill();
+  mc.globalCompositeOperation = 'destination-out'; mc.beginPath(); mc.arc(cx + S * .14, cy - S * .05, S * .36, 0, Math.PI * 2); mc.fill();
+  c.save(); c.shadowColor = mode === 'light' ? 'rgba(150,100,30,.25)' : 'rgba(255,190,90,.55)'; c.shadowBlur = S * .03; c.drawImage(m, 0, 0); c.restore();
+  word(c, S, cx + S * .12, cy - S * .03, S * .3, mode);
+  for (let i = 0; i < 4; i++) { const x = cx + S * .3 - i * S * .085, y = cy + S * .2 + i * S * .035, r = S * (.016 - i * .003); if (mode === 'dark') glowDot(c, x, y, r); c.fillStyle = mode === 'light' ? '#b7862e' : '#ffe39a'; c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fill(); } }
 const params = new URLSearchParams(location.search);
-window.drawLogo = (concept, size, mode) => { const cv = document.createElement('canvas'); cv.width = cv.height = size; ({ A: conceptA, B: conceptB, C: conceptC, F: finalLogo })[concept](cv.getContext('2d'), size, mode); return cv.toDataURL('image/png'); };
+window.drawLogo = (concept, size, mode) => { const cv = document.createElement('canvas'); cv.width = cv.height = size; ({ A: conceptA, B: conceptB, C: conceptC, F: finalLogo, G: conceptG, H: conceptH, I: conceptI })[concept](cv.getContext('2d'), size, mode); return cv.toDataURL('image/png'); };
 (async () => {
   await Promise.all(['700 80px Ruqaa', '700 80px Kufi', '700 80px Amiri'].map(f => document.fonts.load(f, 'أثر')));
   if (!params.has('render')) for (const k of ['A', 'B', 'C']) for (const m of ['dark', 'light']) { const im = new Image(); im.src = drawLogo(k, 1080, m); im.style.width = '360px'; document.body.appendChild(im); }
