@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>المفلس الحقيقي</title>
+<style>
+@font-face{font-family:'Amiri';src:url(fonts/Amiri-Bold.ttf) format('truetype');font-weight:700}
+@font-face{font-family:'ReemKufi';src:url(fonts/ReemKufi-Bold.ttf) format('truetype');font-weight:700}
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+canvas{display:block;width:100vw;height:100vh;object-fit:contain;background:#000}
+#ui{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:12px;align-items:center;background:rgba(10,8,4,.6);border:1px solid rgba(232,190,110,.35);padding:8px 16px;border-radius:40px;color:#f3d79a;font-family:sans-serif}
+#ui button{background:none;border:1px solid rgba(232,190,110,.5);color:#f3d79a;border-radius:20px;padding:6px 16px;cursor:pointer}
+#ui input{width:min(50vw,420px);accent-color:#d9a94e}
+body.render #ui{display:none}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="ui"><button id="play">▶</button><input id="seek" type="range" min="0" max="84" step="0.01" value="0"><span id="tm">0:00</span></div>
+<audio id="aud" src="soundtrack.wav" preload="auto"></audio>
+<script src="rig.js"></script>
+<script>
+/* «المفلس الحقيقي» — حديث صحيح مسلم (2581)، فيديو توعوي عمودي بشخصيات بلا ملامح وجه وكابشن بالفصحى. */
+const W = 1080, H = 1920, FPS = 30, DUR = 84;
+const cv = document.getElementById('c'); cv.width = W; cv.height = H; const ctx = cv.getContext('2d');
+const mk = (w = W, h = H) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const buf = mk(), bctx = buf.getContext('2d');
+const pulse = (t, c, w) => Math.exp(-Math.pow((t - c) / w, 2));
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const R = rng(777);
+function sprite(r, g, b, size = 128) { const c = mk(size, size), x = c.getContext('2d'); const gr = x.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.15, `rgba(${r},${g},${b},.85)`); gr.addColorStop(.45, `rgba(${r},${g},${b},.25)`); gr.addColorStop(1, `rgba(${r},${g},${b},0)`); x.fillStyle = gr; x.fillRect(0, 0, size, size); return c; }
+const SP = { gold: sprite(255, 196, 90), warm: sprite(255, 150, 70), red: sprite(255, 70, 40), white: sprite(230, 240, 255), violet: sprite(150, 90, 255) };
+function glow(c, sp, x, y, s, a = 1) { if (a <= .003) return; c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = a; c.drawImage(sp, x - s / 2, y - s / 2, s, s); c.restore(); }
+function vgrad(c, y0, y1, stops) { const g = c.createLinearGradient(0, y0, 0, y1); stops.forEach(([o, col]) => g.addColorStop(o, col)); return g; }
+function star8(c, cx, cy, Rr, rot) { const ri = Rr * Math.cos(Math.PI / 4) / Math.cos(Math.PI / 8); c.beginPath(); for (let i = 0; i < 16; i++) { const r = i % 2 ? ri : Rr, an = rot + i * Math.PI / 8; c.lineTo(cx + r * Math.cos(an), cy + r * Math.sin(an)); } c.closePath(); }
+function mixP(a, b, k) { const o = {}; for (const key of new Set([...Object.keys(a), ...Object.keys(b)])) { const va = a[key], vb = b[key]; if (Array.isArray(va) && Array.isArray(vb)) o[key] = [lerp(va[0], vb[0], k), lerp(va[1], vb[1], k)]; else if (typeof va === 'number' && typeof vb === 'number') o[key] = lerp(va, vb, k); else o[key] = k < .5 ? (va ?? vb) : (vb ?? va); } return o; }
+function seq(st, t, list) { let i = 0; while (i + 1 < list.length && t >= list[i + 1][0]) i++; const cur = Object.assign(basePose(st), list[i][1](t - list[i][0])); if (i > 0) { const k = eInOut((t - list[i][0]) / .45); if (k < 1) return mixP(Object.assign(basePose(st), list[i - 1][1](t - list[i - 1][0])), cur, k); } return cur; }
+
+/* characters */
+STYLES.man = { P: ADULT, skin: '#c8946a', shirt: '#3d7a6a', sleeve: 'long', pants: '#3a3a44', shoe: '#2a2a2a', hair: '#1e1612' };
+STYLES.man2 = { P: ADULT, skin: '#e0b48e', shirt: '#8a4a6a', sleeve: 'short', pants: '#4a4036', shoe: '#3a2a20', hair: '#5a3a22' };
+const MN = STYLES.man, WK = STYLES.worker, BS = STYLES.boss, M2 = STYLES.man2;
+const GY = H * .64, S = 220;
+const headY = (gy, s, st) => gy - s * ((st.P.thigh + st.P.shin) * .985 + st.P.T + st.P.neck + st.P.headR * 1.9);
+const POINT = (st, k = 1) => ({ handR: [lerp(st.P.sw + .1, st.P.sw + .8, k), lerp(-st.P.T + .95, -st.P.T + .15, k)], elbowR: 1, lean: -.05 * k, head: -.05 });
+const PUSH = (st, k) => ({ handL: [lerp(-st.P.sw, st.P.sw + .55, k), -st.P.T + .4], handR: [lerp(st.P.sw, st.P.sw + .75, k), -st.P.T + .36], elbowL: 1, elbowR: 1, lean: .16 * k });
+const STUMBLE = (st, k) => ({ lean: -.25 * k, head: -.2 * k, handL: [-st.P.sw - .45 * k, -st.P.T + .5], handR: [st.P.sw + .2, -st.P.T + .6], hipX: -.25 * k });
+
+/* hasanat (good deeds) as orbs in an arc above a character */
+function orbPos(i, x, hy) { const an = Math.PI + (i + .5) / 15 * Math.PI; return [x + Math.cos(an) * 230, hy - 40 + Math.sin(an) * 170]; }
+function orb(c, x, y, s, a = 1) { glow(c, SP.gold, x, y, s * 5, .55 * a); c.save(); c.globalAlpha = a; c.fillStyle = '#fff3c8'; c.beginPath(); c.arc(x, y, s * .45, 0, TAU); c.fill(); c.restore(); }
+function sinStone(c, x, y, s, a = 1) { c.save(); c.globalAlpha = a; c.fillStyle = '#1a1416'; c.beginPath(); c.moveTo(x - s, y); c.quadraticCurveTo(x - s * .9, y - s * .9, x, y - s * .8); c.quadraticCurveTo(x + s * 1.1, y - s * .7, x + s, y); c.quadraticCurveTo(x, y + s * .5, x - s, y); c.fill(); c.strokeStyle = 'rgba(255,60,40,.6)'; c.lineWidth = 3; c.stroke(); c.restore(); glow(c, SP.red, x, y, s * 3, .25 * a); }
+function wallet(c, x, y, s, open, tilt) { c.save(); c.translate(x, y); c.rotate(tilt); c.scale(s, s);
+  c.fillStyle = '#6b4226'; c.beginPath(); c.roundRect(-1.2, -.7, 2.4, 1.4, .15); c.fill(); c.strokeStyle = '#3e2414'; c.lineWidth = .06; c.stroke();
+  c.save(); c.rotate(-open * 1.2); c.fillStyle = '#7d4e2e'; c.beginPath(); c.roundRect(-1.2, -.7, 2.4, .6, .12); c.fill(); c.restore();
+  c.setLineDash([.08, .08]); c.strokeStyle = 'rgba(255,220,170,.4)'; c.lineWidth = .03; c.strokeRect(-1.08, -.58, 2.16, 1.16); c.setLineDash([]); c.restore(); }
+function burst(c, x, y, s, t, a) { // angry speech burst (no text)
+  c.save(); c.globalAlpha = a; c.translate(x, y); c.rotate(Math.sin(t * 20) * .05); c.fillStyle = '#d9473a'; c.beginPath();
+  for (let i = 0; i < 18; i++) { const r = i % 2 ? s * .6 : s, an = i / 18 * TAU; c.lineTo(Math.cos(an) * r * 1.3, Math.sin(an) * r); } c.fill();
+  c.strokeStyle = '#1a0a0a'; c.lineWidth = 6; c.beginPath(); for (let i = 0; i < 6; i++) c.lineTo(-s * .7 + i * s * .28, (i % 2 ? -1 : 1) * s * .25); c.stroke(); c.restore(); }
+function cloud(c, x, y, s, a) { c.save(); c.globalAlpha = a; c.fillStyle = '#2a2a33'; [[-.5, 0, .5], [0, -.2, .6], [.5, 0, .5], [0, .15, .55]].forEach(([dx, dy, r]) => { c.beginPath(); c.arc(x + dx * s, y + dy * s, r * s, 0, TAU); c.fill(); }); c.restore(); }
+function book(c, x, y, s, t) { c.save(); c.translate(x, y); c.scale(s, s);
+  c.fillStyle = '#6b2a2a'; c.beginPath(); c.moveTo(-2.1, .1); c.lineTo(0, .3); c.lineTo(2.1, .1); c.lineTo(2.1, .3); c.lineTo(0, .5); c.lineTo(-2.1, .3); c.fill();
+  c.fillStyle = '#f5ecd6'; c.beginPath(); c.moveTo(0, .3); c.quadraticCurveTo(-1, -.05, -2, .05); c.lineTo(-2, -1.3); c.quadraticCurveTo(-1, -1.45, 0, -1.1); c.fill();
+  c.beginPath(); c.moveTo(0, .3); c.quadraticCurveTo(1, -.05, 2, .05); c.lineTo(2, -1.3); c.quadraticCurveTo(1, -1.45, 0, -1.1); c.fill();
+  c.fillStyle = 'rgba(60,40,20,.35)'; for (let i = 0; i < 9; i++) { c.fillRect(-1.8, -1.1 + i * .12, 1.5 - (i % 3) * .2, .035); c.fillRect(.3, -1.1 + i * .12, 1.5 - (i % 2) * .25, .035); }
+  c.strokeStyle = '#d6a94f'; c.lineWidth = .03; star8(c, -1.05, -1.25, .08, 0); c.stroke(); star8(c, 1.05, -1.25, .08, 0); c.stroke();
+  c.restore(); }
+function pattern(c, t, a, col = '#e8be6e') { c.save(); c.globalAlpha = a; c.strokeStyle = col; c.lineWidth = 1.5; for (let gx = -1; gx <= 7; gx++) for (let gy = -1; gy <= 12; gy++) { star8(c, gx * 180, gy * 180, 70, t * .04); c.stroke(); } c.restore(); }
+const STARS = Array.from({ length: 260 }, () => [R() * W, R() * H * .7, R() * 2 + .5, R() * TAU]);
+function stars(c, t, a) { c.fillStyle = '#fff'; for (const [x, y, r, p] of STARS) { c.globalAlpha = a * (.3 + .4 * Math.sin(t * 2 + p)); c.fillRect(x, y, r, r); } c.globalAlpha = 1; }
+
+/* ============================ SCENES ============================ */
+// 1 · 0–12 «أتدرون ما المفلس؟» — the empty wallet
+function sc1(c, lt) {
+  c.fillStyle = vgrad(c, 0, H, [[0, '#1b1426'], [1, '#0a0810']]); c.fillRect(0, 0, W, H); pattern(c, lt, .06);
+  glow(c, SP.gold, W / 2, H * .36, 900, .25);
+  const open = eOut((lt - 6.3) / .8), tilt = lt > 7.3 ? Math.sin((lt - 7.3) * 9) * .25 * Math.max(0, 1 - (lt - 7.3) / 1.6) + Math.PI * eInOut((lt - 7.1) / .5) * .9 : 0;
+  wallet(c, W / 2, H * .36 + Math.sin(lt * 1.5) * 10, 170 * eBack(lt / 1), open, tilt);
+  if (lt > 7.6) { for (let i = 0; i < 18; i++) { const k = (lt - 7.6) / 2.5, x = W / 2 + Math.sin(i * 2.3) * 80 * k * 2, y = H * .42 + k * 400 * (.5 + (i % 5) / 6); c.fillStyle = `rgba(200,180,150,${Math.max(0, .6 - k * .5)})`; c.fillRect(x, y, 4, 4); } }
+  // a little moth flies out of the empty wallet
+  if (lt > 8.2) { const k = lt - 8.2, x = W / 2 + Math.sin(k * 3) * 120 + k * 60, y = H * .38 - k * 160; const fl = Math.abs(Math.sin(lt * 25)); c.fillStyle = '#c9b89a'; c.beginPath(); c.ellipse(x - 12, y, 16, 10 * fl + 2, -.4, 0, TAU); c.fill(); c.beginPath(); c.ellipse(x + 12, y, 16, 10 * fl + 2, .4, 0, TAU); c.fill(); c.fillStyle = '#5a4a3a'; c.fillRect(x - 3, y - 8, 6, 16); }
+  // question mark made of light (shape only)
+  const qa = ss(.6, 1.6, lt) * (1 - ss(5.6, 6.3, lt));
+  if (qa > 0) { c.save(); c.globalAlpha = qa; c.strokeStyle = '#f3cf86'; c.lineWidth = 22; c.lineCap = 'round'; c.shadowColor = '#ffcf80'; c.shadowBlur = 30; c.beginPath(); c.arc(W / 2, H * .14, 70, Math.PI * 1.1, Math.PI * 2.4); c.quadraticCurveTo(W / 2, H * .14 + 90, W / 2, H * .14 + 130); c.stroke(); c.fillStyle = '#f3cf86'; c.beginPath(); c.arc(W / 2, H * .14 + 190, 14, 0, TAU); c.fill(); c.restore(); }
+}
+// 2 · 12–22 he comes with prayer, fasting, zakat → orbs of light
+function sc2(c, lt) {
+  c.fillStyle = vgrad(c, 0, H, [[0, '#0e1a33'], [.7, '#1e2d4a'], [1, '#0a0e18']]); c.fillRect(0, 0, W, H); stars(c, lt, .6); pattern(c, lt, .05);
+  c.fillStyle = 'rgba(0,0,0,.35)'; c.fillRect(0, GY, W, H);
+  const x = W / 2, hy = headY(GY, S, MN);
+  // prayer mat under him
+  c.save(); c.globalAlpha = ss(.8, 1.4, lt); c.fillStyle = '#5a1420'; c.beginPath(); c.moveTo(x - 170, GY + 20); c.lineTo(x + 170, GY + 20); c.lineTo(x + 230, GY + 120); c.lineTo(x - 230, GY + 120); c.fill(); c.strokeStyle = '#d4a94f'; c.lineWidth = 5; c.stroke(); c.restore();
+  const p = seq(MN, lt, [[0, u => MOVES.idle(MN, u)], [1.4, u => Object.assign(MOVES.handOnChest(MN, u), { handL: [MN.P.sw * .2, -MN.P.T + .4], elbowL: 1, nod: .6 })], [5.5, u => Object.assign(MOVES.idle(MN, u), { lean: -.03, head: -.06 })]]);
+  drawChar(c, x, GY, S, MN, p);
+  // icons: prayer (mat star), fasting (crescent), zakat (coins) → orbs
+  const icons = [[1.6, 'p'], [3.4, 'f'], [5.2, 'z']];
+  icons.forEach(([t0, kind], j) => { const k = clamp((lt - t0) / 1.6); if (k <= 0) return; const ix = W * (.2 + j * .3), iy = H * .1;
+    const a = 1 - ss(.65, 1, k); c.save(); c.globalAlpha = a; c.translate(ix, iy + (1 - eBack(k * 2)) * 40); c.fillStyle = '#f3cf86'; c.strokeStyle = '#f3cf86'; c.lineWidth = 8;
+    if (kind === 'p') { star8(c, 0, 0, 55, 0); c.stroke(); } else if (kind === 'f') { c.beginPath(); c.arc(0, 0, 55, .6, TAU - .6); c.arc(18, -8, 44, TAU - .75, .75, true); c.fill(); } else { for (let q = 0; q < 3; q++) { c.beginPath(); c.ellipse(0, 20 - q * 22, 50, 16, 0, 0, TAU); c.fill(); c.strokeStyle = '#b8862e'; c.lineWidth = 3; c.stroke(); } }
+    c.restore(); glow(c, SP.gold, ix, iy, 300, .4 * a); });
+  const n = Math.min(15, Math.floor(clamp((lt - 2.2) / 6) * 15.99));
+  for (let i = 0; i < 15; i++) { const ti = 2.2 + i * .4; if (lt < ti) break; const k = eOut((lt - ti) / .7), src = icons[Math.floor(i / 5)], sx0 = W * (.2 + Math.floor(i / 5) * .3), [ox, oy] = orbPos(i, x, hy); orb(c, lerp(sx0, ox, k), lerp(H * .1, oy, k) - Math.sin(k * Math.PI) * 80, 34); }
+}
+// 3 · 22–34 the wrongs he did (flashback, 5 vignettes × 2.4 s)
+function sc3(c, lt) {
+  c.fillStyle = vgrad(c, 0, H, [[0, '#2a1416'], [1, '#120808']]); c.fillRect(0, 0, W, H);
+  c.fillStyle = 'rgba(0,0,0,.35)'; c.fillRect(0, GY, W, H);
+  const step = Math.min(4, Math.floor(lt / 2.4)), st = lt - step * 2.4, a = ss(0, .25, st) * (1 - ss(2.15, 2.4, st));
+  c.save(); c.globalAlpha = a;
+  const mx = W * .3, vx = W * .72;
+  if (step === 0) { // insulted this one
+    const p = Object.assign(basePose(MN), POINT(MN, eOut(st / .4))); p.face = 1; drawChar(c, mx, GY, S, MN, p);
+    const q = MOVES.sad(WK, st); q.face = -1; drawChar(c, vx, GY, S, WK, q);
+    burst(c, W * .52, headY(GY, S, MN) + 40, 70, lt, ss(.3, .5, st));
+  } else if (step === 1) { // slandered this one: dark cloud over his head
+    const p = Object.assign(basePose(MN), POINT(MN, eOut(st / .4)), { head: .1 }); p.face = 1; drawChar(c, mx, GY, S, MN, p);
+    const q = MOVES.sad(M2, st); q.face = -1; drawChar(c, vx, GY, S, M2, q);
+    cloud(c, vx, headY(GY, S, M2) - 70, 80, ss(.4, .9, st));
+    for (let i = 0; i < 4; i++) { const yy = headY(GY, S, M2) - 20 + ((st * 300 + i * 40) % 140); c.fillStyle = 'rgba(120,140,200,.7)'; c.fillRect(vx - 60 + i * 40, yy, 4, 18); }
+  } else if (step === 2) { // took this one's money
+    const k = eOut((st - .4) / .5);
+    const q = Object.assign(MOVES.give(WK, st, 1 - k * .3), { propR: k < .5 ? PROPS.envelope : null }); q.face = -1; drawChar(c, vx, GY, S, WK, q);
+    const p = Object.assign(MOVES.receive(MN, st, k), { propR: k >= .5 ? PROPS.envelope : null, lean: -.05 }); p.face = 1; drawChar(c, mx, GY, S, MN, p);
+  } else if (step === 3) { // shed blood — symbolized only: a red drop fading in the dark
+    c.fillStyle = 'rgba(0,0,0,.5)'; c.fillRect(0, 0, W, H);
+    const k = clamp(st / 1.6); c.fillStyle = '#9e1c1c'; c.beginPath(); const dx = W / 2, dy = lerp(H * .2, H * .48, k * k); c.moveTo(dx, dy - 40); c.quadraticCurveTo(dx + 30, dy + 10, dx, dy + 24); c.quadraticCurveTo(dx - 30, dy + 10, dx, dy - 40); c.fill();
+    if (st > 1.6) { const r = (st - 1.6) / .8; c.strokeStyle = `rgba(158,28,28,${1 - r})`; c.lineWidth = 5; c.beginPath(); c.ellipse(dx, H * .5, 30 + r * 220, 8 + r * 40, 0, 0, TAU); c.stroke(); }
+  } else { // struck this one
+    const k = eOut((st - .2) / .3);
+    const p = Object.assign(basePose(MN), PUSH(MN, k)); p.face = 1; drawChar(c, mx + 40, GY, S, MN, p);
+    const q = Object.assign(basePose(BS), STUMBLE(BS, ss(.35, .6, st))); q.face = -1; drawChar(c, vx, GY, S, BS, q);
+    if (st > .4 && st < 1.2) for (let i = 0; i < 5; i++) { const an = i * 1.25; c.strokeStyle = 'rgba(255,230,120,.8)'; c.lineWidth = 6; c.beginPath(); c.moveTo(W * .6 + Math.cos(an) * 40, GY - S * 1.9 + Math.sin(an) * 40); c.lineTo(W * .6 + Math.cos(an) * 80, GY - S * 1.9 + Math.sin(an) * 80); c.stroke(); }
+  }
+  c.restore();
+  // sepia flashback film edges
+  c.fillStyle = 'rgba(80,40,20,.18)'; c.fillRect(0, 0, W, H);
+}
+// 4 · 34–46 Day of Judgment: each one takes from his good deeds
+const VICT = [[WK, -1, 3], [M2, 1, 3], [WK, -1, 3], [BS, 1, 3], [M2, -1, 3]]; // who, side
+function sc4(c, lt) {
+  c.fillStyle = vgrad(c, 0, H, [[0, '#05040c'], [.55, '#1c1428'], [1, '#2a1c10']]); c.fillRect(0, 0, W, H); stars(c, lt, .8);
+  c.save(); c.globalCompositeOperation = 'lighter'; c.translate(W / 2, -200); for (let i = 0; i < 14; i++) { const an = Math.PI / 2 + (i - 6.5) * .09; const g = c.createLinearGradient(0, 0, Math.cos(an) * 2600, Math.sin(an) * 2600); g.addColorStop(0, 'rgba(255,230,170,.12)'); g.addColorStop(1, 'rgba(255,230,170,0)'); c.fillStyle = g; c.beginPath(); c.moveTo(0, 0); c.lineTo(Math.cos(an - .03) * 2600, Math.sin(an - .03) * 2600); c.lineTo(Math.cos(an + .03) * 2600, Math.sin(an + .03) * 2600); c.fill(); } c.restore();
+  c.fillStyle = 'rgba(0,0,0,.4)'; c.fillRect(0, GY, W, H);
+  const x = W / 2, hy = headY(GY, S, MN);
+  // victims appear one by one at the sides
+  let taken = 0;
+  VICT.forEach(([st, side], i) => { const t0 = 1 + i * 2.2, k = eOut((lt - t0) / .6); if (lt < t0) return;
+    const POS = [[W * .17, GY, 1], [W * .83, GY, 1], [W * .06, GY + 120, .78], [W * .94, GY + 120, .78], [W * .26, GY + 200, .72]];
+    const vx0 = POS[i][0], vy = POS[i][1], sc = POS[i][2], vx = vx0 - side * 0;
+    const pp = Object.assign(MOVES.idle(st, lt), { lean: 0, handR: [st.P.sw + .45, -st.P.T + .45], elbowR: 1 }); pp.face = -side;
+    c.save(); c.globalAlpha = k; drawChar(c, vx, vy, S * sc, st, pp); c.restore();
+    for (let q = 0; q < 3; q++) { const tq = t0 + .5 + q * .45, fk = eInOut((lt - tq) / .7); if (lt < tq) continue; taken++;
+      const idx = 14 - (i * 3 + q), [ox, oy] = orbPos(idx, x, hy), tx = vx + side * -40 * sc, ty = vy - S * sc * 1.75;
+      orb(c, lerp(ox, tx, fk), lerp(oy, ty, fk) - Math.sin(fk * Math.PI) * 120, 34 * (1 - fk * .4), 1 - fk * .4); }
+  });
+  for (let i = 0; i < 15 - taken; i++) { const [ox, oy] = orbPos(i, x, hy); orb(c, ox, oy, 34); }
+  const fear = clamp((lt - 4) / 7);
+  const p = Object.assign(MOVES.idle(MN, lt), { head: Math.sin(lt * 2.5) * .15 * fear, lean: 0, handL: [-MN.P.sw - .1 - fear * .1, -MN.P.T + .9], handR: [MN.P.sw + .1 + fear * .1, -MN.P.T + .9], nod: fear * .4 });
+  drawChar(c, x, GY, S, MN, p);
+}
+// 5 · 46–56 his good deeds run out: their sins are cast upon him
+function sc5(c, lt) {
+  const red = ss(5.5, 8, lt);
+  c.fillStyle = vgrad(c, 0, H, [[0, '#05040a'], [.6, `rgb(${30 + red * 50},${14},${16})`], [1, `rgb(${50 + red * 120},${16 + red * 20},10)`]]); c.fillRect(0, 0, W, H); stars(c, lt, .4 * (1 - red));
+  c.fillStyle = 'rgba(0,0,0,.4)'; c.fillRect(0, GY, W, H);
+  const x = W / 2;
+  // victims (dim, at the sides) cast stones
+  [[WK, -1], [M2, 1], [BS, -1], [WK, 1]].forEach(([st, side], i) => { const pp = Object.assign(MOVES.idle(st, lt), { handR: [st.P.sw + .2 + .5 * pulse(lt, .6 + i * 1.1, .3), -st.P.T + .3], elbowR: 1 }); pp.face = -side; c.save(); c.globalAlpha = .55 * (1 - red * .8); drawChar(c, x + side * (i < 2 ? 380 : 470), GY + (i < 2 ? 0 : 110), S * (i < 2 ? .9 : .75), st, pp); c.restore(); });
+  const stones = Math.min(8, Math.floor(clamp(lt / 5) * 8.99));
+  const heavy = clamp(lt / 5);
+  const sink = eInOut((lt - 6) / 3);
+  c.save(); c.globalAlpha = 1 - ss(7.5, 9.2, lt);
+  const p = seq(MN, lt, [[0, u => Object.assign(MOVES.sad(MN, u), {})], [1.5, u => Object.assign(MOVES.tired(MN, u), { lean: .2 + heavy * .25 })]]);
+  drawChar(c, x, GY + sink * 260, S, MN, p);
+  const hy = headY(GY, S, MN) + sink * 260 + 120 + heavy * 40;
+  for (let i = 0; i < 8; i++) { const ti = .5 + i * .6; if (lt < ti) break; const k = eOut((lt - ti) / .5); sinStone(c, x - 90 + (i % 3) * 80, lerp(-100, hy - Math.floor(i / 3) * 45, k), 46); }
+  c.restore();
+  // abyss glow below (no graphic depiction)
+  glow(c, SP.red, W / 2, H * .78, 1600 * red, .55 * red); glow(c, SP.warm, W / 2, H * .82, 900 * red, .4 * red);
+  if (lt > 8) { c.fillStyle = `rgba(0,0,0,${ss(8, 9.6, lt) * .7})`; c.fillRect(0, 0, W, H); }
+}
+// 6 · 56–64 Imam an-Nawawi's explanation: the open book
+function sc6(c, lt) {
+  c.fillStyle = vgrad(c, 0, H, [[0, '#2a1d14'], [1, '#120c08']]); c.fillRect(0, 0, W, H); pattern(c, lt, .05);
+  // lamp light
+  glow(c, SP.warm, W * .5, H * .3, 1400, .45);
+  c.fillStyle = '#3a2618'; c.fillRect(0, GY - 30, W, H);
+  c.fillStyle = 'rgba(255,200,120,.08)'; c.fillRect(0, GY - 30, W, 8);
+  book(c, W / 2, GY - 40, 200 * eOut(lt / 1), lt);
+  for (let i = 0; i < 26; i++) { const ph = (lt * .2 + i / 26) % 1; glow(c, SP.gold, W / 2 + Math.sin(i * 2.4 + lt * .5) * 300 * ph, GY - 300 - ph * 700, 30, (1 - ph) * .7 * ss(.6, 1.5, lt)); }
+  // two scales: wallet (fades: wealth passes) vs orbs (remains)
+  const a = ss(2.5, 3.2, lt); c.save(); c.globalAlpha = a; wallet(c, W * .24, H * .14, 60, 0, 0); c.restore();
+  c.save(); c.globalAlpha = a * (1 - ss(4.2, 5.5, lt)); c.fillStyle = '#e8c766'; for (let i = 0; i < 4; i++) { c.beginPath(); c.ellipse(W * .24, H * .14 - 70 - i * 18, 40, 12, 0, 0, TAU); c.fill(); } c.restore();
+  for (let i = 0; i < 5; i++) orb(c, W * .76 + (i - 2) * 50, H * .14 + Math.sin(lt * 2 + i) * 10, 30, a);
+}
+// 7 · 64–74 the remedy today: return the right, ask forgiveness
+function sc7(c, lt) {
+  c.fillStyle = vgrad(c, 0, H, [[0, '#6aa3d8'], [.6, '#f2d7a8'], [1, '#c9a070']]); c.fillRect(0, 0, W, H);
+  glow(c, SP.gold, W * .8, H * .1, 900, .5); c.fillStyle = '#fff4d0'; c.beginPath(); c.arc(W * .8, H * .1, 70, 0, TAU); c.fill();
+  c.fillStyle = 'rgba(90,120,150,.4)'; for (let i = 0; i < 8; i++) c.fillRect(i * 140 - 20, GY - 300 - (i * 61 % 200), 120, 400);
+  c.fillStyle = vgrad(c, GY - 10, H, [[0, '#b48a5a'], [1, '#7a5634']]); c.fillRect(0, GY - 10, W, H);
+  const mx = lerp(W * .05, W * .3, eInOut((lt - .2) / 1.8)), wx = W * .72;
+  const p = seq(MN, lt, [[0, u => MOVES.walk(MN, u, .8)], [2, u => Object.assign(MOVES.give(MN, u, eOut(u / .6)), { head: .1 })], [4, u => MOVES.handOnChest(MN, u)], [7, u => Object.assign(MOVES.give(MN, u, eOut(u / .5)), { propR: null })]]);
+  p.face = 1; drawChar(c, mx, GY, S, MN, p);
+  const q = seq(WK, lt, [[0, u => MOVES.sad(WK, u)], [2.3, u => Object.assign(MOVES.receive(WK, u, eOut(u / .6)), { propR: u > .5 ? PROPS.envelope : null })], [4.2, u => Object.assign(MOVES.idle(WK, u), { head: .1, nod: .5 * Math.max(0, Math.sin(u * 4)) })], [7.1, u => Object.assign(MOVES.give(WK, u, eOut(u / .5)), { propR: null })]]);
+  q.face = -1; drawChar(c, wx, GY, S, WK, q);
+  if (lt > 7.6) { glow(c, SP.gold, (mx + wx) / 2, GY - S * 1.55, 400, .6 * ss(7.6, 8, lt)); heart(c, (mx + wx) / 2, GY - S * 3.2, 34, ss(7.8, 8.2, lt)); }
+  // his good deeds return gently
+  const hy = headY(GY, S, MN); for (let i = 0; i < 15; i++) { const ti = 4.5 + i * .3; if (lt < ti) break; const [ox, oy] = orbPos(i, mx, hy); orb(c, ox, oy, 26, eOut((lt - ti) / .5) * .9); }
+}
+// 8 · 74–84 closing: walk together at dawn → emblem
+function sc8(c, lt) {
+  c.fillStyle = vgrad(c, 0, H, [[0, '#2d4f86'], [.55, '#f2a35e'], [1, '#ffd9a0']]); c.fillRect(0, 0, W, H);
+  glow(c, SP.gold, W / 2, GY - 120, 1500, .6); c.fillStyle = '#fff2c8'; c.beginPath(); c.arc(W / 2, GY - 120 - lt * 8, 110, 0, TAU); c.fill();
+  c.fillStyle = 'rgba(40,30,30,.5)'; c.fillRect(0, GY, W, H);
+  const off = lt * 20;
+  [[MN, .5], [WK, .3], [M2, .7]].forEach(([st, fx], i) => { const pp = MOVES.walk(st, lt + i * .3, .7); pp.face = 1; drawChar(c, W * fx + off - 100, GY + (i ? 40 : 0), S * (i ? .9 : 1), st, pp); });
+  const e = ss(5, 6, lt);
+  if (e > 0) { c.save(); c.globalAlpha = e * .85; c.fillStyle = '#05040a'; c.fillRect(0, 0, W, H); c.restore();
+    glow(c, SP.gold, W / 2, H * .34, 900 * e, .6 * e);
+    c.save(); c.globalAlpha = e; c.strokeStyle = '#f3cf86'; c.lineWidth = 4; c.shadowColor = 'rgba(255,190,90,.9)'; c.shadowBlur = 28; star8(c, W / 2, H * .34, 170, lt * .1); c.stroke(); c.beginPath(); c.arc(W / 2, H * .34, 210, 0, TAU); c.stroke(); c.restore();
+    orb(c, W / 2, H * .34, 60, e); }
+}
+
+/* ---------------- captions (Fusha) ---------------- */
+const CAPS = [
+  { s: .6, e: 5.9, h: 1, l: ['سأل النبيُّ ﷺ أصحابَه:', '«أتدرون ما المُفلِس؟»'] },
+  { s: 6.1, e: 11.8, h: 0, l: ['قالوا: المُفلِسُ فينا', 'مَن لا درهمَ له ولا متاع'] },
+  { s: 12.2, e: 21.6, h: 1, l: ['فقال ﷺ: «إنّ المُفلِسَ من أمّتي', 'يأتي يومَ القيامةِ بصلاةٍ وصيامٍ وزكاة…'] },
+  { s: 22.1, e: 33.6, h: 1, l: ['ويأتي قد شتمَ هذا، وقذفَ هذا،', 'وأكلَ مالَ هذا، وسفكَ دمَ هذا، وضربَ هذا…'] },
+  { s: 34.1, e: 45.6, h: 1, l: ['فيُعطى هذا من حسناتِه،', 'وهذا من حسناتِه…'] },
+  { s: 46.1, e: 55.6, h: 1, l: ['فإن فنيت حسناتُه قبل أن يُقضى ما عليه،', 'أُخِذ من خطاياهم فطُرِحت عليه، ثم طُرِح في النار»'], src: 'رواه مسلم (٢٥٨١)' },
+  { s: 56.1, e: 63.6, h: 0, l: ['قال الإمامُ النوويُّ ما معناه:', 'فقرُ المالِ يزول، أمّا هذا', 'فهو الإفلاسُ الحقيقيُّ والهلاكُ التامّ'], src: 'شرح صحيح مسلم' },
+  { s: 64.1, e: 73.6, h: 1, l: ['«من كانت له مَظلِمةٌ لأخيه من عِرضِه أو شيءٍ،', 'فليتحلّلْه منه اليوم،', 'قبل ألّا يكون دينارٌ ولا درهم»'], src: 'رواه البخاري (٢٤٤٩)' },
+  { s: 74.1, e: 78.9, h: 0, l: ['رُدَّ الحقوقَ إلى أهلِها، واطلبِ العفوَ،', 'وادعُ لمن ظلمتَه'] },
+  { s: 79.2, e: 83.6, h: 1, l: ['تحلَّلِ اليوم…', 'قبل ألّا يكون دينارٌ ولا درهم'] },
+];
+const capCache = new Map();
+function capImg(cap) {
+  if (capCache.has(cap)) return capCache.get(cap);
+  const fs = 54, lh = fs * 1.6, maxW = W * .86, m = mk(10, 10).getContext('2d');
+  const font = cap.h ? `700 ${fs}px Amiri` : `700 ${fs - 4}px ReemKufi`;
+  m.font = font; let sc = 1; for (const ln of cap.l) sc = Math.min(sc, maxW / m.measureText(ln).width);
+  const f2 = cap.h ? `700 ${Math.floor(fs * sc)}px Amiri` : `700 ${Math.floor((fs - 4) * sc)}px ReemKufi`;
+  const hh = cap.l.length * lh * sc + (cap.src ? 70 : 0) + 70, c = mk(W, Math.ceil(hh)), x = c.getContext('2d');
+  x.direction = 'rtl'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillStyle = 'rgba(8,6,10,.62)'; x.beginPath(); x.roundRect(W * .05, 0, W * .9, hh, 36); x.fill();
+  x.strokeStyle = cap.h ? 'rgba(232,190,110,.55)' : 'rgba(255,255,255,.18)'; x.lineWidth = 3; x.stroke();
+  x.font = f2; x.shadowColor = 'rgba(0,0,0,.9)'; x.shadowBlur = 10;
+  cap.l.forEach((ln, i) => { if (cap.h) { const g = x.createLinearGradient(0, 35 + i * lh * sc, 0, 35 + (i + 1) * lh * sc); g.addColorStop(0, '#fff3c8'); g.addColorStop(1, '#f1c56a'); x.fillStyle = g; } else x.fillStyle = '#ffffff'; x.fillText(ln, W / 2, 35 + lh * sc * (i + .5)); });
+  if (cap.src) { x.font = '700 32px ReemKufi'; x.fillStyle = '#e2b765'; x.fillText('— ' + cap.src + ' —', W / 2, hh - 55); }
+  const r = { c, h: hh }; capCache.set(cap, r); return r;
+}
+function captions(c, t) {
+  for (const cap of CAPS) { if (t < cap.s || t > cap.e) continue;
+    const a = ss(cap.s, cap.s + .35, t) * (1 - ss(cap.e - .35, cap.e, t)), im = capImg(cap), y = H * .755 + (1 - eOut((t - cap.s) / .4)) * 30;
+    c.save(); c.globalAlpha = a; c.drawImage(im.c, 0, y); c.restore(); }
+}
+
+const SCENES = [
+  { s: 0, e: 12.3, f: sc1 }, { s: 11.8, e: 22.3, f: sc2 }, { s: 21.8, e: 34.3, f: sc3 }, { s: 33.8, e: 46.3, f: sc4 },
+  { s: 45.8, e: 56.3, f: sc5 }, { s: 55.8, e: 64.3, f: sc6 }, { s: 63.8, e: 74.3, f: sc7 }, { s: 73.8, e: 84, f: sc8 },
+];
+const VIG = mk(); { const x = VIG.getContext('2d'); const g = x.createRadialGradient(W / 2, H / 2, W * .4, W / 2, H / 2, H * .66); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.55)'); x.fillStyle = g; x.fillRect(0, 0, W, H); }
+const GRAIN = Array.from({ length: 6 }, (_, k) => { const c = mk(270, 480), x = c.getContext('2d'), id = x.createImageData(270, 480), r = rng(9 + k); for (let i = 0; i < id.data.length; i += 4) { const v = r() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 255; } x.putImageData(id, 0, 0); return c; });
+function renderAt(t) {
+  t = clamp(t, 0, DUR);
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+  for (const sc of SCENES) { if (t < sc.s || t > sc.e) continue; const a = sc.s > 0 ? ss(sc.s, sc.s + .5, t) : 1;
+    bctx.setTransform(1, 0, 0, 1, 0, 0); bctx.globalAlpha = 1; bctx.globalCompositeOperation = 'source-over'; bctx.shadowBlur = 0; bctx.clearRect(0, 0, W, H);
+    bctx.save(); sc.f(bctx, t - sc.s); bctx.restore(); ctx.globalAlpha = a; ctx.drawImage(buf, 0, 0); ctx.globalAlpha = 1; }
+  ctx.drawImage(VIG, 0, 0); ctx.save(); ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = .045; ctx.drawImage(GRAIN[Math.floor(t * FPS) % 6], 0, 0, W, H); ctx.restore();
+  captions(ctx, t);
+  const fade = Math.max(1 - ss(0, .7, t), ss(DUR - 1, DUR, t)); if (fade > 0) { ctx.globalAlpha = fade; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
+}
+const params = new URLSearchParams(location.search);
+(async () => {
+  await Promise.all(['700 54px Amiri', '700 50px ReemKufi'].map(f => document.fonts.load(f, 'المفلس'))); await document.fonts.ready;
+  window.renderAt = renderAt; window.DUR = DUR; window.FPS = FPS;
+  window.frameJPEG = (t, q = .93) => { renderAt(t); return cv.toDataURL('image/jpeg', q); };
+  if (params.has('render')) { document.body.classList.add('render'); window.READY = true; return; }
+  const aud = document.getElementById('aud'), btn = document.getElementById('play'), seek = document.getElementById('seek'), tm = document.getElementById('tm');
+  let playing = false, t0 = 0, base = 0, cur = 0;
+  btn.onclick = () => { playing = !playing; btn.textContent = playing ? '❚❚' : '▶'; if (playing) { t0 = performance.now(); base = cur; aud.currentTime = cur; aud.play().catch(() => {}); } else aud.pause(); };
+  seek.oninput = () => { cur = +seek.value; base = cur; t0 = performance.now(); aud.currentTime = cur; };
+  (function loop() { if (playing) { cur = base + (performance.now() - t0) / 1000; if (cur >= DUR) { cur = DUR; playing = false; btn.textContent = '▶'; aud.pause(); } } renderAt(cur); seek.value = cur; tm.textContent = Math.floor(cur / 60) + ':' + String(Math.floor(cur % 60)).padStart(2, '0'); requestAnimationFrame(loop); })();
+  window.READY = true;
+})();
+</script>
+</body>
+</html>
