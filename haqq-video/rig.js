@@ -216,11 +216,11 @@ function sparkle(c, x, y, s, a = 1) { c.save(); c.globalAlpha = a; c.fillStyle =
 
 /* ---------------- reusable motions (return pose overrides) ---------------- */
 const MOVES = {
-  idle(st, t) { const b = Math.sin(t * 2.2); return { bob: b * .012, head: Math.sin(t * .9) * .05, handL: [-st.P.sw - .1, -st.P.T + .1 + st.P.up + st.P.fore - .05 + b * .01], handR: [st.P.sw + .1, -st.P.T + .1 + st.P.up + st.P.fore - .05 - b * .01] }; },
+  idle(st, t) { const b = Math.sin(t * 2.2), w = Math.sin(t * .75); return { bob: b * .012, hipX: w * .025, lean: -w * .02, head: Math.sin(t * .9) * .05 + w * .02, handL: [-st.P.sw - .1, -st.P.T + .1 + st.P.up + st.P.fore - .05 + b * .01], handR: [st.P.sw + .1, -st.P.T + .1 + st.P.up + st.P.fore - .05 - b * .01] }; },
   walk(st, t, speed = 1, carry = false) {
     const P = st.P, ph = t * 5.5 * speed, s1 = Math.sin(ph), c1 = Math.cos(ph), hipH = (P.thigh + P.shin) * .97;
     const stride = .26;
-    const o = { bob: -Math.abs(Math.sin(ph)) * .035 + .02, lean: .05, head: .02,
+    const o = { bob: -Math.abs(Math.sin(ph)) * .035 + .02, lean: .05 + Math.sin(ph * 2) * .018, head: .02 + Math.sin(ph * 2 + .6) * .025, hipX: Math.sin(ph) * .012,
       footL: [-s1 * stride, hipH], footR: [s1 * stride, hipH], liftL: Math.max(0, c1) * .12, liftR: Math.max(0, -c1) * .12, kneeL: 1, kneeR: 1 };
     if (carry) { o.handL = [.22, -P.T + .62]; o.handR = [.34, -P.T + .62]; o.elbowL = 1; o.elbowR = 1; o.lean = -.04; }
     else { o.handL = [s1 * .28 - .05, -P.T + .1 + P.up + P.fore - .1]; o.handR = [-s1 * .28 + .05, -P.T + .1 + P.up + P.fore - .1]; o.elbowL = 1; o.elbowR = 1; }
