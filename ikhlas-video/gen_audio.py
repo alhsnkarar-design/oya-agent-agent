@@ -3,7 +3,7 @@ chair squeaks, calendar pages, night crickets, scale creak, chimes — synced to
 import numpy as np, wave, os
 from scipy.signal import butter, sosfilt
 
-SR, DUR = 48000, 96.0
+SR, DUR = 48000, 102.0
 N = int(SR * DUR); t = np.arange(N) / SR
 rng = np.random.default_rng(23)
 def noise(n=N): return rng.standard_normal(n)
@@ -57,8 +57,8 @@ for t0 in (56.6, 58.1, 60.3, 61.6): put(chime(2400, .2), t0, .2, .6)            
 for i in range(3): put(chime(784, 2), .3 + i * .5, .35, (i - 1) * .4)
 put(sparkle(), 4.6, .8); put(chime(660, 2.5), 6.4, .5)
 put(chime(523, 4), 77.4, .6); put(boom(45, 2.5), 81.6, .4)
-footsteps(86, 88, .6, .6, .3); put(paper(.4), 88.4, 1); footsteps(89.4, 92, .55, .6, -.3)
-put(chime(784, 3), 92.8, .8); put(chime(1175, 3), 92.85, .45)
+footsteps(86, 88, .6, .6, .3); put(paper(.4), 88.4, 1); footsteps(89.4, 91, .55, .6, -.3); put(chime(523, 3), 91.2, .4)
+put(chime(784, 3), 95.6, .8); put(chime(1175, 3), 95.65, .45)
 for b in (10.8, 18.9, 32.8, 40.9, 54.8, 62.9, 76.8, 85.8): put(whoosh(), b, .9, -.2)
 
 def verb(x):

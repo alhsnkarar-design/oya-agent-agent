@@ -17,12 +17,12 @@ body.render #ui{display:none}
 </head>
 <body>
 <canvas id="c"></canvas>
-<div id="ui"><button id="play">▶</button><input id="seek" type="range" min="0" max="96" step="0.01" value="0"><span id="tm">0:00</span></div>
+<div id="ui"><button id="play">▶</button><input id="seek" type="range" min="0" max="102" step="0.01" value="0"><span id="tm">0:00</span></div>
 <audio id="aud" src="soundtrack.wav" preload="auto"></audio>
 <script src="rig.js"></script>
 <script>
 /* «الثلاثة أول من يُقضى عليهم يوم القيامة» — صحيح مسلم 1905، شخصيات بلا ملامح وجه، كابشن بالفصحى. */
-const W = 1080, H = 1920, FPS = 30, DUR = 96;
+const W = 1080, H = 1920, FPS = 30, DUR = 102;
 const cv = document.getElementById('c'); cv.width = W; cv.height = H; const ctx = cv.getContext('2d');
 const mk = (w = W, h = H) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
 const buf = mk(), bctx = buf.getContext('2d');
@@ -123,7 +123,7 @@ const FILM = (st, t) => ({ handR: [st.P.sw + .25, -st.P.T + .1], elbowR: 1, prop
 function crowdRow(c, t, y, s, n, x0, x1, move, back, alpha = 1) { c.save(); c.globalAlpha = alpha; for (let i = 0; i < n; i++) { const st = CROWD[i % CROWD.length], x = lerp(x0, x1, n > 1 ? i / (n - 1) : .5);
   const p = Object.assign(basePose(st), st === EL ? ELDER(t) : {}, move(st, t, i), back ? { back: true } : {}); p.face = x < W / 2 ? 1 : -1; drawChar(c, x, y, s, st, p); } c.restore(); }
 function praiseBursts(c, x, y, t, a) { if (a <= 0) return; for (let i = 0; i < 7; i++) { const ph = (t * .8 + i / 7) % 1, an = -Math.PI / 2 + (i - 3) * .35, r = 80 + ph * 260; sparkle(c, x + Math.cos(an) * r, y + Math.sin(an) * r * .7, 16 * (1 - ph) + 6, a * (1 - ph)); } }
-function blessings(c, x, y, k, t) { for (let i = 0; i < 6; i++) { const an = i / 6 * TAU + t * .4, r = 230; const ki = clamp(k * 6 - i); if (ki <= 0) continue; glow(c, SP.gold, x + Math.cos(an) * r, y + Math.sin(an) * r * .45, 90, .6 * ki); c.save(); c.globalAlpha = ki; c.fillStyle = '#fff3c8'; c.beginPath(); c.arc(x + Math.cos(an) * r, y + Math.sin(an) * r * .45, 12, 0, TAU); c.fill(); c.restore(); } }
+function blessings(c, x, y, k, t, kinds) { for (let i = 0; i < 6; i++) { const an = i / 6 * TAU + t * .35, r = 270; const ki = clamp(k * 6 - i); if (ki <= 0) continue; iconBless(c, kinds[i], x + Math.cos(an) * r, y + Math.sin(an) * r * .42, 52 * eBack(ki), ki); } }
 function deedOrb(c, x, y, s, crack, t) { // the golden deed; cracks and turns to dust at «كذبت»
   if (crack >= 1) return; const a = 1 - ss(.55, 1, crack);
   glow(c, SP.gold, x, y, s * 6 * (1 - crack * .6), .6 * a);
@@ -131,17 +131,32 @@ function deedOrb(c, x, y, s, crack, t) { // the golden deed; cracks and turns to
   if (crack > 0) { c.strokeStyle = '#2a1608'; c.lineWidth = 4; c.beginPath(); c.moveTo(x - s * .1, y - s); c.lineTo(x + s * .15, y - s * .2); c.lineTo(x - s * .2, y + s * .2); c.lineTo(x + s * .05, y + s); c.moveTo(x + s * .15, y - s * .2); c.lineTo(x + s * .8, y - s * .1); c.stroke(); }
   c.restore(); if (crack > .5) dust(c, x, y, (crack - .5) * 2, 50);
 }
+function chapterTag(c, lt, num, title) { const a = ss(.3, .8, lt) * (1 - ss(7.2, 7.8, lt)); if (a <= 0) return; c.save(); c.globalAlpha = a; c.direction = 'rtl'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  const y = H * .085 + (1 - eOut((lt - .3) / .5)) * -30; c.fillStyle = 'rgba(8,6,10,.6)'; c.beginPath(); c.roundRect(W / 2 - 250, y - 62, 500, 124, 30); c.fill(); c.strokeStyle = 'rgba(232,190,110,.7)'; c.lineWidth = 3; c.stroke();
+  c.font = '700 30px ReemKufi'; c.fillStyle = '#e2b765'; c.fillText(num, W / 2, y - 26); c.font = '700 52px ReemKufi'; c.fillStyle = '#ffffff'; c.shadowColor = 'rgba(0,0,0,.8)'; c.shadowBlur = 10; c.fillText(title, W / 2, y + 20); c.restore(); }
+function iconBless(c, kind, x, y, s, a) { c.save(); c.globalAlpha = a; glow(c, SP.gold, x, y, s * 4, .45 * a);
+  if (kind === 'heart') heart(c, x, y + s * .3, s * .8, a);
+  else if (kind === 'sun') { c.fillStyle = '#ffe39a'; c.beginPath(); c.arc(x, y, s * .45, 0, TAU); c.fill(); c.strokeStyle = '#ffe39a'; c.lineWidth = s * .12; for (let i = 0; i < 8; i++) { const an = i * TAU / 8; c.beginPath(); c.moveTo(x + Math.cos(an) * s * .62, y + Math.sin(an) * s * .62); c.lineTo(x + Math.cos(an) * s * .9, y + Math.sin(an) * s * .9); c.stroke(); } }
+  else if (kind === 'book') { c.translate(x, y + s * .3); c.scale(s * 1.6, s * 1.6); PROPS.book(c); }
+  else if (kind === 'lamp') { c.fillStyle = '#c9a046'; c.beginPath(); c.ellipse(x, y + s * .25, s * .6, s * .22, 0, 0, TAU); c.fill(); c.fillStyle = '#fff3c8'; c.beginPath(); c.moveTo(x + s * .5, y); c.quadraticCurveTo(x + s * .75, y - s * .4, x + s * .55, y - s * .7); c.quadraticCurveTo(x + s * .35, y - s * .35, x + s * .5, y); c.fill(); }
+  else if (kind === 'coin') coin(c, x, y, s * .5, a);
+  else if (kind === 'house') { c.fillStyle = '#e8d2ae'; c.fillRect(x - s * .5, y - s * .1, s, s * .6); c.fillStyle = '#c0392b'; c.beginPath(); c.moveTo(x - s * .65, y - s * .1); c.lineTo(x, y - s * .6); c.lineTo(x + s * .65, y - s * .1); c.fill(); c.fillStyle = '#6b4226'; c.fillRect(x - s * .12, y + s * .15, s * .24, s * .35); }
+  c.restore(); }
+const BLESS = { WA: ['heart', 'sun', 'heart', 'sun', 'heart', 'sun'], SC: ['book', 'lamp', 'book', 'lamp', 'book', 'lamp'], DO: ['coin', 'house', 'coin', 'house', 'coin', 'house'] };
 function lightFromAbove(c, a) { c.save(); c.globalCompositeOperation = 'lighter'; const g = c.createLinearGradient(0, 0, 0, GY); g.addColorStop(0, `rgba(255,236,190,${.3 * a})`); g.addColorStop(1, 'rgba(255,236,190,0)'); c.fillStyle = g; c.beginPath(); c.moveTo(W / 2 - 90, 0); c.lineTo(W / 2 + 90, 0); c.lineTo(W / 2 + 300, GY + 40); c.lineTo(W / 2 - 300, GY + 40); c.fill(); c.restore(); }
 function echoCrowd(c, t, a) { if (a <= 0) return; c.save(); c.globalAlpha = .3 * a; crowdRow(c, t, GY - 60, 105, 3, W * .06, W * .3, CHEER, false); crowdRow(c, t, GY - 60, 105, 3, W * .7, W * .94, CHEER, false); c.restore(); }
 
 /* each part: 0–8 the deed in the world · 8–15 brought & claims · 15–19.5 «كذبت… فقد قيل» · 19.5–22 the fall */
-function judgment(c, lt, st, deedProp) {
+function judgment(c, lt, st, deedProp, kinds) {
   judgmentBG(c, lt); lightFromAbove(c, ss(8, 9.5, lt));
+  const qp = lt - 11.2; if (qp > 0 && qp < 1.6) { c.save(); c.globalCompositeOperation = 'lighter'; c.strokeStyle = `rgba(255,230,170,${.6 * (1 - qp / 1.6)})`; c.lineWidth = 10; c.beginPath(); c.ellipse(W / 2, GY - S * 1.3, 120 + qp * 420, 40 + qp * 120, 0, 0, TAU); c.stroke(); c.restore(); }
   const x = W / 2, claim = ss(11.2, 12, lt), crack = ss(15.6, 18.2, lt), fall = ss(19.5, 21.8, lt);
   echoCrowd(c, lt, ss(15.4, 16.2, lt) * (1 - ss(18.8, 19.6, lt)));
-  blessings(c, x, GY - S * 1.6, ss(9, 11, lt) * (1 - ss(15, 16, lt)), lt);
+  blessings(c, x, GY - S * 1.6, ss(9, 11, lt) * (1 - ss(15, 16, lt)), lt, kinds);
   const p = Object.assign(MOVES.idle(st, lt), claim > 0 && crack < .3 ? { handL: [-.05, -st.P.T + .3], handR: [.05, -st.P.T + .3], elbowL: 1, elbowR: -1, head: -.15 } : {}, crack > .3 ? { head: .15, nod: .9, lean: .08 } : {}, { propR: deedProp && crack < .3 ? deedProp : null });
-  c.save(); c.globalAlpha = 1 - fall; drawChar(c, x, GY + fall * 220, S, st, p); c.restore();
+  if (fall > 0) { p.lean = .25 + fall * .4; p.nod = 1.2; p.head = .3; p.handL = [-.4, -st.P.T + .2]; p.handR = [.3, -st.P.T + .2]; }
+  c.save(); c.globalAlpha = 1 - ss(.55, 1, fall); c.translate(x - fall * 420, GY + fall * 160); c.rotate(-fall * .55); drawChar(c, 0, 0, S, st, p); c.restore();
+  if (fall > 0) for (let i = 0; i < 5; i++) { const yy = GY - S * (.3 + i * .45) + fall * 160; c.strokeStyle = `rgba(20,4,4,${.7 * fall})`; c.lineWidth = 14 - i * 2; c.beginPath(); c.moveTo(-20, yy + 60); c.quadraticCurveTo(x * .5, yy - 30 + Math.sin(lt * 4 + i) * 20, x - fall * 420, yy); c.stroke(); }
   if (claim > 0) deedOrb(c, x, GY - S * 3.3, 70 * claim, crack, lt);
   glow(c, SP.red, x, H * .78, 1500 * fall, .5 * fall); glow(c, SP.warm, x, H * .82, 800 * fall, .4 * fall);
   if (lt > 21.2) { c.fillStyle = `rgba(0,0,0,${ss(21.2, 22, lt) * .7})`; c.fillRect(0, 0, W, H); }
@@ -160,11 +175,12 @@ function p1(c, lt) {
     c.fillStyle = vgrad(c, 0, GY, [[0, '#c98a4a'], [1, '#f0c890']]); c.fillRect(0, 0, W, H); glow(c, SP.warm, W * .7, H * .15, 900, .5);
     c.fillStyle = vgrad(c, GY - 20, H, [[0, '#b08050'], [1, '#5a3e24']]); c.fillRect(0, GY - 20, W, H);
     for (let i = 0; i < 5; i++) { const bx = W * (.1 + i * .2); c.fillStyle = '#3a2418'; c.fillRect(bx, GY - 420, 8, 420); c.fillStyle = i % 2 ? '#7a1f2a' : '#2a4a6a'; c.beginPath(); c.moveTo(bx + 8, GY - 420); c.quadraticCurveTo(bx + 90, GY - 400 + Math.sin(lt * 3 + i) * 14, bx + 150, GY - 380); c.lineTo(bx + 8, GY - 330); c.fill(); }
+    c.fillStyle = 'rgba(60,36,24,.55)'; for (let i = 0; i < 26; i++) { const ax = i * 44 + 10, ay = GY - 70 + Math.sin(i * 2.1) * 6; c.beginPath(); c.arc(ax, ay - 34, 10, 0, TAU); c.fill(); c.fillRect(ax - 9, ay - 24, 18, 30); c.fillRect(ax + 8, ay - 80, 3, 80); }
     for (let i = 0; i < 40; i++) { const ph = (lt * .3 + i / 40) % 1; c.fillStyle = `rgba(200,160,110,${.25 * (1 - ph)})`; c.beginPath(); c.arc((i * 97) % W + ph * 200, GY - ph * 300, 20 + ph * 60, 0, TAU); c.fill(); }
     const swing = Math.sin(lt * 5) > 0 ? 1 : 0, k = eOut((lt % (Math.PI * 2 / 5)) / .2);
     const p = Object.assign(MOVES.walk(WA, lt, 1.2), { handR: swing ? [WA.P.sw + .7, -WA.P.T + .2] : [WA.P.sw + .2, -WA.P.T - .55], elbowR: 1, propR: PROPS.sword, lean: .1 }); p.face = 1; drawChar(c, lerp(W * .25, W * .55, eInOut(lt / 6)), GY + 40, S, WA, p);
-    crowdRow(c, lt, GY + 330, 118, 6, W * .06, W * .94, CHEER, true, ss(2.5, 3.2, lt)); praiseBursts(c, W * .5, GY - S * 2.2, lt, ss(3, 3.6, lt));
-  } else judgment(c, lt, WA, null);
+    crowdRow(c, lt, GY + 330, 118, 6, W * .06, W * .94, CHEER, true, ss(2.5, 3.2, lt)); praiseBursts(c, W * .5, GY - S * 2.2, lt, ss(3, 3.6, lt)); chapterTag(c, lt, 'الأول', 'المقاتل');
+  } else judgment(c, lt, WA, null, BLESS.WA);
 }
 // 2 · 33–55 the scholar & reciter
 function p2(c, lt) {
@@ -175,8 +191,8 @@ function p2(c, lt) {
     for (let i = 0; i < 2; i++) { c.save(); c.globalCompositeOperation = 'lighter'; c.fillStyle = 'rgba(255,240,200,.08)'; c.beginPath(); c.moveTo(W * (.15 + i * .7), 0); c.lineTo(W * (.17 + i * .7), 0); c.lineTo(W / 2 + 120, GY); c.lineTo(W / 2 - 120, GY); c.fill(); c.restore(); }
     const p = Object.assign(MOVES.idle(SC, lt), { handR: [SC.P.sw + .35, -SC.P.T + .45], elbowR: 1, propR: PROPS.book, handL: [-SC.P.sw - .3, -SC.P.T + .1 + Math.sin(lt * 3) * .1], elbowL: 1 }); drawChar(c, W / 2, GY - 30, S, SC, p);
     c.fillStyle = 'rgba(0,0,0,.3)'; c.fillRect(0, GY + 10, W, H);
-    crowdRow(c, lt, GY + 320, 118, 7, W * .05, W * .95, CLAP, true, ss(2, 2.6, lt)); praiseBursts(c, W / 2, GY - S * 2.3, lt, ss(2.6, 3.2, lt));
-  } else judgment(c, lt, SC, PROPS.book);
+    crowdRow(c, lt, GY + 320, 118, 7, W * .05, W * .95, CLAP, true, ss(2, 2.6, lt)); praiseBursts(c, W / 2, GY - S * 2.3, lt, ss(2.6, 3.2, lt)); chapterTag(c, lt, 'الثاني', 'العالِمُ القارئ');
+  } else judgment(c, lt, SC, PROPS.book, BLESS.SC);
 }
 // 3 · 55–77 the giver — filmed and praised (today's mirror of «ليُقال: جواد»)
 function p3(c, lt) {
@@ -187,8 +203,8 @@ function p3(c, lt) {
     // onlookers filming with phones
     [[YO, W * .86, 0], [ME, W * .1, 1]].forEach(([st, x, i]) => { const f = Object.assign(basePose(st), FILM(st, lt)); f.face = x < W / 2 ? 1 : -1; drawChar(c, x, GY + 60, S * .85, st, f);
       if (Math.sin(lt * 4 + i * 2) > .85) glow(c, SP.white, x + f.face * S * .85 * .6, GY + 60 - S * .85 * 2.2, 260, .8); });
-    praiseBursts(c, W * .32, GY - S * 2.4, lt, ss(2.6, 3.2, lt));
-  } else judgment(c, lt, DO, PROPS.coins);
+    praiseBursts(c, W * .32, GY - S * 2.4, lt, ss(2.6, 3.2, lt)); chapterTag(c, lt, 'الثالث', 'المُنفِق');
+  } else judgment(c, lt, DO, PROPS.coins, BLESS.DO);
 }
 // 4 · 77–86 hadith qudsi: a deed shared with another — left to that partner
 function p4(c, lt) {
@@ -201,8 +217,15 @@ function p4(c, lt) {
 }
 // 5 · 86–96 the remedy: deeds in secret, then the channel mark
 function p5(c, lt) {
-  if (lt > 6.6) { const u = lt - 6.6; c.fillStyle = vgrad(c, 0, H, [[0, '#0d1422'], [1, '#05070d']]); c.fillRect(0, 0, W, H); glow(c, SP.gold, W / 2, H * .38, 1100, .4 * ss(0, 1, u));
+  if (lt > 9.6) { const u = lt - 9.6; c.fillStyle = vgrad(c, 0, H, [[0, '#0d1422'], [1, '#05070d']]); c.fillRect(0, 0, W, H); glow(c, SP.gold, W / 2, H * .38, 1100, .4 * ss(0, 1, u));
     const s = 520 * eBack(u / 1.1); if (LOGO.complete && s > 1) { c.save(); c.globalAlpha = ss(0, .6, u); c.drawImage(LOGO, W / 2 - s / 2, H * .38 - s / 2, s, s); c.restore(); } return; }
+  if (lt > 5.2) { const u = lt - 5.2; // a quiet lamp-lit corner: he teaches one student — no stage, no applause
+    c.fillStyle = vgrad(c, 0, H, [[0, '#1a1410'], [1, '#0a0806']]); c.fillRect(0, 0, W, H); glow(c, SP.warm, W / 2, GY - 260, 1200, .5);
+    c.fillStyle = '#3a2618'; c.fillRect(0, GY - 10, W, H); c.fillStyle = '#5a1420'; c.fillRect(W * .2, GY - 6, W * .6, 30);
+    c.fillStyle = '#c9a046'; c.beginPath(); c.ellipse(W / 2, GY - 30, 40, 14, 0, 0, TAU); c.fill(); c.fillStyle = '#fff3c8'; c.beginPath(); c.moveTo(W / 2 + 30, GY - 36); c.quadraticCurveTo(W / 2 + 46, GY - 70 + Math.sin(u * 8) * 4, W / 2 + 34, GY - 92); c.quadraticCurveTo(W / 2 + 22, GY - 66, W / 2 + 30, GY - 36); c.fill(); glow(c, SP.gold, W / 2 + 34, GY - 70, 260, .7);
+    const a = Object.assign(basePose(SC), { hipH: .3, footL: [-.42, .3], footR: [.42, .3], kneeL: -1, kneeR: 1, handR: [SC.P.sw + .35, -SC.P.T + .5], elbowR: 1, propR: PROPS.book, handL: [-.3, -.05], elbowL: 1, nod: .3 }); a.face = 1; drawChar(c, W * .3, GY + 30, S, SC, a);
+    const b = Object.assign(basePose(YO), { hipH: .3, footL: [-.42, .3], footR: [.42, .3], kneeL: -1, kneeR: 1, handL: [-.2, -.02], handR: [.2, -.02], elbowL: 1, elbowR: -1, head: -.05 + Math.max(0, Math.sin(u * 2.4)) * .08 }); b.face = -1; drawChar(c, W * .7, GY + 30, S * .9, YO, b);
+    return; }
   // night alley: he leaves the bag at a door, looks around, walks away unseen
   c.fillStyle = vgrad(c, 0, GY, [[0, '#070b1c'], [1, '#1d2440']]); c.fillRect(0, 0, W, H); stars(c, lt, .8);
   c.fillStyle = '#2a2433'; c.fillRect(W * .55, GY - 700, 500, 700); c.fillStyle = '#4a3226'; arch(c, W * .78, GY, 200, 380); c.fill(); c.fillStyle = 'rgba(255,200,120,.25)'; c.fillRect(W * .7, GY - 520, 90, 110);
@@ -221,13 +244,15 @@ function partCaps(P, a, b, c2, d) { return [
   { s: P + 19.6, e: P + 21.8, h: 1, l: d },
 ]; }
 const CAPS = [
-  { s: .5, e: 5.9, h: 0, l: ['أعمالٌ عظيمة…', 'جهادٌ، وعلمٌ، وصدقة'] },
+  { s: .5, e: 5.9, h: 0, l: ['جهادٌ… وعلمٌ… وصدقة…', 'فلماذا كانوا أوّلَ من يُقضى عليهم؟'], hl: [[.5, 2.8, 'جهادٌ… وعلمٌ… وصدقة…'], [2.8, 5.9, 'فلماذا كانوا أوّلَ من يُقضى عليهم؟']] },
   { s: 6.2, e: 10.8, h: 1, l: ['«إنّ أولَ الناسِ يُقضى', 'يومَ القيامةِ عليه…»'], src: 'رواه مسلم (١٩٠٥)' },
   ...partCaps(11, ['«رجلٌ استُشهد، فأُتي به', 'فعرّفه نِعَمَه فعرفها»'], ['قال: فما عملتَ فيها؟', 'قال: قاتلتُ فيك حتى استُشهدت'], ['قال: كذبتَ،', 'ولكنك قاتلتَ لأن يُقال: جريء، فقد قيل'], ['ثم أُمر به فسُحب على وجهه', 'حتى أُلقي في النار']),
   ...partCaps(33, ['«ورجلٌ تعلّم العلمَ وعلّمه،', 'وقرأ القرآن…»'], ['قال: فما عملتَ فيها؟', 'قال: تعلّمتُ العلمَ وعلّمتُه، وقرأتُ فيك القرآن'], ['قال: كذبتَ،', 'ولكنك تعلّمتَ ليُقال: عالم، وقرأتَ ليُقال: هو قارئ، فقد قيل'], ['ثم أُمر به فسُحب على وجهه', 'حتى أُلقي في النار']),
   ...partCaps(55, ['«ورجلٌ وسّع اللهُ عليه،', 'وأعطاه من أصناف المال كلِّه…»'], ['قال: فما عملتَ فيها؟', 'قال: ما تركتُ من سبيلٍ تحبّ أن يُنفَق فيها إلا أنفقتُ فيها لك'], ['قال: كذبتَ،', 'ولكنك فعلتَ ليُقال: هو جواد، فقد قيل'], ['ثم أُمر به فسُحب على وجهه', 'ثم أُلقي في النار»']),
   { s: 77.3, e: 85.7, h: 1, l: ['«أنا أغنى الشركاء عن الشرك،', 'من عمل عملًا أشرك فيه معي غيري، تركتُه وشِركَه»'], hl: [[77.3, 81, '«أنا أغنى الشركاء عن الشرك،'], [81, 85.7, 'من عمل عملًا أشرك فيه معي غيري، تركتُه وشِركَه»']], src: 'حديث قدسي — رواه مسلم (٢٩٨٥)' },
-  { s: 86.2, e: 92.4, h: 0, l: ['أخفِ عملك كما تُخفي ذنبك…', 'واجعله لله وحده'] },
+  { s: 86.2, e: 90.9, h: 0, l: ['تصدّق في السرّ…', 'كما تُخفي ذنبك'] },
+  { s: 91.1, e: 95.4, h: 0, l: ['وعلّم لوجه الله…', 'لا لتصفيق الناس'] },
+  { s: 95.6, e: 101.4, h: 1, l: ['«إنّما الأعمالُ بالنيّات»'], src: 'متفق عليه' },
 ];
 const capCache = new Map();
 function capLayout(cap) { if (capCache.has(cap)) return capCache.get(cap);
@@ -247,7 +272,7 @@ function captions(c, t) {
 }
 const SCENES = [
   { s: 0, e: 11.4, f: p0 }, { s: 10.8, e: 33.4, f: (c, lt) => p1(c, lt - .2) }, { s: 32.8, e: 55.4, f: (c, lt) => p2(c, lt - .2) }, { s: 54.8, e: 77.4, f: (c, lt) => p3(c, lt - .2) },
-  { s: 76.8, e: 86.4, f: p4 }, { s: 85.8, e: 96, f: p5 },
+  { s: 76.8, e: 86.4, f: p4 }, { s: 85.8, e: 102, f: p5 },
 ];
 
 const VIG = mk(); { const x = VIG.getContext('2d'); const g = x.createRadialGradient(W / 2, H / 2, W * .4, W / 2, H / 2, H * .66); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.55)'); x.fillStyle = g; x.fillRect(0, 0, W, H); }
