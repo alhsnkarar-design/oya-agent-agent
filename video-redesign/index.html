@@ -28,7 +28,6 @@ canvas{position:absolute;left:0;top:0}
 .glass{background:linear-gradient(160deg,rgba(32,34,56,.92),rgba(16,17,30,.92));border-radius:28px}
 #pill{left:50%;top:64px;transform:translateX(-50%);padding:8px 26px;border-radius:40px;font-size:28px;font-weight:700;direction:rtl;
  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(6px);white-space:nowrap}
-#wm{left:0;width:1080px;top:1868px;text-align:center;font-size:26px;font-weight:700;opacity:.35;letter-spacing:1px}
 /* cards */
 .card{position:absolute;left:160px;width:760px;height:136px;display:flex;align-items:center;justify-content:flex-start;gap:28px;padding:0 34px;direction:rtl;font-size:62px;font-weight:800}
 .ico{width:76px;height:76px;border-radius:20px;display:flex;align-items:center;justify-content:center}
@@ -143,7 +142,7 @@ svg{overflow:visible}
   <div class="scene" id="s5">
    <svg class="abs" width="1080" height="1920" style="left:0;top:0">
     <defs>
-     <filter id="g2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+     <filter id="g2" filterUnits="userSpaceOnUse" x="0" y="0" width="1080" height="1920"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
     </defs>
     <path id="pW" d="M1010,1000 L640,1000" stroke="#fff" stroke-width="10" fill="none" stroke-linecap="round" filter="url(#g2)"/>
     <path id="pG" d="M640,1000 C470,1000 380,640 150,610" stroke="#2EE6B6" stroke-width="10" fill="none" stroke-linecap="round" filter="url(#g2)"/>
@@ -169,76 +168,54 @@ svg{overflow:visible}
    </div>
   </div>
 
-  <!-- ============ CHARACTERS ============ -->
-  <svg class="chr" id="founder" viewBox="-200 -560 400 600">
+  <!-- ============ CHARACTERS (inanimate, faceless: bulb, coin, cursor, blocks) ============ -->
+  <svg class="abs" id="blocks" width="1080" height="1920" style="left:0;top:0;pointer-events:none">
    <defs>
-    <linearGradient id="hood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC24A"/><stop offset="1" stop-color="#F0801C"/></linearGradient>
-    <linearGradient id="sleeve" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F39424"/><stop offset="1" stop-color="#FFBE45"/></linearGradient>
-    <radialGradient id="skin" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#FFD9B5"/><stop offset="1" stop-color="#E9AE84"/></radialGradient>
+    <linearGradient id="blkHi" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/></linearGradient>
    </defs>
-   <ellipse id="fShadow" cx="0" cy="0" rx="110" ry="16" fill="#000" opacity=".45"/>
-   <g id="fBody">
-    <g id="fLegs">
-     <rect x="-56" y="-150" width="44" height="140" rx="20" fill="#2B3150"/>
-     <rect x="12" y="-150" width="44" height="140" rx="20" fill="#2B3150"/>
-     <ellipse cx="-40" cy="-10" rx="40" ry="17" fill="#F4F4F8"/><ellipse cx="40" cy="-10" rx="40" ry="17" fill="#F4F4F8"/>
-     <rect x="-78" y="-16" width="76" height="8" rx="4" fill="#FF4D6A"/><rect x="2" y="-16" width="76" height="8" rx="4" fill="#FF4D6A"/>
-    </g>
-    <g id="fArmL"><rect x="-112" y="-318" width="46" height="88" rx="23" fill="url(#sleeve)"/>
-     <g id="fForeL"><rect x="-110" y="-250" width="42" height="84" rx="21" fill="url(#sleeve)"/><rect x="-108" y="-182" width="38" height="14" rx="7" fill="#d9701a"/><circle cx="-89" cy="-160" r="22" fill="url(#skin)"/></g></g>
-    <g id="fArmR"><rect x="66" y="-318" width="46" height="88" rx="23" fill="url(#sleeve)"/>
-     <g id="fForeR"><rect x="68" y="-250" width="42" height="84" rx="21" fill="url(#sleeve)"/><rect x="70" y="-182" width="38" height="14" rx="7" fill="#d9701a"/>
-      <g id="hammer" opacity="0"><rect x="84" y="-250" width="12" height="110" rx="6" fill="#8a5a34" transform="rotate(-90 89 -160)"/><rect x="138" y="-196" width="30" height="72" rx="8" fill="#9aa3b5" transform="rotate(-90 89 -160)"/></g>
-      <circle cx="89" cy="-160" r="22" fill="url(#skin)"/></g></g>
-    <path d="M-96,-300 Q-112,-160 -86,-128 L86,-128 Q112,-160 96,-300 Q62,-348 0,-348 Q-62,-348 -96,-300Z" fill="url(#hood)"/>
-    <path d="M-56,-200 L56,-200 L46,-150 L-46,-150Z" fill="#E0761A" opacity=".8"/>
-    <ellipse cx="0" cy="-338" rx="64" ry="22" fill="#D96E14"/>
-    <path d="M-22,-330 L-26,-268 M22,-330 L26,-268" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
-    <circle cx="-26" cy="-264" r="6" fill="#fff"/><circle cx="26" cy="-264" r="6" fill="#fff"/>
-    <circle cx="0" cy="-240" r="22" fill="#151726"/><text x="0" y="-229" text-anchor="middle" font-family="Cairo" font-weight="900" font-size="30" fill="#FFB020">Z</text>
-    <rect x="-18" y="-372" width="36" height="40" rx="10" fill="#E2A47A"/>
-    <g id="fHead">
-     <circle cx="-80" cy="-452" r="17" fill="#E9AE84"/><circle cx="80" cy="-452" r="17" fill="#E9AE84"/>
-     <ellipse cx="0" cy="-455" rx="82" ry="88" fill="url(#skin)"/>
-     <path d="M-86,-468 Q-96,-566 0,-566 Q96,-566 86,-468 Q74,-514 34,-508 Q8,-536 -24,-506 Q-70,-520 -86,-468Z" fill="#2A1B14"/>
-     <path d="M-10,-560 Q20,-600 40,-560" fill="#2A1B14"/>
-     <ellipse cx="-56" cy="-424" rx="15" ry="8" fill="#ff7a8a" opacity=".45"/><ellipse cx="56" cy="-424" rx="15" ry="8" fill="#ff7a8a" opacity=".45"/>
-     <g id="fEyes">
-      <g id="fEyeL" transform="translate(-34 -458)"><ellipse rx="16" ry="19" fill="#fff"/><g class="pup"><circle r="9.5" fill="#1b1b2a"/><circle cx="3.5" cy="-3.5" r="3.4" fill="#fff"/></g></g>
-      <g id="fEyeR" transform="translate(34 -458)"><ellipse rx="16" ry="19" fill="#fff"/><g class="pup"><circle r="9.5" fill="#1b1b2a"/><circle cx="3.5" cy="-3.5" r="3.4" fill="#fff"/></g></g>
-     </g>
-     <g fill="none" stroke="#1d1d2b" stroke-width="5"><circle cx="-34" cy="-458" r="27"/><circle cx="34" cy="-458" r="27"/><path d="M-7,-460 Q0,-466 7,-460"/></g>
-     <path id="fBrowL" d="M-54,-496 Q-36,-506 -16,-496" stroke="#2A1B14" stroke-width="8" fill="none" stroke-linecap="round"/>
-     <path id="fBrowR" d="M16,-496 Q36,-506 54,-496" stroke="#2A1B14" stroke-width="8" fill="none" stroke-linecap="round"/>
-     <path d="M0,-440 Q-6,-428 2,-424" stroke="#c98b63" stroke-width="4" fill="none" stroke-linecap="round"/>
-     <path id="fMouth" d="" fill="#7a2632" stroke="#5a1824" stroke-width="3" stroke-linejoin="round"/>
-     <g id="helmet" opacity="0"><path d="M-94,-478 Q-94,-596 0,-596 Q94,-596 94,-478Z" fill="#FFD23F" stroke="#d9a300" stroke-width="4"/><rect x="-10" y="-596" width="20" height="118" rx="8" fill="#FFE27A"/><rect x="-110" y="-490" width="220" height="18" rx="9" fill="#FFC300"/></g>
+  </svg>
+  <svg class="abs" id="bulb" width="240" height="340" viewBox="-120 -310 240 340" style="left:0;top:0">
+   <defs>
+    <radialGradient id="bGlow"><stop offset="0" id="bg0" stop-color="#FFB020" stop-opacity=".85"/><stop offset=".55" id="bg1" stop-color="#FFB020" stop-opacity=".25"/><stop offset="1" id="bg2" stop-color="#FFB020" stop-opacity="0"/></radialGradient>
+    <radialGradient id="bOn" cx=".45" cy=".42" r=".72"><stop offset="0" stop-color="#fffdf2"/><stop offset=".45" id="bOn1" stop-color="#FFE08A"/><stop offset="1" id="bOn2" stop-color="#FFB020"/></radialGradient>
+    <linearGradient id="screw" x1="0" x2="1"><stop offset="0" stop-color="#5d6276"/><stop offset=".42" stop-color="#eef1f8"/><stop offset=".6" stop-color="#c3c8d6"/><stop offset="1" stop-color="#4f5466"/></linearGradient>
+    <radialGradient id="floorGlow"><stop offset="0" id="fg0" stop-color="#FFB020" stop-opacity=".55"/><stop offset="1" id="fg1" stop-color="#FFB020" stop-opacity="0"/></radialGradient>
+   </defs>
+   <ellipse id="bFloor" cx="0" cy="2" rx="190" ry="34" fill="url(#floorGlow)"/>
+   <ellipse id="bShadow" cx="0" cy="2" rx="64" ry="11" fill="#000" opacity=".5"/>
+   <g id="bBody">
+    <circle id="bHalo" cx="0" cy="-185" r="230" fill="url(#bGlow)"/>
+    <path id="glassOff" d="M-36,-74 C-40,-112 -94,-132 -94,-192 C-94,-248 -52,-286 0,-286 C52,-286 94,-248 94,-192 C94,-132 40,-112 36,-74 Z" fill="rgba(190,205,255,.10)" stroke="rgba(255,255,255,.5)" stroke-width="4"/>
+    <path id="glassOn" d="M-36,-74 C-40,-112 -94,-132 -94,-192 C-94,-248 -52,-286 0,-286 C52,-286 94,-248 94,-192 C94,-132 40,-112 36,-74 Z" fill="url(#bOn)"/>
+    <path d="M-14,-76 L-14,-150 M14,-76 L14,-150" stroke="#8e94a8" stroke-width="4" stroke-linecap="round"/>
+    <path id="fil" d="M-14,-150 L-9,-166 L-4,-150 L1,-166 L6,-150 L11,-166 L14,-150" stroke="#fff3c4" stroke-width="5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M-60,-214 Q-66,-248 -38,-268" stroke="#fff" stroke-width="10" stroke-linecap="round" fill="none" opacity=".75"/>
+    <circle cx="-62" cy="-188" r="6" fill="#fff" opacity=".6"/>
+    <rect x="-42" y="-82" width="84" height="16" rx="7" fill="url(#screw)"/>
+    <rect x="-38" y="-66" width="76" height="14" rx="7" fill="url(#screw)"/>
+    <rect x="-38" y="-50" width="76" height="14" rx="7" fill="url(#screw)"/>
+    <rect x="-36" y="-34" width="72" height="13" rx="6" fill="url(#screw)"/>
+    <path d="M-26,-21 L26,-21 L15,-4 L-15,-4Z" fill="#2c3042"/>
+    <ellipse cx="0" cy="-3" rx="9" ry="5" fill="#d9b04e"/>
+   </g>
+  </svg>
+  <svg class="abs" id="coin" width="140" height="140" viewBox="-70 -70 140 140" style="left:0;top:0">
+   <ellipse id="cShadow" cx="0" cy="62" rx="40" ry="8" fill="#000" opacity=".45"/>
+   <g id="cBody">
+    <ellipse id="cEdge" cx="0" cy="0" rx="50" ry="50" fill="#b06a00"/>
+    <g id="cFace">
+     <circle r="50" fill="#FFB020"/><circle r="50" fill="none" stroke="#ffd56b" stroke-width="4"/>
+     <circle r="36" fill="none" stroke="#9a5c00" stroke-width="4" stroke-dasharray="3 5"/>
+     <text y="17" text-anchor="middle" font-size="50" font-weight="900" fill="#8a5200" font-family="Cairo">ج</text>
+     <path d="M-30,-30 Q-18,-42 -2,-44" stroke="#fff" stroke-width="6" stroke-linecap="round" fill="none" opacity=".7"/>
     </g>
    </g>
   </svg>
-
-  <svg class="chr" id="bot" viewBox="-200 -380 400 600" style="width:400px;height:600px">
-   <defs>
-    <linearGradient id="botg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A397FF"/><stop offset="1" stop-color="#3FD9C2"/></linearGradient>
-    <radialGradient id="flame" cx=".5" cy="0" r="1"><stop offset="0" stop-color="#fff"/><stop offset=".3" stop-color="#7ef9e0"/><stop offset="1" stop-color="rgba(46,230,182,0)"/></radialGradient>
-   </defs>
-   <ellipse id="bFlame" cx="0" cy="92" rx="26" ry="60" fill="url(#flame)"/>
-   <g id="bArmL"><ellipse cx="-84" cy="10" rx="16" ry="30" fill="#7d6cf0"/></g>
-   <g id="bArmR"><ellipse cx="84" cy="10" rx="16" ry="30" fill="#33c2ad"/></g>
-   <line x1="0" y1="-62" x2="0" y2="-94" stroke="#cfc9ff" stroke-width="6" stroke-linecap="round"/>
-   <circle id="bBulb" cx="0" cy="-100" r="11" fill="#FFB020"/>
-   <rect x="-72" y="-64" width="144" height="128" rx="44" fill="url(#botg)"/>
-   <rect x="-72" y="-64" width="144" height="60" rx="44" fill="#fff" opacity=".12"/>
-   <rect x="-56" y="-46" width="112" height="80" rx="28" fill="#0E1022"/>
-   <g id="bEyes"><rect id="bEL" x="-34" y="-24" width="20" height="28" rx="10" fill="#6FF7DA"/><rect id="bER" x="14" y="-24" width="20" height="28" rx="10" fill="#6FF7DA"/></g>
-   <g id="bHappy" opacity="0" stroke="#6FF7DA" stroke-width="7" fill="none" stroke-linecap="round"><path d="M-36,-4 Q-24,-22 -12,-4"/><path d="M12,-4 Q24,-22 36,-4"/></g>
-   <path d="M-12,16 Q0,24 12,16" stroke="#6FF7DA" stroke-width="5" fill="none" stroke-linecap="round"/>
-   <circle cx="-44" cy="14" r="6" fill="#ff7aa8" opacity=".7"/><circle cx="44" cy="14" r="6" fill="#ff7aa8" opacity=".7"/>
+  <svg class="abs" id="cursor" width="90" height="110" viewBox="-10 -10 90 110" style="left:0;top:0">
+   <path d="M0,0 L0,74 L18,57 L31,86 L45,80 L32,52 L56,52 Z" fill="#fff" stroke="#11121f" stroke-width="5" stroke-linejoin="round"/>
   </svg>
-
   <canvas id="fx" width="1080" height="1920"></canvas>
   <div class="abs" id="pill">بزنس من الصفر · <span style="color:#FFB020">الحلقة 0</span></div>
-  <div class="abs" id="wm">@zifidit</div>
  </div>
  <div id="wipe"></div>
  <div id="grain"></div>
@@ -280,108 +257,135 @@ function scene(el,t,i){const[a,b]=SC[i];const fi=i===0?1:E.out(P(t,a,a+.45)),fo=
  const o=fi*(1-fo);el.style.display=o<=0.001?'none':'block';
  css(el,{s:lerp(1.12,1,fi)*lerp(1,.86,fo),y:fo*-60,o,blur:(1-fi)*16+fo*18});return o>0.001;}
 
-// ---------- keyframe system for characters ----------
-function kf(t,frames){ // frames: [time,{props},ease]
+// ---------- keyframe system ----------
+function kf(t,frames){
  if(t<=frames[0][0])return {...frames[0][1]};
  for(let i=0;i<frames.length-1;i++){const[a,A]=frames[i],[b,B,e]=frames[i+1];
   if(t<=b){const x=(E[e||'io'])(P(t,a,b));const o={};for(const k in B)o[k]=lerp(A[k]??B[k],B[k],x);for(const k in A)if(!(k in o))o[k]=A[k];return o}}
  return {...frames[frames.length-1][1]};}
 function fill(list){let prev={};return list.map(([t,o,e])=>{prev={...prev,...o};return[t,{...prev},e]})}
-const FB={x:540,y:2500,s:1,rot:0,a1L:8,a2L:6,a1R:-8,a2R:-6,tilt:0,lx:0,ly:0,smile:1,brow:0,wave:0,ham:0,helm:0,squash:0,op:1,worry:0};
-const FK=fill([
- [0,{...FB}],
- [0.9,{y:2500}],
- [1.35,{y:1840,squash:-.12},'back'],
- [1.6,{squash:.1}],[1.8,{squash:0}],
- [1.9,{a1R:-150,a2R:-30,wave:1,tilt:-6,smile:1.2}],
- [2.6,{a1R:-150,a2R:-30,wave:1}],
- [2.85,{a1R:-55,a2R:-70,wave:0,tilt:4,lx:0,ly:-1,smile:1}],   // point to "قدامكم"
- [3.9,{a1R:-55,a2R:-70}],
- [4.35,{x:540,y:1860,s:.92,a1R:40,a2R:125,a1L:10,tilt:8,lx:-.6,ly:-1,smile:.2,brow:1}], // thinking
- [5.05,{a1R:40,a2R:125}],
- [5.3,{a1R:-140,a2R:-20,a1L:140,a2L:20,tilt:-4,lx:0,ly:-1,smile:1.6,brow:-1}],         // money!
- [5.85,{a1R:-140,a1L:140}],
- [6.05,{a1R:-20,a2R:-60,a1L:20,a2L:60,smile:-1,worry:1,brow:-.5,tilt:-10,squash:.08,x:560}], // oops
- [6.7,{a1R:-20,a2R:-60,a1L:20,a2L:60,smile:-1,worry:1,x:560}],
- [7.0,{a1R:-120,a2R:-40,a1L:8,a2L:6,smile:1.2,worry:0,brow:0,tilt:6,squash:0,x:540,lx:-.6,ly:-.8}],
- [8.0,{a1R:-120,a2R:-40}],
- [8.6,{x:220,y:1890,s:.7,a1R:-130,a2R:-10,a1L:8,tilt:-6,lx:1,ly:-1,smile:1.1},'io'],
- [11.9,{x:220,y:1890,s:.7}],
- [12.6,{x:300,y:1820,s:.82,a1R:-35,a2R:-90,a1L:10,tilt:0,lx:.4,ly:-.4,smile:1,helm:1,ham:1}],
- [15.8,{x:300,ham:1,helm:1}],
- [16.5,{x:860,y:1004,s:.6,a1R:-8,a2R:-6,a1L:8,ham:0,helm:0,lx:-1,ly:0,smile:.6,tilt:0}],
- [17.0,{lx:-1,ly:-1,tilt:-8,smile:1.6,a1L:150,a2L:10}],
- [18.0,{lx:-1,ly:-1,tilt:-8,smile:1.6,a1L:150}],
- [18.35,{lx:-1,ly:1,tilt:10,smile:-1,worry:1,brow:-.5,a1L:15,a2L:80,a1R:-15,a2R:-80}],
- [19.7,{lx:-1,ly:1,tilt:10,smile:-1,worry:1}],
- [20.6,{x:540,y:1850,s:.85,lx:0,ly:-1,tilt:0,smile:1,worry:0,brow:0,a1L:8,a2L:6,a1R:-8,a2R:-6}],
- [21.15,{smile:1}],
- [21.35,{y:1760,a1L:155,a2L:15,a1R:-155,a2R:-15,smile:1.8,squash:-.1},'out'],
- [21.65,{y:1850,squash:.1},'in'],[21.8,{squash:0}],
- [22.4,{a1L:8,a2L:6,a1R:-150,a2R:-30,wave:1,tilt:-5}],
- [24,{wave:1}],
-]);
-const BK=fill([
- [0,{x:1300,y:900,s:.8,rot:0,happy:0,arm:0}],
- [8.7,{x:1300,y:620}],
- [9.2,{x:860,y:560,rot:-10},'back'],
- [10.0,{x:860,y:600,rot:0}],
- [10.35,{x:640,y:760,s:.55,rot:-20},'in'],      // dives into preview
- [10.6,{x:880,y:520,s:.8,rot:8,happy:1},'out'],
- [11.4,{x:880,y:520,s:.8,rot:0,happy:1}],
- [11.9,{x:930,y:1330,s:.7,rot:0,happy:1}],
- [12.6,{x:800,y:1420,s:.8,rot:0,happy:1}],
- [15.9,{x:800,y:1400}],
- [16.4,{x:1300,y:1400}],
- [20.3,{x:1300,y:700,s:.8,happy:0}],
- [20.85,{x:640,y:830,s:.7,rot:-14},'out'],
- [21.1,{x:620,y:880,rot:-18,arm:1},'in'],          // tap the button
- [21.3,{x:700,y:780,rot:6,arm:0,happy:1},'out'],
- [22.2,{x:850,y:1520,s:.85,rot:0,happy:1}],
- [24,{x:850,y:1510}],
-]);
-const fd={armL:$('fArmL'),foreL:$('fForeL'),armR:$('fArmR'),foreR:$('fForeR'),head:$('fHead'),body:$('fBody'),eL:$('fEyeL'),eR:$('fEyeR'),
- mouth:$('fMouth'),bL:$('fBrowL'),bR:$('fBrowR'),helm:$('helmet'),ham:$('hammer'),shadow:$('fShadow'),pups:[...document.querySelectorAll('#founder .pup')]};
+// hop arcs with anticipation squash, airborne stretch and landing squash
+function hops(t,list){let y=0,sq=0;for(const[h,H,d]of list){
+  if(t>h-.14&&t<h)sq+=bump(t,h-.14,h+.02)*.16*Math.min(1,H/80);
+  if(t>=h&&t<=h+d){const x=(t-h)/d;y-=H*Math.sin(Math.PI*x);sq-=Math.sin(Math.PI*x)*.12*Math.min(1,H/80)}
+  if(t>h+d&&t<h+d+.25){const x=(t-h-d)/.25;sq+=Math.sin(Math.PI*x)*Math.exp(-x*2)*.2*Math.min(1,H/80)}}
+ return{y,sq}}
 const TALK=[[1.4,2.5],[2.85,3.6],[4.5,5.0],[5.3,5.7],[6.9,7.6],[11.2,11.8],[13.7,14.6],[16.9,17.7],[18.4,19.2],[20.3,21.0],[22.5,23.4]];
-const BLINKS=[0.6,2.3,3.4,4.9,6.4,7.9,9.7,11.1,13.1,14.9,16.3,17.6,19.5,20.9,22.1,23.4];
-function blinkAmt(t){let b=1;for(const s of BLINKS){const x=P(t,s,s+.16);if(x>0&&x<1)b=Math.min(b,Math.abs(Math.cos(Math.PI*x)))}return Math.max(.08,b)}
-function founder(t){
- const k=kf(t,FK);const el=$('founder');
- const breathe=Math.sin(t*3.2)*.012; const sq=k.squash;
- el.style.transform=`translate(${k.x-200}px,${k.y-560}px) scale(${k.s*(1-sq*.6)},${k.s*(1+sq+breathe)}) rotate(${k.rot}deg)`;
- el.style.opacity=k.op;
- const wave=k.wave*Math.sin(t*15)*28, ham=k.ham*Math.pow(Math.max(0,Math.sin(t*9)),3);
- fd.armL.setAttribute('transform',`rotate(${k.a1L} -89 -310)`);
- fd.foreL.setAttribute('transform',`rotate(${k.a2L} -89 -240)`);
- fd.armR.setAttribute('transform',`rotate(${k.a1R - ham*70} 89 -310)`);
- fd.foreR.setAttribute('transform',`rotate(${k.a2R+wave - ham*30} 89 -240)`);
- fd.ham.setAttribute('opacity',k.ham);
- const bob=Math.sin(t*6.4)*2.5 + (k.worry? Math.sin(t*60)*k.worry*2:0);
- fd.head.setAttribute('transform',`rotate(${k.tilt+Math.sin(t*2.1)*2} 0 -370) translate(0 ${bob})`);
- const bl=blinkAmt(t)*(k.smile>1.5?.75:1);
- const surprise=k.brow<0?1+(-k.brow)*.2:1;
- fd.eL.setAttribute('transform',`translate(-34 -458) scale(${surprise} ${bl*surprise})`);
- fd.eR.setAttribute('transform',`translate(34 -458) scale(${surprise} ${bl*surprise})`);
- fd.pups.forEach(p=>p.setAttribute('transform',`translate(${k.lx*6} ${k.ly*6})`));
- const by=k.brow*6, bw=k.worry*10;
- fd.bL.setAttribute('transform',`translate(0 ${by-(k.brow<0?8:0)}) rotate(${-bw+k.brow*-6} -36 -498)`);
- fd.bR.setAttribute('transform',`translate(0 ${by-(k.brow<0?8:0)}) rotate(${bw+k.brow*6} 36 -498)`);
- let open=0;for(const[a,b]of TALK){if(t>a&&t<b){open=Math.max(open,(.45+.55*Math.abs(Math.sin((t-a)*17)))*bump(t,a-.05,b+.05))}}
- const sm=k.smile, w=24+Math.max(0,sm)*6, cy=-412, cyC=cy - sm*6;
- const top=cyC + (sm>=0? sm*4:-sm*-2) - open*3, bot=cyC + 4 + sm*14 + open*36;
- fd.mouth.setAttribute('d',`M${-w},${cyC} Q0,${top} ${w},${cyC} Q0,${Math.max(bot,top+3)} ${-w},${cyC}Z`);
- fd.helm.setAttribute('opacity',k.helm);
- fd.helm.setAttribute('transform',`translate(0 ${(1-E.back(k.helm))*-160})`);
+const hash=n=>{const x=Math.sin(n*127.1)*43758.5453;return x-Math.floor(x)};
+const AMB=[255,176,32],RED=[255,77,106],TEA=[46,230,182];
+const mixc=(r,te)=>AMB.map((v,i)=>Math.round(v*(1-r-te)+RED[i]*r+TEA[i]*te));
+const rgb=(c,w=0)=>`rgb(${c.map(v=>Math.round(v+(255-v)*w)).join(',')})`;
+
+// ===== the bulb (main character: "the idea") =====
+const BULB=fill([
+ [0,{x:540,y:2300,s:1.3,tilt:0,lv:.0,red:0,teal:0,fl:0,sh:0}],
+ [0.95,{y:2300}],
+ [1.32,{y:1830},'back'],
+ [1.3,{lv:0}],[1.38,{lv:.25,fl:1}],[1.75,{lv:1,fl:0}],
+ [3.9,{x:540,y:1830,s:1.3}],
+ [4.4,{x:540,y:1840,s:1.15,tilt:8}],
+ [5.15,{tilt:4,lv:1}],
+ [5.35,{tilt:-6,lv:1.4}],
+ [5.85,{tilt:-2,lv:1.1}],
+ [5.95,{red:1,fl:1,sh:1,tilt:-14,lv:1}],
+ [6.6,{red:1,fl:.6,sh:.4,tilt:-10}],
+ [6.95,{red:0,fl:0,sh:0,tilt:0,lv:1.1}],
+ [8.0,{x:540,y:1840,s:1.15}],
+ [8.6,{x:210,y:1880,s:.85,tilt:10,lv:1}],
+ [10.3,{tilt:10,teal:0}],[10.45,{teal:.6,lv:1.5,tilt:4}],[11.0,{teal:0,lv:1.1,tilt:8}],
+ [11.9,{x:210,y:1880,s:.85}],
+ [12.6,{x:800,y:1810,s:1.0,tilt:-8}],
+ [15.4,{x:800,y:1810,tilt:-8}],
+ [15.85,{x:330,y:1622,tilt:0},'lin'],
+ [16.0,{x:330,y:1622}],
+ [16.55,{x:860,y:1004,s:.62,tilt:0}],
+ [16.95,{tilt:0,teal:0}],[17.15,{tilt:-18,teal:1,lv:1.5}],
+ [18.1,{tilt:-18,teal:1,lv:1.2}],
+ [18.4,{tilt:12,teal:0,red:1,fl:.7,sh:.7,lv:.9}],
+ [19.7,{tilt:12,red:1,fl:.5,sh:.3}],
+ [20.2,{red:0,fl:0,sh:0,tilt:0,lv:1}],
+ [20.65,{x:540,y:1850,s:1.0}],
+ [21.25,{lv:1}],[21.4,{lv:1.7,teal:.4}],[22.0,{lv:1.15,teal:0}],
+ [24,{x:540,y:1850}],
+]);
+const BULB_HOPS=[[1.9,60,.4],[2.72,150,.5],[5.22,90,.42],[7.0,110,.45],[10.4,120,.45],[11.25,60,.38],
+ [13.1,26,.25],[13.55,26,.25],[14.0,26,.25],[14.45,26,.25],[14.9,26,.25],[15.4,230,.45],
+ [17.05,70,.4],[21.25,240,.55],[22.45,70,.38],[23.05,70,.38],[23.6,50,.35]];
+function bulb(t){
+ const k=kf(t,BULB),h=hops(t,BULB_HOPS);
+ let talk=0;for(const[a,b]of TALK)if(t>a&&t<b)talk=Math.max(talk,(.5+.5*Math.abs(Math.sin((t-a)*14)))*bump(t,a-.05,b+.05));
+ let lv=k.lv*(1+talk*.18);
+ if(k.fl>0&&hash(Math.floor(t*22))>.45)lv*=1-k.fl*.85;
+ const c=mixc(k.red,k.teal);
+ $('bg0').setAttribute('stop-color',rgb(c));$('bg1').setAttribute('stop-color',rgb(c));$('bg2').setAttribute('stop-color',rgb(c));
+ $('bOn1').setAttribute('stop-color',rgb(c,.55));$('bOn2').setAttribute('stop-color',rgb(c,.05));
+ $('fg0').setAttribute('stop-color',rgb(c));$('fg1').setAttribute('stop-color',rgb(c));
+ $('glassOn').setAttribute('opacity',clamp(lv*.95));
+ $('bHalo').setAttribute('opacity',clamp(lv*.8));$('bHalo').setAttribute('r',200+lv*40+talk*20);
+ $('fil').setAttribute('stroke',lv>.2?rgb(c,.75):'#7d8296');
+ const sw=Math.sin(t*2.3)*2.5, shake=k.sh*Math.sin(t*75)*6;
+ const sy=1+h.sq*-1+Math.sin(t*3.1)*.012, sx=1+h.sq*.8;
+ $('bBody').setAttribute('transform',`translate(${shake} ${h.y}) rotate(${k.tilt+sw}) scale(${sx} ${sy})`);
+ const air=clamp(-h.y/250);
+ $('bShadow').setAttribute('transform',`scale(${1-air*.5})`);$('bShadow').setAttribute('opacity',.5*(1-air*.6));
+ $('bFloor').setAttribute('opacity',clamp(lv*.9)*(1-air*.5));
+ $('bulb').style.transform=`translate(${k.x-120}px,${k.y-310}px) scale(${k.s})`;$('bulb').style.transformOrigin='120px 310px';
 }
-function bot(t){const k=kf(t,BK);const el=$('bot');const fy=Math.sin(t*3.4)*14;
- el.style.transform=`translate(${k.x-200}px,${k.y-380+fy}px) scale(${k.s}) rotate(${k.rot+Math.sin(t*2.2)*4}deg)`;
- $('bFlame').setAttribute('ry',50+Math.sin(t*40)*10);$('bFlame').setAttribute('opacity',.7+Math.sin(t*33)*.2);
- const bl=blinkAmt(t+.7);$('bEyes').setAttribute('transform',`translate(0 -10) scale(1 ${bl}) translate(0 10)`);
- $('bEyes').setAttribute('opacity',1-k.happy);$('bHappy').setAttribute('opacity',k.happy);
- $('bBulb').setAttribute('fill',Math.sin(t*6)>0?'#FFB020':'#ffd27a');
- $('bArmR').setAttribute('transform',`rotate(${-k.arm*120 + Math.sin(t*5)*10} 84 -10)`);
- $('bArmL').setAttribute('transform',`rotate(${Math.sin(t*5+1)*10} -84 -10)`);
+
+// ===== the coin (supporting: "every pound") =====
+function coin(t){
+ const el=$('coin');let x=0,y=0,o=0,spin=0,face=1,sq=0;
+ const arc=(p,x0,y0,x1,y1,H)=>[lerp(x0,x1,p),lerp(y0,y1,p)-H*Math.sin(Math.PI*p)];
+ if(t>=5.25&&t<8.1){o=1-P(t,7.8,8.05);
+  if(t<5.85){const p=P(t,5.25,5.85);[x,y]=arc(p,848,668,760,1772,380);y+=0;spin=(t-5.25)*20.944}
+  else if(t<6.15){const p=P(t,5.85,6.15);[x,y]=arc(p,760,1772,790,1772,90);spin=(t-5.25)*20.944}
+  else{x=790;y=1772;spin=0;const d=t-6.15;face=1-.35*Math.exp(-d*4)*Math.abs(Math.sin(d*22));
+   if(t>5.95&&t<6.8)x+=Math.sin(t*60)*4*(1-P(t,6.2,6.8));}
+  sq=bump(t,5.83,5.93)*.25+bump(t,6.13,6.23)*.15;}
+ else if(t>=21.35){o=1;
+  if(t<21.95){const p=P(t,21.35,21.95);[x,y]=arc(p,1160,1700,770,1800,260);spin=(t-21.35)*20.944}
+  else{x=770;y=1800;const hs=[[22.45,70,.38],[23.05,70,.38],[23.6,50,.35]];const hh=hops(t,hs);y+=hh.y;sq=hh.sq;
+   let sp=0;for(const[a,,d]of hs)if(t>=a&&t<=a+d)sp=(t-a)/d*Math.PI*2;spin=sp;face=1}
+  if(t<21.99)sq+=bump(t,21.93,22.03)*.25;}
+ el.style.opacity=o;if(o<=0)return;
+ const sx=t<6.15||(t>=21.35)?Math.cos(spin):face;
+ $('cFace').setAttribute('transform',`scale(${sx} 1)`);
+ $('cEdge').setAttribute('rx',Math.max(Math.abs(sx)*50,8));$('cEdge').setAttribute('transform',`translate(${(sx>=0?-1:1)*6*(1-Math.abs(sx))} 0)`);
+ $('cBody').setAttribute('transform',`translate(0 ${sq*30}) scale(${1+sq} ${1-sq})`);
+ const ground=t<8.1?1772:1800;const air=clamp((ground-y)/300);
+ $('cShadow').setAttribute('transform',`translate(0 ${ground-y}) scale(${1-air*.6})`);$('cShadow').setAttribute('opacity',.45*(1-air*.7));
+ el.style.transform=`translate(${x-70}px,${y-70}px)`;
 }
+
+// ===== the cursor (supporting: "the click") =====
+const CUR=fill([
+ [0,{x:1150,y:1420,o:0,pr:0}],
+ [8.8,{x:1150,y:1420,o:0}],[8.85,{o:1}],
+ [9.05,{x:565,y:1112},'out'],[9.09,{pr:1}],[9.2,{pr:0}],
+ [9.9,{x:600,y:1150}],
+ [10.15,{x:178,y:1112},'io'],[10.22,{pr:1}],[10.33,{pr:0}],
+ [10.85,{x:-120,y:1450,o:1},'in'],[10.9,{o:0}],
+ [20.4,{x:1150,y:1350,o:0}],[20.45,{o:1}],
+ [21.0,{x:548,y:930},'out'],[21.1,{pr:1}],[21.22,{pr:0}],
+ [21.7,{x:660,y:1040,o:1}],[22.3,{x:1150,y:1150,o:0},'in'],
+ [24,{o:0}],
+]);
+function cursor(t){const k=kf(t,CUR);const el=$('cursor');el.style.opacity=k.o;
+ el.style.transform=`translate(${k.x}px,${k.y}px) scale(${1-k.pr*.18}) rotate(${-k.pr*6}deg)`;el.style.transformOrigin='10px 10px';}
+
+// ===== building blocks (scene 4: "still building it") =====
+const BLK=[[170,1740,'#8B7CFF'],[300,1740,'#2EE6B6'],[430,1740,'#4DA3FF'],[235,1680,'#ff5fa2'],[365,1680,'#FFB020'],[300,1620,'#2EE6B6']];
+const BLK_T=[13.15,13.6,14.05,14.5,14.95,15.4];
+(()=>{const s=$('blocks');BLK.forEach(([x,y,c],i)=>{const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.id='blk'+i;
+ g.innerHTML=`<rect x="-62" y="0" width="124" height="58" rx="12" fill="${c}"/><rect x="-62" y="0" width="124" height="58" rx="12" fill="url(#blkHi)"/><rect x="-62" y="46" width="124" height="12" rx="6" fill="#000" opacity=".22"/>`;
+ g.setAttribute('opacity',0);s.appendChild(g)})})();
+function blocks(t){const vis=t>12.9&&t<16.25;$('blocks').style.display=vis?'block':'none';if(!vis)return;
+ const fo=1-P(t,15.85,16.15);
+ BLK.forEach(([x,y],i)=>{const tl=BLK_T[i],p=P(t,tl-.45,tl);const g=$('blk'+i);
+  const yy=y-(1-E.in(p))*420, r=(1-p)*(i%2?25:-25), sq=bump(t,tl,tl+.18)*.18;
+  g.setAttribute('opacity',E.out(clamp(p*3))*fo);
+  g.setAttribute('transform',`translate(${x} ${yy+sq*58}) rotate(${r}) scale(${1+sq} ${1-sq})`);});}
+function objects(t){blocks(t);bulb(t);coin(t);cursor(t);}
 
 // ---------- particles ----------
 const BURSTS=[];
@@ -397,7 +401,8 @@ burst(6.95,345,1062,{n:30,spd:700,g:400,colors:['#FFB020','#fff']});
 burst(10.36,540,780,{n:70,spd:1200,g:300,size:7,colors:['#FFB020','#ff5fa2','#8B7CFF','#2EE6B6','#fff'],type:'star'});
 burst(10.7,540,990,{n:40,spd:800,g:900,type:'rect',size:10});
 burst(13.0,540,810,{n:140,spd:1900,g:250,life:1.8,size:8,type:'star'});ring(13.0,540,810,{r1:900,life:1.0,color:'#ff5fa2'});ring(13.08,540,810,{r1:650,life:.9,color:'#FFB020',w:6});
-for(let i=0;i<7;i++)burst(12.75+i*.45+.2,430,1690,{n:10,spd:500,g:1400,life:.6,size:5,dir:-Math.PI/2,spread:2.2,colors:['#ffd27a','#fff']});
+BLK.forEach(([x,y],i)=>burst(BLK_T[i],x,y+58,{n:16,spd:520,g:1300,life:.6,size:5,dir:-Math.PI/2,spread:2.6,colors:['#ffd27a','#fff','#8B7CFF']}));burst(15.85,330,1622,{n:50,spd:900,g:400,type:'star',colors:['#FFB020','#fff','#2EE6B6']});
+ring(9.09,568,1115,{r1:90,life:.4,color:'#fff',w:5});ring(10.22,181,1115,{r1:110,life:.45,color:'#2EE6B6',w:5});ring(1.5,540,1600,{r1:600,life:.9,color:'#FFB020',w:6});
 burst(17.05,150,610,{n:80,spd:1100,g:250,type:'star',colors:['#2EE6B6','#bfffee','#fff','#FFB020']});ring(17.05,150,610,{r1:420,color:'#2EE6B6',life:.8});
 burst(18.45,150,1390,{n:50,spd:900,g:1400,type:'rect',size:7,colors:['#FF4D6A','#ff9aa8','#555']});
 burst(21.12,540,920,{n:160,spd:1700,g:1500,life:2.2,type:'rect',size:12,drag:1.6});ring(21.12,540,920,{r1:700,life:.9});
@@ -462,7 +467,6 @@ function render(t){
  $('wipe').style.opacity=wo*.9;$('wipe').style.clipPath=`circle(${E.io(wp)*120}% at 50% 42%)`;
  // persistent HUD
  css($('pill'),{pre:'translateX(-50%) ',y:(1-E.back(P(t,.1,.7)))*-120,o:P(t,.1,.5)});
- $('wm').style.opacity=.35*P(t,.3,1);
 
  // ===== S1 =====
  if(scene($('s1'),t,0)){
@@ -552,7 +556,7 @@ function render(t){
   $('chipglow').style.background=`conic-gradient(from ${t*200}deg,#2EE6B6,#8B7CFF,#FF4D6A,#4DA3FF,#FFB020,#2EE6B6)`;
  
  }
- founder(t);bot(t);
+ objects(t);
 }
 window.render=render;
 window.ready=document.fonts.ready.then(()=>Promise.all(['600','700','800','900'].map(w=>document.fonts.load(`${w} 40px Cairo`,'ابجد Zifidit'))));

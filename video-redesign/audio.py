@@ -157,7 +157,16 @@ add(whoosh(.5), 11.1, .45); add(pop(.15, 500, 180), 11.2, .4)
 add(whoosh(1.0, True), 11.8, .8); add(riser(1.0), 12.0, .45)
 for i in range(8): add(pop(.07, 1100 - i * 40, 500), 12.55 + i * .06, .25, -.7 + i * .2)
 add(impact(2.0), 13.0, 1.0); add(shimmer(2.0), 13.0, .7); add(glitch(.3), 13.0, .2)
-for i in range(7): add(M(sine(1600, .15, .001, .06, 6), click() * .5), 12.95 + i * .45 + .2, .3, -.4)  # hammer clinks
+for i, tb in enumerate([13.15, 13.6, 14.05, 14.5, 14.95, 15.4]):  # building blocks landing
+    add(M(sine(130 + i * 12, .25, .001, .12, 5), click() * .8), tb, .45, -.4)
+add(pop(.18, 400, 1400), 15.42, .3); add(chime([1046.5, 1568]), 15.85, .3)  # bulb hops on top
+# bulb character: switch-on, hops and coin
+add(click() * 2, 1.33, .6); add(M(sine(1760, .5, .002, .3, 4) * .4, sine(2637, .4, .002, .2, 5) * .2), 1.4, .4)
+t_ = tt(.45); add(np.sin(2 * np.pi * 60 * t_) * np.sign(np.sin(2 * np.pi * 120 * t_)) * env(len(t_), .01, .4, 3) * .3, 1.36, .25)  # mains hum flicker
+for h in [1.9, 2.72, 5.22, 7.0, 10.4, 11.25, 17.05, 21.25, 22.45, 23.05, 23.6]:
+    add(pop(.16, 300, 900), h, .22)      # take-off
+for c in [5.85, 6.15, 21.95]: add(chime([2093, 2637], .04, .35), c, .3)
+
 add(pop(.15, 500, 180), 13.7, .35)
 # scene 5
 add(whoosh(.7), 15.85, .55); add(whoosh(.5), 16.35, .35, .5); add(whoosh(.5), 16.75, .35, -.5)
