@@ -40,3 +40,10 @@ python3 gen_audio.py   # المؤثرات الصوتية
 node render.js         # video/muflis.mp4
 python3 mix_voice.py   # video/muflis_voice.mp4 بعد وضع ملفات الصوت 00…09 في vo/
 ```
+
+## نسخة متزامنة مع الصوت المسجّل (`video/muflis_voice.mp4`)
+مدتها 45 ثانية، وكل مشهد وكل كلمة في الكابشن مضبوطة على صوت القارئ في `voice/voice.m4a`. استُخرجت التوقيتات من فواصل الصوت ومن كابشن الفيديو الأصلي، وتحققتُ من التزامن بالمقارنة مع الصوت الأصلي: الفرق 0 ملّي ثانية.
+```bash
+python3 gen_audio_voice.py
+PAGE=voice.html OUTNAME=muflis_voice.mp4 WAV=soundtrack_voice.wav node render.js
+```

@@ -62,7 +62,7 @@ async function openPage(browser, port) {
   fs.writeFileSync(list, segs.map(s => `file '${s}'`).join('\n'));
   const video = path.join(OUT, 'video_only.mp4');
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', list, '-c', 'copy', video]);
-  const wav = path.join(ROOT, 'soundtrack.wav'), final = path.join(ROOT, 'video', (process.env.OUTNAME || 'muflis.mp4'));
+  const wav = path.join(ROOT, process.env.WAV || 'soundtrack.wav'), final = path.join(ROOT, 'video', (process.env.OUTNAME || 'muflis.mp4'));
   if (fs.existsSync(wav)) execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', video, '-i', wav, '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-shortest', '-movflags', '+faststart', final]);
   else fs.copyFileSync(video, final);
   segs.forEach(s => fs.unlinkSync(s)); fs.unlinkSync(list); fs.unlinkSync(video);
