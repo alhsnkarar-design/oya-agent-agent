@@ -153,11 +153,10 @@ function judgment(c, lt, st, deedProp, kinds) {
   const x = W / 2, claim = ss(11.2, 12, lt), crack = ss(15.6, 18.2, lt), fall = ss(19.5, 21.8, lt);
   echoCrowd(c, lt, ss(15.4, 16.2, lt) * (1 - ss(18.8, 19.6, lt)));
   blessings(c, x, GY - S * 1.6, ss(9, 11, lt) * (1 - ss(15, 16, lt)), lt, kinds);
-  const p = Object.assign(MOVES.idle(st, lt), claim > 0 && crack < .3 ? { handL: [-.05, -st.P.T + .3], handR: [.05, -st.P.T + .3], elbowL: 1, elbowR: -1, head: -.15 } : {}, crack > .3 ? { head: .15, nod: .9, lean: .08 } : {}, { propR: deedProp && crack < .3 ? deedProp : null });
+  const p = Object.assign(MOVES.idle(st, lt), claim > 0 && crack < .3 ? { handL: [-.2, -st.P.T + .5], handR: [.2, -st.P.T + .5], elbowL: 1, elbowR: -1, head: -.08 } : {}, crack > .3 ? { head: .15, nod: .9, lean: .08 } : {}, { propR: deedProp && crack < .3 ? deedProp : null });
   if (fall > 0) { p.lean = .25 + fall * .4; p.nod = 1.2; p.head = .3; p.handL = [-.4, -st.P.T + .2]; p.handR = [.3, -st.P.T + .2]; }
   c.save(); c.globalAlpha = 1 - ss(.55, 1, fall); c.translate(x - fall * 420, GY + fall * 160); c.rotate(-fall * .55); drawChar(c, 0, 0, S, st, p); c.restore();
-  if (fall > 0) for (let i = 0; i < 5; i++) { const yy = GY - S * (.3 + i * .45) + fall * 160; c.strokeStyle = `rgba(20,4,4,${.7 * fall})`; c.lineWidth = 14 - i * 2; c.beginPath(); c.moveTo(-20, yy + 60); c.quadraticCurveTo(x * .5, yy - 30 + Math.sin(lt * 4 + i) * 20, x - fall * 420, yy); c.stroke(); }
-  if (claim > 0) deedOrb(c, x, GY - S * 3.3, 70 * claim, crack, lt);
+  if (claim > 0) deedOrb(c, x, GY - S * 1.42, 52 * claim, crack, lt);
   glow(c, SP.red, x, H * .78, 1500 * fall, .5 * fall); glow(c, SP.warm, x, H * .82, 800 * fall, .4 * fall);
   if (lt > 21.2) { c.fillStyle = `rgba(0,0,0,${ss(21.2, 22, lt) * .7})`; c.fillRect(0, 0, W, H); }
 }
@@ -177,9 +176,9 @@ function p1(c, lt) {
     for (let i = 0; i < 5; i++) { const bx = W * (.1 + i * .2); c.fillStyle = '#3a2418'; c.fillRect(bx, GY - 420, 8, 420); c.fillStyle = i % 2 ? '#7a1f2a' : '#2a4a6a'; c.beginPath(); c.moveTo(bx + 8, GY - 420); c.quadraticCurveTo(bx + 90, GY - 400 + Math.sin(lt * 3 + i) * 14, bx + 150, GY - 380); c.lineTo(bx + 8, GY - 330); c.fill(); }
     c.fillStyle = 'rgba(60,36,24,.55)'; for (let i = 0; i < 26; i++) { const ax = i * 44 + 10, ay = GY - 70 + Math.sin(i * 2.1) * 6; c.beginPath(); c.arc(ax, ay - 34, 10, 0, TAU); c.fill(); c.fillRect(ax - 9, ay - 24, 18, 30); c.fillRect(ax + 8, ay - 80, 3, 80); }
     for (let i = 0; i < 40; i++) { const ph = (lt * .3 + i / 40) % 1; c.fillStyle = `rgba(200,160,110,${.25 * (1 - ph)})`; c.beginPath(); c.arc((i * 97) % W + ph * 200, GY - ph * 300, 20 + ph * 60, 0, TAU); c.fill(); }
-    const swing = Math.sin(lt * 5) > 0 ? 1 : 0, k = eOut((lt % (Math.PI * 2 / 5)) / .2);
-    const p = Object.assign(MOVES.walk(WA, lt, 1.2), { handR: swing ? [WA.P.sw + .7, -WA.P.T + .2] : [WA.P.sw + .2, -WA.P.T - .55], elbowR: 1, propR: PROPS.sword, lean: .1 }); p.face = 1; drawChar(c, lerp(W * .25, W * .55, eInOut(lt / 6)), GY + 40, S, WA, p);
-    crowdRow(c, lt, GY + 330, 118, 6, W * .06, W * .94, CHEER, true, ss(2.5, 3.2, lt)); praiseBursts(c, W * .5, GY - S * 2.2, lt, ss(3, 3.6, lt)); chapterTag(c, lt, 'الأول', 'المقاتل');
+    const swing = (Math.sin(lt * 2.6) + 1) / 2;
+    const p = Object.assign(MOVES.walk(WA, lt, 1.2), { handR: [lerp(WA.P.sw + .2, WA.P.sw + .65, swing), lerp(-WA.P.T - .5, -WA.P.T + .25, swing)], elbowR: 1, propR: PROPS.sword, lean: .1 }); p.face = 1; drawChar(c, lerp(W * .25, W * .55, eInOut(lt / 6)), GY + 40, S, WA, p);
+    crowdRow(c, lt, GY + 330, 118, 6, W * .06, W * .94, CHEER, true, ss(2.5, 3.2, lt)); praiseBursts(c, W * .5, GY - S * 2.2, lt, ss(3, 3.6, lt)); chapterTag(c, lt, 'الأول', 'الشهيد');
   } else judgment(c, lt, WA, null, BLESS.WA);
 }
 // 2 · 33–55 the scholar & reciter
@@ -189,7 +188,7 @@ function p2(c, lt) {
     for (let i = -1; i < 5; i++) { c.fillStyle = 'rgba(255,220,170,.08)'; arch(c, i * 300 + 150, GY - 40, 220, 760); c.fill(); }
     c.fillStyle = '#3a2618'; c.fillRect(W * .2, GY - 30, W * .6, 40); glow(c, SP.gold, W / 2, GY - S * 2, 900, .35);
     for (let i = 0; i < 2; i++) { c.save(); c.globalCompositeOperation = 'lighter'; c.fillStyle = 'rgba(255,240,200,.08)'; c.beginPath(); c.moveTo(W * (.15 + i * .7), 0); c.lineTo(W * (.17 + i * .7), 0); c.lineTo(W / 2 + 120, GY); c.lineTo(W / 2 - 120, GY); c.fill(); c.restore(); }
-    const p = Object.assign(MOVES.idle(SC, lt), { handR: [SC.P.sw + .35, -SC.P.T + .45], elbowR: 1, propR: PROPS.book, handL: [-SC.P.sw - .3, -SC.P.T + .1 + Math.sin(lt * 3) * .1], elbowL: 1 }); drawChar(c, W / 2, GY - 30, S, SC, p);
+    const p = Object.assign(MOVES.idle(SC, lt), { handR: [SC.P.sw + .35, -SC.P.T + .45], elbowR: 1, propR: PROPS.book, handL: [-SC.P.sw - .2 + Math.sin(lt * 1.4) * .04, -SC.P.T + .86 + Math.sin(lt * 2) * .02], elbowL: 1, head: Math.sin(lt * .8) * .05 }); drawChar(c, W / 2, GY - 30, S, SC, p);
     c.fillStyle = 'rgba(0,0,0,.3)'; c.fillRect(0, GY + 10, W, H);
     crowdRow(c, lt, GY + 320, 118, 7, W * .05, W * .95, CLAP, true, ss(2, 2.6, lt)); praiseBursts(c, W / 2, GY - S * 2.3, lt, ss(2.6, 3.2, lt)); chapterTag(c, lt, 'الثاني', 'العالِمُ القارئ');
   } else judgment(c, lt, SC, PROPS.book, BLESS.SC);
