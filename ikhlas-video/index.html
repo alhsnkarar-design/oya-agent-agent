@@ -188,7 +188,7 @@ function p2(c, lt) {
     for (let i = -1; i < 5; i++) { c.fillStyle = 'rgba(255,220,170,.08)'; arch(c, i * 300 + 150, GY - 40, 220, 760); c.fill(); }
     c.fillStyle = '#3a2618'; c.fillRect(W * .2, GY - 30, W * .6, 40); glow(c, SP.gold, W / 2, GY - S * 2, 900, .35);
     for (let i = 0; i < 2; i++) { c.save(); c.globalCompositeOperation = 'lighter'; c.fillStyle = 'rgba(255,240,200,.08)'; c.beginPath(); c.moveTo(W * (.15 + i * .7), 0); c.lineTo(W * (.17 + i * .7), 0); c.lineTo(W / 2 + 120, GY); c.lineTo(W / 2 - 120, GY); c.fill(); c.restore(); }
-    const p = Object.assign(MOVES.idle(SC, lt), { handR: [SC.P.sw + .35, -SC.P.T + .45], elbowR: 1, propR: PROPS.book, handL: [-SC.P.sw - .2 + Math.sin(lt * 1.4) * .04, -SC.P.T + .86 + Math.sin(lt * 2) * .02], elbowL: 1, head: Math.sin(lt * .8) * .05 }); drawChar(c, W / 2, GY - 30, S, SC, p);
+    const p = Object.assign(MOVES.idle(SC, lt), { handR: [SC.P.sw + .35, -SC.P.T + .45], elbowR: 1, propR: PROPS.book, handL: [-SC.P.sw - .05, -SC.P.T + .12 + (SC.P.up + SC.P.fore) * .985], elbowL: 1, head: Math.sin(lt * .8) * .05 }); drawChar(c, W / 2, GY - 30, S, SC, p);
     c.fillStyle = 'rgba(0,0,0,.3)'; c.fillRect(0, GY + 10, W, H);
     crowdRow(c, lt, GY + 320, 118, 7, W * .05, W * .95, CLAP, true, ss(2, 2.6, lt)); praiseBursts(c, W / 2, GY - S * 2.3, lt, ss(2.6, 3.2, lt)); chapterTag(c, lt, 'الثاني', 'العالِمُ القارئ');
   } else judgment(c, lt, SC, PROPS.book, BLESS.SC);

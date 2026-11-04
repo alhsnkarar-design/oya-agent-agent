@@ -46,7 +46,7 @@ const STYLES = {
 function basePose(st) {
   const P = st.P, hipH = (P.thigh + P.shin) * .985, shY = -P.T + .1;
   return { lean: 0, head: 0, nod: 0, hipH, hipX: 0, bob: 0, back: false, face: 1, sq: 0,
-    handL: [-P.sw - .1, shY + P.up + P.fore - .04], handR: [P.sw + .1, shY + P.up + P.fore - .04],
+    handL: [-P.sw - .05, shY + (P.up + P.fore) * .985], handR: [P.sw + .05, shY + (P.up + P.fore) * .985],
     footL: [-.11, hipH], footR: [.11, hipH], liftL: 0, liftR: 0, elbowL: 1, elbowR: -1, kneeL: -1, kneeR: 1, propR: null, propL: null };
 }
 
@@ -91,8 +91,8 @@ function drawChar(c, x, y, s, st, pose) {
   const arm = (side, hand, bend, front) => {
     const ax = side * sw, ay = shY + .02;
     // natural micro-motion: hands are never perfectly still
-    const T = RIG_T + x * .0131 + side * 1.7;
-    const hx = hand[0] + Math.sin(T * 1.3) * .012, hy = hand[1] + Math.sin(T * 1.9 + 1) * .01;
+    const T = RIG_T + x * .0131;
+    const hx = hand[0] + side * Math.sin(T * 1.3) * .005, hy = hand[1] + Math.sin(T * 1.9 + 1) * .004;
     const k = ik(ax, ay, hx, hy, P.up, P.fore, bend);
     const sl = shade(st.sleeve === 'long' ? (st.sleeveCol || st.shirt) : st.shirt, front ? 0 : -.15), dim = front ? 0 : -.15;
     // one smooth curve shoulder → elbow → wrist (no hard hinge), tapering toward the wrist
@@ -232,7 +232,7 @@ function sparkle(c, x, y, s, a = 1) { c.save(); c.globalAlpha = a; c.fillStyle =
 
 /* ---------------- reusable motions (return pose overrides) ---------------- */
 const MOVES = {
-  idle(st, t) { const b = Math.sin(t * 2.2), w = Math.sin(t * .75); return { bob: b * .012, hipX: w * .025, lean: -w * .02, head: Math.sin(t * .9) * .05 + w * .02, handL: [-st.P.sw - .1, -st.P.T + .1 + st.P.up + st.P.fore - .05 + b * .01], handR: [st.P.sw + .1, -st.P.T + .1 + st.P.up + st.P.fore - .05 - b * .01] }; },
+  idle(st, t) { const b = Math.sin(t * 2.2), w = Math.sin(t * .75); return { bob: b * .012, hipX: w * .025, lean: -w * .02, head: Math.sin(t * .9) * .05 + w * .02, handL: [-st.P.sw - .05, -st.P.T + .12 + (st.P.up + st.P.fore) * .985 + b * .006], handR: [st.P.sw + .05, -st.P.T + .12 + (st.P.up + st.P.fore) * .985 + b * .006] }; },
   walk(st, t, speed = 1, carry = false) {
     const P = st.P, ph = t * 5.5 * speed, s1 = Math.sin(ph), c1 = Math.cos(ph), hipH = (P.thigh + P.shin) * .97;
     const stride = .26;
@@ -252,7 +252,7 @@ const MOVES = {
     return { lean: .1 + br, head: .06, nod: 1.2, hipH: h, bob: br * 2, footL: [-.26, h], footR: [.26, h], kneeL: -1, kneeR: 1,
       handL: [-.3, .02], handR: [.3, .02], elbowL: 1, elbowR: -1 };
   },
-  sad(st, t) { const P = st.P; return { head: .12, nod: 1, lean: .04, bob: Math.sin(t * 1.5) * .008, handL: [-P.sw - .04, -P.T + .1 + P.up + P.fore - .1], handR: [P.sw + .04, -P.T + .1 + P.up + P.fore - .1], elbowL: 1, elbowR: -1 }; },
+  sad(st, t) { const P = st.P; return { head: .12, nod: 1, lean: .04, bob: Math.sin(t * 1.5) * .008, handL: [-P.sw - .03, -P.T + .12 + (P.up + P.fore) * .98], handR: [P.sw + .03, -P.T + .12 + (P.up + P.fore) * .98], elbowL: 1, elbowR: -1 }; },
   wait(st, t) { // "wait…" raised palm
     const P = st.P; return { handR: [P.sw + .32, -P.T - .02 + Math.sin(t * 3) * .02], elbowR: 1, head: -.08, lean: -.04 };
   },
