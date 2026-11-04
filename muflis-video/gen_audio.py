@@ -59,16 +59,17 @@ put(paper(.3), 19.0, 1, .2)
 n = int(.5 * SR); put(bp(rng.standard_normal(n), 300, 2500) * dec(n, .12) * .9, 22.6, 1, .2)                         # insult
 put(boom(80, 1.2), 26.2, .4)                                                                                      # slander
 put(paper(.5), 28.8, 1, .2); footsteps(29.6, 31.4, .5, .8, -.4)                                                  # takes goods
-put(splash() * .6, 33.3, 1)                                                                                       # drop
+put(whoosh(.6), 32.0, 1.2, .2); put(boom(60, 1.6), 32.55, 1.0); put(thud(), 33.0, 1.1, .3)                        # dagger, impact, fall
+n = int(1.5 * SR); put(lp(rng.standard_normal(n), 300) * np.hanning(n) * .25, 33.2, 1)                                    # low tension
 put(thud(), 35.2, 1.2, .3); put(thud(), 35.9, .9, .4)                                                            # shove + sack falls
-for i in range(4):
-    for q in range(3): put(whoosh(.7), 38 + .8 + i * 2.6 + .5 + q * .45, .8, (-1) ** i * .5)
+for i in range(5):
+    for q in range(3): put(whoosh(.7), 38 + .6 + i * 2.2 + .5 + q * .45, .8, (-1) ** i * .5)
 put(boom(40, 4), 38.3, .8)
 for i in range(8): put(thud(), 50.3 + .5 + i * .6 + .4, .9, (i % 3 - 1) * .3)
 put(boom(35, 5), 56, 1.0)
 put(paper(.7), 60.3, 1); put(chime(523, 3), 60.6, .5)
-for i in range(4):
-    put(chime(784, 2), 67 + i * 3.2 + 1.6, .55, (i % 2 - .5)); put(sparkle(), 67 + i * 3.2 + 1.7, 1)
+for i in range(5):
+    put(chime(784, 2), 67 + i * 2.6 + 1.3, .55, (i % 2 - .5)); put(sparkle(), 67 + i * 2.6 + 1.4, 1)
 put(chime(784, 3), 84.6, .9); put(chime(1175, 3), 84.65, .5); put(boom(50, 2.5), 84.6, .4)
 for b in (7.8, 12.3, 16.8, 21.8, 37.8, 49.8, 59.8, 66.8, 79.8): put(whoosh(), b - .2, 1, -.2)
 
