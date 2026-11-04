@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><title>شخصيات: أعطِ الأجير أجره</title>
+<style>html,body{margin:0;background:#000;height:100%;overflow:hidden}canvas{display:block;width:100vw;height:100vh;object-fit:contain}</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script src="rig.js"></script>
+<script>
+const W = 1920, H = 1080, FPS = 30, DUR = 24;
+const cv = document.getElementById('c'); cv.width = W; cv.height = H; const ctx = cv.getContext('2d');
+const params = new URLSearchParams(location.search);
+
+function stage(c, x0, w, col1, col2) {
+  const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, col1); g.addColorStop(1, col2);
+  c.fillStyle = g; c.fillRect(x0, 0, w, H);
+  const fl = c.createLinearGradient(0, H * .78, 0, H); fl.addColorStop(0, 'rgba(0,0,0,.15)'); fl.addColorStop(1, 'rgba(0,0,0,.35)');
+  c.fillStyle = fl; c.fillRect(x0, H * .8, w, H * .2);
+  const sp = c.createRadialGradient(x0 + w / 2, H * .45, 10, x0 + w / 2, H * .45, w * .7); sp.addColorStop(0, 'rgba(255,255,255,.18)'); sp.addColorStop(1, 'rgba(255,255,255,0)');
+  c.fillStyle = sp; c.fillRect(x0, 0, w, H);
+}
+const PW = W / 3, GY = H * .86, S = 205;
+// mix between two poses
+function mix(a, b, k) {
+  const o = {}; for (const key of new Set([...Object.keys(a), ...Object.keys(b)])) {
+    const va = a[key], vb = b[key];
+    if (Array.isArray(va) && Array.isArray(vb)) o[key] = [lerp(va[0], vb[0], k), lerp(va[1], vb[1], k)];
+    else if (typeof va === 'number' && typeof vb === 'number') o[key] = lerp(va, vb, k);
+    else o[key] = k < .5 ? (va ?? vb) : (vb ?? va);
+  } return o;
+}
+function seq(st, t, list) { // list of [start, fn]; crossfade .45s
+  let i = 0; while (i + 1 < list.length && t >= list[i + 1][0]) i++;
+  const cur = Object.assign(basePose(st), list[i][1](t - list[i][0]));
+  if (i > 0) { const k = eInOut((t - list[i][0]) / .45); if (k < 1) return mix(Object.assign(basePose(st), list[i - 1][1](t - list[i - 1][0])), cur, k); }
+  return cur;
+}
+
+function worker(c, t) {
+  const st = STYLES.worker, x = PW * 1.5;
+  const pose = seq(st, t, [
+    [0, u => MOVES.idle(st, u)],
+    [4, u => Object.assign(MOVES.walk(st, u, 1, true), { propR: PROPS.brick })],
+    [10, u => MOVES.wipe(st, u)],
+    [14, u => MOVES.tired(st, u)],
+    [17.5, u => MOVES.receive(st, u, eOut(u / .8))],
+    [20, u => Object.assign(MOVES.cheer(st, u), { propR: PROPS.envelope })],
+  ]);
+  // ground motion lines while walking
+  if (t > 4 && t < 10) { c.strokeStyle = 'rgba(255,255,255,.25)'; c.lineWidth = 4; for (let i = 0; i < 5; i++) { const xx = x + 260 - ((t * 300 + i * 110) % 550); c.beginPath(); c.moveTo(xx, GY + 8); c.lineTo(xx - 60, GY + 8); c.stroke(); } }
+  drawChar(c, x, GY, S, st, pose);
+  if (t > 10 && t < 17.5) sweat(c, x + 10, GY - S * 2.75, S, t, ss(10, 10.5, t) * (1 - ss(17, 17.5, t)));
+  if (t > 20) { sparkle(c, x - 150, GY - S * 3.1, 26, .5 + .5 * Math.sin(t * 5)); sparkle(c, x + 160, GY - S * 2.9, 20, .5 + .5 * Math.cos(t * 6)); }
+}
+function boss(c, t) {
+  const st = STYLES.boss, x = PW * 2.45;
+  const turn = t < 5 ? 0 : t < 6 ? eInOut(t - 5) : t < 9 ? 1 : t < 10 ? 1 - eInOut(t - 9) : 0;
+  const sitting = t < 13;
+  if (sitting) {
+    chair(c, x - 40, GY, S, turn, false);
+    const pose = seq(st, t, [[0, u => MOVES.sit(st, u)], [10, u => Object.assign(MOVES.sit(st, u), MOVES.wait(st, u), { handL: [STYLES.boss.P.sw + .3, -STYLES.boss.P.T + .62] })]]);
+    pose.back = turn > .5; pose.face = turn > .5 ? 1 : 1;
+    if (turn > .5) { pose.handL = [-.3, -.2]; pose.handR = [.3, -.2]; }
+    drawChar(c, x - 40, GY - S * .62 + S * (st.P.shin + .1) - S * .3, S, st, Object.assign(pose, { hipH: st.P.shin + .1 }));
+    chair(c, x - 40, GY, S, turn, true && turn > .02);
+    desk(c, x - 40, GY, S, t);
+  } else {
+    const pose = seq(st, t, [
+      [13, u => Object.assign(MOVES.idle(st, u), { lean: .05 * (1 - eOut(u)) })],
+      [15, u => Object.assign(MOVES.give(st, u, eOut((u - .2) / 1)))],
+      [19, u => MOVES.handOnChest(st, u)],
+    ]);
+    pose.face = -1;
+    drawChar(c, x, GY, S, st, pose);
+    if (t > 19.3) heart(c, x - 20, GY - S * 3.0, 30, ss(19.3, 19.8, t) * (1 - ss(23, 23.8, t)));
+  }
+}
+function child(c, t) {
+  const st = STYLES.child, x = PW * .5;
+  const pose = seq(st, t, [
+    [0, u => MOVES.idle(st, u)],
+    [5, u => Object.assign(MOVES.sad(st, u), { footR: [.12 + Math.max(0, Math.sin(u * 2.5)) * .12, st.P.thigh + st.P.shin - .02 - Math.max(0, Math.sin(u * 2.5)) * .05] })],
+    [11, u => ({ head: -.18, lean: -.04, handL: [-.1, -.35], handR: [.1, -.35], elbowL: -1, elbowR: 1 })],
+    [16, u => MOVES.cheer(st, u)],
+  ]);
+  drawChar(c, x, GY, S, st, pose);
+  if (t > 16.2) { heart(c, x - 90, GY - S * 2.3 - (t - 16) * 20, 22, .8 * (1 - ss(21, 22, t))); heart(c, x + 100, GY - S * 2.1 - (t - 16) * 26, 18, .8 * (1 - ss(21, 22, t))); }
+}
+function renderAt(t) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1;
+  stage(ctx, 0, PW, '#2f4f6b', '#17293a');
+  stage(ctx, PW, PW, '#5b4630', '#2e2216');
+  stage(ctx, PW * 2, PW, '#3b3550', '#1d1a2b');
+  ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.fillRect(PW - 2, 0, 4, H); ctx.fillRect(PW * 2 - 2, 0, 4, H);
+  child(ctx, t); worker(ctx, t); boss(ctx, t);
+  const f = Math.max(1 - ss(0, .6, t), ss(DUR - .8, DUR, t)); if (f > 0) { ctx.globalAlpha = f; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
+}
+window.renderAt = renderAt; window.DUR = DUR; window.FPS = FPS;
+window.frameJPEG = (t, q = .93) => { renderAt(t); return cv.toDataURL('image/jpeg', q); };
+window.READY = true;
+if (!params.has('render')) { const t0 = performance.now(); (function loop() { renderAt(((performance.now() - t0) / 1000) % DUR); requestAnimationFrame(loop); })(); }
+</script>
+</body>
+</html>
