@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>غلاف المفلس</title>
+<style>
+@font-face{font-family:'Kufi';src:url(ReemKufi-Bold.ttf) format('truetype');font-weight:700}
+@font-face{font-family:'Amiri';src:url(Amiri-Bold.ttf) format('truetype');font-weight:700}
+body{margin:0;background:#000}
+</style></head><body>
+<script>
+/* غلاف فيسبوك/ريلز 1080×1920 — العناصر المهمة داخل منطقة القص 4:5 (y 285–1635). */
+const W = 1080, H = 1920;
+function load(src) { return new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = src; }); }
+function gold(c, y0, y1) { const g = c.createLinearGradient(0, y0, 0, y1); g.addColorStop(0, '#fff3c8'); g.addColorStop(.45, '#f1c56a'); g.addColorStop(.8, '#c98b2e'); g.addColorStop(1, '#ffe39a'); return g; }
+window.makeCover = async (frame) => {
+  await Promise.all(['700 100px Kufi', '700 60px Amiri'].map(f => document.fonts.load(f, 'المفلس')));
+  const [bg, logo] = await Promise.all([load(frame), load('logo.png')]);
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const c = cv.getContext('2d');
+  c.drawImage(bg, 0, -40, W, H);
+  // darken the bottom (hide the caption box) and the very top
+  let g = c.createLinearGradient(0, 1180, 0, H); g.addColorStop(0, 'rgba(5,4,10,0)'); g.addColorStop(.2, 'rgba(5,4,10,.97)'); g.addColorStop(1, 'rgba(5,4,10,1)'); c.fillStyle = g; c.fillRect(0, 1180, W, H - 1180);
+  g = c.createLinearGradient(0, 0, 0, 420); g.addColorStop(0, 'rgba(5,4,10,.85)'); g.addColorStop(1, 'rgba(5,4,10,0)'); c.fillStyle = g; c.fillRect(0, 0, W, 420);
+  c.direction = 'rtl'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  // title
+  c.font = '700 74px Kufi'; c.fillStyle = '#ffffff'; c.shadowColor = 'rgba(0,0,0,.9)'; c.shadowBlur = 16; c.fillText('مَن هو', W / 2, 1325);
+  c.font = '700 128px Kufi'; c.shadowColor = 'rgba(255,190,90,.75)'; c.shadowBlur = 34; c.fillStyle = gold(c, 1380, 1500); c.fillText('المُفلِس الحقيقي؟', W / 2, 1440);
+  c.shadowBlur = 0;
+  // ornament line + source
+  const lg = c.createLinearGradient(W / 2 - 300, 0, W / 2 + 300, 0); lg.addColorStop(0, 'rgba(232,190,110,0)'); lg.addColorStop(.5, 'rgba(240,200,120,1)'); lg.addColorStop(1, 'rgba(232,190,110,0)');
+  c.fillStyle = lg; c.fillRect(W / 2 - 300, 1522, 600, 3);
+  c.font = '700 40px Amiri'; c.fillStyle = '#e9d3a6'; c.fillText('حديث صحيح · رواه مسلم', W / 2, 1565);
+  // logo (top, inside the 4:5 safe area)
+  c.save(); c.shadowColor = 'rgba(255,190,90,.5)'; c.shadowBlur = 20; c.drawImage(logo, W - 60 - 170, 300, 170, 170); c.restore();
+  return cv.toDataURL('image/jpeg', .94);
+};
+window.READY = true;
+</script></body></html>
