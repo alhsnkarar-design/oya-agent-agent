@@ -5,6 +5,7 @@
    المشاعر تُعبَّر عنها بلغة الجسد: ميل الرأس، انحناء الظهر، الإيماءات.
    ===================================================================== */
 const TAU = Math.PI * 2;
+var RIG_T = 0; // global clock for natural micro-motion (set by the page each frame)
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const lerp = (a, b, t) => a + (b - a) * t;
 const ss = (a, b, x) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
@@ -89,22 +90,35 @@ function drawChar(c, x, y, s, st, pose) {
   const T = P.T, shY = -T + .1, sw = P.sw;
   const arm = (side, hand, bend, front) => {
     const ax = side * sw, ay = shY + .02;
-    const k = ik(ax, ay, hand[0], hand[1], P.up, P.fore, bend);
-    const sl = st.sleeve === 'long' ? (st.sleeveCol || st.shirt) : st.shirt;
-    const dim = front ? 0 : -.15;
-    seg(c, ax, ay, k.jx, k.jy, P.armW + .025, 'rgba(0,0,0,.35)');
-    seg(c, k.jx, k.jy, k.ex, k.ey, P.armW * .85 + .02, 'rgba(0,0,0,.3)');
-    seg(c, ax, ay, k.jx, k.jy, P.armW, shade(sl, dim));
-    if (st.sleeve === 'short') {
-      seg(c, k.jx, k.jy, k.ex, k.ey, P.armW * .82, shade(st.skin, dim));
-      const mx = lerp(ax, k.jx, .62), my = lerp(ay, k.jy, .62);
-      seg(c, ax, ay, mx, my, P.armW * 1.08, shade(sl, dim));
-    } else seg(c, k.jx, k.jy, k.ex, k.ey, P.armW * .92, shade(sl, dim));
-    if (st.watch && side > 0) { const wx = lerp(k.jx, k.ex, .82), wy = lerp(k.jy, k.ey, .82); c.fillStyle = '#d6b25e'; c.beginPath(); c.arc(wx, wy, .055, 0, TAU); c.fill(); }
-    // hand
-    c.fillStyle = st.glove ? shade(st.glove, dim) : shade(st.skin, dim);
-    c.beginPath(); c.arc(k.ex, k.ey, P.armW * .62, 0, TAU); c.fill();
-    c.strokeStyle = 'rgba(0,0,0,.25)'; c.lineWidth = .015; c.stroke();
+    // natural micro-motion: hands are never perfectly still
+    const T = RIG_T + x * .0131 + side * 1.7;
+    const hx = hand[0] + Math.sin(T * 1.3) * .012, hy = hand[1] + Math.sin(T * 1.9 + 1) * .01;
+    const k = ik(ax, ay, hx, hy, P.up, P.fore, bend);
+    const sl = shade(st.sleeve === 'long' ? (st.sleeveCol || st.shirt) : st.shirt, front ? 0 : -.15), dim = front ? 0 : -.15;
+    // one smooth curve shoulder → elbow → wrist (no hard hinge), tapering toward the wrist
+    const qx = lerp(k.jx, 2 * k.jx - (ax + k.ex) / 2, .5), qy = lerp(k.jy, 2 * k.jy - (ay + k.ey) / 2, .5);
+    const pt = t => [(1 - t) * (1 - t) * ax + 2 * (1 - t) * t * qx + t * t * k.ex, (1 - t) * (1 - t) * ay + 2 * (1 - t) * t * qy + t * t * k.ey];
+    const N = 14, sleeveEnd = st.sleeve === 'short' ? .42 : 1, wAt = t => P.armW * (1.04 - .3 * t);
+    c.lineCap = 'round';
+    for (let pass = 0; pass < 2; pass++) for (let i = 0; i < N; i++) {
+      const t0 = i / N, t1 = (i + 1) / N, [x0, y0] = pt(t0), [x1, y1] = pt(t1);
+      c.strokeStyle = pass === 0 ? 'rgba(0,0,0,.3)' : (t0 < sleeveEnd ? sl : shade(st.skin, dim)); c.lineWidth = wAt(t0) + (pass === 0 ? .024 : 0);
+      c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke();
+    }
+    if (st.sleeve === 'short') { const [cx0, cy0] = pt(.42); c.fillStyle = sl; c.beginPath(); c.arc(cx0, cy0, wAt(.42) * .56, 0, TAU); c.fill(); }
+    else { const [cx0, cy0] = pt(.9), [cx1, cy1] = pt(.97); c.strokeStyle = shade(st.sleeve === 'long' ? (st.sleeveCol || st.shirt) : st.shirt, (front ? 0 : -.15) - .16); c.lineWidth = wAt(.92) * 1.05; c.beginPath(); c.moveTo(cx0, cy0); c.lineTo(cx1, cy1); c.stroke(); }
+    const [px0, py0] = pt(.86), ang = Math.atan2(k.ey - py0, k.ex - px0);
+    if (st.watch && side > 0) { const [wx, wy] = pt(.84); c.fillStyle = '#d6b25e'; c.beginPath(); c.arc(wx, wy, .05, 0, TAU); c.fill(); }
+    // hand: palm + rounded fingers + thumb, oriented along the forearm
+    const hc = st.glove ? shade(st.glove, dim) : shade(st.skin, dim), th = (bend > 0 ? 1 : -1);
+    c.save(); c.translate(k.ex, k.ey); c.rotate(ang);
+    c.fillStyle = 'rgba(0,0,0,.28)'; c.beginPath(); c.ellipse(.075, 0, .108, .083, 0, 0, TAU); c.fill();
+    c.fillStyle = hc; c.beginPath(); c.ellipse(.07, 0, .095, .07, 0, 0, TAU); c.fill();
+    c.beginPath(); c.ellipse(.135, .005, .05, .062, 0, 0, TAU); c.fill();
+    c.beginPath(); c.ellipse(.05, -.068 * th, .03, .048, -.6 * th, 0, TAU); c.fill();
+    c.strokeStyle = 'rgba(0,0,0,.18)'; c.lineWidth = .01; c.beginPath(); c.moveTo(.11, -.035); c.lineTo(.16, -.03); c.moveTo(.11, .03); c.lineTo(.16, .028); c.stroke();
+    c.restore();
+    k.ex += Math.cos(ang) * .08; k.ey += Math.sin(ang) * .08;
     return k;
   };
   // back arm (behind torso)

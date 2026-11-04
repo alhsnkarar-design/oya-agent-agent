@@ -17,12 +17,12 @@ body.render #ui{display:none}
 </head>
 <body>
 <canvas id="c"></canvas>
-<div id="ui"><button id="play">▶</button><input id="seek" type="range" min="0" max="102" step="0.01" value="0"><span id="tm">0:00</span></div>
+<div id="ui"><button id="play">▶</button><input id="seek" type="range" min="0" max="91" step="0.01" value="0"><span id="tm">0:00</span></div>
 <audio id="aud" src="soundtrack.wav" preload="auto"></audio>
 <script src="rig.js"></script>
 <script>
 /* «الثلاثة أول من يُقضى عليهم يوم القيامة» — صحيح مسلم 1905، شخصيات بلا ملامح وجه، كابشن بالفصحى. */
-const W = 1080, H = 1920, FPS = 30, DUR = 102;
+const W = 1080, H = 1920, FPS = 30, DUR = 91;
 const cv = document.getElementById('c'); cv.width = W; cv.height = H; const ctx = cv.getContext('2d');
 const mk = (w = W, h = H) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
 const buf = mk(), bctx = buf.getContext('2d');
@@ -238,22 +238,21 @@ function p5(c, lt) {
 
 /* ---------------- captions (hadith wording from Sahih Muslim 1905) ---------------- */
 function partCaps(P, a, b, c2, d) { return [
-  { s: P + .3, e: P + 7.8, h: 1, l: a },
+  a ? { s: P + .3, e: P + 7.8, h: 1, l: a } : null,
   { s: P + 8.1, e: P + 14.9, h: 1, l: b },
   { s: P + 15.1, e: P + 19.4, h: 1, l: c2, hl: [[P + 15.1, P + 16.4, 'كذبتَ'], [P + 16.4, P + 19.4, c2[c2.length - 1]]] },
   { s: P + 19.6, e: P + 21.8, h: 1, l: d },
 ]; }
 const CAPS = [
-  { s: .5, e: 5.9, h: 0, l: ['جهادٌ… وعلمٌ… وصدقة…', 'فلماذا كانوا أوّلَ من يُقضى عليهم؟'], hl: [[.5, 2.8, 'جهادٌ… وعلمٌ… وصدقة…'], [2.8, 5.9, 'فلماذا كانوا أوّلَ من يُقضى عليهم؟']] },
-  { s: 6.2, e: 10.8, h: 1, l: ['«إنّ أولَ الناسِ يُقضى', 'يومَ القيامةِ عليه…»'], src: 'رواه مسلم (١٩٠٥)' },
-  ...partCaps(11, ['«رجلٌ استُشهد، فأُتي به', 'فعرّفه نِعَمَه فعرفها»'], ['قال: فما عملتَ فيها؟', 'قال: قاتلتُ فيك حتى استُشهدت'], ['قال: كذبتَ،', 'ولكنك قاتلتَ لأن يُقال: جريء، فقد قيل'], ['ثم أُمر به فسُحب على وجهه', 'حتى أُلقي في النار']),
-  ...partCaps(33, ['«ورجلٌ تعلّم العلمَ وعلّمه،', 'وقرأ القرآن…»'], ['قال: فما عملتَ فيها؟', 'قال: تعلّمتُ العلمَ وعلّمتُه، وقرأتُ فيك القرآن'], ['قال: كذبتَ،', 'ولكنك تعلّمتَ ليُقال: عالم، وقرأتَ ليُقال: هو قارئ، فقد قيل'], ['ثم أُمر به فسُحب على وجهه', 'حتى أُلقي في النار']),
-  ...partCaps(55, ['«ورجلٌ وسّع اللهُ عليه،', 'وأعطاه من أصناف المال كلِّه…»'], ['قال: فما عملتَ فيها؟', 'قال: ما تركتُ من سبيلٍ تحبّ أن يُنفَق فيها إلا أنفقتُ فيها لك'], ['قال: كذبتَ،', 'ولكنك فعلتَ ليُقال: هو جواد، فقد قيل'], ['ثم أُمر به فسُحب على وجهه', 'ثم أُلقي في النار»']),
-  { s: 77.3, e: 85.7, h: 1, l: ['«أنا أغنى الشركاء عن الشرك،', 'من عمل عملًا أشرك فيه معي غيري، تركتُه وشِركَه»'], hl: [[77.3, 81, '«أنا أغنى الشركاء عن الشرك،'], [81, 85.7, 'من عمل عملًا أشرك فيه معي غيري، تركتُه وشِركَه»']], src: 'حديث قدسي — رواه مسلم (٢٩٨٥)' },
-  { s: 86.2, e: 90.9, h: 0, l: ['تصدّق في السرّ…', 'كما تُخفي ذنبك'] },
-  { s: 91.1, e: 95.4, h: 0, l: ['وعلّم لوجه الله…', 'لا لتصفيق الناس'] },
-  { s: 95.6, e: 101.4, h: 1, l: ['«إنّما الأعمالُ بالنيّات»'], src: 'متفق عليه' },
-];
+  { s: .15, e: 7.8, h: 1, l: ['«إنّ أولَ الناسِ يُقضى يومَ القيامةِ عليه', 'رجلٌ استُشهد، فأُتي به فعرّفه نِعَمَه فعرفها'], hl: [[.15, 3.6, '«إنّ أولَ الناسِ يُقضى يومَ القيامةِ عليه'], [3.6, 7.8, 'رجلٌ استُشهد، فأُتي به فعرّفه نِعَمَه فعرفها']], src: 'رواه مسلم (١٩٠٥)' },
+  ...partCaps(0, null, ['قال: فما عملتَ فيها؟', 'قال: قاتلتُ فيك حتى استُشهدت'], ['قال: كذبتَ،', 'ولكنك قاتلتَ لأن يُقال: جريء، فقد قيل'], ['ثم أُمر به فسُحب على وجهه', 'حتى أُلقي في النار']),
+  ...partCaps(22, ['ورجلٌ تعلّم العلمَ وعلّمه، وقرأ القرآن،', 'فأُتي به فعرّفه نِعَمَه فعرفها'], ['قال: فما عملتَ فيها؟', 'قال: تعلّمتُ العلمَ وعلّمتُه، وقرأتُ فيك القرآن'], ['قال: كذبتَ،', 'ولكنك تعلّمتَ العلمَ ليُقال: عالم، وقرأتَ القرآنَ ليُقال: هو قارئ، فقد قيل'], ['ثم أُمر به فسُحب على وجهه', 'حتى أُلقي في النار']),
+  ...partCaps(44, ['ورجلٌ وسّع اللهُ عليه، وأعطاه من أصناف المال كلِّه،', 'فأُتي به فعرّفه نِعَمَه فعرفها'], ['قال: فما عملتَ فيها؟', 'قال: ما تركتُ من سبيلٍ تحبّ أن يُنفَق فيها إلا أنفقتُ فيها لك'], ['قال: كذبتَ،', 'ولكنك فعلتَ ليُقال: هو جواد، فقد قيل'], ['ثم أُمر به فسُحب على وجهه', 'ثم أُلقي في النار»']),
+  { s: 66.3, e: 74.7, h: 1, l: ['«أنا أغنى الشركاء عن الشرك،', 'من عمل عملًا أشرك فيه معي غيري، تركتُه وشِركَه»'], hl: [[66.3, 70, '«أنا أغنى الشركاء عن الشرك،'], [70, 74.7, 'من عمل عملًا أشرك فيه معي غيري، تركتُه وشِركَه»']], src: 'حديث قدسي — رواه مسلم (٢٩٨٥)' },
+  { s: 75.2, e: 79.9, h: 0, l: ['تصدّق في السرّ…', 'كما تُخفي ذنبك'] },
+  { s: 80.1, e: 84.4, h: 0, l: ['وعلّم لوجه الله…', 'لا لتصفيق الناس'] },
+  { s: 84.6, e: 90.4, h: 1, l: ['«إنّما الأعمالُ بالنيّات»'], src: 'متفق عليه' },
+].filter(Boolean);
 const capCache = new Map();
 function capLayout(cap) { if (capCache.has(cap)) return capCache.get(cap);
   const fs = 54, lh = fs * 1.6, maxW = W * .86, m = mk(10, 10).getContext('2d'); const fam = cap.h ? 'Amiri' : 'ReemKufi', base = cap.h ? fs : fs - 4; m.font = `700 ${base}px ${fam}`;
@@ -271,14 +270,14 @@ function captions(c, t) {
     c.restore(); }
 }
 const SCENES = [
-  { s: 0, e: 11.4, f: p0 }, { s: 10.8, e: 33.4, f: (c, lt) => p1(c, lt - .2) }, { s: 32.8, e: 55.4, f: (c, lt) => p2(c, lt - .2) }, { s: 54.8, e: 77.4, f: (c, lt) => p3(c, lt - .2) },
-  { s: 76.8, e: 86.4, f: p4 }, { s: 85.8, e: 102, f: p5 },
+  { s: 0, e: 22.4, f: p1 }, { s: 21.8, e: 44.4, f: (c, lt) => p2(c, lt - .2) }, { s: 43.8, e: 66.4, f: (c, lt) => p3(c, lt - .2) },
+  { s: 65.8, e: 75.4, f: p4 }, { s: 74.8, e: 91, f: p5 },
 ];
 
 const VIG = mk(); { const x = VIG.getContext('2d'); const g = x.createRadialGradient(W / 2, H / 2, W * .4, W / 2, H / 2, H * .66); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.55)'); x.fillStyle = g; x.fillRect(0, 0, W, H); }
 const GRAIN = Array.from({ length: 6 }, (_, k) => { const c = mk(270, 480), x = c.getContext('2d'), id = x.createImageData(270, 480), r = rng(9 + k); for (let i = 0; i < id.data.length; i += 4) { const v = r() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 255; } x.putImageData(id, 0, 0); return c; });
 /* ---------- cinematic layer ---------- */
-const CAMS = [[1.02, 1.08, .5, .45], [1.02, 1.1, .5, .45], [1.02, 1.1, .5, .45], [1.02, 1.1, .5, .45], [1.1, 1.02, .5, .35], [1.02, 1.06, .5, .45]];
+const CAMS = [[1.02, 1.1, .5, .45], [1.02, 1.1, .5, .45], [1.02, 1.1, .5, .45], [1.1, 1.02, .5, .35], [1.02, 1.06, .5, .45]];
 const BLM = mk(270, 480), blx = BLM.getContext('2d');
 const MOTES = Array.from({ length: 26 }, () => ({ x: R() * W, y: R() * H, z: R(), p: R() * TAU }));
 function drawScene(sc, i, t, a) {
@@ -290,7 +289,7 @@ function drawScene(sc, i, t, a) {
   if (a < 1) { const r = eInOut(a) * Math.hypot(W, H) * .62; ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.strokeStyle = `rgba(255,205,120,${.75 * (1 - a)})`; ctx.lineWidth = 26; ctx.shadowColor = 'rgba(255,190,90,1)'; ctx.shadowBlur = 40; ctx.beginPath(); ctx.arc(W / 2, H * .45, Math.max(1, r), 0, TAU); ctx.stroke(); ctx.restore(); }
 }
 function renderAt(t) {
-  t = clamp(t, 0, DUR);
+  t = clamp(t, 0, DUR); RIG_T = t;
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
   SCENES.forEach((sc, i) => { if (t < sc.s || t > sc.e) return; const a = sc.s > 0 ? ss(sc.s, sc.s + .6, t) : 1;
     bctx.setTransform(1, 0, 0, 1, 0, 0); bctx.globalAlpha = 1; bctx.globalCompositeOperation = 'source-over'; bctx.shadowBlur = 0; bctx.filter = 'none'; bctx.clearRect(0, 0, W, H);
@@ -302,7 +301,7 @@ function renderAt(t) {
   for (const m of MOTES) { const y = ((m.y - t * (10 + m.z * 30)) % H + H) % H, x = m.x + Math.sin(t * .4 + m.p) * 40; glow(ctx, SP.gold, x, y, 20 + m.z * 90, (.06 + .1 * m.z) * (.6 + .4 * Math.sin(t + m.p))); }
   ctx.drawImage(VIG, 0, 0); ctx.save(); ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = .045; ctx.drawImage(GRAIN[Math.floor(t * FPS) % 6], 0, 0, W, H); ctx.restore();
   captions(ctx, t);
-  const fade = Math.max(1 - ss(0, .7, t), ss(DUR - 1, DUR, t)); if (fade > 0) { ctx.globalAlpha = fade; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
+  const fade = Math.max(1 - ss(0, .25, t), ss(DUR - 1, DUR, t)); if (fade > 0) { ctx.globalAlpha = fade; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
 }
 const MB = mk(), mbx = MB.getContext('2d');
 const params = new URLSearchParams(location.search);
