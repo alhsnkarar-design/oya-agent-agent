@@ -65,6 +65,8 @@ Account plugin: `servicenow-sdk` (skill `servicenow-sdk:now-sdk`).
 ## Account-level copy
 
 `.claude/my-skills.zip` packs this registry plus full copies of every
-installed skill as one skill named `my-skills`. Uploaded in claude.ai under
+installed skill as one skill named `my-skills`. Each pack is stored as one
+`library/<pack>.tar.gz` so the upload stays under claude.ai's 200-file limit
+(it also allows only one `SKILL.md`). Uploaded in claude.ai under
 Customize, Skills, it syncs into every session in every repository. Rebuild
 and re-upload it whenever this registry changes.
