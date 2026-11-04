@@ -102,9 +102,11 @@ function judgmentBG(c, t) {
   c.save(); c.globalCompositeOperation = 'lighter'; c.translate(W / 2, -200); for (let i = 0; i < 14; i++) { const an = Math.PI / 2 + (i - 6.5) * .09; const g = c.createLinearGradient(0, 0, Math.cos(an) * 2600, Math.sin(an) * 2600); g.addColorStop(0, 'rgba(255,230,170,.12)'); g.addColorStop(1, 'rgba(255,230,170,0)'); c.fillStyle = g; c.beginPath(); c.moveTo(0, 0); c.lineTo(Math.cos(an - .03) * 2600, Math.sin(an - .03) * 2600); c.lineTo(Math.cos(an + .03) * 2600, Math.sin(an + .03) * 2600); c.fill(); } c.restore();
   c.fillStyle = 'rgba(0,0,0,.4)'; c.fillRect(0, GY, W, H);
 }
-function streetBG(c, t) { c.save(); c.filter = 'blur(1.6px)'; _streetBG(c, t); c.restore(); }
-function fieldBG(c, t, n) { c.save(); c.filter = 'blur(1.4px)'; _fieldBG(c, t, n); c.restore(); }
-function officeBG(c, t) { c.save(); c.filter = 'blur(1.6px)'; _officeBG(c, t); c.restore(); }
+const BGC = mk(), BGX = BGC.getContext('2d');
+function blurred(c, px, fn) { BGX.setTransform(1, 0, 0, 1, 0, 0); BGX.globalAlpha = 1; BGX.filter = 'none'; BGX.clearRect(0, 0, W, H); fn(BGX); c.save(); c.filter = `blur(${px}px)`; c.drawImage(BGC, 0, 0); c.restore(); }
+function streetBG(c, t) { blurred(c, 1.6, x => _streetBG(x, t)); }
+function fieldBG(c, t, n) { blurred(c, 1.4, x => _fieldBG(x, t, n)); }
+function officeBG(c, t) { blurred(c, 1.6, x => _officeBG(x, t)); }
 const LOGO = new Image(); LOGO.src = 'logo.png';
 
 /* ============================ SCENES ============================ */
