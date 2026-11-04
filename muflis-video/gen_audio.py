@@ -3,7 +3,7 @@ chair squeaks, calendar pages, night crickets, scale creak, chimes — synced to
 import numpy as np, wave, os
 from scipy.signal import butter, sosfilt
 
-SR, DUR = 48000, 84.0
+SR, DUR = 48000, 90.0
 N = int(SR * DUR); t = np.arange(N) / SR
 rng = np.random.default_rng(23)
 def noise(n=N): return rng.standard_normal(n)
@@ -42,33 +42,35 @@ def footsteps(a, b, period=.57, g=1.0, pan=0.0):
     while x < b: put(step(g), x, 1, pan); x += period
 
 # --- ambience beds
-bed(lp(noise(), 150) * .3 * env([(0, 0), (1, 1), (33, 1), (34, .6), (46, .9), (56, .4), (64, .2), (84, .1)]))           # room / low bed
-bed(lp(noise(), 70) * .7 * env([(0, 0), (34, 0), (35.5, 1), (45, 1), (51, 1.4), (55.5, 1.6), (56.3, 0), (84, 0)]))     # judgment drone & rumble
-bed(bp(noise(), 200, 900) * .04 * env([(0, 0), (64, 0), (65, 1), (84, 1)]), -.3)                                     # outdoor air
-for i in range(14):
-    at = 64.5 + rng.uniform(0, 18); n = int(.16 * SR); k = np.arange(n) / SR
-    f0 = rng.uniform(2800, 4300); put(np.sin(2 * np.pi * (f0 + 800 * np.sin(2 * np.pi * 15 * k)) * k) * np.hanning(n) * .045, at, 1, rng.uniform(-.7, .7))
-# --- scene events
-put(chime(660, 2.5), .8, .7); put(squeak(.8), 6.3, 1, .2); put(whoosh(.8), 7.0, 1, .1)                               # 1 wallet
-n = int(1.8 * SR); put(bp(rng.standard_normal(n), 120, 400) * (np.abs(np.sin(2 * np.pi * 18 * np.arange(n) / SR)) ) * np.hanning(n) * .25, 8.2, 1, .3)  # moth wings
-for k, t0 in enumerate((13.6, 15.4, 17.2)): put(sparkle(), t0, 1, (k - 1) * .5)                                      # 2 worship → light
-for i in range(15): put(chime(880 * 2 ** ((i % 5) / 12 * 2), .9), 14.2 + i * .4, .35, (i % 3 - 1) * .4)
-n = int(.5 * SR); put(bp(rng.standard_normal(n), 300, 2500) * dec(n, .12) * .9, 22.4, 1, .2)                          # 3 insult burst
-put(boom(70, 1.5), 24.8, .5)                                                                                          #   slander rumble
-put(paper(.5), 27.4, 1, -.2)                                                                                          #   money taken
-put(splash() * .6, 31.0, 1)                                                                                           #   the drop
-put(thud(), 31.9, 1.2, .3)                                                                                            #   the shove
-for i in range(5):                                                                                                    # 4 good deeds taken
-    for q in range(3): put(whoosh(.7), 34 + 1.5 + i * 2.2 + q * .45, .8, (-1) ** i * .5)
-put(boom(40, 4), 34.2, .8)
-for i in range(8): put(thud(), 46.5 + i * .6 + .35, .9, (i % 3 - 1) * .3)                                            # 5 sins cast
-put(boom(35, 5), 52, 1.0)
-put(paper(.7), 56.3, 1); put(chime(523, 3), 56.6, .5)                                                                 # 6 the book
-footsteps(64.3, 66, .6, pan=-.3); put(paper(.5), 66.4, 1); put(chime(784, 2.5), 68.6, .7)                            # 7 returning the right
-for i in range(15): put(chime(1046, .7), 68.5 + i * .3, .2, (i % 3 - 1) * .4)
-put(sparkle(), 71.7, 1); footsteps(74, 79, .6, .7)                                                                   # 8 together
-put(chime(784, 3), 79, .9); put(chime(1175, 3), 79.05, .5); put(boom(50, 2.5), 79, .4)
-for b in (11.8, 21.8, 33.8, 45.8, 55.8, 63.8, 73.8): put(whoosh(), b - .2, 1, -.2)
+bed(lp(noise(), 150) * .3 * env([(0, 0), (1, 1), (8, .6), (38, .8), (50, .9), (60, .4), (90, .1)]))
+bed(bp(noise(), 300, 1200) * .03 * env([(0, 0), (8, 0), (8.5, 1), (12.3, 1), (12.6, 0), (90, 0)]))                       # mosque air
+bed(bp(noise(), 200, 900) * .04 * env([(0, 0), (12.5, 0), (13, 1), (16.8, 1), (17.2, 0), (90, 0)]), .3)                   # sunset breeze
+bed(bp(noise(), 400, 2500) * .035 * env([(0, 0), (17, 0), (17.5, 1), (37.6, 1), (38, 0), (66.8, 0), (67.4, 1), (80, 1), (80.4, 0), (90, 0)]), -.2)  # street murmur
+bed(lp(noise(), 70) * .7 * env([(0, 0), (38, 0), (39.5, 1), (49.5, 1), (55, 1.4), (59.5, 1.6), (60.3, 0), (90, 0)]))      # judgment drone
+for i in range(24):
+    at = rng.choice([rng.uniform(17.5, 37), rng.uniform(67.5, 89)]); n = int(.16 * SR); k = np.arange(n) / SR
+    f0 = rng.uniform(2800, 4300); put(np.sin(2 * np.pi * (f0 + 800 * np.sin(2 * np.pi * 15 * k)) * k) * np.hanning(n) * .04, at, 1, rng.uniform(-.7, .7))
+# --- events
+put(chime(660, 2.5), .7, .7); put(squeak(.8), 4.3, 1, .2); put(whoosh(.8), 5.0, 1, .1)
+n = int(1.8 * SR); put(bp(rng.standard_normal(n), 120, 400) * np.abs(np.sin(2 * np.pi * 18 * np.arange(n) / SR)) * np.hanning(n) * .25, 5.6, 1, .3)
+for t0 in (9.6, 14.1, 18.6):
+    for j in range(4): put(chime(880 * 2 ** (j * 2 / 12), .9), t0 + j * .45, .35, (j - 1.5) * .3)
+put(paper(.3), 19.0, 1, .2)
+n = int(.5 * SR); put(bp(rng.standard_normal(n), 300, 2500) * dec(n, .12) * .9, 22.6, 1, .2)                         # insult
+put(boom(80, 1.2), 26.2, .4)                                                                                      # slander
+put(paper(.5), 28.8, 1, .2); footsteps(29.6, 31.4, .5, .8, -.4)                                                  # takes goods
+put(splash() * .6, 33.3, 1)                                                                                       # drop
+put(thud(), 35.2, 1.2, .3); put(thud(), 35.9, .9, .4)                                                            # shove + sack falls
+for i in range(4):
+    for q in range(3): put(whoosh(.7), 38 + .8 + i * 2.6 + .5 + q * .45, .8, (-1) ** i * .5)
+put(boom(40, 4), 38.3, .8)
+for i in range(8): put(thud(), 50.3 + .5 + i * .6 + .4, .9, (i % 3 - 1) * .3)
+put(boom(35, 5), 56, 1.0)
+put(paper(.7), 60.3, 1); put(chime(523, 3), 60.6, .5)
+for i in range(4):
+    put(chime(784, 2), 67 + i * 3.2 + 1.6, .55, (i % 2 - .5)); put(sparkle(), 67 + i * 3.2 + 1.7, 1)
+put(chime(784, 3), 84.6, .9); put(chime(1175, 3), 84.65, .5); put(boom(50, 2.5), 84.6, .4)
+for b in (7.8, 12.3, 16.8, 21.8, 37.8, 49.8, 59.8, 66.8, 79.8): put(whoosh(), b - .2, 1, -.2)
 
 def verb(x):
     y = x.copy()
