@@ -7,6 +7,7 @@
 <style>
 @font-face{font-family:'Amiri';src:url(fonts/Amiri-Bold.ttf) format('truetype');font-weight:700}
 @font-face{font-family:'ReemKufi';src:url(fonts/ReemKufi-Bold.ttf) format('truetype');font-weight:700}
+@font-face{font-family:'Cairo';src:url(fonts/Cairo-ExtraBold.ttf) format('truetype');font-weight:700}
 html,body{margin:0;height:100%;background:#000;overflow:hidden}
 canvas{display:block;width:100vw;height:100vh;object-fit:contain;background:#000}
 #ui{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:12px;align-items:center;background:rgba(10,8,4,.6);border:1px solid rgba(232,190,110,.35);padding:8px 16px;border-radius:40px;color:#f3d79a;font-family:sans-serif}
@@ -75,15 +76,15 @@ const DUA = { armL: [-.32, -.22], armR: [.32, -.22] };
 /* ---------- text ---------- */
 function headline(c, t, s, e, txt, col = GOLD, y = H * .15, size = 70) {
   if (t < s || t > e) return; const a = ss(s, s + .35, t) * (1 - ss(e - .35, e, t)); c.save(); c.globalAlpha = a; c.direction = 'rtl'; c.textAlign = 'center'; c.textBaseline = 'middle';
-  c.font = `700 ${size}px ReemKufi`; c.shadowColor = col === GOLD ? 'rgba(242,193,78,.45)' : 'rgba(0,0,0,.6)'; c.shadowBlur = 18; c.fillStyle = col; c.fillText(txt, W / 2, y + (1 - eOut((t - s) / .5)) * 18); c.restore(); }
-function subline(c, t, s, e, txt, col = DIM, y = H * .19, size = 38) { if (t < s || t > e) return; const a = ss(s + .2, s + .6, t) * (1 - ss(e - .35, e, t)); c.save(); c.globalAlpha = a; c.direction = 'rtl'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = `700 ${size}px ReemKufi`; c.fillStyle = col; c.fillText(txt, W / 2, y); c.restore(); }
+  c.font = `700 ${size}px Cairo`; c.shadowColor = col === GOLD ? 'rgba(242,193,78,.45)' : 'rgba(0,0,0,.6)'; c.shadowBlur = 18; c.fillStyle = col; c.fillText(txt, W / 2, y + (1 - eOut((t - s) / .5)) * 18); c.restore(); }
+function subline(c, t, s, e, txt, col = DIM, y = H * .19, size = 38) { if (t < s || t > e) return; const a = ss(s + .2, s + .6, t) * (1 - ss(e - .35, e, t)); c.save(); c.globalAlpha = a; c.direction = 'rtl'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = `700 ${size}px Cairo`; c.fillStyle = col; c.fillText(txt, W / 2, y); c.restore(); }
 /* the hadith in Fusha at the bottom: thin gold rules, no box */
 const HAD = []; // motivational: no hadith captions
 function hadith(c, t) { for (const [s, e, lines, src] of HAD) { if (t < s || t > e) continue; const a = ss(s, s + .4, t) * (1 - ss(e - .4, e, t)); c.save(); c.globalAlpha = a; c.direction = 'rtl'; c.textAlign = 'center'; c.textBaseline = 'middle';
     const m = c; m.font = '700 46px Amiri'; let sc = 1; for (const l of lines) sc = Math.min(sc, W * .86 / m.measureText(l).width); const fs = Math.floor(46 * sc), lh = fs * 1.55, y0 = H * .8 - (lines.length - 1) * lh / 2;
     const rule = (y) => { const g = c.createLinearGradient(W * .2, 0, W * .8, 0); g.addColorStop(0, 'rgba(242,193,78,0)'); g.addColorStop(.5, 'rgba(242,193,78,.8)'); g.addColorStop(1, 'rgba(242,193,78,0)'); c.fillStyle = g; c.fillRect(W * .2, y, W * .6 * eOut((t - s) / .8), 2); };
     rule(y0 - lh * .85); c.font = `700 ${fs}px Amiri`; c.fillStyle = WHITE; c.shadowColor = 'rgba(0,0,0,.8)'; c.shadowBlur = 8; lines.forEach((l, i) => c.fillText(l, W / 2, y0 + i * lh)); c.shadowBlur = 0;
-    rule(y0 + (lines.length - 1) * lh + lh * .7); if (src) { c.font = '700 30px ReemKufi'; c.fillStyle = GOLD; c.fillText(src, W / 2, y0 + (lines.length - 1) * lh + lh * 1.25); } c.restore(); } }
+    rule(y0 + (lines.length - 1) * lh + lh * .7); if (src) { c.font = '700 30px Cairo'; c.fillStyle = GOLD; c.fillText(src, W / 2, y0 + (lines.length - 1) * lh + lh * 1.25); } c.restore(); } }
 
 /* ---------- scrolls (records) ---------- */
 function scroll(c, x, y, w, h, k, col = SLATE_L, a = 1) { if (k <= 0) return; c.save(); c.globalAlpha = a; stroke(c, col, 3, a); const hh = h * eOut(k);
@@ -94,7 +95,7 @@ function card(c, x, y, w, h, k, t, glowA = 1) { if (k <= 0) return; glow(c, SP.g
 
 /* ============================ SCENES — «الفجر» (تحفيزي، بلا قصص ولا أحاديث) ============================ */
 const BASEY = H * .58;
-function label(c, txt, x, y, a, col = WHITE, size = 40) { if (a <= 0) return; c.save(); c.globalAlpha = a; c.direction = 'rtl'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = `700 ${size}px ReemKufi`; c.fillStyle = col; c.fillText(txt, x, y); c.restore(); }
+function label(c, txt, x, y, a, col = WHITE, size = 40) { if (a <= 0) return; c.save(); c.globalAlpha = a; c.direction = 'rtl'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = `700 ${size}px Cairo`; c.fillStyle = col; c.fillText(txt, x, y); c.restore(); }
 function sunArc(c, x, y, r, k, rise) { c.save(); c.beginPath(); c.rect(0, 0, W, y); c.clip(); arcDraw(c, x, y + (1 - rise) * r * 1.2, r, k, GOLD, 5, Math.PI); glow(c, SP.gold, x, y + (1 - rise) * r, r * 4, .5 * rise); c.restore(); }
 // 0 · 0–4.5 «عايز يومك يتغير؟»
 function f0(c, t) {
@@ -197,7 +198,7 @@ function renderAt(t) {
 }
 const params = new URLSearchParams(location.search);
 (async () => {
-  await Promise.all(['700 70px ReemKufi', '700 46px Amiri'].map(f => document.fonts.load(f, 'البطاقة'))); await document.fonts.ready;
+  await Promise.all(['700 70px Cairo', '700 46px Amiri'].map(f => document.fonts.load(f, 'البطاقة'))); await document.fonts.ready;
   await new Promise(r => { if (LOGO.complete) r(); else { LOGO.onload = r; LOGO.onerror = r; } });
   window.renderAt = renderAt; window.DUR = DUR; window.FPS = FPS;
   window.frameJPEG = (t, q = .93) => { renderAt(t); return cv.toDataURL('image/jpeg', q); };
