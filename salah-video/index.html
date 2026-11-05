@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>صلاتك في وقتها</title>
+<style>
+@font-face{font-family:'Amiri';src:url(fonts/Amiri-Bold.ttf) format('truetype');font-weight:700}
+@font-face{font-family:'ReemKufi';src:url(fonts/ReemKufi-Bold.ttf) format('truetype');font-weight:700}
+@font-face{font-family:'Cairo';src:url(fonts/Cairo-ExtraBold.ttf) format('truetype');font-weight:700}
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+canvas{display:block;width:100vw;height:100vh;object-fit:contain;background:#000}
+#ui{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:12px;align-items:center;background:rgba(10,8,4,.6);border:1px solid rgba(232,190,110,.35);padding:8px 16px;border-radius:40px;color:#f3d79a;font-family:sans-serif}
+#ui button{background:none;border:1px solid rgba(232,190,110,.5);color:#f3d79a;border-radius:20px;padding:6px 16px;cursor:pointer}
+#ui input{width:min(50vw,420px);accent-color:#d9a94e}
+body.render #ui{display:none}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="ui"><button id="play">▶</button><input id="seek" type="range" min="0" max="41" step="0.01" value="0"><span id="tm">0:00</span></div>
+<audio id="aud" src="soundtrack.wav" preload="auto"></audio>
+<script>
+'use strict';
+/* «صلاتك في وقتها» — فيديو تحفيزي بأسلوب الخطوط الذهبية الرفيعة (line-art infographic):
+   خلفية فحمية، خطوط ترسم نفسها، رجل خطي بهالة ذهبية، رسوم بيانية متحركة،
+   عناوين بالعامية المصرية والحديث بالفصحى. كل إطار دالة في الزمن t. */
+const W = 1080, H = 1920, FPS = 30, DUR = 41;
+const cv = document.getElementById('c'); cv.width = W; cv.height = H; const ctx = cv.getContext('2d');
+const mk = (w = W, h = H) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const buf = mk(), bctx = buf.getContext('2d');
+const TAU = Math.PI * 2, clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), lerp = (a, b, t) => a + (b - a) * t;
+const ss = (a, b, x) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+const eOut = t => 1 - Math.pow(1 - clamp(t), 3), eInOut = t => { t = clamp(t); return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+const eBack = t => { t = clamp(t); const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+const pulse = (t, c, w) => Math.exp(-Math.pow((t - c) / w, 2));
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const R = rng(99);
+
+/* ---------- palette ---------- */
+const GOLD = '#f2c14e', GOLD2 = '#ffd978', WHITE = '#e9e6df', SLATE = '#2b3442', SLATE_L = '#55657a', RED = '#d9534f', DIM = 'rgba(233,230,223,.28)';
+function sprite(r, g, b, size = 128) { const c = mk(size, size), x = c.getContext('2d'); const gr = x.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2); gr.addColorStop(0, `rgba(${r},${g},${b},.9)`); gr.addColorStop(.35, `rgba(${r},${g},${b},.35)`); gr.addColorStop(1, `rgba(${r},${g},${b},0)`); x.fillStyle = gr; x.fillRect(0, 0, size, size); return c; }
+const SP = { gold: sprite(242, 193, 78), red: sprite(217, 83, 79), white: sprite(233, 230, 223) };
+function glow(c, sp, x, y, s, a = 1) { if (a <= .003) return; c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = a; c.drawImage(sp, x - s / 2, y - s / 2, s, s); c.restore(); }
+
+/* ---------- line primitives that draw themselves ---------- */
+function stroke(c, col, w, a = 1) { c.strokeStyle = col; c.lineWidth = w; c.globalAlpha = a; c.lineCap = 'round'; c.lineJoin = 'round'; }
+function polyline(c, pts, k, col = GOLD, w = 4, a = 1) { // draw first k (0..1) of a polyline
+  if (k <= 0 || pts.length < 2) return; let L = 0; const seg = []; for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); seg.push(d); L += d; }
+  let rem = L * clamp(k); c.save(); stroke(c, col, w, a); c.beginPath(); c.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i < pts.length && rem > 0; i++) { const d = seg[i - 1], f = Math.min(1, rem / d); c.lineTo(lerp(pts[i - 1][0], pts[i][0], f), lerp(pts[i - 1][1], pts[i][1], f)); rem -= d; }
+  c.stroke(); c.restore(); }
+function arcDraw(c, x, y, r, k, col = GOLD, w = 4, a = 1, start = -Math.PI / 2) { if (k <= 0) return; c.save(); stroke(c, col, w, a); c.beginPath(); c.arc(x, y, r, start, start + TAU * clamp(k)); c.stroke(); c.restore(); }
+function rectDraw(c, x, y, w, h, k, col = GOLD, lw = 4, a = 1) { polyline(c, [[x, y + h], [x, y], [x + w, y], [x + w, y + h], [x, y + h]], k, col, lw, a); }
+function node(c, x, y, r, a = 1, col = GOLD, t = 0) { if (a <= 0) return; glow(c, SP.gold, x, y, r * 7, .5 * a); c.save(); c.globalAlpha = a; c.fillStyle = col; c.beginPath(); c.arc(x, y, r, 0, TAU); c.fill(); c.strokeStyle = col; c.lineWidth = 2; c.globalAlpha = a * .7; c.beginPath(); c.arc(x, y, r * 1.9 + Math.sin(t * 3) * 2, 0, TAU); c.stroke(); c.restore(); }
+function dots(c, x, y, cols, rows, gap, k, col = WHITE, r = 3.4) { const n = cols * rows, m = Math.floor(n * clamp(k)); c.save(); c.fillStyle = col; for (let i = 0; i < m; i++) { const cx = i % cols, cy = Math.floor(i / cols); c.beginPath(); c.arc(x + cx * gap, y - cy * gap, r, 0, TAU); c.fill(); } c.restore(); }
+
+/* ---------- the line figure (faceless: a circle head) ---------- */
+function figure(c, x, y, s, pose = {}, a = 1, halo = 1) {
+  const p = Object.assign({ nod: 0, armL: [-.32, .55], armR: [.32, .55], legL: [-.16, 1.05], legR: [.16, 1.05], lean: 0 }, pose);
+  if (halo > 0) glow(c, SP.gold, x, y + s * .45, s * 2.6, .35 * halo * a);
+  c.save(); c.translate(x, y); c.rotate(p.lean); stroke(c, WHITE, s * .045, a);
+  const neck = [0, -.02 * s], hip = [0, s * .5], hy = -s * .2 + p.nod * s * .1;
+  c.beginPath(); c.arc(p.nod * s * .06, hy, s * .17, 0, TAU); c.stroke();
+  c.beginPath(); c.moveTo(neck[0], neck[1]); c.lineTo(hip[0], hip[1]); c.stroke();
+  const sh = [0, s * .08];
+  c.beginPath(); c.moveTo(sh[0], sh[1]); c.quadraticCurveTo(p.armL[0] * s * .5, sh[1] + p.armL[1] * s * .35, p.armL[0] * s, p.armL[1] * s); c.stroke();
+  c.beginPath(); c.moveTo(sh[0], sh[1]); c.quadraticCurveTo(p.armR[0] * s * .5, sh[1] + p.armR[1] * s * .35, p.armR[0] * s, p.armR[1] * s); c.stroke();
+  c.beginPath(); c.moveTo(hip[0], hip[1]); c.lineTo(p.legL[0] * s, p.legL[1] * s); c.stroke();
+  c.beginPath(); c.moveTo(hip[0], hip[1]); c.lineTo(p.legR[0] * s, p.legR[1] * s); c.stroke();
+  c.restore(); }
+const STAND = { armL: [-.18, .62], armR: [.18, .62] };
+const BOW = { nod: 1, armL: [-.12, .64], armR: [.12, .64], lean: .08 };
+const DUA = { armL: [-.32, -.22], armR: [.32, -.22] };
+
+/* ---------- text ---------- */
+function headline(c, t, s, e, txt, col = GOLD, y = H * .15, size = 70) {
+  if (t < s || t > e) return; const a = ss(s, s + .35, t) * (1 - ss(e - .35, e, t)); c.save(); c.globalAlpha = a; c.direction = 'rtl'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.font = `700 ${size}px Cairo`; c.shadowColor = col === GOLD ? 'rgba(242,193,78,.45)' : 'rgba(0,0,0,.6)'; c.shadowBlur = 18; c.fillStyle = col; c.fillText(txt, W / 2, y + (1 - eOut((t - s) / .5)) * 18); c.restore(); }
+function subline(c, t, s, e, txt, col = DIM, y = H * .19, size = 38) { if (t < s || t > e) return; const a = ss(s + .2, s + .6, t) * (1 - ss(e - .35, e, t)); c.save(); c.globalAlpha = a; c.direction = 'rtl'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = `700 ${size}px Cairo`; c.fillStyle = col; c.fillText(txt, W / 2, y); c.restore(); }
+/* the hadith in Fusha at the bottom: thin gold rules, no box */
+const HAD = []; // motivational: no hadith captions
+function hadith(c, t) { for (const [s, e, lines, src] of HAD) { if (t < s || t > e) continue; const a = ss(s, s + .4, t) * (1 - ss(e - .4, e, t)); c.save(); c.globalAlpha = a; c.direction = 'rtl'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    const m = c; m.font = '700 46px Amiri'; let sc = 1; for (const l of lines) sc = Math.min(sc, W * .86 / m.measureText(l).width); const fs = Math.floor(46 * sc), lh = fs * 1.55, y0 = H * .8 - (lines.length - 1) * lh / 2;
+    const rule = (y) => { const g = c.createLinearGradient(W * .2, 0, W * .8, 0); g.addColorStop(0, 'rgba(242,193,78,0)'); g.addColorStop(.5, 'rgba(242,193,78,.8)'); g.addColorStop(1, 'rgba(242,193,78,0)'); c.fillStyle = g; c.fillRect(W * .2, y, W * .6 * eOut((t - s) / .8), 2); };
+    rule(y0 - lh * .85); c.font = `700 ${fs}px Amiri`; c.fillStyle = WHITE; c.shadowColor = 'rgba(0,0,0,.8)'; c.shadowBlur = 8; lines.forEach((l, i) => c.fillText(l, W / 2, y0 + i * lh)); c.shadowBlur = 0;
+    rule(y0 + (lines.length - 1) * lh + lh * .7); if (src) { c.font = '700 30px Cairo'; c.fillStyle = GOLD; c.fillText(src, W / 2, y0 + (lines.length - 1) * lh + lh * 1.25); } c.restore(); } }
+
+/* ---------- scrolls (records) ---------- */
+function scroll(c, x, y, w, h, k, col = SLATE_L, a = 1) { if (k <= 0) return; c.save(); c.globalAlpha = a; stroke(c, col, 3, a); const hh = h * eOut(k);
+  c.beginPath(); c.ellipse(x, y, w / 2, 9, 0, 0, TAU); c.stroke(); c.beginPath(); c.moveTo(x - w / 2, y); c.lineTo(x - w / 2, y + hh); c.moveTo(x + w / 2, y); c.lineTo(x + w / 2, y + hh); c.stroke();
+  c.beginPath(); c.ellipse(x, y + hh, w / 2, 9, 0, 0, TAU); c.stroke(); c.globalAlpha = a * .5; for (let i = 1; i < 6 && i * h / 6 < hh; i++) { c.beginPath(); c.moveTo(x - w * .32, y + i * h / 6); c.lineTo(x + w * .32 - (i % 2) * w * .15, y + i * h / 6); c.stroke(); } c.restore(); }
+function card(c, x, y, w, h, k, t, glowA = 1) { if (k <= 0) return; glow(c, SP.gold, x, y, w * 3.2, .55 * glowA * k); rectDraw(c, x - w / 2, y - h / 2, w, h, k, GOLD, 5);
+  c.save(); c.globalAlpha = ss(.6, 1, k); c.strokeStyle = 'rgba(242,193,78,.55)'; c.lineWidth = 3; for (let i = 0; i < 3; i++) { c.beginPath(); c.moveTo(x - w * .32, y - h * .2 + i * h * .2); c.lineTo(x + w * .32 - (i === 2 ? w * .2 : 0), y - h * .2 + i * h * .2); c.stroke(); } c.restore(); }
+
+/* ============================ SCENES — «صلاتك في وقتها» (تحفيزي) ============================ */
+const BASEY = H * .58, CX = W / 2, CY = BASEY - 80, CR = 270;
+const ang = h => h / 24 * TAU - Math.PI / 2;
+const PRAY = [4.6, 12.1, 15.5, 18.1, 19.6];               // approximate prayer hours on a 24h dial
+function label(c, txt, x, y, a, col = WHITE, size = 40) { if (a <= 0) return; c.save(); c.globalAlpha = a; c.direction = 'rtl'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = `700 ${size}px Cairo`; c.fillStyle = col; c.fillText(txt, x, y); c.restore(); }
+function dial(c, k, a = 1) {
+  arcDraw(c, CX, CY, CR, k, WHITE, 5, a);
+  for (let i = 0; i < 24; i++) { const an = ang(i), big = i % 6 === 0, r0 = CR * (big ? .82 : .88); polyline(c, [[CX + Math.cos(an) * r0, CY + Math.sin(an) * r0], [CX + Math.cos(an) * CR * .95, CY + Math.sin(an) * CR * .95]], ss(.2 + i * .03, .5 + i * .03, k * 2), big ? GOLD : DIM, big ? 5 : 3, a); }
+}
+function prayNodes(c, t, appear, colorFn) { PRAY.forEach((h, i) => { const a = appear(i); if (a <= 0) return; const an = ang(h); node(c, CX + Math.cos(an) * CR, CY + Math.sin(an) * CR, 13, a, colorFn ? colorFn(i) : GOLD, t); }); }
+// 1 · 0–4.5
+function p1(c, t) { dial(c, ss(.1, 2, t)); headline(c, t, .1, 4.4, 'يومك فيه ٢٤ ساعة…'); subline(c, t, .9, 4.4, 'يعني ١٤٤٠ دقيقة', WHITE, H * .2, 44); }
+// 2 · 4.5–8.5
+function p2(c, t) { dial(c, 1); label(c, '؟', CX, CY, ss(.3, .8, t), GOLD, 220 * eBack((t - .3) / .6) || 1); glow(c, SP.gold, CX, CY, 500, .3 * ss(.3, .8, t)); headline(c, t, .1, 3.9, 'الصلاة بتاخد منهم كام؟'); }
+// 3 · 8.5–13.5
+function p3(c, t) { dial(c, 1); prayNodes(c, t, i => ss(.4 + i * .45, .7 + i * .45, t));
+  label(c, '٥ × ٥', CX, CY - 20, ss(2.8, 3.2, t), WHITE, 96); label(c, 'دقايق', CX, CY + 60, ss(3, 3.4, t), DIM, 38);
+  headline(c, t, .1, 4.9, '٥ صلوات × ٥ دقايق'); subline(c, t, 2.6, 4.9, '= ٢٥ دقيقة بس', GOLD2, H * .2, 46); }
+// 4 · 13.5–18 the slice of the day
+function p4(c, t) { const k = ss(.1, .8, t);
+  c.save(); c.globalAlpha = k; c.fillStyle = SLATE; c.beginPath(); c.arc(CX, CY, CR, 0, TAU); c.fill(); c.restore(); arcDraw(c, CX, CY, CR, k, SLATE_L, 4);
+  const sl = 25 / 1440 * TAU * ss(.9, 1.6, t), a0 = -Math.PI / 2; c.save(); c.fillStyle = GOLD; c.beginPath(); c.moveTo(CX, CY); c.arc(CX, CY, CR, a0, a0 + sl); c.closePath(); c.fill(); c.restore(); glow(c, SP.gold, CX + 20, CY - CR + 30, 260, .7 * ss(.9, 1.6, t));
+  arcDraw(c, CX + 18, CY - CR + 10, 70, ss(1.7, 2.3, t), GOLD2, 4);
+  label(c, '١٫٧٪', CX + 200, CY - CR + 10, ss(2.2, 2.6, t), GOLD2, 64);
+  headline(c, t, .1, 4.4, 'أقل من ٢٪ من يومك'); }
+// 5 · 18–22.5 «بس انت بتأجلها…»
+function p5(c, t) { dial(c, 1); const shift = eInOut((t - .8) / 2.4) * 3.2;
+  prayNodes(c, t, i => i === 2 ? 0 : 1);
+  const h0 = PRAY[2], a0 = ang(h0), a1 = ang(h0 + shift); c.save(); c.setLineDash([10, 12]); stroke(c, DIM, 4); c.beginPath(); c.arc(CX, CY, CR + 34, a0, a1); c.stroke(); c.restore();
+  node(c, CX + Math.cos(a0) * CR, CY + Math.sin(a0) * CR, 13, .35, SLATE_L, t); node(c, CX + Math.cos(a1) * CR, CY + Math.sin(a1) * CR, 13, 1, GOLD, t);
+  headline(c, t, .1, 4.4, 'بس انت بتأجلها…', WHITE); subline(c, t, .8, 4.4, '«هصلي بعدين»', DIM, H * .2, 46); }
+// 6 · 22.5–26.5 «والـ"بعدين" ساعات مبيجيش»
+function p6(c, t) { dial(c, 1); prayNodes(c, t, i => i === 2 ? 0 : 1);
+  const a1 = ang(PRAY[2] + 3.2), red = ss(.4, 1.2, t), fade = 1 - ss(1.8, 3, t); const x = CX + Math.cos(a1) * CR, y = CY + Math.sin(a1) * CR;
+  if (fade > 0) { glow(c, red > .5 ? SP.red : SP.gold, x, y, 140, .6 * fade); c.save(); c.globalAlpha = fade; c.fillStyle = red > .5 ? RED : GOLD; c.beginPath(); c.arc(x, y, 13, 0, TAU); c.fill(); c.restore(); }
+  arcDraw(c, x, y, 34 + (1 - fade) * 40, 1, RED, 3, .6 * (1 - fade) * red);
+  headline(c, t, .1, 3.9, 'والـ«بعدين» ساعات مبيجيش', RED); }
+// 7 · 26.5–31.5 at the call to prayer, he gets up
+function minaret(c, x, y, k) { const pts = [[x - 46, y], [x - 46, y - 360], [x - 70, y - 380], [x + 70, y - 380], [x + 46, y - 360], [x + 46, y], [x - 46, y]]; polyline(c, pts, k, WHITE, 4);
+  polyline(c, [[x - 34, y - 380], [x - 34, y - 470], [x + 34, y - 470], [x + 34, y - 380]], ss(.4, 1, k), WHITE, 4); polyline(c, [[x - 40, y - 470], [x, y - 540], [x + 40, y - 470]], ss(.6, 1, k), GOLD, 4); }
+function p7(c, t) { const mx = W * .26, my = BASEY + 160; minaret(c, mx, my, ss(.1, 1.2, t)); polyline(c, [[W * .08, my], [W * .92, my]], ss(.1, .7, t), DIM, 3);
+  for (let i = 0; i < 4; i++) { const ph = ((t - 1) * .7 + i / 4) % 1; if (t > 1) arcDraw(c, mx, my - 500, 70 + ph * 380, .16, GOLD, 4, (1 - ph) * .8, -.3); }
+  const up = ss(2, 2.8, t), fx = W * .7; figure(c, fx, my - 200 + (1 - up) * 70, 220, up > .5 ? STAND : { nod: .6, lean: .15, armL: [-.1, .5], armR: [.35, .25], legL: [-.4, .7], legR: [.3, .75] }, 1, .6 + up);
+  if (up < 1) { c.save(); c.globalAlpha = 1 - up; c.fillStyle = '#4a7ab8'; c.fillRect(fx + 60, my - 220, 22, 40); c.restore(); }
+  headline(c, t, .1, 4.9, 'صليها أول ما تسمع الأذان'); subline(c, t, .8, 4.9, 'سيب اللي في إيدك ٥ دقايق', WHITE, H * .2, 42); }
+// 8 · 31.5–36 the day falls into place
+function p8(c, t) { dial(c, 1, .8); prayNodes(c, t, i => 1);
+  arcDraw(c, CX, CY, CR, ss(.4, 2.2, t), GOLD, 8, 1, ang(PRAY[0])); glow(c, SP.gold, CX, CY, 900, .18 * ss(1.6, 2.4, t));
+  const by = BASEY + 400; for (let i = 0; i < 5; i++) { const x = W * .2 + i * W * .15, k = eOut((t - 1.4 - i * .18) / .6), h = 120; c.save(); c.globalAlpha = k; c.fillStyle = i % 2 ? SLATE_L : GOLD; c.beginPath(); c.roundRect(x - 30, by - h * k, 60, h * k, 10); c.fill(); c.restore(); }
+  headline(c, t, .1, 4.4, 'وشوف يومك هيتظبط إزاي'); }
+// 9 · 36–41 calm heart, then the mark
+const LOGO = new Image(); LOGO.src = 'logo.png';
+function p9(c, t) { figure(c, W / 2, BASEY - 120, 230, STAND, 1, 1.3);
+  const hx = W / 2, hy = BASEY - 60, hk = ss(.4, 1.4, t); c.save(); stroke(c, GOLD, 5, hk); c.beginPath(); c.moveTo(hx, hy + 26); c.bezierCurveTo(hx - 70, hy - 20, hx - 30, hy - 66, hx, hy - 30); c.bezierCurveTo(hx + 30, hy - 66, hx + 70, hy - 20, hx, hy + 26); c.stroke(); c.restore(); glow(c, SP.gold, hx, hy - 10, 240, .6 * hk);
+  const s = 240 * eBack((t - 2.4) / .8); if (LOGO.complete && s > 1) { c.save(); c.globalAlpha = ss(2.4, 2.9, t); c.drawImage(LOGO, W / 2 - s / 2, BASEY + 170, s, s); c.restore(); }
+  headline(c, t, .1, 4.9, 'صلاتك في وقتها… راحة لقلبك'); }
+const SCENES = [[0, 4.5, p1], [4.5, 8.5, p2], [8.5, 13.5, p3], [13.5, 18, p4], [18, 22.5, p5], [22.5, 26.5, p6], [26.5, 31.5, p7], [31.5, 36, p8], [36, 41, p9]];
+
+/* ---------- compositing ---------- */
+const BG = mk(); { const x = BG.getContext('2d'); x.fillStyle = '#0c0e11'; x.fillRect(0, 0, W, H); const g = x.createRadialGradient(W / 2, H * .45, 40, W / 2, H * .45, H * .7); g.addColorStop(0, 'rgba(40,48,58,.55)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, W, H); }
+const GRAIN = Array.from({ length: 6 }, (_, k) => { const c = mk(270, 480), x = c.getContext('2d'), id = x.createImageData(270, 480), r = rng(9 + k); for (let i = 0; i < id.data.length; i += 4) { const v = r() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 255; } x.putImageData(id, 0, 0); return c; });
+function renderAt(t) {
+  t = clamp(t, 0, DUR); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.drawImage(BG, 0, 0);
+  for (const [s, e, f] of SCENES) { if (t < s - .01 || t > e + .45) continue;
+    const a = (s > 0 ? ss(s, s + .45, t) : 1) * (1 - ss(e, e + .45, t)); if (a <= 0) continue;
+    bctx.setTransform(1, 0, 0, 1, 0, 0); bctx.globalAlpha = 1; bctx.clearRect(0, 0, W, H); bctx.save(); f(bctx, t - s); bctx.restore();
+    const z = 1 + .03 * clamp((t - s) / (e - s)); ctx.save(); ctx.globalAlpha = a; ctx.translate(W / 2, H * .45); ctx.scale(z, z); ctx.translate(-W / 2, -H * .45); ctx.drawImage(buf, 0, 0); ctx.restore(); }
+  hadith(ctx, t);
+  ctx.save(); ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = .035; ctx.drawImage(GRAIN[Math.floor(t * FPS) % 6], 0, 0, W, H); ctx.restore();
+  const fade = Math.max(1 - ss(0, .25, t), ss(DUR - 1, DUR, t)); if (fade > 0) { ctx.globalAlpha = fade; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
+}
+const params = new URLSearchParams(location.search);
+(async () => {
+  await Promise.all(['700 70px Cairo', '700 46px Amiri'].map(f => document.fonts.load(f, 'البطاقة'))); await document.fonts.ready;
+  await new Promise(r => { if (LOGO.complete) r(); else { LOGO.onload = r; LOGO.onerror = r; } });
+  window.renderAt = renderAt; window.DUR = DUR; window.FPS = FPS;
+  window.frameJPEG = (t, q = .93) => { renderAt(t); return cv.toDataURL('image/jpeg', q); };
+  if (params.has('render')) { document.body.classList.add('render'); window.READY = true; return; }
+  const aud = document.getElementById('aud'), btn = document.getElementById('play'), seek = document.getElementById('seek'), tm = document.getElementById('tm');
+  let playing = false, t0 = 0, base = 0, cur = 0;
+  btn.onclick = () => { playing = !playing; btn.textContent = playing ? '❚❚' : '▶'; if (playing) { t0 = performance.now(); base = cur; aud.currentTime = cur; aud.play().catch(() => {}); } else aud.pause(); };
+  seek.oninput = () => { cur = +seek.value; base = cur; t0 = performance.now(); aud.currentTime = cur; };
+  (function loop() { if (playing) { cur = base + (performance.now() - t0) / 1000; if (cur >= DUR) { cur = DUR; playing = false; btn.textContent = '▶'; aud.pause(); } } renderAt(cur); seek.value = cur; tm.textContent = Math.floor(cur / 60) + ':' + String(Math.floor(cur % 60)).padStart(2, '0'); requestAnimationFrame(loop); })();
+  window.READY = true;
+})();
+</script>
+</body>
+</html>
