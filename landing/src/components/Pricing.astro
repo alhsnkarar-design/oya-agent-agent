@@ -1,0 +1,92 @@
+---
+// Plans after launch. The first 100 bookings get 50% off for 3 months; prices shown are the discounted ones.
+const plans = [
+  {
+    name: "صانع محتوى", who: "اللي بينزل ريلز لنفسه", price: 9, sale: 4.5,
+    items: ["60 دقيقة مونتاج تلقائي + كابشن بالعامية", "10 دقايق دبلجة", "300 أمر بالصوت أو الوصف", "مقاس لكل منصة", "من غير علامة Zifidit"],
+  },
+  {
+    name: "مونتير", who: "المونتير الفريلانسر", price: 19, sale: 9.5, best: true,
+    items: ["200 دقيقة مونتاج تلقائي + كابشن بالعامية", "40 دقيقة دبلجة", "أوامر بالصوت أو الوصف غير محدودة*", "مقاس لكل منصة", "من غير علامة Zifidit"],
+  },
+  {
+    name: "استوديو", who: "التيمات والوكالات", price: 49, sale: 24.5,
+    items: ["600 دقيقة مونتاج تلقائي + كابشن بالعامية", "120 دقيقة دبلجة", "أوامر بالصوت أو الوصف غير محدودة*", "3 حسابات للتيم", "مقاس لكل منصة، ومن غير علامة Zifidit"],
+  },
+];
+---
+<section class="section" id="pricing" aria-labelledby="t-price">
+  <div class="wrap">
+    <div class="head">
+      <h2 class="h2" id="t-price">الباقات. <em>وأول 100 بنص السعر.</em></h2>
+      <p class="lead">أول 100 يحجزوا ليهم خصم 50% لمدة 3 شهور من الإطلاق. الأسعار بالدولار في الشهر.</p>
+    </div>
+
+    <div class="plans">
+      {plans.map((p) => (
+        <article class:list={["plan", { best: p.best }]}>
+          {p.best && <span class="badge">الأنسب للمونتيرين</span>}
+          <div class="top">
+            <h3>{p.name}</h3>
+            <p class="who">{p.who}</p>
+          </div>
+          <div class="price">
+            <span class="now" dir="ltr">${p.sale}</span>
+            <span class="per">/ شهر</span>
+          </div>
+          <p class="was">بدل <s dir="ltr">${p.price}</s> · لأول 3 شهور</p>
+          <ul>
+            {p.items.map((it) => (
+              <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7" /></svg>{it}</li>
+            ))}
+          </ul>
+          <a class="go" href="#book">احجز بالخصم</a>
+        </article>
+      ))}
+    </div>
+
+    <div class="notes">
+      <p><strong>اشتراك سنوي:</strong> ادفع 10 شهور وخد 12.</p>
+      <p><strong>دقايق زيادة:</strong> 60 دقيقة مونتاج إضافية بـ5 دولار.</p>
+      <p class="fine">* غير محدودة باستخدام معقول. الحجز دلوقتي ببلاش ومن غير بطاقة، والدفع بيبدأ لما الموقع يفتح.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+  .plan {
+    position: relative; display: flex; flex-direction: column; gap: 18px; min-width: 0;
+    padding: clamp(24px, 2.6vw, 32px); border-radius: 22px; background: var(--surface); border: 1px solid var(--line);
+  }
+  .plan.best { border-color: var(--amber); box-shadow: 0 24px 60px -30px rgba(255, 181, 71, .45); }
+  .badge {
+    position: absolute; top: -13px; inset-inline-start: 24px; font: 700 .78rem/1 var(--f-body);
+    color: var(--amber-ink); background: var(--amber); padding: 7px 12px; border-radius: 99px;
+  }
+  h3 { font: 700 1.35rem/1.3 var(--f-display); }
+  .who { color: var(--ink-3); font-size: .9rem; margin-top: 4px; }
+  .price { display: flex; align-items: baseline; gap: 8px; }
+  .now { font: 800 clamp(2.4rem, 4vw, 3rem)/1 var(--f-display); letter-spacing: -.02em; }
+  .best .now { color: var(--amber); }
+  .per { color: var(--ink-3); font-size: .95rem; }
+  .was { color: var(--ink-3); font-size: .88rem; margin-top: -10px; }
+  .was s { color: var(--ink-2); }
+  ul { display: grid; gap: 10px; flex: 1; }
+  li { display: flex; gap: 10px; align-items: flex-start; color: var(--ink-2); font-size: .95rem; line-height: 1.6; }
+  li .ico { color: var(--peri); margin-top: 4px; }
+  .go {
+    display: block; text-align: center; text-decoration: none; padding: 14px; border-radius: 12px;
+    font: 700 1rem/1 var(--f-body); color: var(--ink); background: var(--surface-2); border: 1px solid var(--line-2);
+  }
+  .go:hover { border-color: var(--ink-3); }
+  .best .go { background: var(--amber); color: var(--amber-ink); border-color: transparent; }
+  .best .go:hover { filter: brightness(1.06); }
+  .notes { display: grid; gap: 6px; margin-top: 28px; color: var(--ink-2); font-size: .95rem; }
+  .notes strong { color: var(--ink); }
+  .fine { color: var(--ink-3); font-size: .85rem; margin-top: 6px; }
+  @media (max-width: 900px) {
+    .plans { grid-template-columns: 1fr; max-width: 520px; }
+    .plan.best { order: -1; }
+  }
+</style>
