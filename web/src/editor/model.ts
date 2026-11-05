@@ -15,6 +15,9 @@ export type Trans = { t: number; kind: "whip" | "flash" | "fade" };
 export type Sfx = { t: number; kind: SfxKind; vol: number };
 export type CapLine = { s: number; e: number; text: string; words?: Word[] };
 export type DubClip = { t: number; dur: number; text: string; pcm: ArrayBuffer; rate: number };
+export type FxKind = "shake" | "glow" | "light_leak" | "rgb_split" | "blur_in" | "punch" | "film_grain";
+export const FX_KINDS: FxKind[] = ["shake", "glow", "light_leak", "rgb_split", "blur_in", "punch", "film_grain"];
+export type Fx = { t: number; d: number; kind: FxKind; k: number };
 
 export type Project = {
   id: string; name: string; createdAt: number; updatedAt: number;
@@ -25,6 +28,12 @@ export type Project = {
   captions: { on: boolean; style: CapStyle; color: string; pos: Pos; size: number; lines: CapLine[] | null; lang?: string };
   overlays: Overlay[]; zooms: Zoom[]; trans: Trans[]; sfx: Sfx[];
   dub: { lang: string; voice: string; clips: DubClip[] } | null;
+  /** visual effects (shake, glow, light leaks, ...) */
+  fx: Fx[];
+  /** voice-over narration clips added on top of the original sound */
+  vo: DubClip[];
+  /** clean up the speaker's voice (rumble cut, presence, leveling) */
+  enhance: boolean;
   origVolume: number;
   edited: boolean;
 };
@@ -41,8 +50,13 @@ export function newProject(id: string, name: string, duration: number, width: nu
     words: [], transcribed: false, silences: [],
     segs: [{ s: 0, e: duration }], aspect: width >= height ? "16:9" : "9:16", grade: "none",
     captions: { on: false, style: "karaoke", color: "gold", pos: "bottom", size: 1, lines: null },
-    overlays: [], zooms: [], trans: [], sfx: [], dub: null, origVolume: 1, edited: false,
+    overlays: [], zooms: [], trans: [], sfx: [], dub: null, fx: [], vo: [], enhance: false, origVolume: 1, edited: false,
   };
+}
+
+/** Fills fields added after a project was first saved. */
+export function migrate(p: Project): Project {
+  return { ...p, fx: p.fx ?? [], vo: p.vo ?? [], enhance: p.enhance ?? false };
 }
 
 /* ---------- time mapping ---------- */
@@ -126,7 +140,7 @@ let idc = 0;
 const uid = () => "o" + Date.now().toString(36) + (idc++).toString(36);
 
 /** Actions that need the network (handled by the editor, not here). */
-export const ASYNC_ACTIONS = new Set(["dub", "translate_captions", "auto_edit", "transcribe"]);
+export const ASYNC_ACTIONS = new Set(["dub", "translate_captions", "auto_edit", "transcribe", "voiceover"]);
 
 export function applyAction(p0: Project, a: Action): Project {
   const p: Project = structuredClone(p0);
@@ -245,12 +259,34 @@ export function applyAction(p0: Project, a: Action): Project {
       for (const tr of p.trans) out.push({ t: Math.max(0, tr.t - 0.25), kind: tr.kind === "whip" ? "whoosh" : "swipe", vol: 0.45 });
       for (const o of p.overlays) out.push({ t: o.s, kind: "pop", vol: 0.4 });
       for (const z of p.zooms) out.push({ t: z.t, kind: "impact", vol: 0.25 });
+      for (const f of p.fx) if (f.kind === "shake") out.push({ t: f.t, kind: "impact", vol: 0.35 });
+      for (const o of p.overlays) if (o.anim === "type") out.push({ t: o.s, kind: "typing", vol: 0.25 });
       p.sfx = out;
       break;
     }
     case "remove_sfx": p.sfx = []; break;
     case "original_volume": p.origVolume = Math.max(0, Math.min(1, num(a.value, 1))); break;
     case "remove_dub": p.dub = null; p.origVolume = 1; break;
+    case "add_effect": {
+      const k = str(a.kind, "glow") as FxKind;
+      const kind = FX_KINDS.includes(k) ? k : "glow";
+      const dd = { shake: 0.5, glow: 1.6, light_leak: 1.8, rgb_split: 0.5, blur_in: 0.8, punch: 0.6, film_grain: D }[kind];
+      const t = clampT(num(a.at, 0));
+      p.fx.push({ t, d: Math.max(0.2, Math.min(D - t || dd, num(a.duration, dd))), kind, k: Math.max(0.2, Math.min(1, num(a.intensity, 0.7))) });
+      break;
+    }
+    case "auto_effects": {
+      // a light pass: soft blur-in at the start, a punch + shake on each zoom, light leaks on transitions
+      const out: Fx[] = p.fx.filter((f) => f.kind === "film_grain");
+      if (D > 1) out.push({ t: 0, d: 0.8, kind: "blur_in", k: 0.7 });
+      for (const z of p.zooms.slice(0, 6)) out.push({ t: z.t, d: 0.5, kind: "punch", k: 0.6 });
+      p.trans.forEach((tr, i) => out.push(i % 2 ? { t: Math.max(0, tr.t - 0.3), d: 1.4, kind: "light_leak", k: 0.6 } : { t: tr.t, d: 0.45, kind: "rgb_split", k: 0.6 }));
+      p.fx = out;
+      break;
+    }
+    case "remove_effects": { const k = str(a.kind, "all"); p.fx = k === "all" ? [] : p.fx.filter((f) => f.kind !== k); break; }
+    case "enhance_audio": p.enhance = a.on !== false; break;
+    case "remove_voiceover": p.vo = []; break;
     default: return p0;
   }
   p.edited = true;
@@ -260,6 +296,8 @@ export function applyAction(p0: Project, a: Action): Project {
   p.zooms = p.zooms.filter((z) => z.t < D2);
   p.trans = p.trans.filter((t) => t.t < D2);
   p.sfx = p.sfx.filter((s) => s.t < D2);
+  p.fx = p.fx.filter((f) => f.t < D2);
+  p.vo = p.vo.filter((c) => c.t < D2);
   p.updatedAt = Date.now();
   return p;
 }
@@ -288,6 +326,8 @@ export function summary(p: Project) {
     titles: p.overlays.map((o) => ({ id: o.id, text: o.text, start: +o.s.toFixed(2), end: +o.e.toFixed(2), color: o.color, size: o.size, position: o.pos })),
     zooms: p.zooms.length, transitions: p.trans.length, sfx: p.sfx.length, cuts: p.segs.length - 1,
     dub: p.dub ? { language: p.dub.lang, voice: p.dub.voice } : null,
+    effects: p.fx.map((f) => ({ kind: f.kind, at: +f.t.toFixed(2) })), voiceovers: p.vo.map((c) => ({ at: +c.t.toFixed(2), text: c.text })),
+    audio_enhanced: p.enhance, original_volume: p.origVolume,
     transcript,
   };
 }

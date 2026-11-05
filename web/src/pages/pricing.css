@@ -6,15 +6,15 @@
 .seg button.on { background: var(--ink); color: #121212; }
 .bar .div { width: 1px; height: 32px; background: var(--line-2); }
 .bar .note { color: var(--ink-2); font-size: 1.05rem; }
-.promo { display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 22px; border-radius: 999px; background: var(--amber); color: var(--amber-ink); font-weight: 700; }
+.promo { display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 22px; border-radius: 999px; background: var(--amber); color: var(--amber-ink); font-weight: 600; }
 .plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; width: 100%; max-width: 1380px; }
 .plan { padding: 28px 24px 24px; display: grid; gap: 14px; align-content: start; border-radius: 26px; }
 .plan.best { border: 2px solid var(--amber); box-shadow: 0 30px 70px -40px rgba(245,165,36,.6); }
 .plan .head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-.plan h2 { margin: 0; font: 400 2.2rem/1.1 var(--f-display); }
-.badge { padding: 6px 14px; border-radius: 99px; background: var(--amber); color: var(--amber-ink); font-weight: 700; font-size: .9rem; }
+.plan h2 { margin: 0; font: 500 2.2rem/1.1 var(--f-display); }
+.badge { padding: 6px 14px; border-radius: 99px; background: var(--amber); color: var(--amber-ink); font-weight: 600; font-size: .9rem; }
 .price { margin: 4px 0 0; display: flex; align-items: baseline; gap: 8px; }
-.price span { font: 700 clamp(2.6rem, 4vw, 3.4rem)/1 var(--f-body); letter-spacing: -.02em; }
+.price span { font: 600 clamp(2.6rem, 4vw, 3.4rem)/1 var(--f-body); letter-spacing: -.02em; }
 .price small { color: var(--ink-3); font-size: 1.25rem; }
 .yr { margin: -6px 0 0; color: var(--ink-3); }
 .plan ul { list-style: none; padding: 0; margin: 4px 0 10px; display: grid; gap: 12px; font-size: 1.08rem; color: var(--ink-2); }

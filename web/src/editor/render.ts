@@ -1,9 +1,9 @@
 // Draws one output frame: crop to the aspect, zoom, color grade, transitions, titles and captions.
-import { captionLines, colorOf, type CapLine, type Overlay, type Project } from "./model";
+import { captionLines, colorOf, type CapLine, type Fx, type Overlay, type Project } from "./model";
 
 export const SIZES = { "9:16": [1080, 1920], "1:1": [1080, 1080], "16:9": [1920, 1080] } as const;
 const isAr = (s: string) => /[؀-ۿ]/.test(s);
-const fontFor = (s: string, weight = 800) => `${weight} {px}px ${isAr(s) ? '"Readex Pro Variable"' : '"Manrope Variable"'}, system-ui, sans-serif`;
+const fontFor = (s: string, weight = 500) => `${weight} {px}px ${isAr(s) ? '"Readex Pro Variable"' : '"Manrope Variable"'}, system-ui, sans-serif`;
 const ease = (x: number) => 1 - Math.pow(1 - Math.max(0, Math.min(1, x)), 3);
 
 const GRADES: Record<string, string> = {
@@ -27,10 +27,27 @@ function zoomAt(p: Project, t: number) {
   return z;
 }
 
-function drawSource(ctx: CanvasRenderingContext2D, v: CanvasImageSource, sw: number, sh: number, W: number, H: number, zoom: number, dx = 0) {
+function drawSource(ctx: CanvasRenderingContext2D, v: CanvasImageSource, sw: number, sh: number, W: number, H: number, zoom: number, dx = 0, dy = 0) {
   const scale = Math.max(W / sw, H / sh) * zoom;
   const dw = sw * scale, dh = sh * scale;
-  ctx.drawImage(v, (W - dw) / 2 + dx, (H - dh) / 2, dw, dh);
+  ctx.drawImage(v, (W - dw) / 2 + dx, (H - dh) / 2 + dy, dw, dh);
+}
+
+/** Envelope 0..1..0 of an effect at time t (fast in, slower out). */
+function envOf(f: Fx, t: number) {
+  const x = t - f.t;
+  if (x < 0 || x > f.d) return 0;
+  return Math.min(1, x / Math.min(0.12, f.d / 3), (f.d - x) / Math.min(0.3, f.d / 2));
+}
+
+let grain: HTMLCanvasElement | null = null;
+function grainTile() {
+  if (grain) return grain;
+  grain = document.createElement("canvas"); grain.width = grain.height = 256;
+  const g = grain.getContext("2d")!, img = g.createImageData(256, 256);
+  for (let i = 0; i < img.data.length; i += 4) { const v = Math.random() * 255; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255; }
+  g.putImageData(img, 0, 0);
+  return grain;
 }
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
@@ -122,7 +139,7 @@ function drawCaption(ctx: CanvasRenderingContext2D, p: Project, line: CapLine, t
     : Math.min(words.length - 1, Math.floor(((t - line.s) / Math.max(0.1, line.e - line.s)) * words.length));
   const y = c.pos === "top" ? H * 0.2 : c.pos === "center" ? H * 0.55 : H * (p.aspect === "16:9" ? 0.85 : 0.76);
   ctx.save();
-  ctx.font = fontFor(line.text, c.style === "minimal" ? 600 : 800).replace("{px}", String(Math.round(base)));
+  ctx.font = fontFor(line.text, c.style === "bold" ? 600 : 500).replace("{px}", String(Math.round(base)));
   ctx.textBaseline = "middle";
   const hi = colorOf(c.color);
   if (c.style === "boxed") {
@@ -165,11 +182,50 @@ export function drawFrame(ctx: CanvasRenderingContext2D, p: Project, video: HTML
     if (tr.kind === "flash") flash = Math.max(flash, k * 0.85);
     if (tr.kind === "fade") black = Math.max(black, k);
   }
+  // visual effects that move or blur the picture
+  let dy = 0, punch = 1, glow = 0, leak = 0, rgb = 0, grainK = 0;
+  for (const f of p.fx ?? []) {
+    const e = envOf(f, t) * f.k;
+    if (!e) continue;
+    const x = t - f.t;
+    if (f.kind === "shake") { const a = Math.min(W, H) * 0.018 * e; dx += Math.sin(x * 71) * a; dy += Math.cos(x * 53) * a; }
+    else if (f.kind === "punch") punch = Math.max(punch, 1 + 0.07 * e * Math.max(0, 1 - x / f.d));
+    else if (f.kind === "blur_in") blur = Math.max(blur, 22 * f.k * Math.max(0, 1 - x / f.d));
+    else if (f.kind === "glow") glow = Math.max(glow, e);
+    else if (f.kind === "light_leak") leak = Math.max(leak, e);
+    else if (f.kind === "rgb_split") rgb = Math.max(rgb, e);
+    else if (f.kind === "film_grain") grainK = Math.max(grainK, f.k);
+  }
   if (ready) {
     const g = GRADES[p.grade] ?? "none";
+    const z = zoomAt(p, t) * punch;
     ctx.filter = [g !== "none" ? g : "", blur ? `blur(${blur.toFixed(1)}px)` : ""].join(" ").trim() || "none";
-    drawSource(ctx, video, sw, sh, W, H, zoomAt(p, t), dx);
+    drawSource(ctx, video, sw, sh, W, H, z, dx, dy);
+    if (rgb) {
+      // chromatic split: a red copy one way, a cyan copy the other
+      const off = W * 0.012 * rgb;
+      ctx.globalCompositeOperation = "lighten"; ctx.globalAlpha = 0.55 * rgb;
+      ctx.filter = "sepia(1) saturate(8) hue-rotate(-40deg)"; drawSource(ctx, video, sw, sh, W, H, z, dx + off, dy);
+      ctx.filter = "sepia(1) saturate(8) hue-rotate(150deg)"; drawSource(ctx, video, sw, sh, W, H, z, dx - off, dy);
+      ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1;
+    }
+    if (glow) {
+      // soft bloom: a blurred, brightened copy screened on top
+      ctx.globalCompositeOperation = "screen"; ctx.globalAlpha = 0.45 * glow;
+      ctx.filter = `blur(${Math.round(Math.min(W, H) * 0.02)}px) brightness(1.25)`;
+      drawSource(ctx, video, sw, sh, W, H, z, dx, dy);
+      ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1;
+    }
     ctx.filter = "none";
+  }
+  if (leak) {
+    // warm light leak drifting across the frame
+    ctx.save(); ctx.globalCompositeOperation = "screen";
+    const cx = W * (0.1 + 0.8 * ((t * 0.35) % 1)), cy = H * 0.3;
+    const r = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.6);
+    r.addColorStop(0, `rgba(255,170,70,${0.55 * leak})`); r.addColorStop(0.45, `rgba(255,90,40,${0.25 * leak})`); r.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = r; ctx.fillRect(0, 0, W, H);
+    ctx.restore();
   }
   if (p.grade === "cinematic" || p.grade === "warm") {
     const v = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.75);
@@ -180,6 +236,12 @@ export function drawFrame(ctx: CanvasRenderingContext2D, p: Project, video: HTML
   if (p.captions.on) {
     const line = captionLines(p).find((l) => t >= l.s && t < l.e + 0.15);
     if (line) drawCaption(ctx, p, line, t, W, H);
+  }
+  if (grainK) {
+    ctx.save(); ctx.globalCompositeOperation = "overlay"; ctx.globalAlpha = 0.16 * grainK;
+    const pat = ctx.createPattern(grainTile(), "repeat");
+    if (pat) { const ox = Math.floor(Math.random() * 256), oy = Math.floor(Math.random() * 256); ctx.translate(-ox, -oy); ctx.fillStyle = pat; ctx.fillRect(0, 0, W + 256, H + 256); }
+    ctx.restore();
   }
   if (flash) { ctx.fillStyle = `rgba(255,255,255,${flash})`; ctx.fillRect(0, 0, W, H); }
   if (black) { ctx.fillStyle = `rgba(0,0,0,${black})`; ctx.fillRect(0, 0, W, H); }

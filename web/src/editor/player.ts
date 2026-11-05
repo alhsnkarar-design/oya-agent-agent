@@ -22,6 +22,13 @@ export class Player {
   private ac = audioCtx();
   private master: GainNode;
   private orig: GainNode;
+  private duck: GainNode;
+  private hp: BiquadFilterNode;
+  private presence: BiquadFilterNode;
+  private comp: DynamicsCompressorNode;
+  private makeup: GainNode;
+  private voBufs: AudioBuffer[] = [];
+  private voKey = "";
   private nodes: AudioBufferSourceNode[] = [];
   private dubBufs: AudioBuffer[] = [];
   private dubKey = "";
@@ -31,11 +38,18 @@ export class Player {
     this.video = video; this.canvas = canvas; this.p = p;
     this.ctx = canvas.getContext("2d", { alpha: false })!;
     this.master = this.ac.createGain(); this.master.connect(this.ac.destination);
-    this.orig = this.ac.createGain(); this.orig.connect(this.master);
+    this.orig = this.ac.createGain();
+    // original sound: [voice enhance: rumble cut → presence → leveling] → volume → ducking under voice-over
+    this.hp = this.ac.createBiquadFilter(); this.hp.type = "highpass";
+    this.presence = this.ac.createBiquadFilter(); this.presence.type = "peaking"; this.presence.frequency.value = 3200; this.presence.Q.value = 0.9;
+    this.comp = this.ac.createDynamicsCompressor();
+    this.makeup = this.ac.createGain();
+    this.duck = this.ac.createGain();
+    this.hp.connect(this.presence).connect(this.comp).connect(this.makeup).connect(this.orig).connect(this.duck).connect(this.master);
     // a media element can be wired into WebAudio only once
     let srcNode = SOURCES.get(video);
     if (!srcNode) { srcNode = this.ac.createMediaElementSource(video); SOURCES.set(video, srcNode); }
-    srcNode.disconnect(); srcNode.connect(this.orig);
+    srcNode.disconnect(); srcNode.connect(this.hp);
     video.addEventListener("seeked", () => { if (!this.playing) this.draw(); });
     video.addEventListener("loadeddata", () => this.draw());
     this.setProject(p);
@@ -48,12 +62,24 @@ export class Player {
     this.orig.gain.value = p.dub ? Math.min(p.origVolume, 0.12) : p.origVolume;
     const key = p.dub ? p.dub.lang + ":" + p.dub.clips.length + ":" + p.dub.clips.map((c) => c.t.toFixed(2)).join(",") : "";
     if (key !== this.dubKey) { this.dubKey = key; this.dubBufs = p.dub ? p.dub.clips.map((c) => pcmToBuffer(c.pcm, c.rate)) : []; }
+    const vo = p.vo ?? [];
+    const vkey = vo.map((c) => c.t.toFixed(2) + c.text.length).join(",");
+    if (vkey !== this.voKey) { this.voKey = vkey; this.voBufs = vo.map((c) => pcmToBuffer(c.pcm, c.rate)); }
+    this.setEnhance(!!p.enhance);
     const D = outDuration(p);
     if (this.t > D) this.t = 0;
     if (wasPlaying) void this.play(); else this.seek(this.t);
   }
 
   get duration() { return outDuration(this.p); }
+
+  private setEnhance(on: boolean) {
+    this.hp.frequency.value = on ? 90 : 10;
+    this.presence.gain.value = on ? 3.5 : 0;
+    this.comp.threshold.value = on ? -24 : 0; this.comp.ratio.value = on ? 3.5 : 1;
+    this.comp.knee.value = on ? 12 : 0; this.comp.attack.value = 0.008; this.comp.release.value = 0.2;
+    this.makeup.gain.value = on ? 1.5 : 1;
+  }
 
   setMuted(m: boolean) { this.master.gain.value = m ? 0 : 1; }
 
@@ -91,6 +117,17 @@ export class Player {
       // fit long lines into their slot by speeding up a little (max 1.25×)
       const rate = Math.min(1.25, Math.max(1, b.duration / Math.max(0.3, c.dur)));
       at(c.t, b, 1, rate);
+    });
+    // voice-over: play the narration and lower the original sound under it
+    const d = this.duck.gain;
+    d.cancelScheduledValues(this.ac.currentTime); d.setValueAtTime(1, this.ac.currentTime);
+    (this.p.vo ?? []).forEach((c, i) => {
+      const b = this.voBufs[i]; if (!b) return;
+      at(c.t, b, 1);
+      const s = now + Math.max(0, c.t - t0), e = now + Math.max(0, c.t + b.duration - t0);
+      if (e <= now) return;
+      if (c.t <= t0) d.setValueAtTime(0.25, now); else { d.setValueAtTime(1, Math.max(now, s - 0.2)); d.linearRampToValueAtTime(0.25, s); }
+      d.setValueAtTime(0.25, e); d.linearRampToValueAtTime(1, e + 0.3);
     });
     for (const s of this.p.sfx) at(s.t, await sfxBuffer(s.kind), s.vol);
   }
@@ -137,6 +174,7 @@ export class Player {
 
   pause() {
     this.playing = false;
+    this.duck.gain.cancelScheduledValues(this.ac.currentTime); this.duck.gain.setValueAtTime(1, this.ac.currentTime);
     cancelAnimationFrame(this.raf);
     this.video.pause();
     this.stopNodes();

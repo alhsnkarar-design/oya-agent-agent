@@ -1,7 +1,8 @@
 // Natural sound effects synthesized in the browser (no samples, no music):
-// whoosh for transitions, pop for titles, click for captions/cuts, soft impact for emphasis, riser before a hook.
-export type SfxKind = "whoosh" | "pop" | "click" | "impact" | "riser" | "swipe";
-export const SFX_KINDS: SfxKind[] = ["whoosh", "pop", "click", "impact", "riser", "swipe"];
+// whoosh for transitions, pop for titles, click for captions/cuts, soft impact for emphasis, riser before a hook,
+// ding for a key point, camera shutter for a freeze or photo, keyboard typing under typed text, heartbeat for tension, clock tick.
+export type SfxKind = "whoosh" | "pop" | "click" | "impact" | "riser" | "swipe" | "ding" | "shutter" | "typing" | "heartbeat" | "tick";
+export const SFX_KINDS: SfxKind[] = ["whoosh", "pop", "click", "impact", "riser", "swipe", "ding", "shutter", "typing", "heartbeat", "tick"];
 
 const cache = new Map<SfxKind, Promise<AudioBuffer>>();
 
@@ -13,7 +14,7 @@ function noise(ctx: BaseAudioContext, dur: number) {
 }
 
 async function render(kind: SfxKind): Promise<AudioBuffer> {
-  const dur = { whoosh: 0.55, pop: 0.18, click: 0.06, impact: 0.6, riser: 1.2, swipe: 0.32 }[kind];
+  const dur = { whoosh: 0.55, pop: 0.18, click: 0.06, impact: 0.6, riser: 1.2, swipe: 0.32, ding: 1.4, shutter: 0.22, typing: 1.2, heartbeat: 1.6, tick: 0.05 }[kind];
   const ctx = new OfflineAudioContext(1, Math.ceil(dur * 48000), 48000);
   const g = ctx.createGain(); g.connect(ctx.destination);
   const t = 0;
@@ -38,6 +39,44 @@ async function render(kind: SfxKind): Promise<AudioBuffer> {
     const n = noise(ctx, dur), f = ctx.createBiquadFilter(); f.type = "highpass"; f.frequency.value = 2500;
     g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     n.connect(f).connect(g); n.start(t);
+  } else if (kind === "ding") {
+    // small bell: a few inharmonic partials with a long decay
+    for (const [f0, a] of [[1320, 0.32], [2640, 0.12], [3560, 0.07], [4980, 0.04]] as const) {
+      const o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = f0;
+      const og = ctx.createGain(); og.gain.setValueAtTime(0.0001, t); og.gain.exponentialRampToValueAtTime(a, t + 0.004);
+      og.gain.exponentialRampToValueAtTime(0.0001, t + dur * (f0 > 2000 ? 0.5 : 1));
+      o.connect(og).connect(ctx.destination); o.start(t); o.stop(t + dur);
+    }
+  } else if (kind === "shutter") {
+    // two mechanical clicks: the curtain opening and closing
+    for (const at of [0, 0.09]) {
+      const n = noise(ctx, 0.06), f = ctx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = at ? 2600 : 3800; f.Q.value = 1.4;
+      const ng = ctx.createGain(); ng.gain.setValueAtTime(0.6, t + at); ng.gain.exponentialRampToValueAtTime(0.0001, t + at + 0.05);
+      n.connect(f).connect(ng).connect(ctx.destination); n.start(t + at);
+    }
+  } else if (kind === "typing") {
+    // irregular key presses
+    let at = 0;
+    while (at < dur - 0.06) {
+      const n = noise(ctx, 0.03), f = ctx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 1800 + Math.random() * 1800; f.Q.value = 2;
+      const ng = ctx.createGain(); ng.gain.setValueAtTime(0.25 + Math.random() * 0.2, t + at); ng.gain.exponentialRampToValueAtTime(0.0001, t + at + 0.03);
+      n.connect(f).connect(ng).connect(ctx.destination); n.start(t + at);
+      at += 0.07 + Math.random() * 0.09;
+    }
+  } else if (kind === "heartbeat") {
+    // lub-dub, twice
+    for (const at of [0, 0.22, 0.8, 1.02]) {
+      const o = ctx.createOscillator(); o.type = "sine";
+      o.frequency.setValueAtTime(70, t + at); o.frequency.exponentialRampToValueAtTime(40, t + at + 0.15);
+      const og = ctx.createGain(); og.gain.setValueAtTime(0.0001, t + at); og.gain.exponentialRampToValueAtTime(at % 0.8 ? 0.45 : 0.7, t + at + 0.015);
+      og.gain.exponentialRampToValueAtTime(0.0001, t + at + 0.2);
+      o.connect(og).connect(ctx.destination); o.start(t + at); o.stop(t + at + 0.22);
+    }
+  } else if (kind === "tick") {
+    const o = ctx.createOscillator(); o.type = "square"; o.frequency.value = 3200;
+    const f = ctx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 3200; f.Q.value = 6;
+    g.gain.setValueAtTime(0.4, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(f).connect(g); o.start(t); o.stop(t + dur);
   } else {
     // impact: low thump + short noise body
     const o = ctx.createOscillator(); o.type = "sine";

@@ -8,7 +8,7 @@ import { createProject, fmt } from "../lib/newproject";
 import { liveListen, pcmToBuffer, playBuffer, startRecording } from "../lib/audio";
 import { ApiError, speak, type ChatMsg } from "../lib/api";
 import { toast } from "../lib/toast";
-import { applyAction, captionLines, outDuration, type Action, type Aspect, type Project } from "../editor/model";
+import { applyAction, captionLines, migrate, outDuration, type Action, type Aspect, type Project } from "../editor/model";
 import { Player } from "../editor/player";
 import { autoEdit, command, voiceToText, type Step } from "../editor/ai";
 import { describe } from "../editor/describe";
@@ -60,7 +60,7 @@ export default function Editor() {
       const row = await getRow(id);
       if (!row) { go("/editor"); return; }
       u = URL.createObjectURL(row.file);
-      setFile(row.file); setUrl(u); setP(row.project);
+      setFile(row.file); setUrl(u); setP(migrate(row.project));
       undo.current = []; redo.current = [];
     })();
     return () => { if (u) URL.revokeObjectURL(u); };
@@ -257,6 +257,9 @@ export default function Editor() {
           <button className="q" disabled={busy || !p} onClick={() => void run(lang === "ar" ? "شيل السكتات" : "Cut the silences")}>{lang === "ar" ? "شيل السكتات" : "Cut silences"}</button>
           <button className="q" disabled={busy || !p} onClick={() => void run(lang === "ar" ? "حط كابشن كلمة كلمة" : "Add word-by-word captions")}>{lang === "ar" ? "كابشن" : "Captions"}</button>
           <button className="q" disabled={busy || !p} onClick={() => setInput(lang === "ar" ? "دبلجه للإنجليزي" : "Dub it to Arabic")}>{lang === "ar" ? "دبلجة" : "Dub"}</button>
+          <button className="q" disabled={busy || !p} onClick={() => void run(lang === "ar" ? "نضّف صوت المتكلم وخليه أوضح" : "Clean up and enhance the voice")}>{lang === "ar" ? "حسّن الصوت" : "Enhance voice"}</button>
+          <button className="q" disabled={busy || !p} onClick={() => void run(lang === "ar" ? "ضيف مؤثرات بصرية احترافية مع أصوات طبيعية مناسبة" : "Add professional visual effects with matching natural sounds")}>{lang === "ar" ? "مؤثرات" : "Effects"}</button>
+          <button className="q" disabled={busy || !p} onClick={() => setInput(lang === "ar" ? "ضيف تعليق صوتي في الأول يقول: " : "Add a voice-over at the start saying: ")}>{lang === "ar" ? "تعليق صوتي" : "Voice-over"}</button>
         </div>
         <div className="composer">
           <button className="ib" onClick={() => fileInput.current?.click()} aria-label={t.attach} title={t.attach}><Icon n="clip" /></button>

@@ -35,7 +35,7 @@
 .ib.rec { color: var(--bad); border-color: var(--bad); }
 .ib.send { background: var(--amber); color: var(--amber-ink); border-color: transparent; }
 [dir="rtl"] .ib.send .ico { transform: scaleX(-1); }
-.live-btn { position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; height: 48px; border-radius: 14px; border: 1px solid rgba(245,165,36,.5); background: rgba(245,165,36,.08); color: var(--amber); font-weight: 700; overflow: hidden; }
+.live-btn { position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; height: 48px; border-radius: 14px; border: 1px solid rgba(245,165,36,.5); background: rgba(245,165,36,.08); color: var(--amber); font-weight: 600; overflow: hidden; }
 .live-btn.on { background: var(--amber); color: var(--amber-ink); }
 .live-btn .lvl { position: absolute; inset-inline-start: 18px; width: 10px; height: 10px; border-radius: 50%; background: currentColor; opacity: .5; transition: transform .08s; }
 .live-btn:disabled { opacity: .45; }
@@ -62,7 +62,7 @@
 .handle .ico:last-child { transform: rotate(-90deg); }
 .exporting { position: absolute; inset: auto 0 0 0; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; background: rgba(10,10,12,.82); font-weight: 600; }
 .controls { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 16px; }
-.controls .tc { white-space: nowrap; font-weight: 700; font-variant-numeric: tabular-nums; font-size: 1.05rem; }
+.controls .tc { white-space: nowrap; font-weight: 600; font-variant-numeric: tabular-nums; font-size: 1.05rem; }
 .controls .grow { flex: 1; }
 
 .timeline { grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; padding: 14px; }
@@ -99,7 +99,7 @@
 
 .editor-empty { padding-block: 60px; display: grid; place-items: center; }
 .drop { display: grid; justify-items: center; gap: 14px; padding: 60px 30px; text-align: center; width: min(720px, 100%); border-style: dashed; cursor: pointer; }
-.drop h1 { margin: 0; font: 400 2.4rem/1.2 var(--f-display); }
+.drop h1 { margin: 0; font: 500 2.4rem/1.2 var(--f-display); }
 .drop p { margin: 0; }
 
 @media (max-width: 1080px) {

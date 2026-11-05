@@ -1,8 +1,8 @@
 .login { display: grid; place-items: center; padding-block: 50px 80px; }
 .login .box { width: min(460px, 100%); padding: 32px 28px; display: grid; gap: 16px; }
-.login h1 { margin: 0; font: 400 2.4rem/1.2 var(--f-display); text-align: center; }
+.login h1 { margin: 0; font: 500 2.4rem/1.2 var(--f-display); text-align: center; }
 .login .note { margin: 0; padding: 12px 14px; border-radius: 12px; background: rgba(245,165,36,.1); border: 1px solid rgba(245,165,36,.4); color: var(--ink-2); font-size: .95rem; }
-.btn.google { height: 50px; background: #fff; color: #1f1f1f; border-color: transparent; font-weight: 700; }
+.btn.google { height: 50px; background: #fff; color: #1f1f1f; border-color: transparent; font-weight: 600; }
 .or { display: flex; align-items: center; gap: 12px; color: var(--ink-3); font-size: .9rem; }
 .or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 .login form { display: grid; gap: 8px; }

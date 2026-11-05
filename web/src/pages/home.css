@@ -34,7 +34,7 @@
 .g .time { position: absolute; bottom: 12px; inset-inline-end: 12px; padding: 4px 9px; border-radius: 8px; background: rgba(10,10,12,.72); font-size: .85rem; font-variant-numeric: tabular-nums; direction: ltr; }
 .g3 { grid-column: span 1; }
 
-.h2 { font: 400 clamp(2rem, 4.6vw, 3.4rem)/1.15 var(--f-display); margin: 0 0 34px; text-wrap: balance; }
+.h2 { font: 500 clamp(2rem, 4.6vw, 3.4rem)/1.15 var(--f-display); margin: 0 0 34px; text-wrap: balance; }
 :root[dir="rtl"] .h2 { line-height: 1.4; }
 .features { padding-block: 40px 90px; }
 .fgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }

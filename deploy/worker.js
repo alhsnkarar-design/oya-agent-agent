@@ -164,7 +164,11 @@ const ACTIONS = [
   "remove_titles {target?: \"all\" | \"last\" | id}",
   "add_zoom {at, duration?: seconds, scale?: 1.05-1.6}   remove_zooms {}",
   "add_transition {at, kind: whip | flash | fade}   auto_transitions {every?: n}   remove_transitions {}",
-  "add_sfx {at, kind: whoosh | pop | click | impact | riser | swipe, volume?: 0-1}   auto_sfx {}   remove_sfx {}",
+  "add_sfx {at, kind: whoosh | pop | click | impact | riser | swipe | ding | shutter | typing | heartbeat | tick, volume?: 0-1}   auto_sfx {}   remove_sfx {}  (natural sound effects only, never music)",
+  "add_effect {at, kind: shake | punch | glow | light_leak | rgb_split | blur_in | film_grain, duration?: seconds, intensity?: 0.2-1}   auto_effects {}   remove_effects {kind?: one kind or \"all\"}",
+  "voiceover {text, at?: output seconds, voice?: Kore (female) | Puck (male) | Charon (deep male) | Aoede (soft female), tone?: delivery instructions}: speak a narration line over the video (the original sound is lowered under it). Write the text in the language the user wants.",
+  "remove_voiceover {}",
+  "enhance_audio {on?: boolean}: clean up the speaker's voice (cuts rumble, adds clarity, evens the level).",
   "original_volume {value: 0-1}",
   "dub {language, voice?}: translate the speech and replace the voice in that language (any language).",
   "translate_captions {language}",
@@ -193,11 +197,14 @@ function systemPrompt(mode, lang) {
       "turn captions on (karaoke, gold) unless the user said otherwise; " +
       "add 3 to 8 add_zoom on emphasised moments (scale 1.1-1.2); add_transition (whip or flash) at the 2 to 5 biggest topic changes; " +
       "add_sfx: whoosh just before each transition, pop when the title appears, a light impact on the strongest moment; " +
-      "pick a color_grade that suits the video (usually warm or cinematic). Follow any extra instructions from the user. " +
+      "add_effect: punch or shake on the 1 to 3 strongest moments (with a light impact sound), a light_leak or rgb_split on one or two transitions, blur_in at 0; keep it tasteful; " +
+      "turn on enhance_audio when there is speech; " +
+      "pick a color_grade that suits the video (usually warm or cinematic). Do not add a voiceover unless the user asks for one. Follow any extra instructions from the user. " +
       "In reply, summarise what you did in one or two sentences.";
   }
   return base + "\n\nTask: do what the user asks with the right actions, using the transcript and current state. " +
     "If the user asks for a full or automatic edit, use auto_edit. If they ask to dub or translate the voice, use dub. " +
+    "If they want narration or a voice saying something, use voiceover. If they want visual effects, use add_effect or auto_effects, usually with matching natural sound effects. " +
     "If they ask for something you cannot do (music, generating new footage), say so kindly and suggest the closest thing. " +
     "If the request is just conversation, reply with no actions.";
 }

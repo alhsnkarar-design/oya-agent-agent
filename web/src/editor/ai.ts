@@ -41,6 +41,12 @@ export async function autoEdit(p: Project, file: Blob, lang: string, onStep: OnS
   const r = await chat({ mode: "auto_edit", lang, project: summary(p), messages: [{ role: "user", content: extra || "Auto edit this video like a professional human editor." }] });
   onStep("step_apply");
   p = apply(p, r.actions as Action[]);
+  for (const a of r.actions as Action[]) {
+    if (a.type === "voiceover" && typeof a.text === "string" && a.text.trim()) {
+      try { p = await voiceover(p, a.text, Number(a.at) || 0, typeof a.voice === "string" ? a.voice : "Kore", typeof a.tone === "string" ? a.tone : "", onStep); } catch { /* narration is optional in an auto edit */ }
+    }
+  }
+  if (!p.fx.length) p = applyAction(p, { type: "auto_effects" });
   if (!p.captions.on && p.words.length) p = applyAction(p, { type: "captions", on: true });
   if (!p.sfx.length) p = applyAction(p, { type: "auto_sfx" });
   onStep(null);
@@ -98,6 +104,16 @@ export async function dub(p: Project, file: Blob, target: string, voice: string,
   return { ...p, edited: true, dub: { lang: target, voice, clips }, origVolume: 0.1, captions: { ...p.captions, lines: capLines, lang: p.captions.on ? target : p.captions.lang } };
 }
 
+/** Adds a narration line (text to speech) at an output time. */
+export async function voiceover(p: Project, text: string, at: number, voice: string, tone: string, onStep: OnStep): Promise<Project> {
+  onStep("step_voice", 0);
+  const r = await speak(text.slice(0, 1000), voice, tone || "Clear, warm, natural voice-over narration.");
+  onStep(null);
+  const t = Math.max(0, Math.min(outDuration(p) - 0.2, at));
+  const clip: DubClip = { t, dur: r.pcm.byteLength / 2 / r.rate, text, pcm: r.pcm, rate: r.rate };
+  return { ...p, edited: true, vo: [...(p.vo ?? []), clip].sort((a, b) => a.t - b.t) };
+}
+
 export type CommandResult = { p: Project; reply: string };
 
 /** A free-form command from the user (text or transcribed voice). */
@@ -111,6 +127,7 @@ export async function command(p: Project, file: Blob, history: ChatMsg[], text: 
   for (const a of r.actions as Action[]) {
     if (a.type === "auto_edit") { const x = await autoEdit(p, file, lang, onStep, typeof a.instructions === "string" ? a.instructions : text); p = x.p; reply = reply || x.reply; }
     else if (a.type === "dub") p = await dub(p, file, String(a.language ?? "English"), typeof a.voice === "string" ? a.voice : voice, lang, onStep);
+    else if (a.type === "voiceover" && typeof a.text === "string" && a.text.trim()) p = await voiceover(p, a.text, Number(a.at) || 0, typeof a.voice === "string" ? a.voice : voice, typeof a.tone === "string" ? a.tone : "", onStep);
     else if (a.type === "translate_captions") p = await translateCaptions(p, file, String(a.language ?? "English"), lang, onStep);
     else p = applyAction(p, a);
   }
