@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>البطاقة</title>
+<style>
+@font-face{font-family:'Amiri';src:url(fonts/Amiri-Bold.ttf) format('truetype');font-weight:700}
+@font-face{font-family:'ReemKufi';src:url(fonts/ReemKufi-Bold.ttf) format('truetype');font-weight:700}
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+canvas{display:block;width:100vw;height:100vh;object-fit:contain;background:#000}
+#ui{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:12px;align-items:center;background:rgba(10,8,4,.6);border:1px solid rgba(232,190,110,.35);padding:8px 16px;border-radius:40px;color:#f3d79a;font-family:sans-serif}
+#ui button{background:none;border:1px solid rgba(232,190,110,.5);color:#f3d79a;border-radius:20px;padding:6px 16px;cursor:pointer}
+#ui input{width:min(50vw,420px);accent-color:#d9a94e}
+body.render #ui{display:none}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="ui"><button id="play">▶</button><input id="seek" type="range" min="0" max="73" step="0.01" value="0"><span id="tm">0:00</span></div>
+<audio id="aud" src="soundtrack.wav" preload="auto"></audio>
+<script>
+'use strict';
+/* «البطاقة» — أسلوب الخطوط الذهبية الرفيعة (line-art infographic):
+   خلفية فحمية، خطوط ترسم نفسها، رجل خطي بهالة ذهبية، رسوم بيانية متحركة،
+   عناوين بالعامية المصرية والحديث بالفصحى. كل إطار دالة في الزمن t. */
+const W = 1080, H = 1920, FPS = 30, DUR = 73;
+const cv = document.getElementById('c'); cv.width = W; cv.height = H; const ctx = cv.getContext('2d');
+const mk = (w = W, h = H) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const buf = mk(), bctx = buf.getContext('2d');
+const TAU = Math.PI * 2, clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), lerp = (a, b, t) => a + (b - a) * t;
+const ss = (a, b, x) => { const t = clamp((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+const eOut = t => 1 - Math.pow(1 - clamp(t), 3), eInOut = t => { t = clamp(t); return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+const eBack = t => { t = clamp(t); const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+const pulse = (t, c, w) => Math.exp(-Math.pow((t - c) / w, 2));
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const R = rng(99);
+
+/* ---------- palette ---------- */
+const GOLD = '#f2c14e', GOLD2 = '#ffd978', WHITE = '#e9e6df', SLATE = '#2b3442', SLATE_L = '#55657a', RED = '#d9534f', DIM = 'rgba(233,230,223,.28)';
+function sprite(r, g, b, size = 128) { const c = mk(size, size), x = c.getContext('2d'); const gr = x.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2); gr.addColorStop(0, `rgba(${r},${g},${b},.9)`); gr.addColorStop(.35, `rgba(${r},${g},${b},.35)`); gr.addColorStop(1, `rgba(${r},${g},${b},0)`); x.fillStyle = gr; x.fillRect(0, 0, size, size); return c; }
+const SP = { gold: sprite(242, 193, 78), red: sprite(217, 83, 79), white: sprite(233, 230, 223) };
+function glow(c, sp, x, y, s, a = 1) { if (a <= .003) return; c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = a; c.drawImage(sp, x - s / 2, y - s / 2, s, s); c.restore(); }
+
+/* ---------- line primitives that draw themselves ---------- */
+function stroke(c, col, w, a = 1) { c.strokeStyle = col; c.lineWidth = w; c.globalAlpha = a; c.lineCap = 'round'; c.lineJoin = 'round'; }
+function polyline(c, pts, k, col = GOLD, w = 4, a = 1) { // draw first k (0..1) of a polyline
+  if (k <= 0 || pts.length < 2) return; let L = 0; const seg = []; for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); seg.push(d); L += d; }
+  let rem = L * clamp(k); c.save(); stroke(c, col, w, a); c.beginPath(); c.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i < pts.length && rem > 0; i++) { const d = seg[i - 1], f = Math.min(1, rem / d); c.lineTo(lerp(pts[i - 1][0], pts[i][0], f), lerp(pts[i - 1][1], pts[i][1], f)); rem -= d; }
+  c.stroke(); c.restore(); }
+function arcDraw(c, x, y, r, k, col = GOLD, w = 4, a = 1, start = -Math.PI / 2) { if (k <= 0) return; c.save(); stroke(c, col, w, a); c.beginPath(); c.arc(x, y, r, start, start + TAU * clamp(k)); c.stroke(); c.restore(); }
+function rectDraw(c, x, y, w, h, k, col = GOLD, lw = 4, a = 1) { polyline(c, [[x, y + h], [x, y], [x + w, y], [x + w, y + h], [x, y + h]], k, col, lw, a); }
+function node(c, x, y, r, a = 1, col = GOLD, t = 0) { if (a <= 0) return; glow(c, SP.gold, x, y, r * 7, .5 * a); c.save(); c.globalAlpha = a; c.fillStyle = col; c.beginPath(); c.arc(x, y, r, 0, TAU); c.fill(); c.strokeStyle = col; c.lineWidth = 2; c.globalAlpha = a * .7; c.beginPath(); c.arc(x, y, r * 1.9 + Math.sin(t * 3) * 2, 0, TAU); c.stroke(); c.restore(); }
+function dots(c, x, y, cols, rows, gap, k, col = WHITE, r = 3.4) { const n = cols * rows, m = Math.floor(n * clamp(k)); c.save(); c.fillStyle = col; for (let i = 0; i < m; i++) { const cx = i % cols, cy = Math.floor(i / cols); c.beginPath(); c.arc(x + cx * gap, y - cy * gap, r, 0, TAU); c.fill(); } c.restore(); }
+
+/* ---------- the line figure (faceless: a circle head) ---------- */
+function figure(c, x, y, s, pose = {}, a = 1, halo = 1) {
+  const p = Object.assign({ nod: 0, armL: [-.32, .55], armR: [.32, .55], legL: [-.16, 1.05], legR: [.16, 1.05], lean: 0 }, pose);
+  if (halo > 0) glow(c, SP.gold, x, y + s * .45, s * 2.6, .35 * halo * a);
+  c.save(); c.translate(x, y); c.rotate(p.lean); stroke(c, WHITE, s * .045, a);
+  const neck = [0, -.02 * s], hip = [0, s * .5], hy = -s * .2 + p.nod * s * .1;
+  c.beginPath(); c.arc(p.nod * s * .06, hy, s * .17, 0, TAU); c.stroke();
+  c.beginPath(); c.moveTo(neck[0], neck[1]); c.lineTo(hip[0], hip[1]); c.stroke();
+  const sh = [0, s * .08];
+  c.beginPath(); c.moveTo(sh[0], sh[1]); c.quadraticCurveTo(p.armL[0] * s * .5, sh[1] + p.armL[1] * s * .35, p.armL[0] * s, p.armL[1] * s); c.stroke();
+  c.beginPath(); c.moveTo(sh[0], sh[1]); c.quadraticCurveTo(p.armR[0] * s * .5, sh[1] + p.armR[1] * s * .35, p.armR[0] * s, p.armR[1] * s); c.stroke();
+  c.beginPath(); c.moveTo(hip[0], hip[1]); c.lineTo(p.legL[0] * s, p.legL[1] * s); c.stroke();
+  c.beginPath(); c.moveTo(hip[0], hip[1]); c.lineTo(p.legR[0] * s, p.legR[1] * s); c.stroke();
+  c.restore(); }
+const STAND = { armL: [-.18, .62], armR: [.18, .62] };
+const BOW = { nod: 1, armL: [-.12, .64], armR: [.12, .64], lean: .08 };
+const DUA = { armL: [-.32, -.22], armR: [.32, -.22] };
+
+/* ---------- text ---------- */
+function headline(c, t, s, e, txt, col = GOLD, y = H * .15, size = 70) {
+  if (t < s || t > e) return; const a = ss(s, s + .35, t) * (1 - ss(e - .35, e, t)); c.save(); c.globalAlpha = a; c.direction = 'rtl'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.font = `700 ${size}px ReemKufi`; c.shadowColor = col === GOLD ? 'rgba(242,193,78,.45)' : 'rgba(0,0,0,.6)'; c.shadowBlur = 18; c.fillStyle = col; c.fillText(txt, W / 2, y + (1 - eOut((t - s) / .5)) * 18); c.restore(); }
+function subline(c, t, s, e, txt, col = DIM, y = H * .19, size = 38) { if (t < s || t > e) return; const a = ss(s + .2, s + .6, t) * (1 - ss(e - .35, e, t)); c.save(); c.globalAlpha = a; c.direction = 'rtl'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = `700 ${size}px ReemKufi`; c.fillStyle = col; c.fillText(txt, W / 2, y); c.restore(); }
+/* the hadith in Fusha at the bottom: thin gold rules, no box */
+const HAD = [
+  [5.2, 11.8, ['«إنّ اللهَ سيُخلِّصُ رجلًا من أمّتي', 'على رؤوسِ الخلائقِ يومَ القيامة»']],
+  [12.2, 19.8, ['«فيَنشُرُ عليه تسعةً وتسعين سجلًّا،', 'كلُّ سجلٍّ مثلُ مدِّ البصر»']],
+  [20.2, 26.8, ['«أتُنكِرُ من هذا شيئًا؟… فيقول: لا يا ربّ.', 'أفلك عذرٌ؟ فيقول: لا يا ربّ»']],
+  [27.2, 33.8, ['«بلى، إنّ لك عندنا حسنةً،', 'فإنه لا ظلمَ عليك اليوم»']],
+  [34.2, 40.8, ['«فتُخرَج بطاقةٌ فيها: أشهد أن لا إله إلا الله،', 'وأشهد أن محمدًا عبده ورسوله»']],
+  [41.2, 47.8, ['«يا ربّ ما هذه البطاقة مع هذه السجلات؟', 'فقال: إنك لا تُظلَم»']],
+  [48.2, 55.8, ['«فتُوضَع السجلاتُ في كِفّة والبطاقةُ في كِفّة،', 'فطاشت السجلاتُ وثقُلت البطاقة»']],
+  [56.2, 61.8, ['«فلا يثقُلُ مع اسمِ الله شيء»'], 'رواه الترمذي وصححه الألباني'],
+];
+function hadith(c, t) { for (const [s, e, lines, src] of HAD) { if (t < s || t > e) continue; const a = ss(s, s + .4, t) * (1 - ss(e - .4, e, t)); c.save(); c.globalAlpha = a; c.direction = 'rtl'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    const m = c; m.font = '700 46px Amiri'; let sc = 1; for (const l of lines) sc = Math.min(sc, W * .86 / m.measureText(l).width); const fs = Math.floor(46 * sc), lh = fs * 1.55, y0 = H * .8 - (lines.length - 1) * lh / 2;
+    const rule = (y) => { const g = c.createLinearGradient(W * .2, 0, W * .8, 0); g.addColorStop(0, 'rgba(242,193,78,0)'); g.addColorStop(.5, 'rgba(242,193,78,.8)'); g.addColorStop(1, 'rgba(242,193,78,0)'); c.fillStyle = g; c.fillRect(W * .2, y, W * .6 * eOut((t - s) / .8), 2); };
+    rule(y0 - lh * .85); c.font = `700 ${fs}px Amiri`; c.fillStyle = WHITE; c.shadowColor = 'rgba(0,0,0,.8)'; c.shadowBlur = 8; lines.forEach((l, i) => c.fillText(l, W / 2, y0 + i * lh)); c.shadowBlur = 0;
+    rule(y0 + (lines.length - 1) * lh + lh * .7); if (src) { c.font = '700 30px ReemKufi'; c.fillStyle = GOLD; c.fillText(src, W / 2, y0 + (lines.length - 1) * lh + lh * 1.25); } c.restore(); } }
+
+/* ---------- scrolls (records) ---------- */
+function scroll(c, x, y, w, h, k, col = SLATE_L, a = 1) { if (k <= 0) return; c.save(); c.globalAlpha = a; stroke(c, col, 3, a); const hh = h * eOut(k);
+  c.beginPath(); c.ellipse(x, y, w / 2, 9, 0, 0, TAU); c.stroke(); c.beginPath(); c.moveTo(x - w / 2, y); c.lineTo(x - w / 2, y + hh); c.moveTo(x + w / 2, y); c.lineTo(x + w / 2, y + hh); c.stroke();
+  c.beginPath(); c.ellipse(x, y + hh, w / 2, 9, 0, 0, TAU); c.stroke(); c.globalAlpha = a * .5; for (let i = 1; i < 6 && i * h / 6 < hh; i++) { c.beginPath(); c.moveTo(x - w * .32, y + i * h / 6); c.lineTo(x + w * .32 - (i % 2) * w * .15, y + i * h / 6); c.stroke(); } c.restore(); }
+function card(c, x, y, w, h, k, t, glowA = 1) { if (k <= 0) return; glow(c, SP.gold, x, y, w * 3.2, .55 * glowA * k); rectDraw(c, x - w / 2, y - h / 2, w, h, k, GOLD, 5);
+  c.save(); c.globalAlpha = ss(.6, 1, k); c.strokeStyle = 'rgba(242,193,78,.55)'; c.lineWidth = 3; for (let i = 0; i < 3; i++) { c.beginPath(); c.moveTo(x - w * .32, y - h * .2 + i * h * .2); c.lineTo(x + w * .32 - (i === 2 ? w * .2 : 0), y - h * .2 + i * h * .2); c.stroke(); } c.restore(); }
+
+/* ============================ SCENES ============================ */
+const BASEY = H * .58;
+// 0 · 0–5 hook
+function s0(c, t) {
+  figure(c, W / 2, BASEY - 120, 230, STAND, ss(.2, .8, t));
+  for (let i = 0; i < 9; i++) scroll(c, W * .2 + (i % 3) * 70 + (i > 5 ? 380 : 0), BASEY - 260 + Math.floor(i / 3) * 40, 60, 120, ss(1.4 + i * .18, 2 + i * .18, t), SLATE_L, .75);
+  polyline(c, [[W * .15, BASEY + 160], [W * .85, BASEY + 160]], ss(.1, 1, t), DIM, 3);
+  headline(c, t, .1, 4.9, 'ذنوبك كتير؟');
+  subline(c, t, .1, 4.9, 'طيب رحمة ربنا أوسع… اسمع القصة دي', WHITE, H * .2, 42);
+}
+// 1 · 5–12 before all creation on the Day
+function s1(c, t) {
+  const cx = W / 2, cy = BASEY - 40;
+  for (let r = 0; r < 5; r++) { const rr = 180 + r * 70, n = 14 + r * 6; for (let i = 0; i < n; i++) { const an = i / n * TAU + r * .2, k = ss(.2 + r * .25, .8 + r * .25, t); if (k <= 0) continue; c.save(); c.globalAlpha = k * .55; c.fillStyle = WHITE; c.beginPath(); c.arc(cx + Math.cos(an) * rr, cy + Math.sin(an) * rr * .42 + 120, 4, 0, TAU); c.fill(); c.restore(); } }
+  polyline(c, [[cx, 120], [cx, cy - 160]], ss(1.2, 2.4, t), GOLD, 3); node(c, cx, 120, 12, ss(1, 1.4, t), GOLD, t);
+  figure(c, cx, cy - 60, 200, STAND, 1, 1.4);
+  headline(c, t, .1, 6.8, 'يوم القيامة… قدّام الخلق كلهم');
+}
+// 2 · 12–20 ninety-nine records, each as far as the eye can see
+function s2(c, t) {
+  const vx = W / 2, vy = H * .3;
+  for (let i = 0; i < 11; i++) { const x0 = W * (.05 + i * .09), k = ss(.4 + i * .12, 1.6 + i * .12, t); polyline(c, [[x0, BASEY + 180], [lerp(x0, vx, .92), lerp(BASEY + 180, vy, .92)]], k, i % 2 ? SLATE_L : DIM, 3); }
+  polyline(c, [[W * .05, BASEY + 180], [W * .95, BASEY + 180]], ss(.1, .8, t), DIM, 3);
+  node(c, vx, vy, 8, ss(1.6, 2, t), WHITE, t);
+  const n = Math.min(99, Math.floor(eInOut((t - .6) / 5.2) * 99));
+  c.save(); c.direction = 'ltr'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = '700 150px ReemKufi'; c.fillStyle = WHITE; c.globalAlpha = ss(.5, 1, t); c.shadowColor = 'rgba(0,0,0,.6)'; c.shadowBlur = 20; c.fillText(n.toLocaleString('ar-EG'), W / 2, BASEY - 20); c.restore();
+  subline(c, t, .5, 7.6, 'سِجِل', DIM, BASEY + 80, 44);
+  headline(c, t, .1, 7.8, '٩٩ سجل… كل سجل مدّ البصر');
+}
+// 3 · 20–27 he denies nothing, has no excuse
+function s3(c, t) {
+  for (let i = 0; i < 12; i++) { const x = W * (.12 + (i % 6) * .152), y = BASEY - 330 + Math.floor(i / 6) * 180; scroll(c, x, y, 70, 130, 1, ss(1, 2, t) > 0 ? RED : SLATE_L, .35 + .45 * ss(1, 2, t)); }
+  figure(c, W / 2, BASEY + 40, 200, t > .8 ? BOW : STAND, 1, .5);
+  ['لا', 'لا'].forEach((w, i) => { const tk = 2.6 + i * 2.2, a = pulse(t, tk + .6, .7); if (a < .02) return; c.save(); c.globalAlpha = a; c.direction = 'rtl'; c.textAlign = 'center'; c.font = '700 64px ReemKufi'; c.fillStyle = RED; c.fillText(w, W / 2 + (i ? 150 : -150), BASEY - 90); c.restore(); });
+  headline(c, t, .1, 6.8, 'ولا حاجة يقدر ينكرها', WHITE);
+}
+// 4 · 27–34 «بلى، إن لك عندنا حسنة»
+function s4(c, t) {
+  for (let i = 0; i < 12; i++) { const x = W * (.12 + (i % 6) * .152), y = BASEY - 330 + Math.floor(i / 6) * 180; scroll(c, x, y, 70, 130, 1, RED, .25); }
+  figure(c, W / 2, BASEY + 40, 200, t > 3 ? STAND : BOW, 1, .6 + ss(3, 5, t));
+  const dy = lerp(110, BASEY - 230, eInOut((t - 1) / 2.4)); polyline(c, [[W / 2, 110], [W / 2, dy]], ss(1, 3.4, t), GOLD, 3); node(c, W / 2, dy, 16 + 4 * Math.sin(t * 4), ss(.6, 1.1, t), GOLD, t);
+  headline(c, t, .1, 6.8, 'لكن… فيه حسنة واحدة');
+}
+// 5 · 34–41 the card
+function s5(c, t) {
+  const k = eBack((t - .4) / 1.2); card(c, W / 2, BASEY - 120, 340 * Math.max(.01, k), 210 * Math.max(.01, k), ss(.4, 1.8, t), t);
+  for (let i = 0; i < 16; i++) { const an = i / 16 * TAU + t * .15, r1 = 240, r2 = 260 + 40 * Math.sin(t * 2 + i); polyline(c, [[W / 2 + Math.cos(an) * r1, BASEY - 120 + Math.sin(an) * r1 * .7], [W / 2 + Math.cos(an) * r2, BASEY - 120 + Math.sin(an) * r2 * .7]], ss(2, 3, t), GOLD, 3, .6); }
+  headline(c, t, .1, 6.8, 'بطاقة صغيرة…');
+  subline(c, t, .8, 6.8, 'فيها كلمة التوحيد', WHITE, H * .2, 42);
+}
+// 6 · 41–48 a size comparison: 99 records vs one small card
+function s6(c, t) {
+  const bx = W * .62, by = BASEY + 120, cols = 9, rows = 11, gap = 30;
+  polyline(c, [[W * .1, by + 20], [W * .9, by + 20]], ss(.1, .7, t), DIM, 3);
+  dots(c, bx - cols * gap / 2, by, cols, rows, gap, ss(.4, 3.4, t), SLATE_L, 5);
+  card(c, W * .26, by - 50, 110, 70, ss(1.6, 2.6, t), t, .6);
+  c.save(); c.direction = 'rtl'; c.textAlign = 'center'; c.font = '700 40px ReemKufi'; c.fillStyle = DIM; c.globalAlpha = ss(3, 3.6, t); c.fillText('٩٩ سجل', bx, by + 80); c.fillText('بطاقة', W * .26, by + 80); c.restore();
+  headline(c, t, .1, 6.8, 'البطاقة دي… قدّام كل دول؟', WHITE);
+}
+// 7 · 48–56 the balance flips
+function s7(c, t) {
+  const cx = W / 2, cy = BASEY - 260, arm = 330, flip = eInOut((t - 3.6) / 1.8), tilt = lerp(-.32, .38, flip) + Math.sin(t * 3) * .01 * (1 - flip);
+  polyline(c, [[cx, cy - 20], [cx, BASEY + 170]], ss(.1, .8, t), GOLD, 5); polyline(c, [[cx - 140, BASEY + 170], [cx + 140, BASEY + 170]], ss(.4, 1, t), GOLD, 5); node(c, cx, cy - 20, 12, ss(.5, .9, t), GOLD, t);
+  const bx = Math.cos(tilt) * arm, byy = Math.sin(tilt) * arm, L = [cx - bx, cy - byy], Rr = [cx + bx, cy + byy];
+  c.save(); c.globalAlpha = ss(.6, 1.2, t); stroke(c, GOLD, 5); c.beginPath(); c.moveTo(L[0], L[1]); c.lineTo(Rr[0], Rr[1]); c.stroke();
+  for (const [px, py] of [L, Rr]) { stroke(c, DIM, 3, ss(.6, 1.2, t)); c.beginPath(); c.moveTo(px, py); c.lineTo(px - 110, py + 170); c.moveTo(px, py); c.lineTo(px + 110, py + 170); c.stroke(); stroke(c, GOLD, 5, ss(.6, 1.2, t)); c.beginPath(); c.ellipse(px, py + 170, 130, 22, 0, 0, Math.PI); c.stroke(); }
+  c.restore();
+  // left pan (screen): the records — they fly up when they «طاشت»; right pan: the card
+  const fly = ss(3.8, 6, t); for (let i = 0; i < 9; i++) { const sx = L[0] - 80 + (i % 3) * 80, sy = L[1] + 140 - Math.floor(i / 3) * 34; scroll(c, sx + fly * (i - 4) * 40, sy - fly * (200 + i * 60), 50, 30, ss(1 + i * .1, 1.5 + i * .1, t), RED, .7 * (1 - fly * .7)); }
+  card(c, Rr[0], Rr[1] + 130, 110, 70, ss(1.6, 2.4, t), t, .6 + flip);
+  headline(c, t, .1, 7.8, flip > .5 ? 'وثقُلت البطاقة!' : 'الميزان…', flip > .5 ? GOLD : WHITE);
+}
+// 8 · 56–62 «فلا يثقل مع اسم الله شيء»
+function s8(c, t) {
+  card(c, W / 2, BASEY - 140, 300, 190, 1, t, 1.3);
+  for (let i = 0; i < 24; i++) { const an = i / 24 * TAU + t * .1, k = ss(.4 + i * .03, 1.6 + i * .03, t); polyline(c, [[W / 2 + Math.cos(an) * 220, BASEY - 140 + Math.sin(an) * 220], [W / 2 + Math.cos(an) * 520, BASEY - 140 + Math.sin(an) * 520]], k, i % 2 ? GOLD : DIM, 3, .7); }
+  headline(c, t, .1, 5.8, 'ولا حاجة تتقل قدّام اسم الله');
+}
+// 9 · 62–68 sincerity: a heart lit from within
+function s9(c, t) {
+  figure(c, W / 2, BASEY - 60, 230, STAND, 1, 1.2);
+  const hk = ss(.6, 2, t), hx = W / 2, hy = BASEY + 20; c.save(); stroke(c, GOLD, 5, hk); c.beginPath(); c.moveTo(hx, hy + 26); c.bezierCurveTo(hx - 70, hy - 20, hx - 30, hy - 66, hx, hy - 30); c.bezierCurveTo(hx + 30, hy - 66, hx + 70, hy - 20, hx, hy + 26); c.stroke(); c.restore(); glow(c, SP.gold, hx, hy - 10, 260, .7 * hk * (.8 + .2 * Math.sin(t * 4)));
+  headline(c, t, .1, 5.8, 'مش مجرد كلمة…');
+  subline(c, t, .8, 5.8, 'قالها بصدق ويقين… فثقُلت', WHITE, H * .2, 44);
+  subline(c, t, 2.2, 5.8, 'كما قرّر أهل العلم', DIM, H * .8, 34);
+}
+// 10 · 68–73 ending
+const LOGO = new Image(); LOGO.src = 'logo.png';
+function s10(c, t) {
+  headline(c, t, .1, 4.9, 'ما تيأسش من رحمة ربنا', GOLD, H * .2);
+  const s = 420 * eBack((t - .6) / 1); if (LOGO.complete && s > 1) { c.save(); c.globalAlpha = ss(.6, 1.2, t); c.drawImage(LOGO, W / 2 - s / 2, BASEY - 220 - s / 2 + 120, s, s); c.restore(); }
+}
+const SCENES = [[0, 5, s0], [5, 12, s1], [12, 20, s2], [20, 27, s3], [27, 34, s4], [34, 41, s5], [41, 48, s6], [48, 56, s7], [56, 62, s8], [62, 68, s9], [68, 73, s10]];
+
+/* ---------- compositing ---------- */
+const BG = mk(); { const x = BG.getContext('2d'); x.fillStyle = '#0c0e11'; x.fillRect(0, 0, W, H); const g = x.createRadialGradient(W / 2, H * .45, 40, W / 2, H * .45, H * .7); g.addColorStop(0, 'rgba(40,48,58,.55)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, W, H); }
+const GRAIN = Array.from({ length: 6 }, (_, k) => { const c = mk(270, 480), x = c.getContext('2d'), id = x.createImageData(270, 480), r = rng(9 + k); for (let i = 0; i < id.data.length; i += 4) { const v = r() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 255; } x.putImageData(id, 0, 0); return c; });
+function renderAt(t) {
+  t = clamp(t, 0, DUR); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.drawImage(BG, 0, 0);
+  for (const [s, e, f] of SCENES) { if (t < s - .01 || t > e + .45) continue;
+    const a = (s > 0 ? ss(s, s + .45, t) : 1) * (1 - ss(e, e + .45, t)); if (a <= 0) continue;
+    bctx.setTransform(1, 0, 0, 1, 0, 0); bctx.globalAlpha = 1; bctx.clearRect(0, 0, W, H); bctx.save(); f(bctx, t - s); bctx.restore();
+    const z = 1 + .03 * clamp((t - s) / (e - s)); ctx.save(); ctx.globalAlpha = a; ctx.translate(W / 2, H * .45); ctx.scale(z, z); ctx.translate(-W / 2, -H * .45); ctx.drawImage(buf, 0, 0); ctx.restore(); }
+  hadith(ctx, t);
+  ctx.save(); ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = .035; ctx.drawImage(GRAIN[Math.floor(t * FPS) % 6], 0, 0, W, H); ctx.restore();
+  const fade = Math.max(1 - ss(0, .25, t), ss(DUR - 1, DUR, t)); if (fade > 0) { ctx.globalAlpha = fade; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
+}
+const params = new URLSearchParams(location.search);
+(async () => {
+  await Promise.all(['700 70px ReemKufi', '700 46px Amiri'].map(f => document.fonts.load(f, 'البطاقة'))); await document.fonts.ready;
+  await new Promise(r => { if (LOGO.complete) r(); else { LOGO.onload = r; LOGO.onerror = r; } });
+  window.renderAt = renderAt; window.DUR = DUR; window.FPS = FPS;
+  window.frameJPEG = (t, q = .93) => { renderAt(t); return cv.toDataURL('image/jpeg', q); };
+  if (params.has('render')) { document.body.classList.add('render'); window.READY = true; return; }
+  const aud = document.getElementById('aud'), btn = document.getElementById('play'), seek = document.getElementById('seek'), tm = document.getElementById('tm');
+  let playing = false, t0 = 0, base = 0, cur = 0;
+  btn.onclick = () => { playing = !playing; btn.textContent = playing ? '❚❚' : '▶'; if (playing) { t0 = performance.now(); base = cur; aud.currentTime = cur; aud.play().catch(() => {}); } else aud.pause(); };
+  seek.oninput = () => { cur = +seek.value; base = cur; t0 = performance.now(); aud.currentTime = cur; };
+  (function loop() { if (playing) { cur = base + (performance.now() - t0) / 1000; if (cur >= DUR) { cur = DUR; playing = false; btn.textContent = '▶'; aud.pause(); } } renderAt(cur); seek.value = cur; tm.textContent = Math.floor(cur / 60) + ':' + String(Math.floor(cur % 60)).padStart(2, '0'); requestAnimationFrame(loop); })();
+  window.READY = true;
+})();
+</script>
+</body>
+</html>

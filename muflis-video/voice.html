@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>المفلس الحقيقي</title>
+<style>
+@font-face{font-family:'Amiri';src:url(fonts/Amiri-Bold.ttf) format('truetype');font-weight:700}
+@font-face{font-family:'ReemKufi';src:url(fonts/ReemKufi-Bold.ttf) format('truetype');font-weight:700}
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+canvas{display:block;width:100vw;height:100vh;object-fit:contain;background:#000}
+#ui{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:12px;align-items:center;background:rgba(10,8,4,.6);border:1px solid rgba(232,190,110,.35);padding:8px 16px;border-radius:40px;color:#f3d79a;font-family:sans-serif}
+#ui button{background:none;border:1px solid rgba(232,190,110,.5);color:#f3d79a;border-radius:20px;padding:6px 16px;cursor:pointer}
+#ui input{width:min(50vw,420px);accent-color:#d9a94e}
+body.render #ui{display:none}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="ui"><button id="play">▶</button><input id="seek" type="range" min="0" max="45.2" step="0.01" value="0"><span id="tm">0:00</span></div>
+<audio id="aud" src="soundtrack_voice.wav" preload="auto"></audio>
+<script src="rig.js"></script>
+<script>
+/* «المفلس الحقيقي» — حديث صحيح مسلم (2581)، فيديو توعوي عمودي بشخصيات بلا ملامح وجه وكابشن بالفصحى. */
+const W = 1080, H = 1920, FPS = 30, DUR = 45.2;
+const cv = document.getElementById('c'); cv.width = W; cv.height = H; const ctx = cv.getContext('2d');
+const mk = (w = W, h = H) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const buf = mk(), bctx = buf.getContext('2d');
+const pulse = (t, c, w) => Math.exp(-Math.pow((t - c) / w, 2));
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const R = rng(777);
+function sprite(r, g, b, size = 128) { const c = mk(size, size), x = c.getContext('2d'); const gr = x.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.15, `rgba(${r},${g},${b},.85)`); gr.addColorStop(.45, `rgba(${r},${g},${b},.25)`); gr.addColorStop(1, `rgba(${r},${g},${b},0)`); x.fillStyle = gr; x.fillRect(0, 0, size, size); return c; }
+const SP = { gold: sprite(255, 196, 90), warm: sprite(255, 150, 70), red: sprite(255, 70, 40), white: sprite(230, 240, 255), violet: sprite(150, 90, 255) };
+function glow(c, sp, x, y, s, a = 1) { if (a <= .003) return; c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = a; c.drawImage(sp, x - s / 2, y - s / 2, s, s); c.restore(); }
+function vgrad(c, y0, y1, stops) { const g = c.createLinearGradient(0, y0, 0, y1); stops.forEach(([o, col]) => g.addColorStop(o, col)); return g; }
+function star8(c, cx, cy, Rr, rot) { const ri = Rr * Math.cos(Math.PI / 4) / Math.cos(Math.PI / 8); c.beginPath(); for (let i = 0; i < 16; i++) { const r = i % 2 ? ri : Rr, an = rot + i * Math.PI / 8; c.lineTo(cx + r * Math.cos(an), cy + r * Math.sin(an)); } c.closePath(); }
+function mixP(a, b, k) { const o = {}; for (const key of new Set([...Object.keys(a), ...Object.keys(b)])) { const va = a[key], vb = b[key]; if (Array.isArray(va) && Array.isArray(vb)) o[key] = [lerp(va[0], vb[0], k), lerp(va[1], vb[1], k)]; else if (typeof va === 'number' && typeof vb === 'number') o[key] = lerp(va, vb, k); else o[key] = k < .5 ? (va ?? vb) : (vb ?? va); } return o; }
+function seq(st, t, list) { let i = 0; while (i + 1 < list.length && t >= list[i + 1][0]) i++; const cur = Object.assign(basePose(st), list[i][1](t - list[i][0])); if (i > 0) { const k = eInOut((t - list[i][0]) / .45); if (k < 1) return mixP(Object.assign(basePose(st), list[i - 1][1](t - list[i - 1][0])), cur, k); } return cur; }
+
+/* ---------------- cast (faceless) ---------------- */
+STYLES.muflis = { P: ADULT, skin: '#c8946a', shirt: '#8d9097', robe: true, sleeve: 'long', pants: '#6a6d74', shoe: '#3a2a20', hair: '#1e1612', cap: '#f4f1ea' };
+STYLES.elder = { P: ADULT, skin: '#d2a07a', shirt: '#7a5a3a', robe: true, sleeve: 'long', pants: '#5a4430', shoe: '#2a1d14', hair: '#e9e6e0' };
+STYLES.youth = { P: ADULT, skin: '#e0b48e', shirt: '#3f73b8', sleeve: 'short', pants: '#2f3440', shoe: '#e8e8e8', hair: '#3a2416' };
+STYLES.merchant = { P: ADULT, skin: '#b9825a', shirt: '#2f7a72', sleeve: 'long', pants: '#3e3a36', shoe: '#2a1d14', hair: '#231914', apron: '#e9dcc0', belly: .1 };
+STYLES.porter = { P: ADULT, skin: '#9c6a46', shirt: '#b5562e', sleeve: 'short', pants: '#4a4036', shoe: '#5b3b22', hair: '#1a120e' };
+STYLES.poor = { P: ADULT, skin: '#c08a62', shirt: '#7d7a6e', sleeve: 'short', pants: '#5a564c', shoe: '#4a3a2a', hair: '#4a3a2a', patches: true };
+STYLES.wounded = { P: ADULT, skin: '#d9a982', shirt: '#6b4f8a', sleeve: 'long', pants: '#3a3446', shoe: '#2a2a2a', hair: '#2a1d16' };
+const MF = STYLES.muflis, EL = STYLES.elder, YO = STYLES.youth, ME = STYLES.merchant, PO = STYLES.porter, PR = STYLES.poor, WD = STYLES.wounded;
+const GY = H * .64, S = 220;
+const headY = (gy, s, st) => gy - s * ((st.P.thigh + st.P.shin) * .985 + st.P.T + st.P.neck + st.P.headR * 1.9);
+const ELDER = (t, extra) => Object.assign({ lean: .1, nod: .5, hipH: (EL.P.thigh + EL.P.shin) * .95, handR: [EL.P.sw + .25, -EL.P.T + .95], elbowR: -1, propR: PROPS.cane, bob: Math.sin(t * 1.8) * .008 }, extra || {});
+const PORTER = (t, extra) => Object.assign({ handR: [PO.P.sw - .05, -PO.P.T - .02], elbowR: -1, propR: PROPS.sack, head: .08 }, extra || {});
+const POINT = (st, k = 1) => ({ handR: [lerp(st.P.sw + .1, st.P.sw + .8, k), lerp(-st.P.T + .95, -st.P.T + .15, k)], elbowR: 1, lean: -.05 * k, head: -.05 });
+const PUSH = (st, k) => ({ handL: [lerp(-st.P.sw, st.P.sw + .55, k), -st.P.T + .4], handR: [lerp(st.P.sw, st.P.sw + .75, k), -st.P.T + .36], elbowL: 1, elbowR: 1, lean: .16 * k });
+const QIYAM = st => ({ handL: [.06, -st.P.T + .42], handR: [-.02, -st.P.T + .38], elbowL: 1, elbowR: -1, nod: .5 });
+const DEFEND = (st, k) => ({ handL: [lerp(-st.P.sw - .1, -.05, k), lerp(-st.P.T + .9, -st.P.T - .2, k)], handR: [lerp(st.P.sw + .1, .28, k), lerp(-st.P.T + .9, -st.P.T - .28, k)], elbowL: 1, elbowR: -1, lean: -.14 * k, head: -.12 * k, hipX: -.05 * k });
+function lying(c, x, gy, s, st, k) { // fallen on the ground, head to the right
+  const e = eOut(k); c.save(); c.translate(x, gy - s * .24 * e); c.rotate(Math.PI / 2 * e);
+  const p = Object.assign(basePose(st), { handL: [-st.P.sw * .55, -st.P.T + .98], handR: [st.P.sw * .2, -st.P.T + .62], elbowL: 1, elbowR: -1, head: .12, footL: [-.06, (st.P.thigh + st.P.shin) * .985], footR: [.06, (st.P.thigh + st.P.shin) * .985], kneeL: 1 });
+  drawChar(c, 0, 0, s, st, p); c.restore(); }
+function sling(c, x, gy, s, st, face) { // bandaged forearm held across the chest, strap around the neck
+  const hip = gy - s * (st.P.thigh + st.P.shin) * .985, hx = x + face * s * .06, hy = hip - s * (st.P.T - .45), nx = x, ny = hip - s * (st.P.T + .02);
+  c.save(); c.strokeStyle = '#f4f2ec'; c.lineCap = 'round'; c.lineWidth = s * .045;
+  c.beginPath(); c.moveTo(nx - face * s * .1, ny); c.lineTo(hx - face * s * .05, hy); c.moveTo(nx + face * s * .1, ny); c.lineTo(hx - face * s * .3, hy); c.stroke();
+  c.fillStyle = '#f4f2ec'; c.beginPath(); c.roundRect(Math.min(hx, hx - face * s * .38) , hy - s * .1, s * .38, s * .2, s * .08); c.fill();
+  c.strokeStyle = 'rgba(0,0,0,.15)'; c.lineWidth = 2; c.stroke(); for (let i = 1; i < 4; i++) { const xx = hx - face * s * .095 * i; c.beginPath(); c.moveTo(xx, hy - s * .09); c.lineTo(xx, hy + s * .09); c.stroke(); }
+  c.restore(); }
+const SITX = st => { const h = .3; return { hipH: h, footL: [-.42, h], footR: [.42, h], kneeL: -1, kneeR: 1, handL: [-.3, -.05], handR: [.42, -st.P.T + .55], elbowL: 1, elbowR: -1 }; };
+
+/* hasanat = 12 orbs (4 victims × 3) */
+const NORB = 15;
+function orbPos(i, x, hy) { const an = Math.PI + (i + .5) / NORB * Math.PI; return [x + Math.cos(an) * 230, hy - 40 + Math.sin(an) * 170]; }
+function orb(c, x, y, s, a = 1) { glow(c, SP.gold, x, y, s * 5, .55 * a); c.save(); c.globalAlpha = a; c.fillStyle = '#fff3c8'; c.beginPath(); c.arc(x, y, s * .45, 0, TAU); c.fill(); c.restore(); }
+function sinStone(c, x, y, s, a = 1) { c.save(); c.globalAlpha = a; c.fillStyle = '#1a1416'; c.beginPath(); c.moveTo(x - s, y); c.quadraticCurveTo(x - s * .9, y - s * .9, x, y - s * .8); c.quadraticCurveTo(x + s * 1.1, y - s * .7, x + s, y); c.quadraticCurveTo(x, y + s * .5, x - s, y); c.fill(); c.strokeStyle = 'rgba(255,60,40,.6)'; c.lineWidth = 3; c.stroke(); c.restore(); glow(c, SP.red, x, y, s * 3, .25 * a); }
+/* the "grievance" mark that stays above a wronged person */
+function mark(c, x, y, a, t) { if (a <= 0) return; c.save(); c.globalAlpha = a; c.translate(x, y); const s = 1 + .06 * Math.sin(t * 4); c.scale(s, s);
+  glow(c, SP.red, 0, 0, 160, .5 * a); c.fillStyle = '#c0392b'; c.beginPath(); c.arc(0, 0, 26, 0, TAU); c.fill(); c.strokeStyle = '#ffd2c8'; c.lineWidth = 6; c.lineCap = 'round';
+  c.beginPath(); c.moveTo(-6, -14); c.lineTo(4, -2); c.lineTo(-4, 4); c.lineTo(6, 14); c.stroke(); c.restore(); }
+function wallet(c, x, y, s, open, tilt) { c.save(); c.translate(x, y); c.rotate(tilt); c.scale(s, s);
+  c.fillStyle = '#6b4226'; c.beginPath(); c.roundRect(-1.2, -.7, 2.4, 1.4, .15); c.fill(); c.strokeStyle = '#3e2414'; c.lineWidth = .06; c.stroke();
+  c.save(); c.rotate(-open * 1.2); c.fillStyle = '#7d4e2e'; c.beginPath(); c.roundRect(-1.2, -.7, 2.4, .6, .12); c.fill(); c.restore();
+  c.setLineDash([.08, .08]); c.strokeStyle = 'rgba(255,220,170,.4)'; c.lineWidth = .03; c.strokeRect(-1.08, -.58, 2.16, 1.16); c.setLineDash([]); c.restore(); }
+function burst(c, x, y, s, t, a) { c.save(); c.globalAlpha = a; c.translate(x, y); c.rotate(Math.sin(t * 20) * .05); c.fillStyle = '#d9473a'; c.beginPath();
+  for (let i = 0; i < 18; i++) { const r = i % 2 ? s * .6 : s, an = i / 18 * TAU; c.lineTo(Math.cos(an) * r * 1.3, Math.sin(an) * r); } c.fill();
+  c.strokeStyle = '#1a0a0a'; c.lineWidth = 6; c.beginPath(); for (let i = 0; i < 6; i++) c.lineTo(-s * .7 + i * s * .28, (i % 2 ? -1 : 1) * s * .25); c.stroke(); c.restore(); }
+function cloud(c, x, y, s, a) { c.save(); c.globalAlpha = a; c.fillStyle = '#2a2a33'; [[-.5, 0, .5], [0, -.2, .6], [.5, 0, .5], [0, .15, .55]].forEach(([dx, dy, r]) => { c.beginPath(); c.arc(x + dx * s, y + dy * s, r * s, 0, TAU); c.fill(); }); c.restore(); }
+function whisper(c, x, y, a, t) { c.save(); c.globalAlpha = a; c.strokeStyle = 'rgba(40,40,50,.85)'; c.lineWidth = 5; for (let i = 0; i < 3; i++) { c.beginPath(); c.arc(x, y, 20 + i * 18 + (t * 30 % 18), -.6, .6); c.stroke(); } c.restore(); }
+function book(c, x, y, s) { c.save(); c.translate(x, y); c.scale(s, s);
+  c.fillStyle = '#6b2a2a'; c.beginPath(); c.moveTo(-2.1, .1); c.lineTo(0, .3); c.lineTo(2.1, .1); c.lineTo(2.1, .3); c.lineTo(0, .5); c.lineTo(-2.1, .3); c.fill();
+  c.fillStyle = '#f5ecd6'; c.beginPath(); c.moveTo(0, .3); c.quadraticCurveTo(-1, -.05, -2, .05); c.lineTo(-2, -1.3); c.quadraticCurveTo(-1, -1.45, 0, -1.1); c.fill();
+  c.beginPath(); c.moveTo(0, .3); c.quadraticCurveTo(1, -.05, 2, .05); c.lineTo(2, -1.3); c.quadraticCurveTo(1, -1.45, 0, -1.1); c.fill();
+  c.fillStyle = 'rgba(60,40,20,.35)'; for (let i = 0; i < 9; i++) { c.fillRect(-1.8, -1.1 + i * .12, 1.5 - (i % 3) * .2, .035); c.fillRect(.3, -1.1 + i * .12, 1.5 - (i % 2) * .25, .035); }
+  c.strokeStyle = '#d6a94f'; c.lineWidth = .03; star8(c, -1.05, -1.25, .08, 0); c.stroke(); star8(c, 1.05, -1.25, .08, 0); c.stroke(); c.restore(); }
+function pattern(c, t, a, col = '#e8be6e') { c.save(); c.globalAlpha = a; c.strokeStyle = col; c.lineWidth = 1.5; for (let gx = -1; gx <= 7; gx++) for (let gy = -1; gy <= 12; gy++) { star8(c, gx * 180, gy * 180, 70, t * .04); c.stroke(); } c.restore(); }
+const STARS = Array.from({ length: 260 }, () => [R() * W, R() * H * .7, R() * 2 + .5, R() * TAU]);
+function stars(c, t, a) { c.fillStyle = '#fff'; for (const [x, y, r, p] of STARS) { c.globalAlpha = a * (.3 + .4 * Math.sin(t * 2 + p)); c.fillRect(x, y, r, r); } c.globalAlpha = 1; }
+function arch(c, x, y, w, h) { c.beginPath(); c.moveTo(x - w / 2, y); c.lineTo(x - w / 2, y - h * .62); c.quadraticCurveTo(x - w / 2, y - h, x, y - h * 1.08); c.quadraticCurveTo(x + w / 2, y - h, x + w / 2, y - h * .62); c.lineTo(x + w / 2, y); c.closePath(); }
+function lantern(c, x, y, t, a = 1) { c.strokeStyle = '#2a1d14'; c.lineWidth = 3; c.beginPath(); c.moveTo(x, y - 120); c.lineTo(x, y - 40); c.stroke(); c.fillStyle = '#c9a046'; c.beginPath(); c.moveTo(x - 26, y - 40); c.lineTo(x + 26, y - 40); c.lineTo(x + 20, y + 30); c.lineTo(x - 20, y + 30); c.fill(); c.fillStyle = '#ffe2a0'; c.fillRect(x - 14, y - 30, 28, 50); glow(c, SP.warm, x, y, 360, .45 * a * (.9 + .1 * Math.sin(t * 9 + x))); }
+
+/* ---------------- environments ---------------- */
+function mosqueBG(c, t) {
+  c.fillStyle = vgrad(c, 0, H, [[0, '#1b2a3a'], [1, '#0d141c']]); c.fillRect(0, 0, W, H);
+  c.fillStyle = '#e9e0cc'; c.fillRect(0, 0, W, GY - 40);
+  for (let i = -1; i < 5; i++) { c.fillStyle = 'rgba(160,140,110,.35)'; arch(c, i * 300 + 150, GY - 40, 220, 760); c.fill(); }
+  c.fillStyle = '#1e5a4a'; arch(c, W / 2, GY - 40, 300, 760); c.fill(); c.strokeStyle = '#d4a94f'; c.lineWidth = 10; c.stroke();
+  glow(c, SP.gold, W / 2, GY - 400, 700, .45); c.strokeStyle = 'rgba(212,169,79,.8)'; c.lineWidth = 4; star8(c, W / 2, GY - 520, 60, t * .1); c.stroke();
+  c.fillStyle = '#7a1f2a'; c.fillRect(0, GY - 40, W, H); c.strokeStyle = 'rgba(212,169,79,.5)'; c.lineWidth = 4; for (let i = 0; i < 6; i++) { c.beginPath(); c.moveTo(0, GY + 40 + i * 110); c.lineTo(W, GY + 40 + i * 110); c.stroke(); }
+  for (let i = 0; i < 3; i++) lantern(c, W * (.2 + i * .3), H * .12, t);
+}
+function iftarBG(c, t) {
+  c.fillStyle = vgrad(c, 0, GY, [[0, '#2a2350'], [.55, '#e3735a'], [1, '#ffc46e']]); c.fillRect(0, 0, W, H);
+  glow(c, SP.gold, W * .75, GY - 220, 900, .55); c.fillStyle = '#ffe0a0'; c.beginPath(); c.arc(W * .75, GY - 220 + t * 14, 90, 0, TAU); c.fill();
+  const ma = ss(1.5, 3, t); c.save(); c.globalAlpha = ma; c.fillStyle = '#fff6dc'; c.beginPath(); c.arc(W * .22, H * .12, 46, .5, TAU - .5); c.arc(W * .22 + 16, H * .12 - 6, 38, TAU - .65, .65, true); c.fill(); c.restore();
+  c.fillStyle = 'rgba(60,30,40,.6)'; for (let i = 0; i < 7; i++) { const bx = i * 160 - 20, bh = 220 + (i * 71 % 200); c.fillRect(bx, GY - 60 - bh, 140, bh + 60); }
+  c.fillStyle = 'rgba(60,30,40,.7)'; c.beginPath(); c.arc(W * .5, GY - 360, 110, Math.PI, 0); c.fill(); c.fillRect(W * .5 - 110, GY - 360, 220, 300); c.fillRect(W * .84, GY - 620, 50, 560); c.beginPath(); c.arc(W * .84 + 25, GY - 620, 32, Math.PI, 0); c.fill();
+  c.fillStyle = vgrad(c, GY - 10, H, [[0, '#8a5a3a'], [1, '#3a2418']]); c.fillRect(0, GY - 10, W, H);
+}
+function streetBG(c, t) {
+  c.fillStyle = vgrad(c, 0, GY, [[0, '#7fb6dc'], [1, '#f2e2c0']]); c.fillRect(0, 0, W, H);
+  const house = (x, w, h, col) => { c.fillStyle = col; c.fillRect(x, GY - h, w, h); c.fillStyle = 'rgba(0,0,0,.12)'; c.fillRect(x, GY - h, w, 16);
+    c.fillStyle = '#5a3a26'; arch(c, x + w / 2, GY, w * .32, h * .45); c.fill();
+    c.fillStyle = '#6b4a30'; c.fillRect(x + w * .14, GY - h * .8, w * .3, h * .2); c.strokeStyle = '#3a2416'; c.lineWidth = 3; for (let i = 1; i < 4; i++) { c.beginPath(); c.moveTo(x + w * .14 + i * w * .075, GY - h * .8); c.lineTo(x + w * .14 + i * w * .075, GY - h * .6); c.stroke(); } };
+  house(-40, 330, 760, '#e3c9a0'); house(290, 300, 620, '#d9b88a'); house(590, 320, 820, '#e8d2ae'); house(910, 260, 680, '#d4ae80');
+  c.fillStyle = vgrad(c, GY - 10, H, [[0, '#c9a77a'], [1, '#6b5034']]); c.fillRect(0, GY - 10, W, H);
+  c.strokeStyle = 'rgba(0,0,0,.08)'; c.lineWidth = 3; for (let i = 0; i < 10; i++) { c.beginPath(); c.moveTo(0, GY + 30 + i * 70); c.lineTo(W, GY + 30 + i * 70); c.stroke(); }
+}
+function stall(c, x, t) { // merchant's stall
+  c.fillStyle = '#6b4226'; c.fillRect(x - 220, GY - 260, 440, 30); c.fillRect(x - 210, GY - 230, 20, 230); c.fillRect(x + 190, GY - 230, 20, 230);
+  for (let i = 0; i < 8; i++) { c.fillStyle = i % 2 ? '#f4efe4' : '#c0392b'; c.beginPath(); c.moveTo(x - 240 + i * 60, GY - 560); c.lineTo(x - 180 + i * 60, GY - 560); c.lineTo(x - 180 + i * 60, GY - 500); c.quadraticCurveTo(x - 210 + i * 60, GY - 470, x - 240 + i * 60, GY - 500); c.fill(); }
+  c.fillStyle = '#4a2e1c'; c.fillRect(x - 225, GY - 560, 10, 300); c.fillRect(x + 215, GY - 560, 10, 300);
+  const fr = [['#e67e22', 5], ['#c0392b', 4], ['#7cb342', 5]]; fr.forEach(([col, n], j) => { for (let k = 0; k < n; k++) { c.fillStyle = col; c.beginPath(); c.arc(x - 170 + j * 140 + k * 22, GY - 282 - (k % 2) * 16, 20, 0, TAU); c.fill(); } });
+}
+
+/* ============================ SCENES ============================ */
+// 1 · 0–8 «أتدرون ما المفلس؟» — the empty wallet
+function sc1(c, lt) {
+  c.fillStyle = vgrad(c, 0, H, [[0, '#1b1426'], [1, '#0a0810']]); c.fillRect(0, 0, W, H); pattern(c, lt, .06); glow(c, SP.gold, W / 2, H * .36, 900, .25);
+  const open = eOut((lt - 4.3) / .7), tilt = lt > 5.1 ? Math.PI * eInOut((lt - 5) / .5) * .9 + Math.sin((lt - 5.1) * 9) * .2 * Math.max(0, 1 - (lt - 5.1) / 1.4) : 0;
+  wallet(c, W / 2, H * .36 + Math.sin(lt * 1.5) * 10, 170 * eBack(lt / 1), open, tilt);
+  if (lt > 5.6) { const k = lt - 5.6, x = W / 2 + Math.sin(k * 3) * 120 + k * 60, y = H * .38 - k * 160, fl = Math.abs(Math.sin(lt * 25)); c.fillStyle = '#c9b89a'; c.beginPath(); c.ellipse(x - 12, y, 16, 10 * fl + 2, -.4, 0, TAU); c.fill(); c.beginPath(); c.ellipse(x + 12, y, 16, 10 * fl + 2, .4, 0, TAU); c.fill(); c.fillStyle = '#5a4a3a'; c.fillRect(x - 3, y - 8, 6, 16); }
+  const qa = ss(.5, 1.3, lt) * (1 - ss(3.6, 4.2, lt));
+  if (qa > 0) { c.save(); c.globalAlpha = qa; c.strokeStyle = '#f3cf86'; c.lineWidth = 22; c.lineCap = 'round'; c.shadowColor = '#ffcf80'; c.shadowBlur = 30; c.beginPath(); c.arc(W / 2, H * .14, 70, Math.PI * 1.1, Math.PI * 2.4); c.quadraticCurveTo(W / 2, H * .14 + 90, W / 2, H * .14 + 130); c.stroke(); c.fillStyle = '#f3cf86'; c.beginPath(); c.arc(W / 2, H * .14 + 190, 14, 0, TAU); c.fill(); c.restore(); }
+}
+// orbs collected in scene 2 (prayer → 4, fasting → 4, zakat → 4)
+function orbsCollected(lt) { return [[13.8, 0], [16.0, 5], [18.6, 10]].reduce((n, [t0, base]) => lt < t0 ? n : Math.max(n, base + Math.min(5, Math.floor((lt - t0) / .4) + 1)), 0); }
+function drawOrbArc(c, x, hy, n, lt, from) { for (let i = 0; i < n; i++) { const [ox, oy] = orbPos(i, x, hy); orb(c, ox, oy + Math.sin(lt * 2 + i) * 5, 32); } }
+// 1b · 7.8–10.9 «إن المفلس من أمّتي»: we meet the man
+function scIntro(c, lt) {
+  streetBG(c, lt); c.fillStyle = 'rgba(10,8,20,.35)'; c.fillRect(0, 0, W, H);
+  c.save(); c.globalCompositeOperation = 'lighter'; const g = c.createLinearGradient(0, 0, 0, GY); g.addColorStop(0, 'rgba(255,230,170,0)'); g.addColorStop(1, 'rgba(255,230,170,.22)'); c.fillStyle = g; c.beginPath(); c.moveTo(W / 2 - 80, 0); c.lineTo(W / 2 + 80, 0); c.lineTo(W / 2 + 260, GY + 40); c.lineTo(W / 2 - 260, GY + 40); c.fill(); c.restore();
+  c.save(); c.fillStyle = 'rgba(255,220,150,.25)'; c.beginPath(); c.ellipse(W / 2, GY + 10, 240, 40, 0, 0, TAU); c.fill(); c.restore();
+  const x = lerp(W * 1.1, W / 2, eInOut((lt - .3) / 1.6));
+  const p = seq(MF, lt, [[0, u => MOVES.walk(MF, u, .85)], [1.9, u => Object.assign(MOVES.idle(MF, u), { head: -.04 })]]); p.face = -1; drawChar(c, x, GY, S * 1.05, MF, p);
+}
+// 2 · 8–22 his worship: prayer (8–12.5), fasting (12.5–17), zakat (17–22)
+function sc2(c, lt) {
+  const T = 10.5 + lt;
+  const part = T < 15.9 ? 0 : T < 18.4 ? 1 : 2, pt = T - [10.5, 15.9, 18.4][part];
+  if (part === 0) { mosqueBG(c, lt);
+    [W * .2, W * .8].forEach((x, i) => { const p = Object.assign(basePose(STYLES.youth), QIYAM(YO), { back: true }); drawChar(c, x, GY + 60, S * .95, i ? PR : YO, p); });
+    const p = Object.assign(basePose(MF), QIYAM(MF), { back: true }); drawChar(c, W / 2, GY + 60, S, MF, p);
+    drawOrbArc(c, W / 2, headY(GY + 60, S, MF), Math.min(orbsCollected(T), 5), lt);
+  } else if (part === 1) { iftarBG(c, pt);
+    c.fillStyle = '#a03a2a'; c.beginPath(); c.ellipse(W / 2, GY + 70, 360, 60, 0, 0, TAU); c.fill(); c.strokeStyle = '#d4a94f'; c.lineWidth = 5; c.stroke();
+    c.fillStyle = '#efe6d2'; c.beginPath(); c.ellipse(W * .64, GY + 50, 70, 18, 0, 0, TAU); c.fill(); for (let i = 0; i < 6; i++) { c.fillStyle = '#5a2a14'; c.beginPath(); c.ellipse(W * .64 - 40 + i * 16, GY + 42 - (i % 2) * 6, 8, 12, 0, 0, TAU); c.fill(); }
+    c.fillStyle = 'rgba(200,230,255,.7)'; c.fillRect(W * .33, GY + 10, 34, 50);
+    const reach = pt > 1.4 ? eOut((pt - 1.4) / .5) * (1 - ss(2.6, 3, pt)) : 0;
+    const p = Object.assign(basePose(MF), SITX(MF), { handR: [lerp(MF.P.sw + .2, MF.P.sw + .6, reach), lerp(-MF.P.T + .6, -MF.P.T + .9, reach)], propR: pt > 1.9 && pt < 3.2 ? PROPS.date : null, head: .05 });
+    drawChar(c, W / 2, GY + 70, S, MF, p);
+    drawOrbArc(c, W / 2, headY(GY + 70, S, MF) + S * .7, orbsCollected(T), lt);
+  } else { streetBG(c, pt);
+    const k = eOut((pt - .6) / .7);
+    const p = Object.assign(MOVES.give(MF, pt, k), { propR: pt < 1.6 ? PROPS.coins : null }); p.face = 1; drawChar(c, W * .38, GY, S, MF, p);
+    const q = Object.assign(MOVES.receive(PR, pt, eOut((pt - .9) / .6)), { propR: pt > 1.5 ? PROPS.coins : null }); q.face = -1; drawChar(c, W * .74, GY, S, PR, q);
+    if (pt > 2.2) { const q2 = MOVES.handOnChest(PR, pt); }
+    drawOrbArc(c, W * .38, headY(GY, S, MF), orbsCollected(T), lt);
+  }
+  // fly-in sparkle for each new orb
+  const n = orbsCollected(T), lastT = [[13.8, 0], [16.0, 5], [18.6, 10]];
+  for (const [t0] of lastT) for (let j = 0; j < 5; j++) { const tj = t0 + j * .4; if (T > tj && T < tj + .5) glow(c, SP.white, W / 2, H * .5, 900, .25 * (1 - (T - tj) / .5)); }
+}
+// 3 · 22–38 the five wrongs, 3.2 s each, matching the hadith's order
+const WR = 3.2;
+function sc3(c, lt) {
+  streetBG(c, lt); c.fillStyle = 'rgba(70,30,20,.22)'; c.fillRect(0, 0, W, H);
+  const WIN = [[.45, 2.85], [2.85, 4.2], [4.2, 5.7], [5.7, 7.3], [7.3, 8.9]];
+  let step = 0; while (step < 4 && lt >= WIN[step + 1][0]) step++;
+  const w0 = WIN[step][0], w1 = WIN[step][1], st = clamp((lt - w0) / (w1 - w0)) * WR, a = ss(0, .25, st) * (step < 4 ? 1 - ss(WR - .25, WR, st) : 1);
+  if (lt < WIN[0][0]) { c.save(); c.fillStyle = 'rgba(0,0,0,.25)'; c.fillRect(0, 0, W, H); c.restore(); }
+  c.save(); c.globalAlpha = a;
+  const mx = W * .28, vx = W * .72;
+  if (step === 0) { // «شتم هذا»: insults the elderly neighbour
+    const p = Object.assign(basePose(MF), POINT(MF, eOut(st / .4))); p.face = 1; drawChar(c, mx, GY, S, MF, p);
+    const q = Object.assign(basePose(EL), ELDER(lt, { lean: .1 + .12 * ss(.6, 1, st), nod: .5 + .6 * ss(.6, 1, st) })); q.face = -1; drawChar(c, vx, GY, S, EL, q);
+    burst(c, W * .5, headY(GY, S, MF) + 40, 70, lt, ss(.3, .5, st) * (1 - ss(1.8, 2.2, st)));
+    mark(c, vx, headY(GY, S, EL) - 70, ss(1.2, 1.6, st), lt);
+  } else if (step === 1) { // «قذف هذا»: slanders the young man to others
+    const p = Object.assign(basePose(MF), { handR: [MF.P.sw + .05, -MF.P.T - .12], elbowR: 1, lean: .12, head: .15 }); p.face = 1; drawChar(c, W * .22, GY, S, MF, p);
+    const l = Object.assign(MOVES.idle(PO, lt), { lean: -.08, head: -.12 }); l.face = -1; drawChar(c, W * .45, GY, S * .95, PO, l);
+    whisper(c, W * .33, headY(GY, S, MF) + 60, ss(.2, .5, st), lt);
+    const q = MOVES.sad(YO, st); q.face = -1; drawChar(c, W * .82, GY, S, YO, q);
+    cloud(c, W * .82, headY(GY, S, YO) - 60, 75, ss(.8, 1.3, st));
+    mark(c, W * .82, headY(GY, S, YO) - 150, ss(1.5, 1.9, st), lt);
+  } else if (step === 2) { // «أكل مال هذا»: takes goods and never pays the merchant
+    stall(c, W * .7, lt);
+    const k = eOut((st - .3) / .5), walk = ss(1.1, 2.6, st);
+    const q = seq(ME, st, [[0, u => Object.assign(MOVES.give(ME, u, eOut(u / .5)), { propR: u < .9 ? PROPS.bag : null })], [1.2, u => Object.assign(MOVES.receive(ME, u, .8), { head: -.05 })], [2.2, u => MOVES.sad(ME, u)]]); q.face = -1; drawChar(c, W * .72, GY, S, ME, q);
+    const p = st < 1.1 ? Object.assign(MOVES.receive(MF, st, k), { propR: st > .9 ? PROPS.bag : null }) : Object.assign(MOVES.walk(MF, st, .9), { propR: PROPS.bag }); p.face = st < 1.1 ? 1 : -1; drawChar(c, lerp(W * .38, W * .05, walk), GY, S, MF, p);
+    mark(c, W * .72, headY(GY, S, ME) - 70, ss(2.2, 2.6, st), lt);
+  } else if (step === 3) { // «سفك دم هذا»: he wounds a man with a dagger — shown by implication, no gore
+    c.fillStyle = 'rgba(12,6,24,.5)'; c.fillRect(0, 0, W, H);
+    const strike = .95, down = ss(strike + .05, strike + .45, st);
+    if (st < strike + .05) {
+      const raise = eOut(st / .55), k = ss(strike - .16, strike, st);
+      const p = Object.assign(basePose(MF), { handR: [MF.P.sw + .1 + k * .55, lerp(-MF.P.T + .9, -MF.P.T - .6, raise) + k * .9], elbowR: 1, lean: -.06 * raise + .22 * k, head: -.05 + .1 * k, propR: PROPS.dagger }); p.face = 1; drawChar(c, W * .3, GY, S, MF, p);
+      const q = Object.assign(basePose(WD), DEFEND(WD, ss(.25, .65, st))); q.face = -1; drawChar(c, W * .62, GY, S, WD, q);
+    } else {
+      const pool = ss(strike + .5, strike + 1.9, st);
+      c.save(); c.fillStyle = 'rgba(128,14,14,.9)'; c.beginPath(); c.ellipse(W * .68, GY + 6, 160 * pool, 24 * pool, 0, 0, TAU); c.fill(); c.restore();
+      lying(c, W * .44, GY, S * .92, WD, down);
+      const away = ss(strike + 1.2, WR - .1, st);
+      const p = Object.assign(away > 0 ? MOVES.walk(MF, st, .9) : Object.assign(basePose(MF), { head: .2, nod: .3 }), { propR: PROPS.daggerRed, handR: [MF.P.sw + .18, -MF.P.T + .9], elbowR: -1 }); p.face = away > 0 ? -1 : 1;
+      drawChar(c, lerp(W * .24, W * .02, away), GY, S, MF, p);
+      mark(c, W * .7, GY - S * 1.45, ss(strike + .9, strike + 1.3, st), lt);
+    }
+    c.save(); c.globalAlpha = .9 * pulse(st, strike, .06); c.fillStyle = '#ffffff'; c.fillRect(0, 0, W, H); c.globalAlpha = .6 * pulse(st, strike + .12, .12); c.fillStyle = '#a80f0f'; c.fillRect(0, 0, W, H); c.restore();
+  } else { // «ضرب هذا»: shoves the porter, his sack falls
+    const k = eOut((st - .2) / .3), hit = ss(.35, .6, st);
+    const p = Object.assign(basePose(MF), PUSH(MF, k)); p.face = 1; drawChar(c, mx + 40, GY, S, MF, p);
+    const q = Object.assign(basePose(PO), PORTER(lt, { lean: -.25 * hit, head: -.2 * hit, hipX: -.25 * hit, propR: hit < .5 ? PROPS.sack : null })); q.face = -1; drawChar(c, vx, GY, S, PO, q);
+    if (hit >= .5) { const fk = clamp((st - .6) / .5); c.save(); c.translate(vx + 120, lerp(GY - S * 2.3, GY - 40, fk * fk)); c.scale(S, S); c.rotate(fk * 1.4); PROPS.sack(c); c.restore(); }
+    if (st > .4 && st < 1.2) for (let i = 0; i < 5; i++) { const an = i * 1.25; c.strokeStyle = 'rgba(255,230,120,.8)'; c.lineWidth = 6; c.beginPath(); c.moveTo(W * .6 + Math.cos(an) * 40, GY - S * 1.9 + Math.sin(an) * 40); c.lineTo(W * .6 + Math.cos(an) * 80, GY - S * 1.9 + Math.sin(an) * 80); c.stroke(); }
+    mark(c, vx, headY(GY, S, PO) - 70, ss(1.4, 1.8, st), lt);
+  }
+  c.restore();
+  // the four victims' marks gathered as a row of icons (memory of the wrongs)
+  const got = [0, 1, 2, 3, 4].filter(i => lt > WIN[i][0] + (WIN[i][1] - WIN[i][0]) * .66); got.forEach((_, j) => mark(c, W / 2 + (j - (got.length - 1) / 2) * 80, H * .06, .9, lt));
+}
+// 4 · 38–50 Day of Judgment: the same four people take from his good deeds
+const VICT = [[EL, -1, W * .15, GY, .95], [YO, 1, W * .85, GY, .95], [ME, -1, W * .09, GY + 170, .8], [WD, 1, W * .91, GY + 170, .8], [PO, -1, W * .25, GY + 300, .7]];
+function sc4(c, lt) {
+  c.fillStyle = vgrad(c, 0, H, [[0, '#05040c'], [.55, '#1c1428'], [1, '#2a1c10']]); c.fillRect(0, 0, W, H); stars(c, lt, .8);
+  c.save(); c.globalCompositeOperation = 'lighter'; c.translate(W / 2, -200); for (let i = 0; i < 14; i++) { const an = Math.PI / 2 + (i - 6.5) * .09; const g = c.createLinearGradient(0, 0, Math.cos(an) * 2600, Math.sin(an) * 2600); g.addColorStop(0, 'rgba(255,230,170,.12)'); g.addColorStop(1, 'rgba(255,230,170,0)'); c.fillStyle = g; c.beginPath(); c.moveTo(0, 0); c.lineTo(Math.cos(an - .03) * 2600, Math.sin(an - .03) * 2600); c.lineTo(Math.cos(an + .03) * 2600, Math.sin(an + .03) * 2600); c.fill(); } c.restore();
+  c.fillStyle = 'rgba(0,0,0,.4)'; c.fillRect(0, GY, W, H);
+  const x = W / 2, hy = headY(GY, S, MF); let taken = 0;
+  VICT.forEach(([st, side, vx, vy, sc], i) => { const t0 = .2 + i * .75, k = eOut((lt - t0) / .45); if (lt < t0) return;
+    const pp = st === EL ? Object.assign(basePose(EL), ELDER(lt, { handL: [-EL.P.sw * .2 + .5, -EL.P.T + .45], elbowL: 1 })) : st === PO ? Object.assign(MOVES.idle(st, lt), { handR: [st.P.sw + .45, -st.P.T + .45], elbowR: 1 }) : Object.assign(MOVES.idle(st, lt), { handR: [st.P.sw + .45, -st.P.T + .45], elbowR: 1 });
+    pp.face = -side; c.save(); c.globalAlpha = k; drawChar(c, vx, vy, S * sc, st, pp); c.restore();
+    mark(c, vx, headY(vy, S * sc, st) - 60, k * (1 - .65 * ss(t0 + 1.2, t0 + 1.6, lt) + .65 * ss(6.1, 6.5, lt)), lt);
+    for (let q = 0; q < 3; q++) { const tq = t0 + .3 + q * .2, fk = eInOut((lt - tq) / .6); if (lt < tq) continue; taken++;
+      const idx = NORB - 1 - (i * 3 + q), [ox, oy] = orbPos(idx, x, hy), tx = vx - side * 40 * sc, ty = vy - S * sc * 1.75;
+      orb(c, lerp(ox, tx, fk), lerp(oy, ty, fk) - Math.sin(fk * Math.PI) * 120, 32 * (1 - fk * .4), 1 - fk * .4); }
+  });
+  for (let i = 0; i < NORB - taken; i++) { const [ox, oy] = orbPos(i, x, hy); orb(c, ox, oy, 32); }
+  const fear = clamp((lt - 1) / 4);
+  const p = Object.assign(MOVES.idle(MF, lt), { head: Math.sin(lt * 2.5) * .15 * fear, handL: [-MF.P.sw - .1 - fear * .1, -MF.P.T + .9], handR: [MF.P.sw + .1 + fear * .1, -MF.P.T + .9], nod: fear * .4 });
+  drawChar(c, x, GY, S, MF, p);
+}
+// 5 · 50–60 good deeds gone: their sins are cast upon him
+function sc5(c, lt) {
+  const red = ss(3.25, 4.4, lt);
+  c.fillStyle = vgrad(c, 0, H, [[0, '#05040a'], [.6, `rgb(${30 + red * 50},14,16)`], [1, `rgb(${50 + red * 120},${16 + red * 20},10)`]]); c.fillRect(0, 0, W, H); stars(c, lt, .4 * (1 - red));
+  c.fillStyle = 'rgba(0,0,0,.4)'; c.fillRect(0, GY, W, H);
+  const x = W / 2;
+  VICT.forEach(([st, side, vx, vy, sc], i) => { const pp = st === EL ? Object.assign(basePose(EL), ELDER(lt)) : Object.assign(MOVES.idle(st, lt), { handR: [st.P.sw + .2 + .5 * pulse(lt, .4 + i * .55, .2), -st.P.T + .3], elbowR: 1 }); pp.face = -side; c.save(); c.globalAlpha = .55 * (1 - red * .8); drawChar(c, vx, vy, S * sc, st, pp); c.restore(); });
+  const heavy = clamp(lt / 2.8), sink = eInOut((lt - 3.3) / 1.5);
+  c.save(); c.globalAlpha = 1 - ss(4.3, 5.2, lt);
+  const p = seq(MF, lt, [[0, u => MOVES.sad(MF, u)], [.9, u => Object.assign(MOVES.tired(MF, u), { lean: .15 + heavy * .1 })]]);
+  drawChar(c, x, GY + sink * 260, S, MF, p);
+  const hy = headY(GY, S, MF) + sink * 260 + 120 + heavy * 40;
+  for (let i = 0; i < 8; i++) { const ti = .3 + i * .32; if (lt < ti) break; const k = eOut((lt - ti) / .45), from = VICT[i % 5]; sinStone(c, lerp(from[2], x - 90 + (i % 3) * 80, k), lerp(from[3] - S * 2, hy - Math.floor(i / 3) * 45, k) - Math.sin(k * Math.PI) * 200, 44); }
+  c.restore();
+  glow(c, SP.red, W / 2, H * .78, 1600 * red, .55 * red); glow(c, SP.warm, W / 2, H * .82, 900 * red, .4 * red);
+  if (lt > 4.6) { c.fillStyle = `rgba(0,0,0,${ss(4.6, 6, lt) * .7})`; c.fillRect(0, 0, W, H); }
+}
+// 6 · 60–67 Imam an-Nawawi's explanation
+function sc6(c, lt) {
+  c.fillStyle = vgrad(c, 0, H, [[0, '#2a1d14'], [1, '#120c08']]); c.fillRect(0, 0, W, H); pattern(c, lt, .05); glow(c, SP.warm, W * .5, H * .3, 1400, .45);
+  c.fillStyle = '#3a2618'; c.fillRect(0, GY - 30, W, H);
+  book(c, W / 2, GY - 40, 200 * eOut(lt / 1));
+  for (let i = 0; i < 26; i++) { const ph = (lt * .2 + i / 26) % 1; glow(c, SP.gold, W / 2 + Math.sin(i * 2.4 + lt * .5) * 300 * ph, GY - 300 - ph * 700, 30, (1 - ph) * .7 * ss(.6, 1.5, lt)); }
+  const a = ss(2, 2.7, lt); c.save(); c.globalAlpha = a * (1 - ss(3.6, 4.8, lt) * .7); wallet(c, W * .24, H * .14, 60, 0, 0); c.restore();
+  c.save(); c.globalAlpha = a * (1 - ss(3.6, 4.8, lt)); c.fillStyle = '#e8c766'; for (let i = 0; i < 4; i++) { c.beginPath(); c.ellipse(W * .24, H * .14 - 70 - i * 18, 40, 12, 0, 0, TAU); c.fill(); } c.restore();
+  for (let i = 0; i < 5; i++) orb(c, W * .76 + (i - 2) * 50, H * .14 + Math.sin(lt * 2 + i) * 10, 30, a);
+}
+// 7 · 67–80 the remedy today: he returns to each one (3.2 s each)
+const RM = 2.6;
+function sc7(c, lt) {
+  streetBG(c, lt); glow(c, SP.gold, W * .85, H * .08, 800, .4);
+  const step = Math.min(4, Math.floor(lt / RM)), st = lt - step * RM, a = ss(0, .3, st) * (step < 4 ? 1 - ss(RM - .3, RM, st) : 1);
+  const mx = W * .3, vx = W * .72;
+  c.save(); c.globalAlpha = a;
+  if (step === 0) { // apologizes to the elder and kisses his head
+    const k = eOut((st - .3) / .8);
+    const p = Object.assign(basePose(MF), { lean: .22 * k, head: .25 * k, handR: [MF.P.sw + .55 * k, -MF.P.T + .2], handL: [MF.P.sw * .2 + .3 * k, -MF.P.T + .35], elbowR: 1, elbowL: 1 }); p.face = 1; drawChar(c, lerp(mx, W * .5, k), GY, S, MF, p);
+    const q = Object.assign(basePose(EL), ELDER(lt, { nod: .5 - .5 * ss(1.4, 2, st), handL: [-EL.P.sw - .1 + .4 * ss(1.6, 2.2, st), -EL.P.T + .9 - .7 * ss(1.6, 2.2, st)], elbowL: 1 })); q.face = -1; drawChar(c, vx, GY, S, EL, q);
+    if (st > 1.5) heart(c, (W * .5 + vx) / 2, headY(GY, S, EL) - 60, 30, ss(1.5, 1.9, st));
+  } else if (step === 1) { // pays the merchant
+    stall(c, W * .72, lt);
+    const p = Object.assign(MOVES.give(MF, st, eOut((st - .2) / .5)), { propR: st < 1.3 ? PROPS.coins : null }); p.face = 1; drawChar(c, W * .4, GY, S, MF, p);
+    const q = Object.assign(MOVES.receive(ME, st, eOut((st - .5) / .5)), { propR: st > 1.2 ? PROPS.coins : null }); q.face = -1; drawChar(c, W * .72, GY, S, ME, q);
+    if (st > 1.5) heart(c, W * .56, headY(GY, S, ME) - 50, 28, ss(1.5, 1.9, st));
+  } else if (step === 2) { // clears the young man's name before people: the cloud lifts
+    const p = Object.assign(basePose(MF), POINT(MF, .6), { handR: [MF.P.sw + .45, -MF.P.T + .5], head: .1 }); p.face = 1; drawChar(c, W * .22, GY, S, MF, p);
+    const l = Object.assign(MOVES.idle(PO, lt), { head: .08 }); l.face = -1; drawChar(c, W * .45, GY, S * .95, PO, l);
+    const lift = ss(.6, 1.8, st), q = Object.assign(MOVES.idle(YO, lt), { head: -.05 * lift, nod: .8 * (1 - lift) }); q.face = -1; drawChar(c, W * .8, GY, S, YO, q);
+    cloud(c, W * .8, headY(GY, S, YO) - 60 - lift * 220, 75, 1 - lift); glow(c, SP.gold, W * .8, headY(GY, S, YO), 400, .5 * lift);
+  } else if (step === 3) { // asks pardon of the man he wounded and pays the diya
+    const p = Object.assign(MOVES.give(MF, st, eOut((st - .2) / .5)), { propR: st < 1.1 ? PROPS.coins : null, head: .14, lean: .08 }); p.face = 1; drawChar(c, W * .36, GY, S, MF, p);
+    const q = Object.assign(MOVES.receive(WD, st, eOut((st - .45) / .5) * .8), { handL: [.06, -WD.P.T + .45], elbowL: 1, propR: st > 1.0 ? PROPS.coins : null }); q.face = -1; drawChar(c, W * .72, GY, S, WD, q);
+    sling(c, W * .72, GY, S, WD, -1);
+    if (st > 1.5) heart(c, W * .54, GY - S * 3, 30, ss(1.5, 1.9, st));
+  } else { // helps the porter lift his sack — and they shake hands
+    const k = eOut((st - .2) / .6);
+    const p = Object.assign(MOVES.give(MF, st, k), {}); p.face = 1; drawChar(c, W * .38, GY, S, MF, p);
+    const q = Object.assign(basePose(PO), PORTER(lt, { handL: [PO.P.sw + .5 * k, -PO.P.T + .4], elbowL: 1 })); q.face = -1; drawChar(c, W * .7, GY, S, PO, q);
+    if (st > 1.1) heart(c, W * .54, GY - S * 3, 30, ss(1.1, 1.5, st));
+  }
+  c.restore();
+  // his good deeds return — 3 per reconciliation
+  const hx = step === 0 ? W * .45 : W * .3, hy = H * .1;
+  const back = Math.min(NORB, [0, 1, 2, 3, 4].reduce((n, i) => n + (lt > i * RM + 1.3 ? 3 : 0), 0));
+  for (let i = 0; i < back; i++) { const an = Math.PI + (i + .5) / NORB * Math.PI; orb(c, W / 2 + Math.cos(an) * 300, hy + 90 + Math.sin(an) * 70, 26, .9); }
+}
+// 8 · 80–90 closing: the neighbourhood at peace, then the emblem
+function sc8(c, lt) {
+  c.fillStyle = vgrad(c, 0, H, [[0, '#2d4f86'], [.55, '#f2a35e'], [1, '#ffd9a0']]); c.fillRect(0, 0, W, H);
+  glow(c, SP.gold, W / 2, GY - 140, 1500, .6); c.fillStyle = '#fff2c8'; c.beginPath(); c.arc(W / 2, GY - 140 - lt * 8, 110, 0, TAU); c.fill();
+  c.fillStyle = 'rgba(40,30,30,.45)'; c.fillRect(0, GY, W, H);
+  const row = [[EL, W * .09, .76], [ME, W * .26, .8], [WD, W * .41, .8], [MF, W * .57, 1], [YO, W * .74, .8], [PO, W * .91, .76]];
+  row.forEach(([st, x, sc], i) => { const pp = st === EL ? Object.assign(basePose(EL), ELDER(lt)) : st === PO ? Object.assign(basePose(PO), PORTER(lt)) : MOVES.idle(st, lt + i); pp.face = x < W / 2 ? 1 : -1; drawChar(c, x, GY + (st === MF ? 0 : 50), S * sc, st, pp); });
+  for (let i = 0; i < NORB; i++) { const [ox, oy] = orbPos(i, W * .57, headY(GY, S, MF)); orb(c, ox, oy, 26, .9); }
+  const e = ss(4.6, 5.6, lt);
+  if (e > 0) { c.save(); c.globalAlpha = e * .85; c.fillStyle = '#05040a'; c.fillRect(0, 0, W, H); c.restore();
+    glow(c, SP.gold, W / 2, H * .34, 900 * e, .6 * e);
+    c.save(); c.globalAlpha = e; c.strokeStyle = '#f3cf86'; c.lineWidth = 4; c.shadowColor = 'rgba(255,190,90,.9)'; c.shadowBlur = 28; star8(c, W / 2, H * .34, 170, lt * .1); c.stroke(); c.beginPath(); c.arc(W / 2, H * .34, 210, 0, TAU); c.stroke(); c.restore();
+    orb(c, W / 2, H * .34, 60, e); }
+}
+
+/* ---------------- captions (Fusha), with phrase highlighting ---------------- */
+const CAPS = [
+  { s: .1, e: 4.45, h: 1, l: ['قال رسولُ الله ﷺ:', '«أتدرون ما المُفلِس؟»'], hl: [[.1, 2.9, 'قال رسولُ الله ﷺ:'], [2.9, 4.45, '«أتدرون ما المُفلِس؟»']] },
+  { s: 4.5, e: 7.85, h: 1, l: ['قالوا: المُفلِسُ فينا', 'مَن لا درهمَ له ولا متاع'], hl: [[4.5, 5.9, 'قالوا: المُفلِسُ فينا'], [5.9, 7.85, 'مَن لا درهمَ له ولا متاع']] },
+  { s: 7.95, e: 10.45, h: 1, l: ['فقال: «إنّ المُفلِسَ', 'من أمّتي'], hl: [[7.95, 9.3, 'فقال: «إنّ المُفلِسَ'], [9.3, 10.45, 'من أمّتي']] },
+  { s: 10.55, e: 22.6, h: 1, l: ['يأتي يومَ القيامةِ', 'بصلاةٍ وصيامٍ وزكاة'], hl: [[10.55, 13.7, 'يأتي يومَ القيامةِ'], [13.7, 15.9, 'بصلاةٍ'], [15.9, 18.4, 'وصيامٍ'], [18.4, 22.6, 'وزكاة']] },
+  { s: 23.0, e: 26.75, h: 1, l: ['ويأتي قد شتمَ هذا،', 'وقذفَ هذا،'], hl: [[23.0, 24.05, 'ويأتي قد'], [24.05, 25.45, 'شتمَ هذا،'], [25.45, 26.75, 'وقذفَ هذا،']] },
+  { s: 26.8, e: 29.85, h: 1, l: ['وأكلَ مالَ هذا،', 'وسفكَ دمَ هذا،'], hl: [[26.8, 28.3, 'وأكلَ مالَ هذا،'], [28.3, 29.85, 'وسفكَ دمَ هذا،']] },
+  { s: 29.9, e: 31.3, h: 1, l: ['وضربَ هذا،'], hl: [[29.9, 31.3, 'وضربَ هذا،']] },
+  { s: 31.35, e: 35.3, h: 1, l: ['فيُعطى هذا من حسناتِه،', 'وهذا من حسناتِه،'], hl: [[31.35, 33.5, 'فيُعطى هذا من حسناتِه،'], [33.5, 35.3, 'وهذا من حسناتِه،']] },
+  { s: 35.35, e: 39.3, h: 1, l: ['فإن فنيت حسناتُه', 'قبل أن يُقضى ما عليه،'], hl: [[35.35, 37.3, 'فإن فنيت حسناتُه'], [37.3, 39.3, 'قبل أن يُقضى ما عليه،']] },
+  { s: 39.35, e: 42.4, h: 1, l: ['أُخِذ من خطاياهم', 'فطُرِحت عليه،'], hl: [[39.35, 41.1, 'أُخِذ من خطاياهم'], [41.1, 42.4, 'فطُرِحت عليه،']] },
+  { s: 42.45, e: 45.0, h: 1, l: ['ثم طُرِح في النار»'], hl: [[42.45, 43.7, 'ثم طُرِح في النار»']], src: 'رواه مسلم (٢٥٨١)' },
+];
+const capCache = new Map();
+function capLayout(cap) {
+  if (capCache.has(cap)) return capCache.get(cap);
+  const fs = 54, lh = fs * 1.6, maxW = W * .86, m = mk(10, 10).getContext('2d');
+  const fam = cap.h ? 'Amiri' : 'ReemKufi', base = cap.h ? fs : fs - 4; m.font = `700 ${base}px ${fam}`;
+  let sc = 1; for (const ln of cap.l) sc = Math.min(sc, maxW / m.measureText(ln).width);
+  const font = `700 ${Math.floor(base * sc)}px ${fam}`, hh = cap.l.length * lh * sc + (cap.src ? 70 : 0) + 70;
+  const r = { font, lh: lh * sc, hh }; capCache.set(cap, r); return r;
+}
+function captions(c, t) {
+  for (const cap of CAPS) { if (t < cap.s || t > cap.e) continue;
+    const a = ss(cap.s, cap.s + .35, t) * (1 - ss(cap.e - .35, cap.e, t)), L = capLayout(cap), y0 = H * .755 + (1 - eOut((t - cap.s) / .4)) * 30;
+    c.save(); c.globalAlpha = a; c.direction = 'rtl'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillStyle = 'rgba(8,6,10,.64)'; c.beginPath(); c.roundRect(W * .05, y0, W * .9, L.hh, 36); c.fill();
+    c.strokeStyle = cap.h ? 'rgba(232,190,110,.55)' : 'rgba(255,255,255,.18)'; c.lineWidth = 3; c.stroke();
+    c.font = L.font; c.shadowColor = 'rgba(0,0,0,.9)'; c.shadowBlur = 10;
+    const cur = cap.hl ? cap.hl.find(([s, e]) => t >= s && t < e) : null;
+    cap.l.forEach((ln, i) => { const y = y0 + 35 + L.lh * (i + .5);
+      c.fillStyle = cap.h ? (cur ? 'rgba(241,197,106,.55)' : '#f6dc9a') : '#ffffff'; c.fillText(ln, W / 2, y);
+      if (cur && ln.includes(cur[2])) { // highlight the phrase being shown: re-draw it bright over its position
+        c.textAlign = 'right'; const full = c.measureText(ln).width, right = W / 2 + full / 2, idx = ln.indexOf(cur[2]), before = c.measureText(ln.slice(0, idx)).width, pw = c.measureText(cur[2]).width;
+        const px = right - before; c.save(); c.shadowColor = 'rgba(255,200,90,.95)'; c.shadowBlur = 24; c.fillStyle = '#fff6d6'; c.fillText(cur[2], px, y); c.restore();
+        c.fillStyle = 'rgba(241,197,106,.9)'; c.fillRect(px - pw, y + L.lh * .38, pw, 4); c.textAlign = 'center'; }
+    });
+    if (cap.src) { c.font = '700 32px ReemKufi'; c.fillStyle = '#e2b765'; c.fillText('— ' + cap.src + ' —', W / 2, y0 + L.hh - 55); }
+    c.restore(); }
+}
+
+const SCENES = [
+  { s: 0, e: 8.3, f: sc1 }, { s: 7.8, e: 10.9, f: scIntro }, { s: 10.4, e: 23.0, f: sc2 }, { s: 22.6, e: 31.6, f: sc3 },
+  { s: 31.2, e: 39.6, f: sc4 }, { s: 39.2, e: 45.2, f: sc5 },
+];
+const VIG = mk(); { const x = VIG.getContext('2d'); const g = x.createRadialGradient(W / 2, H / 2, W * .4, W / 2, H / 2, H * .66); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.55)'); x.fillStyle = g; x.fillRect(0, 0, W, H); }
+const GRAIN = Array.from({ length: 6 }, (_, k) => { const c = mk(270, 480), x = c.getContext('2d'), id = x.createImageData(270, 480), r = rng(9 + k); for (let i = 0; i < id.data.length; i += 4) { const v = r() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 255; } x.putImageData(id, 0, 0); return c; });
+function renderAt(t) {
+  t = clamp(t, 0, DUR);
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+  for (const sc of SCENES) { if (t < sc.s || t > sc.e) continue; const a = sc.s > 0 ? ss(sc.s, sc.s + .5, t) : 1;
+    bctx.setTransform(1, 0, 0, 1, 0, 0); bctx.globalAlpha = 1; bctx.globalCompositeOperation = 'source-over'; bctx.shadowBlur = 0; bctx.clearRect(0, 0, W, H);
+    bctx.save(); sc.f(bctx, t - sc.s); bctx.restore(); ctx.globalAlpha = a; ctx.drawImage(buf, 0, 0); ctx.globalAlpha = 1; }
+  ctx.drawImage(VIG, 0, 0); ctx.save(); ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = .045; ctx.drawImage(GRAIN[Math.floor(t * FPS) % 6], 0, 0, W, H); ctx.restore();
+  captions(ctx, t);
+  const fade = Math.max(1 - ss(0, .7, t), ss(DUR - 1, DUR, t)); if (fade > 0) { ctx.globalAlpha = fade; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
+}
+const params = new URLSearchParams(location.search);
+(async () => {
+  await Promise.all(['700 54px Amiri', '700 50px ReemKufi'].map(f => document.fonts.load(f, 'المفلس'))); await document.fonts.ready;
+  window.renderAt = renderAt; window.DUR = DUR; window.FPS = FPS;
+  window.frameJPEG = (t, q = .93) => { renderAt(t); return cv.toDataURL('image/jpeg', q); };
+  if (params.has('render')) { document.body.classList.add('render'); window.READY = true; return; }
+  const aud = document.getElementById('aud'), btn = document.getElementById('play'), seek = document.getElementById('seek'), tm = document.getElementById('tm');
+  let playing = false, t0 = 0, base = 0, cur = 0;
+  btn.onclick = () => { playing = !playing; btn.textContent = playing ? '❚❚' : '▶'; if (playing) { t0 = performance.now(); base = cur; aud.currentTime = cur; aud.play().catch(() => {}); } else aud.pause(); };
+  seek.oninput = () => { cur = +seek.value; base = cur; t0 = performance.now(); aud.currentTime = cur; };
+  (function loop() { if (playing) { cur = base + (performance.now() - t0) / 1000; if (cur >= DUR) { cur = DUR; playing = false; btn.textContent = '▶'; aud.pause(); } } renderAt(cur); seek.value = cur; tm.textContent = Math.floor(cur / 60) + ':' + String(Math.floor(cur % 60)).padStart(2, '0'); requestAnimationFrame(loop); })();
+  window.READY = true;
+})();
+</script>
+</body>
+</html>

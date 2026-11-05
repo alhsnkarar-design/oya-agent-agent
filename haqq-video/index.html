@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>أكل أموال الناس بالباطل</title>
+<style>
+@font-face{font-family:'Amiri';src:url(fonts/Amiri-Bold.ttf) format('truetype');font-weight:700}
+@font-face{font-family:'ReemKufi';src:url(fonts/ReemKufi-Bold.ttf) format('truetype');font-weight:700}
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+canvas{display:block;width:100vw;height:100vh;object-fit:contain;background:#000}
+#ui{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:12px;align-items:center;background:rgba(10,8,4,.6);border:1px solid rgba(232,190,110,.35);padding:8px 16px;border-radius:40px;color:#f3d79a;font-family:sans-serif}
+#ui button{background:none;border:1px solid rgba(232,190,110,.5);color:#f3d79a;border-radius:20px;padding:6px 16px;cursor:pointer}
+#ui input{width:min(50vw,420px);accent-color:#d9a94e}
+body.render #ui{display:none}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="ui"><button id="play">▶</button><input id="seek" type="range" min="0" max="84" step="0.01" value="0"><span id="tm">0:00</span></div>
+<audio id="aud" src="soundtrack.wav" preload="auto"></audio>
+<script src="rig.js"></script>
+<script>
+/* «أكل أموال الناس بالباطل» — فيديو توعوي عمودي بأحاديث صحيحة، شخصيات بلا ملامح وجه، وكابشن بالفصحى. */
+const W = 1080, H = 1920, FPS = 30, DUR = 84;
+const cv = document.getElementById('c'); cv.width = W; cv.height = H; const ctx = cv.getContext('2d');
+const mk = (w = W, h = H) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const buf = mk(), bctx = buf.getContext('2d');
+const pulse = (t, c, w) => Math.exp(-Math.pow((t - c) / w, 2));
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const R = rng(777);
+function sprite(r, g, b, size = 128) { const c = mk(size, size), x = c.getContext('2d'); const gr = x.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.15, `rgba(${r},${g},${b},.85)`); gr.addColorStop(.45, `rgba(${r},${g},${b},.25)`); gr.addColorStop(1, `rgba(${r},${g},${b},0)`); x.fillStyle = gr; x.fillRect(0, 0, size, size); return c; }
+const SP = { gold: sprite(255, 196, 90), warm: sprite(255, 150, 70), red: sprite(255, 70, 40), white: sprite(230, 240, 255), violet: sprite(150, 90, 255) };
+function glow(c, sp, x, y, s, a = 1) { if (a <= .003) return; c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = a; c.drawImage(sp, x - s / 2, y - s / 2, s, s); c.restore(); }
+function vgrad(c, y0, y1, stops) { const g = c.createLinearGradient(0, y0, 0, y1); stops.forEach(([o, col]) => g.addColorStop(o, col)); return g; }
+function star8(c, cx, cy, Rr, rot) { const ri = Rr * Math.cos(Math.PI / 4) / Math.cos(Math.PI / 8); c.beginPath(); for (let i = 0; i < 16; i++) { const r = i % 2 ? ri : Rr, an = rot + i * Math.PI / 8; c.lineTo(cx + r * Math.cos(an), cy + r * Math.sin(an)); } c.closePath(); }
+function mixP(a, b, k) { const o = {}; for (const key of new Set([...Object.keys(a), ...Object.keys(b)])) { const va = a[key], vb = b[key]; if (Array.isArray(va) && Array.isArray(vb)) o[key] = [lerp(va[0], vb[0], k), lerp(va[1], vb[1], k)]; else if (typeof va === 'number' && typeof vb === 'number') o[key] = lerp(va, vb, k); else o[key] = k < .5 ? (va ?? vb) : (vb ?? va); } return o; }
+function seq(st, t, list) { let i = 0; while (i + 1 < list.length && t >= list[i + 1][0]) i++; const cur = Object.assign(basePose(st), list[i][1](t - list[i][0])); if (i > 0) { const k = eInOut((t - list[i][0]) / .45); if (k < 1) return mixP(Object.assign(basePose(st), list[i - 1][1](t - list[i - 1][0])), cur, k); } return cur; }
+
+/* ---------------- cast (faceless) ---------------- */
+STYLES.taker = { P: ADULT, skin: '#d2a07a', shirt: '#f3f3f1', sleeve: 'long', sleeveCol: '#5a4632', pants: '#4a3a2a', shoe: '#1a1410', jacket: '#5a4632', tie: '#2f7a4a', hair: '#1e1612', watch: true, belly: .05 };
+STYLES.elder = { P: ADULT, skin: '#d2a07a', shirt: '#7a5a3a', robe: true, sleeve: 'long', pants: '#5a4430', shoe: '#2a1d14', hair: '#e9e6e0' };
+STYLES.youth = { P: ADULT, skin: '#e0b48e', shirt: '#3f73b8', sleeve: 'short', pants: '#2f3440', shoe: '#e8e8e8', hair: '#3a2416' };
+STYLES.merchant = { P: ADULT, skin: '#b9825a', shirt: '#2f7a72', sleeve: 'long', pants: '#3e3a36', shoe: '#2a1d14', hair: '#231914', apron: '#e9dcc0', belly: .1 };
+STYLES.porter = { P: ADULT, skin: '#9c6a46', shirt: '#b5562e', sleeve: 'short', pants: '#4a4036', shoe: '#5b3b22', hair: '#1a120e' };
+STYLES.judge = { P: ADULT, skin: '#c8946a', shirt: '#e8e2d2', robe: true, sleeve: 'long', pants: '#d8d0bc', shoe: '#3a2a20', hair: '#2a1d16', cap: '#ffffff' };
+STYLES.pilgrim = { P: ADULT, skin: '#c8946a', shirt: '#f4f2ec', robe: true, sleeve: 'long', pants: '#f4f2ec', shoe: '#d9c3a6', hair: '#2a1d16' };
+const TK = STYLES.taker, EL = STYLES.elder, YO = STYLES.youth, ME = STYLES.merchant, PO = STYLES.porter, JD = STYLES.judge, PG = STYLES.pilgrim;
+const GY = H * .64, S = 220;
+const headY = (gy, s, st) => gy - s * ((st.P.thigh + st.P.shin) * .985 + st.P.T + st.P.neck + st.P.headR * 1.9);
+const ELDER = (t, extra) => Object.assign({ lean: .1, nod: .5, hipH: (EL.P.thigh + EL.P.shin) * .95, handR: [EL.P.sw + .25, -EL.P.T + .95], elbowR: -1, propR: PROPS.cane, bob: Math.sin(t * 1.8) * .008 }, extra || {});
+const OATH = st => ({ handR: [st.P.sw + .05, -st.P.T - .62], elbowR: 1, head: -.06, lean: -.03 });
+const WAITP = st => ({ handR: [st.P.sw + .32, -st.P.T - .02], elbowR: 1, head: -.08 });
+
+/* ---------------- helpers ---------------- */
+function coin(c, x, y, s, a = 1, rot = 0) { c.save(); c.globalAlpha = a; c.translate(x, y); c.scale(Math.max(.15, Math.abs(Math.cos(rot))), 1); c.fillStyle = '#e8c766'; c.beginPath(); c.arc(0, 0, s, 0, TAU); c.fill(); c.strokeStyle = '#a8862e'; c.lineWidth = s * .14; c.stroke(); c.fillStyle = 'rgba(255,255,255,.45)'; c.beginPath(); c.arc(-s * .3, -s * .3, s * .25, 0, TAU); c.fill(); c.restore(); }
+function coinPile(c, x, y, n, s) { for (let i = 0; i < n; i++) { const r = Math.floor(Math.sqrt(i)), k = i - r * r; coin(c, x + (k - r) * s * 1.1 + (r % 2) * s * .5, y - r * s * .55, s); } }
+function dust(c, x, y, k, n = 40) { for (let i = 0; i < n; i++) { const a = i * 2.39, r = k * (60 + (i % 7) * 25); c.fillStyle = `rgba(150,140,120,${Math.max(0, .8 - k)})`; c.fillRect(x + Math.cos(a) * r, y + Math.sin(a) * r * .5 + k * k * 160, 6, 6); } }
+function mark(c, x, y, a, t) { if (a <= 0) return; c.save(); c.globalAlpha = a; c.translate(x, y); const s = 1 + .06 * Math.sin(t * 4); c.scale(s, s);
+  glow(c, SP.red, 0, 0, 160, .5 * a); c.fillStyle = '#c0392b'; c.beginPath(); c.arc(0, 0, 26, 0, TAU); c.fill(); c.strokeStyle = '#ffd2c8'; c.lineWidth = 6; c.lineCap = 'round';
+  c.beginPath(); c.moveTo(-6, -14); c.lineTo(4, -2); c.lineTo(-4, 4); c.lineTo(6, 14); c.stroke(); c.restore(); }
+function siwak(c, x, y, s, a) { c.save(); c.globalAlpha = a; c.translate(x, y); c.rotate(-.5); c.fillStyle = '#8a5a2b'; c.fillRect(-s * 1.4, -s * .09, s * 2.6, s * .18); c.fillStyle = '#e8d8b0'; for (let i = 0; i < 7; i++) c.fillRect(s * 1.2, -s * .09 + i * s * .03, s * .3, s * .02); c.restore(); glow(c, SP.gold, x, y, s * 6, .5 * a); }
+function stars(c, t, a) { c.fillStyle = '#fff'; for (let i = 0; i < 220; i++) { const x = PERMX[i] * W, y = PERMY[i] * H * .6; c.globalAlpha = a * (.3 + .4 * Math.sin(t * 2 + i)); c.fillRect(x, y, 2, 2); } c.globalAlpha = 1; }
+const PERMX = Array.from({ length: 220 }, () => R()), PERMY = Array.from({ length: 220 }, () => R());
+function arch(c, x, y, w, h) { c.beginPath(); c.moveTo(x - w / 2, y); c.lineTo(x - w / 2, y - h * .62); c.quadraticCurveTo(x - w / 2, y - h, x, y - h * 1.08); c.quadraticCurveTo(x + w / 2, y - h, x + w / 2, y - h * .62); c.lineTo(x + w / 2, y); c.closePath(); }
+function _streetBG(c, t) {
+  c.fillStyle = vgrad(c, 0, GY, [[0, '#7fb6dc'], [1, '#f2e2c0']]); c.fillRect(0, 0, W, H);
+  const house = (x, w, h, col) => { c.fillStyle = col; c.fillRect(x, GY - h, w, h); c.fillStyle = 'rgba(0,0,0,.12)'; c.fillRect(x, GY - h, w, 16); c.fillStyle = '#5a3a26'; arch(c, x + w / 2, GY, w * .32, h * .45); c.fill();
+    c.fillStyle = '#6b4a30'; c.fillRect(x + w * .14, GY - h * .8, w * .3, h * .2); c.strokeStyle = '#3a2416'; c.lineWidth = 3; for (let i = 1; i < 4; i++) { c.beginPath(); c.moveTo(x + w * .14 + i * w * .075, GY - h * .8); c.lineTo(x + w * .14 + i * w * .075, GY - h * .6); c.stroke(); } };
+  house(-40, 330, 760, '#e3c9a0'); house(290, 300, 620, '#d9b88a'); house(590, 320, 820, '#e8d2ae'); house(910, 260, 680, '#d4ae80');
+  c.fillStyle = vgrad(c, GY - 10, H, [[0, '#c9a77a'], [1, '#6b5034']]); c.fillRect(0, GY - 10, W, H);
+}
+function stall(c, x) { c.fillStyle = '#6b4226'; c.fillRect(x - 220, GY - 260, 440, 30); c.fillRect(x - 210, GY - 230, 20, 230); c.fillRect(x + 190, GY - 230, 20, 230);
+  for (let i = 0; i < 8; i++) { c.fillStyle = i % 2 ? '#f4efe4' : '#c0392b'; c.beginPath(); c.moveTo(x - 240 + i * 60, GY - 560); c.lineTo(x - 180 + i * 60, GY - 560); c.lineTo(x - 180 + i * 60, GY - 500); c.quadraticCurveTo(x - 210 + i * 60, GY - 470, x - 240 + i * 60, GY - 500); c.fill(); }
+  c.fillStyle = '#4a2e1c'; c.fillRect(x - 225, GY - 560, 10, 300); c.fillRect(x + 215, GY - 560, 10, 300);
+  [['#e67e22', 5], ['#c0392b', 4], ['#7cb342', 5]].forEach(([col, n], j) => { for (let k = 0; k < n; k++) { c.fillStyle = col; c.beginPath(); c.arc(x - 170 + j * 140 + k * 22, GY - 282 - (k % 2) * 16, 20, 0, TAU); c.fill(); } }); }
+function _fieldBG(c, t, night) {
+  c.fillStyle = vgrad(c, 0, GY, night ? [[0, '#070b1c'], [1, '#26304e']] : [[0, '#8cc7ec'], [1, '#f3e2b4']]); c.fillRect(0, 0, W, H);
+  if (night) { stars(c, t, .8); c.fillStyle = '#eef3ff'; c.beginPath(); c.arc(W * .8, H * .12, 50, 0, TAU); c.fill(); glow(c, SP.white, W * .8, H * .12, 400, .3); }
+  c.fillStyle = night ? '#1a1f14' : '#6a8a3a'; c.beginPath(); c.moveTo(0, GY - 160); for (let x = 0; x <= W; x += 30) c.lineTo(x, GY - 160 - 30 * Math.sin(x * .006)); c.lineTo(W, H); c.lineTo(0, H); c.fill();
+  // two plots with crop rows
+  for (let r = 0; r < 14; r++) { const y = GY - 130 + r * 34; c.strokeStyle = night ? 'rgba(80,110,60,.6)' : (r % 2 ? '#7aa04a' : '#8db456'); c.lineWidth = 10; c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke(); }
+  c.fillStyle = night ? 'rgba(0,0,0,.35)' : 'rgba(0,0,0,0)'; c.fillRect(0, 0, W, H);
+}
+function stake(c, x, y, a = 1) { c.save(); c.globalAlpha = a; c.fillStyle = '#7a5530'; c.fillRect(x - 9, y - 120, 18, 130); c.fillStyle = '#f2efe6'; c.fillRect(x - 11, y - 128, 22, 26); c.fillStyle = '#c0392b'; c.fillRect(x - 11, y - 110, 22, 6); c.restore(); }
+function _officeBG(c, t) {
+  c.fillStyle = vgrad(c, 0, GY, [[0, '#3b3f58'], [1, '#2a2d40']]); c.fillRect(0, 0, W, H);
+  const wx = W * .56, wy = H * .14, ww = 400, wh = 520; c.fillStyle = vgrad(c, wy, wy + wh, [[0, '#6aa7d8'], [1, '#c9e2f2']]); c.fillRect(wx, wy, ww, wh);
+  c.fillStyle = 'rgba(60,90,130,.6)'; for (let i = 0; i < 6; i++) c.fillRect(wx + i * 70, wy + wh - 120 - (i * 47 % 180), 60, 300);
+  c.strokeStyle = '#1e2030'; c.lineWidth = 18; c.strokeRect(wx, wy, ww, wh); c.lineWidth = 8; c.beginPath(); c.moveTo(wx + ww / 2, wy); c.lineTo(wx + ww / 2, wy + wh); c.stroke();
+  c.fillStyle = '#4a3226'; c.fillRect(40, GY - 640, 300, 640); c.fillStyle = '#5a3e2e'; c.fillRect(70, GY - 610, 240, 260); c.fillRect(70, GY - 320, 240, 280); c.fillStyle = '#d6b25e'; c.beginPath(); c.arc(300, GY - 320, 14, 0, TAU); c.fill();
+  c.fillStyle = vgrad(c, GY - 10, H, [[0, '#5a4636'], [1, '#2a1f18']]); c.fillRect(0, GY - 10, W, H);
+}
+function calendar(c, x, y, t, flips) { c.fillStyle = '#efe6cf'; c.fillRect(x - 90, y - 110, 180, 220); c.fillStyle = '#b84a3a'; c.fillRect(x - 90, y - 110, 180, 50);
+  c.fillStyle = 'rgba(0,0,0,.18)'; for (let r = 0; r < 4; r++) for (let q = 0; q < 5; q++) c.fillRect(x - 74 + q * 31, y - 40 + r * 34, 20, 18);
+  for (const ft of flips) { const k = clamp((t - ft) / .7); if (k <= 0 || k >= 1) continue; c.save(); c.translate(x, y - 110); c.scale(1, Math.cos(k * Math.PI)); c.globalAlpha = 1 - k * .5; c.fillStyle = '#f7f0de'; c.fillRect(-90, 0, 180, 220); c.fillStyle = '#b84a3a'; c.fillRect(-90, 0, 180, 50); c.restore(); } }
+function seated(c, st, x, gy, s, t, turn, extra) { chair(c, x, gy, s, turn, false);
+  const pose = Object.assign(basePose(st), MOVES.sit(st, t), extra || {}, { hipH: st.P.shin + .1 }); pose.back = turn > .5; if (pose.back) { pose.handL = [-.3, -.2]; pose.handR = [.3, -.2]; }
+  drawChar(c, x, gy - s * .62 + s * (st.P.shin + .1) - s * .3, s, st, pose); if (turn > .02) chair(c, x, gy, s, turn, true); desk(c, x, gy, s, t); }
+function judgmentBG(c, t) {
+  c.fillStyle = vgrad(c, 0, H, [[0, '#05040c'], [.55, '#1c1428'], [1, '#2a1c10']]); c.fillRect(0, 0, W, H); stars(c, t, .8);
+  c.save(); c.globalCompositeOperation = 'lighter'; c.translate(W / 2, -200); for (let i = 0; i < 14; i++) { const an = Math.PI / 2 + (i - 6.5) * .09; const g = c.createLinearGradient(0, 0, Math.cos(an) * 2600, Math.sin(an) * 2600); g.addColorStop(0, 'rgba(255,230,170,.12)'); g.addColorStop(1, 'rgba(255,230,170,0)'); c.fillStyle = g; c.beginPath(); c.moveTo(0, 0); c.lineTo(Math.cos(an - .03) * 2600, Math.sin(an - .03) * 2600); c.lineTo(Math.cos(an + .03) * 2600, Math.sin(an + .03) * 2600); c.fill(); } c.restore();
+  c.fillStyle = 'rgba(0,0,0,.4)'; c.fillRect(0, GY, W, H);
+}
+const BGC = mk(), BGX = BGC.getContext('2d');
+function blurred(c, px, fn) { BGX.setTransform(1, 0, 0, 1, 0, 0); BGX.globalAlpha = 1; BGX.filter = 'none'; BGX.clearRect(0, 0, W, H); fn(BGX); c.save(); c.filter = `blur(${px}px)`; c.drawImage(BGC, 0, 0); c.restore(); }
+function streetBG(c, t) { blurred(c, 1.6, x => _streetBG(x, t)); }
+function fieldBG(c, t, n) { blurred(c, 1.4, x => _fieldBG(x, t, n)); }
+function officeBG(c, t) { blurred(c, 1.6, x => _officeBG(x, t)); }
+const LOGO = new Image(); LOGO.src = 'logo.png';
+
+/* ============================ SCENES ============================ */
+// 1 · 0–6 hook: gold pouring into his hands — «هل كل مال في يدك حلال؟»
+function sc1(c, lt) {
+  c.fillStyle = vgrad(c, 0, H, [[0, '#15101e'], [1, '#07060c']]); c.fillRect(0, 0, W, H); glow(c, SP.gold, W / 2, H * .3, 1000, .3);
+  const p = Object.assign(MOVES.receive(TK, lt, 1), { head: -.1, lean: .05 }); drawChar(c, W / 2, GY, S * 1.1, TK, p);
+  for (let i = 0; i < 40; i++) { const ph = (lt * .7 + i / 40) % 1, x = W / 2 + 60 + Math.sin(i * 3.1) * 70, y = -40 + ph * (GY - S * 1.9 + 40); coin(c, x, y, 18, Math.min(1, (1 - ph) * 3), lt * 6 + i); }
+  coinPile(c, W / 2 + 120, GY - 4, 15, 20);
+  const q = ss(2.5, 3.2, lt); c.save(); c.globalAlpha = .55 * q; c.fillStyle = '#000'; c.fillRect(0, 0, W, H); c.restore();
+  if (q > 0) { c.save(); c.globalAlpha = q; c.strokeStyle = '#f3cf86'; c.lineWidth = 22; c.lineCap = 'round'; c.shadowColor = '#ffcf80'; c.shadowBlur = 30; c.beginPath(); c.arc(W / 2, H * .15, 70, Math.PI * 1.1, Math.PI * 2.4); c.quadraticCurveTo(W / 2, H * .15 + 90, W / 2, H * .15 + 130); c.stroke(); c.fillStyle = '#f3cf86'; c.beginPath(); c.arc(W / 2, H * .15 + 190, 14, 0, TAU); c.fill(); c.restore(); }
+}
+// 2 · 6–14 the farewell sermon: «إنّ دماءكم وأموالكم وأعراضكم عليكم حرام» (crowd from behind, no depiction of the Prophet ﷺ)
+function sc2(c, lt) {
+  c.fillStyle = vgrad(c, 0, GY, [[0, '#f3c27a'], [.6, '#f7dca8'], [1, '#f2e2c0']]); c.fillRect(0, 0, W, H); glow(c, SP.gold, W * .5, H * .08, 1200, .5);
+  // the mount of Arafat with its pillar
+  c.fillStyle = '#b08a5a'; c.beginPath(); c.moveTo(W * .1, GY - 200); c.quadraticCurveTo(W * .5, GY - 620, W * .9, GY - 200); c.fill(); c.fillStyle = '#e9e4d6'; c.fillRect(W * .5 - 14, GY - 600, 28, 180);
+  c.fillStyle = vgrad(c, GY - 210, H, [[0, '#d9c4a0'], [1, '#8a6e4a']]); c.fillRect(0, GY - 210, W, H);
+  for (let r = 0; r < 3; r++) for (let i = 0; i < 6 + r; i++) { const n = 6 + r, x = (i + .5) * W / n + (r % 2 ? 0 : 30), y = GY - 70 + r * 150, s = 62 + r * 30;
+    const p = Object.assign(basePose(PG), { back: true, bob: Math.sin(lt * 2 + i + r) * .01, handL: [-.1, -PG.P.T + .4], handR: [.1, -PG.P.T + .4], elbowL: 1, elbowR: -1, nod: .3 }); drawChar(c, x, y, s, PG, p); }
+}
+// 3 · 14–24 land grabbing by a hand-span: «من ظلم قيد شبر من الأرض طوّقه من سبع أرضين»
+function sc3(c, lt) {
+  const night = lt < 6;
+  fieldBG(c, lt, night);
+  const sx0 = W * .5, sx1 = W * .5 + 120 * eInOut((lt - 2.2) / 1), sy = GY + 30;
+  for (let i = 0; i < 4; i++) stake(c, (i === 1 ? sx1 : sx0) + (i - 1.5) * 0, sy - 40 + i * 110 - 160, 1);
+  // dashed old boundary
+  c.save(); c.setLineDash([16, 14]); c.strokeStyle = 'rgba(255,255,255,.4)'; c.lineWidth = 4; c.beginPath(); c.moveTo(sx0, GY - 260); c.lineTo(sx0, H); c.stroke(); c.restore();
+  if (lt > 3.2) { c.save(); c.fillStyle = 'rgba(192,57,43,.25)'; c.fillRect(sx0, GY - 260, sx1 - sx0, H); c.restore(); }
+  const walk = lt < 1.6 ? lerp(W * .15, W * .38, eInOut(lt / 1.6)) : W * .38;
+  const p = lt < 1.6 ? MOVES.walk(TK, lt, .7) : lt < 3.4 ? Object.assign(basePose(TK), { lean: .35, nod: .8, hipH: (TK.P.thigh + TK.P.shin) * .85, handR: [TK.P.sw + .5, -.05], handL: [TK.P.sw + .3, 0], elbowL: 1, elbowR: 1 }) : Object.assign(MOVES.idle(TK, lt), { head: -.1 });
+  p.face = 1; drawChar(c, walk, GY + 60, S, TK, p);
+  // seven encircling earths (symbolic)
+  const k = ss(5.2, 8.5, lt);
+  if (k > 0) { c.save(); c.fillStyle = `rgba(5,4,10,${.55 * k})`; c.fillRect(0, 0, W, H); c.restore();
+    for (let i = 0; i < 7; i++) { const ki = clamp(k * 7 - i), r = 140 + i * 50; if (ki <= 0) continue; c.save(); c.globalAlpha = ki; c.strokeStyle = i % 2 ? '#6b4a2a' : '#8a6a3a'; c.lineWidth = 26; c.beginPath(); c.ellipse(W * .38, GY - 120, r * .9, r * .45, 0, 0, TAU); c.stroke(); c.restore(); }
+    glow(c, SP.red, W * .38, GY - 120, 900, .3 * k); }
+}
+// 4 · 24–33 the rich man who delays: «مطل الغني ظلم»
+function sc4(c, lt) {
+  officeBG(c, lt); calendar(c, W * .2, H * .38, lt, [3.2, 4.8, 6.4]);
+  const bx = W * .66, turn = lt < 2.2 ? 0 : lt < 2.9 ? eInOut((lt - 2.2) / .7) : lt < 5.4 ? 1 : lt < 6.1 ? 1 - eInOut((lt - 5.4) / .7) : 0;
+  seated(c, TK, bx, GY, S * .92, lt, turn, lt > 6.2 ? Object.assign(WAITP(TK), { handL: [TK.P.sw + .3, -TK.P.T + .62] }) : {});
+  coinPile(c, bx + 120, GY - S * .92 * 1.05, 10, 16);
+  const x = lerp(W * .12, W * .32, eInOut((lt - .2) / 1.6));
+  const p = seq(ME, lt, [[0, u => MOVES.walk(ME, u, .8)], [1.8, u => Object.assign(MOVES.receive(ME, u, .7), { propR: PROPS.envelope })], [6.6, u => MOVES.sad(ME, u)]]); p.face = 1; drawChar(c, x, GY, S, ME, p);
+  mark(c, x, headY(GY, S, ME) - 60, ss(7, 7.4, lt), lt);
+}
+// 5 · 33–45 intention: the honest borrower (left) vs. the one who means to destroy it (right)
+function sc5(c, lt) {
+  streetBG(c, lt);
+  const lit = ss(.3, 1.2, lt) * (1 - ss(5.6, 6.2, lt)) + .25, dim = ss(5.6, 6.4, lt);
+  // left: youth repays with light
+  c.save(); c.globalAlpha = 1 - .72 * dim;
+  const q = seq(YO, lt, [[0, u => Object.assign(MOVES.receive(YO, u, eOut(u / .6)), { propR: u > .6 ? PROPS.coins : null })], [2.2, u => MOVES.walk(YO, u, .8)], [3.6, u => Object.assign(MOVES.give(YO, u, eOut(u / .6)), { propR: u < .8 ? PROPS.coins : null })]]); q.face = 1; drawChar(c, W * .2, GY, S * .9, YO, q);
+  const r = Object.assign(basePose(ME), lt > 4 ? MOVES.receive(ME, lt, .8) : MOVES.give(ME, lt, eOut(lt / .5) * (1 - ss(.9, 1.3, lt)))); r.face = -1; drawChar(c, W * .42, GY + 30, S * .8, ME, r);
+  if (lt > 4.4 && lt < 6) glow(c, SP.gold, W * .3, GY - S * 1.4, 600, .6 * (1 - ss(5.4, 6, lt)));
+  c.restore();
+  // right: he takes from the elder meaning never to repay — the money crumbles
+  c.save(); c.globalAlpha = .28 + .72 * dim;
+  const e = Object.assign(basePose(EL), ELDER(lt, { handL: [EL.P.sw * .2 + .5 * eOut((lt - 6) / .6), -EL.P.T + .45], elbowL: 1 })); e.face = -1; drawChar(c, W * .9, GY + 30, S * .8, EL, e);
+  const crumble = ss(8.5, 10.5, lt);
+  const t2 = Object.assign(MOVES.receive(TK, lt, eOut((lt - 6.3) / .6)), { propR: lt > 6.9 && crumble < .5 ? PROPS.coins : null, head: crumble * .2, nod: crumble }); t2.face = 1; drawChar(c, W * .66, GY, S * .9, TK, t2);
+  if (crumble > 0) dust(c, W * .66 + S * .9 * .7, GY - S * 1.25, crumble);
+  c.restore();
+  // divider
+  c.save(); c.globalAlpha = .6; c.strokeStyle = 'rgba(255,255,255,.6)'; c.lineWidth = 3; c.setLineDash([12, 12]); c.beginPath(); c.moveTo(W * .53, GY - S * 3); c.lineTo(W * .53, GY + 60); c.stroke(); c.restore();
+}
+// 6 · 45–58 the false oath before the judge — «وإن قضيبًا من أراك»
+function sc6(c, lt) {
+  c.fillStyle = vgrad(c, 0, GY, [[0, '#4a3a2a'], [1, '#2a2018']]); c.fillRect(0, 0, W, H);
+  for (let i = 0; i < 3; i++) { c.fillStyle = 'rgba(255,220,160,.08)'; arch(c, W * (.2 + i * .3), GY - 30, 220, 640); c.fill(); }
+  c.fillStyle = vgrad(c, GY - 10, H, [[0, '#5a4030'], [1, '#22170f']]); c.fillRect(0, GY - 10, W, H);
+  seated(c, JD, W / 2, GY - 40, S * .8, lt, 0, { head: Math.sin(lt * .8) * .06 });
+  const tp = seq(TK, lt, [[0, u => MOVES.idle(TK, u)], [1.2, u => OATH(TK)], [3.4, u => Object.assign(MOVES.receive(TK, u, eOut(u / .5)), { propR: u > .5 ? PROPS.bag : null })], [5.2, u => Object.assign(MOVES.walk(TK, u, .7), { propR: PROPS.bag })]]);
+  tp.face = 1; drawChar(c, lt < 5.2 ? W * .16 : lerp(W * .16, -W * .1, (lt - 5.2) / 3), GY + 80, S, TK, tp);
+  const pp = seq(PO, lt, [[0, u => Object.assign(MOVES.give(PO, u, .5), { propR: PROPS.bag })], [3.2, u => Object.assign(MOVES.give(PO, u, .9), { propR: null })], [4.2, u => MOVES.sad(PO, u)]]); pp.face = -1; drawChar(c, W * .84, GY + 80, S, PO, pp);
+  if (lt > 1.4 && lt < 3.4) glow(c, SP.red, W * .16, GY - S * 3, 400, .4 * Math.sin((lt - 1.4) / 2 * Math.PI));
+  mark(c, W * .84, headY(GY + 80, S, PO) - 60, ss(4.4, 4.8, lt), lt);
+  // «وإن قضيبًا من أراك»: the tiny miswak stick
+  const sw = ss(7.6, 8.4, lt); if (sw > 0) { c.save(); c.globalAlpha = .6 * sw; c.fillStyle = '#000'; c.fillRect(0, 0, W, H); c.restore(); siwak(c, W / 2, H * .3, 120 * eBack((lt - 7.6) / .8), sw); }
+}
+// 7 · 58–68 «لتؤدُّنّ الحقوق إلى أهلها يوم القيامة»: rights handed back on the Day
+const VICT = [[EL, -1, W * .16, GY, .9], [ME, 1, W * .84, GY, .9], [PO, -1, W * .1, GY + 170, .78]];
+function sc7(c, lt) {
+  judgmentBG(c, lt);
+  const x = W / 2;
+  VICT.forEach(([st, side, vx, vy, sc], i) => { const t0 = .4 + i * .7, k = eOut((lt - t0) / .5); if (lt < t0) return;
+    const pp = st === EL ? Object.assign(basePose(EL), ELDER(lt)) : Object.assign(MOVES.idle(st, lt), { handR: [st.P.sw + .45, -st.P.T + .45], elbowR: 1 }); pp.face = -side;
+    c.save(); c.globalAlpha = k; drawChar(c, vx, vy, S * sc, st, pp); c.restore();
+    for (let q = 0; q < 5; q++) { const tq = 2.6 + i * 1.6 + q * .2, fk = eInOut((lt - tq) / .7); if (lt < tq) continue; const tx = vx - side * 40 * sc, ty = vy - S * sc * 1.7;
+      coin(c, lerp(x, tx, fk), lerp(GY - S * 1.6, ty, fk) - Math.sin(fk * Math.PI) * 160, 22, 1 - ss(.85, 1, fk) * .6, lt * 5 + q); }
+    mark(c, vx, headY(vy, S * sc, st) - 60, k * (1 - ss(3.6 + i * 1.6, 4.2 + i * 1.6, lt)), lt);
+  });
+  const p = Object.assign(MOVES.idle(TK, lt), { head: Math.sin(lt * 2) * .1, nod: .5 * ss(2, 4, lt), handR: [TK.P.sw + .4, -TK.P.T + .6], elbowR: 1 }); drawChar(c, x, GY, S, TK, p);
+  coinPile(c, x + 40, GY - 4, Math.max(0, 15 - Math.floor(clamp((lt - 2.6) / 4.8) * 15)), 18);
+}
+// 8 · 68–78 return the rights today (4 quick reconciliations)
+function sc8(c, lt) {
+  const step = Math.min(3, Math.floor(lt / 2.5)), st = lt - step * 2.5, a = ss(0, .25, st) * (step < 3 ? 1 - ss(2.25, 2.5, st) : 1);
+  c.save(); c.globalAlpha = a;
+  if (step === 0) { fieldBG(c, lt, false); const back = eInOut((st - .6) / .8); stake(c, W * .5 + 120 * (1 - back), GY - 40); c.save(); c.setLineDash([16, 14]); c.strokeStyle = 'rgba(255,255,255,.6)'; c.lineWidth = 4; c.beginPath(); c.moveTo(W * .5, GY - 260); c.lineTo(W * .5, H); c.stroke(); c.restore();
+    const p = Object.assign(MOVES.handOnChest(TK, st), {}); p.face = 1; drawChar(c, W * .3, GY + 60, S, TK, p); const e = Object.assign(basePose(EL), ELDER(lt, { nod: .2 })); e.face = -1; drawChar(c, W * .76, GY + 60, S, EL, e); if (st > 1.4) heart(c, W * .53, GY - S * 2.6, 28, ss(1.4, 1.8, st)); }
+  else if (step === 1) { streetBG(c, lt); stall(c, W * .72); const p = Object.assign(MOVES.give(TK, st, eOut((st - .2) / .5)), { propR: st < 1 ? PROPS.envelope : null }); p.face = 1; drawChar(c, W * .38, GY, S, TK, p);
+    const q = Object.assign(MOVES.receive(ME, st, eOut((st - .45) / .5)), { propR: st > .95 ? PROPS.envelope : null }); q.face = -1; drawChar(c, W * .72, GY, S, ME, q); if (st > 1.4) heart(c, W * .55, GY - S * 3, 28, ss(1.4, 1.8, st)); }
+  else if (step === 2) { streetBG(c, lt); const p = Object.assign(MOVES.give(TK, st, eOut((st - .2) / .5)), { propR: st < 1 ? PROPS.bag : null }); p.face = 1; drawChar(c, W * .36, GY, S, TK, p);
+    const q = Object.assign(MOVES.receive(PO, st, eOut((st - .45) / .5)), { propR: st > .95 ? PROPS.bag : null }); q.face = -1; drawChar(c, W * .72, GY, S, PO, q); if (st > 1.4) heart(c, W * .54, GY - S * 3, 28, ss(1.4, 1.8, st)); }
+  else { streetBG(c, lt); const p = Object.assign(MOVES.give(TK, st, eOut((st - .2) / .5)), { propR: st < 1 ? PROPS.coins : null, head: .12 }); p.face = 1; drawChar(c, W * .38, GY, S, TK, p);
+    const e = Object.assign(basePose(EL), ELDER(lt, { handL: [EL.P.sw * .2 + .5 * eOut((st - .45) / .5), -EL.P.T + .45], elbowL: 1, nod: .2 })); e.face = -1; drawChar(c, W * .74, GY + 20, S, EL, e); if (st > 1.4) heart(c, W * .56, GY - S * 3, 28, ss(1.4, 1.8, st)); }
+  c.restore();
+}
+// 9 · 78–84 closing: the channel mark
+function sc9(c, lt) {
+  c.fillStyle = vgrad(c, 0, H, [[0, '#0d1422'], [1, '#05070d']]); c.fillRect(0, 0, W, H); glow(c, SP.gold, W / 2, H * .38, 1100, .4 * ss(0, 1, lt));
+  const k = eBack(lt / 1.1), s = 520 * k; if (LOGO.complete && s > 1) { c.save(); c.globalAlpha = ss(0, .6, lt); c.drawImage(LOGO, W / 2 - s / 2, H * .38 - s / 2, s, s); c.restore(); }
+}
+
+/* ---------------- captions ---------------- */
+const CAPS = [
+  { s: .4, e: 5.8, h: 0, l: ['هل كلُّ مالٍ في يدِك…', 'حلال؟'], hl: [[.4, 3, 'هل كلُّ مالٍ في يدِك…'], [3, 5.8, 'حلال؟']] },
+  { s: 6.2, e: 13.8, h: 1, l: ['«إنّ دماءَكم وأموالَكم وأعراضَكم', 'عليكم حرام»'], hl: [[6.2, 9, 'دماءَكم'], [9, 11.5, 'وأموالَكم'], [11.5, 13.8, 'وأعراضَكم']], src: 'متفق عليه — من خطبة حجة الوداع' },
+  { s: 14.3, e: 23.7, h: 1, l: ['«من ظلم قِيدَ شبرٍ من الأرض،', 'طُوِّقَه من سبعِ أرَضين»'], hl: [[14.3, 19.2, 'من ظلم قِيدَ شبرٍ من الأرض،'], [19.2, 23.7, 'طُوِّقَه من سبعِ أرَضين»']], src: 'متفق عليه' },
+  { s: 24.2, e: 32.7, h: 1, l: ['«مَطْلُ الغنيِّ ظُلم»'], src: 'متفق عليه' },
+  { s: 33.2, e: 44.7, h: 1, l: ['«من أخذ أموالَ الناس يريد أداءها أدّى اللهُ عنه،', 'ومن أخذ يريد إتلافها أتلفه الله»'], hl: [[33.2, 39, 'أدّى اللهُ عنه،'], [39, 44.7, 'ومن أخذ يريد إتلافها أتلفه الله»']], src: 'رواه البخاري (٢٣٨٧)' },
+  { s: 45.2, e: 52.4, h: 1, l: ['«من اقتطع حقَّ امرئٍ مسلمٍ بيمينه،', 'فقد أوجب اللهُ له النار، وحرّم عليه الجنة»'], hl: [[45.2, 48.6, 'من اقتطع حقَّ امرئٍ مسلمٍ بيمينه،'], [48.6, 52.4, 'فقد أوجب اللهُ له النار، وحرّم عليه الجنة»']] },
+  { s: 52.6, e: 57.8, h: 1, l: ['قيل: وإن كان شيئًا يسيرًا؟', 'قال: «وإن قضيبًا من أراك»'], hl: [[52.6, 54.8, 'قيل: وإن كان شيئًا يسيرًا؟'], [54.8, 57.8, 'قال: «وإن قضيبًا من أراك»']], src: 'رواه مسلم (١٣٧)' },
+  { s: 58.3, e: 67.7, h: 1, l: ['«لَتُؤدُّنَّ الحقوقَ إلى أهلِها', 'يومَ القيامة»'], src: 'رواه مسلم (٢٥٨٢)' },
+  { s: 68.2, e: 77.7, h: 0, l: ['رُدَّ الحقوقَ إلى أهلِها اليوم…', 'قبل أن تُرَدَّ يومَ القيامة'] },
+  { s: 78.6, e: 83.6, h: 0, l: ['شارِكْه… فلعلّه يكون أثرًا يبقى لك'] },
+];
+const capCache = new Map();
+function capLayout(cap) { if (capCache.has(cap)) return capCache.get(cap);
+  const fs = 54, lh = fs * 1.6, maxW = W * .86, m = mk(10, 10).getContext('2d'); const fam = cap.h ? 'Amiri' : 'ReemKufi', base = cap.h ? fs : fs - 4; m.font = `700 ${base}px ${fam}`;
+  let sc = 1; for (const ln of cap.l) sc = Math.min(sc, maxW / m.measureText(ln).width); const r = { font: `700 ${Math.floor(base * sc)}px ${fam}`, lh: lh * sc, hh: cap.l.length * lh * sc + (cap.src ? 70 : 0) + 70 }; capCache.set(cap, r); return r; }
+function captions(c, t) {
+  for (const cap of CAPS) { if (t < cap.s || t > cap.e) continue;
+    const a = ss(cap.s, cap.s + .35, t) * (1 - ss(cap.e - .35, cap.e, t)), L = capLayout(cap), y0 = H * .755 + (1 - eOut((t - cap.s) / .4)) * 30;
+    c.save(); c.globalAlpha = a; c.direction = 'rtl'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillStyle = 'rgba(8,6,10,.64)'; c.beginPath(); c.roundRect(W * .05, y0, W * .9, L.hh, 36); c.fill(); c.strokeStyle = cap.h ? 'rgba(232,190,110,.55)' : 'rgba(255,255,255,.18)'; c.lineWidth = 3; c.stroke();
+    c.font = L.font; c.shadowColor = 'rgba(0,0,0,.9)'; c.shadowBlur = 10; const cur = cap.hl ? cap.hl.find(([s, e]) => t >= s && t < e) : null;
+    cap.l.forEach((ln, i) => { const y = y0 + 35 + L.lh * (i + .5); c.fillStyle = cap.h ? (cur ? 'rgba(241,197,106,.55)' : '#f6dc9a') : '#ffffff'; c.fillText(ln, W / 2, y);
+      if (cur && ln.includes(cur[2])) { c.textAlign = 'right'; const full = c.measureText(ln).width, right = W / 2 + full / 2, idx = ln.indexOf(cur[2]), before = c.measureText(ln.slice(0, idx)).width, pw = c.measureText(cur[2]).width, px = right - before;
+        c.save(); c.shadowColor = 'rgba(255,200,90,.95)'; c.shadowBlur = 24; c.fillStyle = '#fff6d6'; c.fillText(cur[2], px, y); c.restore(); c.fillStyle = 'rgba(241,197,106,.9)'; c.fillRect(px - pw, y + L.lh * .38, pw, 4); c.textAlign = 'center'; } });
+    if (cap.src) { c.font = '700 32px ReemKufi'; c.fillStyle = '#e2b765'; c.fillText('— ' + cap.src + ' —', W / 2, y0 + L.hh - 55); }
+    c.restore(); }
+}
+const SCENES = [
+  { s: 0, e: 6.3, f: sc1 }, { s: 5.8, e: 14.3, f: sc2 }, { s: 13.8, e: 24.3, f: sc3 }, { s: 23.8, e: 33.3, f: sc4 }, { s: 32.8, e: 45.3, f: sc5 },
+  { s: 44.8, e: 58.3, f: sc6 }, { s: 57.8, e: 68.3, f: sc7 }, { s: 67.8, e: 78.3, f: sc8 }, { s: 77.8, e: 84, f: sc9 },
+];
+
+const VIG = mk(); { const x = VIG.getContext('2d'); const g = x.createRadialGradient(W / 2, H / 2, W * .4, W / 2, H / 2, H * .66); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.55)'); x.fillStyle = g; x.fillRect(0, 0, W, H); }
+const GRAIN = Array.from({ length: 6 }, (_, k) => { const c = mk(270, 480), x = c.getContext('2d'), id = x.createImageData(270, 480), r = rng(9 + k); for (let i = 0; i < id.data.length; i += 4) { const v = r() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 255; } x.putImageData(id, 0, 0); return c; });
+/* ---------- cinematic layer ---------- */
+const CAMS = [[1.02, 1.14, .5, .42], [1.1, 1.02, .5, .45], [1.02, 1.12, .4, .5], [1.02, 1.09, .62, .5], [1.04, 1.04, .5, .5], [1.02, 1.1, .4, .45], [1.12, 1.02, .5, .5], [1.02, 1.07, .5, .5], [1.02, 1.05, .5, .4]];
+const BLM = mk(270, 480), blx = BLM.getContext('2d');
+const MOTES = Array.from({ length: 26 }, () => ({ x: R() * W, y: R() * H, z: R(), p: R() * TAU }));
+function drawScene(sc, i, t, a) {
+  const [z0, z1, fx, fy] = CAMS[i] || [1.02, 1.06, .5, .5], k = eInOut((t - sc.s) / (sc.e - sc.s)), z = lerp(z0, z1, k);
+  const dx = Math.sin(t * .31 + i) * 7, dy = Math.cos(t * .27 + i) * 6;
+  ctx.save();
+  if (a < 1) { const r = eInOut(a) * Math.hypot(W, H) * .62; ctx.beginPath(); ctx.arc(W / 2, H * .45, Math.max(1, r), 0, TAU); ctx.clip(); }
+  ctx.translate(fx * W, fy * H); ctx.scale(z, z); ctx.translate(-fx * W + dx, -fy * H + dy); ctx.drawImage(buf, 0, 0); ctx.restore();
+  if (a < 1) { const r = eInOut(a) * Math.hypot(W, H) * .62; ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.strokeStyle = `rgba(255,205,120,${.75 * (1 - a)})`; ctx.lineWidth = 26; ctx.shadowColor = 'rgba(255,190,90,1)'; ctx.shadowBlur = 40; ctx.beginPath(); ctx.arc(W / 2, H * .45, Math.max(1, r), 0, TAU); ctx.stroke(); ctx.restore(); }
+}
+function renderAt(t) {
+  t = clamp(t, 0, DUR);
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+  SCENES.forEach((sc, i) => { if (t < sc.s || t > sc.e) return; const a = sc.s > 0 ? ss(sc.s, sc.s + .6, t) : 1;
+    bctx.setTransform(1, 0, 0, 1, 0, 0); bctx.globalAlpha = 1; bctx.globalCompositeOperation = 'source-over'; bctx.shadowBlur = 0; bctx.filter = 'none'; bctx.clearRect(0, 0, W, H);
+    bctx.save(); sc.f(bctx, t - sc.s); bctx.restore(); drawScene(sc, i, t, a); });
+  // bloom
+  blx.filter = 'blur(7px)'; blx.clearRect(0, 0, 270, 480); blx.drawImage(cv, 0, 0, 270, 480); blx.filter = 'none';
+  ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = .075; ctx.drawImage(BLM, 0, 0, W, H); ctx.restore();
+  // depth motes (foreground bokeh)
+  for (const m of MOTES) { const y = ((m.y - t * (10 + m.z * 30)) % H + H) % H, x = m.x + Math.sin(t * .4 + m.p) * 40; glow(ctx, SP.gold, x, y, 20 + m.z * 90, (.06 + .1 * m.z) * (.6 + .4 * Math.sin(t + m.p))); }
+  ctx.drawImage(VIG, 0, 0); ctx.save(); ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = .045; ctx.drawImage(GRAIN[Math.floor(t * FPS) % 6], 0, 0, W, H); ctx.restore();
+  captions(ctx, t);
+  const fade = Math.max(1 - ss(0, .7, t), ss(DUR - 1, DUR, t)); if (fade > 0) { ctx.globalAlpha = fade; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
+}
+const MB = mk(), mbx = MB.getContext('2d');
+const params = new URLSearchParams(location.search);
+(async () => {
+  await Promise.all(['700 54px Amiri', '700 50px ReemKufi'].map(f => document.fonts.load(f, 'المفلس'))); await document.fonts.ready;
+  window.renderAt = renderAt; window.DUR = DUR; window.FPS = FPS;
+  window.frameJPEG = (t, q = .93) => { renderAt(Math.max(0, t - .5 / FPS)); mbx.drawImage(cv, 0, 0); renderAt(t); ctx.save(); ctx.globalAlpha = .42; ctx.drawImage(MB, 0, 0); ctx.restore(); return cv.toDataURL('image/jpeg', q); };
+  if (params.has('render')) { document.body.classList.add('render'); window.READY = true; return; }
+  const aud = document.getElementById('aud'), btn = document.getElementById('play'), seek = document.getElementById('seek'), tm = document.getElementById('tm');
+  let playing = false, t0 = 0, base = 0, cur = 0;
+  btn.onclick = () => { playing = !playing; btn.textContent = playing ? '❚❚' : '▶'; if (playing) { t0 = performance.now(); base = cur; aud.currentTime = cur; aud.play().catch(() => {}); } else aud.pause(); };
+  seek.oninput = () => { cur = +seek.value; base = cur; t0 = performance.now(); aud.currentTime = cur; };
+  (function loop() { if (playing) { cur = base + (performance.now() - t0) / 1000; if (cur >= DUR) { cur = DUR; playing = false; btn.textContent = '▶'; aud.pause(); } } renderAt(cur); seek.value = cur; tm.textContent = Math.floor(cur / 60) + ':' + String(Math.floor(cur % 60)).padStart(2, '0'); requestAnimationFrame(loop); })();
+  window.READY = true;
+})();
+</script>
+</body>
+</html>
