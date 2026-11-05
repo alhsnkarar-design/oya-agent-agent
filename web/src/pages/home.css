@@ -1,7 +1,7 @@
 .home .hero { display: grid; justify-items: center; text-align: center; gap: 22px; padding-block: clamp(48px, 9vw, 110px) 34px; }
 .home .sub { color: var(--ink-2); font-size: clamp(1.02rem, 1.6vw, 1.22rem); max-width: 62ch; margin: 0; }
-.prompt { width: min(1240px, 100%); padding: 22px 22px 18px; text-align: start; border-radius: 22px; background: rgba(21,21,24,.86); border-color: var(--line-2); }
-.prompt textarea { width: 100%; resize: none; border: 0; outline: none; background: transparent; font-size: 1.2rem; line-height: 1.5; min-height: 2.4em; }
+.prompt { width: min(1240px, 100%); padding: 28px 28px 22px; text-align: start; border-radius: 22px; background: rgba(21,21,24,.86); border-color: var(--line-2); }
+.prompt textarea { width: 100%; resize: none; border: 0; outline: none; background: transparent; font-size: 1.25rem; line-height: 1.6; min-height: 6.4em; }
 .prompt textarea::placeholder { color: var(--ink-3); }
 .prompt .row { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
 .prompt .grow { flex: 1; }
@@ -61,7 +61,7 @@
 }
 @media (max-width: 560px) {
   .prompt { padding: 16px; }
-  .prompt textarea { font-size: 1.05rem; }
+  .prompt textarea { font-size: 1.08rem; min-height: 6em; }
   .lang-select { flex: 1; min-width: 0; }
   .file .name { max-width: 14ch; }
   .gallery { grid-auto-rows: 150px; }

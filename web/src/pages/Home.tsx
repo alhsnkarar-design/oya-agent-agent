@@ -71,7 +71,7 @@ export function Home() {
 
         <div className="prompt card" onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f?.type.startsWith("video/")) setFile(f); }}>
           <label className="sr" htmlFor="hero-prompt">{t.prompt_ph}</label>
-          <textarea id="hero-prompt" rows={2} value={text} placeholder={t.prompt_ph} onChange={(e) => setText(e.target.value)}
+          <textarea id="hero-prompt" rows={4} value={text} placeholder={t.prompt_ph} onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void start(); } }} />
           <div className="row">
             {file ? (
