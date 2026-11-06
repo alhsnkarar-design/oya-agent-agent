@@ -8,8 +8,8 @@ const REPO = "https://raw.githubusercontent.com/alhsnkarar-design/oya-agent-agen
 const OR = "https://openrouter.ai/api/v1";
 const STT_MODEL = "openai/whisper-large-v3-turbo";
 const STT_FALLBACK = "openai/whisper-large-v3";
-const CHAT_MODEL = "google/gemini-2.5-flash";
-const TTS_MODEL = "google/gemini-3.8-flash-lite-tts";
+const CHAT_MODELS = ["google/gemini-2.5-flash", "openai/gpt-4o-mini"];
+const TTS_MODELS = ["google/gemini-3.8-flash-lite-tts", "google/gemini-3.8-flash-tts"];
 
 // Until payments open, signed-in users get a trial allowance per month and guests a small one per day.
 const LIMITS = {
@@ -93,12 +93,18 @@ async function add(env, me, kind, amount) {
 function orHeaders(env, extra) {
   return Object.assign({ Authorization: "Bearer " + env.OPENROUTER_API_KEY, "HTTP-Referer": "https://zifidit.com", "X-Title": "Zifidit" }, extra || {});
 }
-function upstreamError(res) {
-  if (res.status === 402) return json({ error: "ai_unavailable" }, 503);
-  if (res.status === 401 || res.status === 403) return json({ error: "not_configured" }, 503);
+// Turns an OpenRouter failure into a clear error code for the site, and logs the details for us.
+async function upstreamError(res, what) {
+  let detail = "";
+  try { detail = (await res.text()).slice(0, 600); } catch (e) { /* no body */ }
+  console.error("openrouter " + what + " failed", res.status, detail);
+  if (res.status === 402) return json({ error: "no_credits" }, 503);
+  if (res.status === 401 || res.status === 403) return json({ error: "bad_key" }, 503);
   if (res.status === 429) return json({ error: "busy" }, 503);
   return json({ error: "upstream", status: res.status }, 502);
 }
+// These statuses mean every model will fail the same way, so there is no point trying the next one.
+const FATAL = { 401: 1, 402: 1, 403: 1 };
 
 /* ---------- speech to text ---------- */
 
@@ -126,22 +132,35 @@ async function transcribe(request, env, me) {
   if (!file || typeof file === "string") return json({ error: "bad_request" }, 400);
   if (file.size > 25 * 1024 * 1024) return json({ error: "too_large" }, 413);
   if (!(await allow(env, me, "stt", seconds))) return json({ error: "quota" }, 429);
-  let res, model = STT_MODEL;
+  // Word timings first; if a provider refuses that format, fall back to segments, then to plain text.
+  const lang = form.get("language");
+  const tries = [];
   for (const m of [STT_MODEL, STT_FALLBACK]) {
-    model = m;
+    tries.push({ m: m, f: "verbose_json", w: true }, { m: m, f: "verbose_json", w: false });
+  }
+  tries.push({ m: STT_MODEL, f: "json", w: false });
+  let res = null, model = STT_MODEL;
+  for (const t of tries) {
+    model = t.m;
     const fd = new FormData();
     fd.append("file", file, "audio.wav");
-    fd.append("model", m);
-    fd.append("response_format", "verbose_json");
-    fd.append("timestamp_granularities[]", "word");
-    fd.append("timestamp_granularities[]", "segment");
-    const lang = form.get("language");
+    fd.append("model", t.m);
+    fd.append("response_format", t.f);
+    if (t.f === "verbose_json") {
+      if (t.w) fd.append("timestamp_granularities[]", "word");
+      fd.append("timestamp_granularities[]", "segment");
+    }
     if (lang) fd.append("language", String(lang));
     res = await fetch(OR + "/audio/transcriptions", { method: "POST", headers: orHeaders(env), body: fd });
-    if (res.ok || res.status === 402 || res.status === 401 || res.status === 429) break;
+    if (res.ok || FATAL[res.status]) break;
+    console.error("transcribe try failed", t.m, t.f, t.w, res.status, (await res.text()).slice(0, 300));
   }
-  if (!res.ok) return upstreamError(res);
+  if (!res.ok) return upstreamError(res, "transcribe");
   const j = await res.json();
+  if (!j.words && !j.segments && j.text) {
+    // plain text only: one segment over the whole clip, words spread evenly
+    j.segments = [{ start: 0, end: seconds, text: j.text }];
+  }
   await add(env, me, "stt", seconds);
   return json({ text: String(j.text || ""), language: j.language || null, duration: Number(j.duration) || seconds, words: wordsFrom(j), model: model });
 }
@@ -231,14 +250,29 @@ async function chat(request, env, me) {
     const hist = Array.isArray(body.messages) ? body.messages.slice(-10) : [];
     for (const m of hist) if (m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string") messages.push({ role: m.role, content: m.content.slice(0, 4000) });
   }
-  const res = await fetch(OR + "/chat/completions", {
-    method: "POST", headers: orHeaders(env, { "Content-Type": "application/json" }),
-    body: JSON.stringify({ model: CHAT_MODEL, messages: messages, response_format: { type: "json_object" }, temperature: 0.3, max_tokens: 4000 }),
-  });
-  if (!res.ok) return upstreamError(res);
-  const j = await res.json();
-  const content = j.choices && j.choices[0] && j.choices[0].message ? j.choices[0].message.content : "";
-  const out = parseJson(typeof content === "string" ? content : JSON.stringify(content)) || {};
+  let out = null, lastStatus = 0;
+  for (const model of CHAT_MODELS) {
+    const res = await fetch(OR + "/chat/completions", {
+      method: "POST", headers: orHeaders(env, { "Content-Type": "application/json" }),
+      body: JSON.stringify({
+        model: model, messages: messages, response_format: { type: "json_object" }, temperature: 0.3, max_tokens: 8000,
+        // keep thinking short so the JSON answer is never cut off
+        reasoning: model.indexOf("gemini") >= 0 ? { max_tokens: 1024, exclude: true } : undefined,
+      }),
+    });
+    if (!res.ok) {
+      if (FATAL[res.status]) return upstreamError(res, "chat");
+      lastStatus = res.status;
+      console.error("chat model failed", model, res.status, (await res.text()).slice(0, 300));
+      continue;
+    }
+    const j = await res.json();
+    const content = j.choices && j.choices[0] && j.choices[0].message ? j.choices[0].message.content : "";
+    out = parseJson(typeof content === "string" ? content : JSON.stringify(content));
+    if (out) break;
+    console.error("chat model returned no JSON", model, String(content).slice(0, 300));
+  }
+  if (!out) return lastStatus === 429 ? json({ error: "busy" }, 503) : json({ error: "upstream", status: lastStatus || 502 }, 502);
   await add(env, me, "chat", 1);
   if (mode === "translate") return json({ reply: "", actions: [], lines: Array.isArray(out.lines) ? out.lines.map(String) : [] });
   const actions = Array.isArray(out.actions) ? out.actions.filter(function (a) { return a && typeof a.type === "string"; }).slice(0, 80) : [];
@@ -252,11 +286,16 @@ async function tts(request, env, me) {
   const text = body && typeof body.text === "string" ? body.text.trim().slice(0, 1200) : "";
   if (!text) return json({ error: "bad_request" }, 400);
   if (!(await allow(env, me, "tts", text.length))) return json({ error: "quota" }, 429);
-  const res = await fetch(OR + "/audio/speech", {
-    method: "POST", headers: orHeaders(env, { "Content-Type": "application/json" }),
-    body: JSON.stringify({ model: TTS_MODEL, input: text, voice: typeof body.voice === "string" ? body.voice : "Kore", response_format: "pcm", instructions: typeof body.instructions === "string" ? body.instructions.slice(0, 300) : undefined }),
-  });
-  if (!res.ok) return upstreamError(res);
+  let res = null;
+  for (const model of TTS_MODELS) {
+    res = await fetch(OR + "/audio/speech", {
+      method: "POST", headers: orHeaders(env, { "Content-Type": "application/json" }),
+      body: JSON.stringify({ model: model, input: text, voice: typeof body.voice === "string" ? body.voice : "Kore", response_format: "pcm", instructions: typeof body.instructions === "string" ? body.instructions.slice(0, 300) : undefined }),
+    });
+    if (res.ok || FATAL[res.status]) break;
+    console.error("tts model failed", model, res.status, (await res.text()).slice(0, 300));
+  }
+  if (!res.ok) return upstreamError(res, "tts");
   await add(env, me, "tts", text.length);
   return new Response(res.body, { headers: Object.assign({}, SEC, { "Content-Type": res.headers.get("content-type") || "audio/pcm;rate=24000;channels=1", "Cache-Control": "no-store" }) });
 }
@@ -277,10 +316,27 @@ export default {
             : null;
           return json({ firebase: fb });
         }
+        if (path === "/api/health") {
+          // Checks the OpenRouter key without running (or paying for) any model.
+          if (!env.OPENROUTER_API_KEY) return json({ ai: false, reason: "no_key" });
+          const r = await fetch(OR + "/key", { headers: orHeaders(env) });
+          if (r.status === 401 || r.status === 403) return json({ ai: false, reason: "bad_key" });
+          if (r.status === 402) return json({ ai: false, reason: "no_credits" });
+          if (!r.ok) return json({ ai: false, reason: "openrouter_" + r.status });
+          const k = (await r.json()).data || {};
+          const left = k.limit_remaining;
+          if (left !== null && left !== undefined && left <= 0) return json({ ai: false, reason: "key_limit_reached" });
+          const c = await fetch(OR + "/credits", { headers: orHeaders(env) });
+          if (c.ok) {
+            const cd = (await c.json()).data || {};
+            if (typeof cd.total_credits === "number" && cd.total_credits - (cd.total_usage || 0) <= 0) return json({ ai: false, reason: "no_credits" });
+          }
+          return json({ ai: true });
+        }
         const me = await who(request, env);
         if (path === "/api/usage") return json({ plan: me.plan, used: await used(env, me), limits: LIMITS[me.plan] });
         if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
-        if (!env.OPENROUTER_API_KEY) return json({ error: "not_configured" }, 503);
+        if (!env.OPENROUTER_API_KEY) return json({ error: "no_key" }, 503);
         if (path === "/api/transcribe") return await transcribe(request, env, me);
         if (path === "/api/chat") return await chat(request, env, me);
         if (path === "/api/tts") return await tts(request, env, me);

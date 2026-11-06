@@ -52,3 +52,12 @@ export async function usage() {
   if (!res.ok) return null;
   return (await res.json()) as { plan: string; used: Record<string, number>; limits: Record<string, number> };
 }
+
+/** Whether the AI is ready (key present, valid, with credit). Costs nothing. */
+export async function health(): Promise<{ ai: boolean; reason?: string } | null> {
+  try {
+    const res = await fetch("/api/health", { cache: "no-store" });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch { return null; }
+}

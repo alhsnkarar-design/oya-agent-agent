@@ -51,6 +51,14 @@ const ar = {
   err_generic: "حصلت مشكلة. جرّب تاني.", err_quota: "خلصت حدود الاستخدام المتاحة. سجّل دخول أو استنى للشهر الجاي.",
   err_ai_off: "الذكاء الاصطناعي مش متاح دلوقتي. جرّب بعد شوية.", err_mic: "مش قادر أوصل للمايك. اسمح للمتصفح يستخدمه.",
   err_video: "مش قادر أفتح الفيديو ده. جرّب MP4.",
+  err_no_key: "الذكاء الاصطناعي لسه مش متوصّل: مفتاح OpenRouter مش متحط في إعدادات الموقع على Cloudflare.",
+  err_bad_key: "مفتاح OpenRouter اللي في إعدادات الموقع غلط أو اتلغى. اعمل مفتاح جديد وحطه في Cloudflare.",
+  err_no_credits: "رصيد OpenRouter خلص، أو المفتاح وصل لحد الصرف بتاعه. اشحن الرصيد أو ارفع الحد.",
+  err_busy: "الذكاء الاصطناعي عليه ضغط دلوقتي. جرّب كمان دقيقة.",
+  err_upstream: "خدمة الذكاء الاصطناعي رجّعت خطأ. جرّب تاني بعد شوية.",
+  err_network: "مفيش اتصال بالإنترنت أو الموقع مش بيرد. اتأكد من النت وجرّب تاني.",
+  err_too_large: "الصوت في الجزء ده كبير قوي. جرّب فيديو أقصر.",
+  ai_off_banner: "تنبيه: الذكاء الاصطناعي مش شغال دلوقتي. ",
   footer_rights: "كل الحقوق محفوظة",
 };
 
@@ -102,6 +110,14 @@ const en: Dict = {
   err_generic: "Something went wrong. Try again.", err_quota: "You've reached your usage limit. Log in or wait for next month.",
   err_ai_off: "The AI isn't available right now. Try again shortly.", err_mic: "Can't reach the microphone. Allow access in your browser.",
   err_video: "Can't open this video. Try an MP4.",
+  err_no_key: "The AI isn't connected yet: the OpenRouter key is missing from the site's Cloudflare settings.",
+  err_bad_key: "The OpenRouter key in the site settings is wrong or was revoked. Create a new key and add it in Cloudflare.",
+  err_no_credits: "OpenRouter credits ran out, or the key hit its spending limit. Top up or raise the limit.",
+  err_busy: "The AI is busy right now. Try again in a minute.",
+  err_upstream: "The AI service returned an error. Try again shortly.",
+  err_network: "No connection, or the site isn't responding. Check your internet and try again.",
+  err_too_large: "The audio in this part is too large. Try a shorter video.",
+  ai_off_banner: "Heads up: the AI isn't working right now. ",
   footer_rights: "All rights reserved",
 };
 

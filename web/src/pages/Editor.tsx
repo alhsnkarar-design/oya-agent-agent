@@ -6,7 +6,7 @@ import { getRow, saveProject } from "../lib/db";
 import { takePending } from "../lib/pending";
 import { createProject, fmt } from "../lib/newproject";
 import { liveListen, pcmToBuffer, playBuffer, startRecording } from "../lib/audio";
-import { ApiError, speak, type ChatMsg } from "../lib/api";
+import { ApiError, health, speak, type ChatMsg } from "../lib/api";
 import { toast } from "../lib/toast";
 import { applyAction, captionLines, migrate, outDuration, type Action, type Aspect, type Project } from "../editor/model";
 import { Player } from "../editor/player";
@@ -66,6 +66,18 @@ export default function Editor() {
     return () => { if (u) URL.revokeObjectURL(u); };
   }, [id]);
 
+  /* tell the user up front if the AI can't work, and why */
+  useEffect(() => {
+    let off = false;
+    void health().then((h) => {
+      if (off || !h || h.ai) return;
+      const why = h.reason === "no_key" ? t.err_no_key : h.reason === "bad_key" ? t.err_bad_key
+        : h.reason === "no_credits" || h.reason === "key_limit_reached" ? t.err_no_credits : t.err_upstream;
+      setMsgs((m) => [...m, { role: "ai", text: t.ai_off_banner + why }]);
+    });
+    return () => { off = true; };
+  }, [t]);
+
   /* the player, once the video element has the file */
   useEffect(() => {
     if (!p || !url || !video.current || !canvas.current || player.current) return;
@@ -103,10 +115,19 @@ export default function Editor() {
 
   function errText(e: unknown) {
     if (e instanceof ApiError) {
-      if (e.code === "quota") return t.err_quota;
-      if (e.status === 402 || e.status === 503 || e.code === "ai_unavailable" || e.code === "not_configured") return t.err_ai_off;
+      const c = e.code;
+      if (c === "quota") return t.err_quota;
+      if (c === "no_key" || c === "not_configured") return t.err_no_key;
+      if (c === "bad_key") return t.err_bad_key;
+      if (c === "no_credits" || c === "ai_unavailable" || e.status === 402) return t.err_no_credits;
+      if (c === "busy") return t.err_busy;
+      if (c === "too_large") return t.err_too_large;
+      if (c === "upstream" || e.status >= 500) return t.err_upstream;
     }
+    if (e instanceof TypeError) return t.err_network; // fetch could not reach the site
     if (e instanceof Error && e.message === "no_speech") return lang === "ar" ? "مفيش كلام في الفيديو ده أدبلجه." : "There is no speech in this video to dub.";
+    if (e instanceof Error && /decode|audio/i.test(e.message)) return t.err_video;
+    console.error(e);
     return t.err_generic;
   }
 
