@@ -109,8 +109,10 @@ export async function voiceover(p: Project, text: string, at: number, voice: str
   onStep("step_voice", 0);
   const r = await speak(text.slice(0, 1000), voice, tone || "Clear, warm, natural voice-over narration.");
   onStep(null);
-  const t = Math.max(0, Math.min(outDuration(p) - 0.2, at));
-  const clip: DubClip = { t, dur: r.pcm.byteLength / 2 / r.rate, text, pcm: r.pcm, rate: r.rate };
+  const dur = r.pcm.byteLength / 2 / r.rate;
+  // "at the end" means finishing before the video ends, so pull the line back far enough to be heard in full
+  const t = Math.max(0, Math.min(outDuration(p) - dur - 0.15, at));
+  const clip: DubClip = { t, dur, text, pcm: r.pcm, rate: r.rate };
   return { ...p, edited: true, vo: [...(p.vo ?? []), clip].sort((a, b) => a.t - b.t) };
 }
 
