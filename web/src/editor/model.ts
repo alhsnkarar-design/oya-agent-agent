@@ -331,3 +331,93 @@ export function summary(p: Project) {
     transcript,
   };
 }
+
+/* ---------- professional finish ---------- */
+
+/** Sentence starts in output time (for zooms, transitions and key moments). */
+function sentenceStarts(p: Project): number[] {
+  const out: number[] = [];
+  let prevEnd = -1, startNext = true;
+  for (const w of p.words) {
+    const s = srcToOut(p, w.s);
+    if (s === null) continue;
+    if (startNext || (prevEnd >= 0 && s - prevEnd > 0.5)) out.push(s);
+    startNext = ENDS.test(w.w);
+    prevEnd = srcToOut(p, Math.max(w.s, w.e - 0.01)) ?? s;
+  }
+  return out;
+}
+
+/** Picks times at least `gap` apart from a sorted list. */
+function spaced(ts: number[], gap: number, max: number, from = 0, to = Infinity) {
+  const out: number[] = [];
+  for (const t of ts) if (t >= from && t <= to && (!out.length || t - out[out.length - 1] >= gap)) { out.push(t); if (out.length >= max) break; }
+  return out;
+}
+
+/**
+ * Makes sure an automatic edit always has the full professional treatment, whatever the AI returned:
+ * hook title with motion graphics, word-by-word captions, punch-in zooms, transitions on the cuts,
+ * tasteful visual effects, natural sound effects (never music), color and a cleaned-up voice.
+ * Anything the AI already set is kept.
+ */
+export function polish(p0: Project, lang: string): Project {
+  let p: Project = structuredClone(p0);
+  const D = outDuration(p);
+  if (D < 0.5) return p0;
+  const starts = sentenceStarts(p);
+  const hasSpeech = p.words.length > 0;
+
+  // 1) hook title in motion-graphics style
+  if (!p.overlays.length) {
+    const first = p.words.slice(0, 6).map((w) => w.w.replace(/[.،,!?؟…]+$/, "")).filter(Boolean);
+    const text = first.length >= 2 ? first.slice(0, Math.min(5, first.length)).join(" ") : (lang === "ar" ? "شوف ده" : "Watch this");
+    p = applyAction(p, { type: "add_title", text, start: 0, end: Math.min(D, 3.2), color: "gold", anim: "kinetic", position: "top", motion: true });
+  }
+  p.overlays = p.overlays.map((o, i) => (i === 0 && o.s < 1 ? { ...o, kind: "motion" as const } : o));
+
+  // 2) captions
+  if (hasSpeech && !p.captions.on) p = applyAction(p, { type: "captions", on: true, style: "karaoke", color: "gold" });
+
+  // 3) zooms: on sentence starts (or every few seconds without speech), alternating strength
+  if (p.zooms.length < 3) {
+    const pool = starts.length >= 3 ? starts : Array.from({ length: Math.floor(D / 3.5) }, (_, i) => 1.5 + i * 3.5);
+    const at = spaced(pool.filter((t) => t > 1.2 && t < D - 1), 3.2, 8);
+    at.forEach((t, i) => { if (!p.zooms.some((z) => Math.abs(z.t - t) < 1.5)) p.zooms.push({ t, d: 1.5, scale: i % 2 ? 1.18 : 1.12 }); });
+    p.zooms.sort((a, b) => a.t - b.t);
+  }
+
+  // 4) transitions on the strongest cut points (fallback: topic changes)
+  if (p.trans.length < 2) {
+    const pool = cutPoints(p).length >= 2 ? cutPoints(p) : starts.length ? starts : Array.from({ length: Math.floor(D / 6) }, (_, i) => 4 + i * 6);
+    const at = spaced(pool.filter((t) => t > 2 && t < D - 1.5), 5, 5);
+    at.forEach((t, i) => { if (!p.trans.some((x) => Math.abs(x.t - t) < 2)) p.trans.push({ t, kind: i % 3 === 2 ? "flash" : "whip" }); });
+    p.trans.sort((a, b) => a.t - b.t);
+  }
+
+  // 5) visual effects
+  if (p.fx.length < 2) {
+    const keep = p.fx;
+    p = applyAction(p, { type: "auto_effects" });
+    p.fx = [...keep, ...p.fx.filter((f) => !keep.some((k) => k.kind === f.kind && Math.abs(k.t - f.t) < 0.3))];
+    // a light shake on the strongest moment: the middle zoom
+    const z = p.zooms[Math.floor(p.zooms.length / 2)];
+    if (z && !p.fx.some((f) => f.kind === "shake")) p.fx.push({ t: z.t, d: 0.45, kind: "shake", k: 0.5 });
+  }
+
+  // 6) natural sound effects matched to everything above (never music)
+  const sfx: Sfx[] = [...p.sfx];
+  const near = (t: number, kind?: string) => sfx.some((x) => Math.abs(x.t - t) < 0.35 && (!kind || x.kind === kind));
+  for (const tr of p.trans) { const t = Math.max(0, tr.t - 0.25); if (!near(t)) sfx.push({ t, kind: tr.kind === "flash" ? "swipe" : "whoosh", vol: 0.42 }); }
+  for (const o of p.overlays) if (!near(o.s)) sfx.push({ t: o.s, kind: o.anim === "type" ? "typing" : "pop", vol: 0.38 });
+  for (const f of p.fx) if (f.kind === "shake" && !near(f.t)) sfx.push({ t: f.t, kind: "impact", vol: 0.35 });
+  p.zooms.forEach((z, i) => { if (i % 2 === 1 && !near(z.t)) sfx.push({ t: z.t, kind: "click", vol: 0.2 }); });
+  if (p.overlays.length && D > 6 && !near(Math.max(0, p.overlays[0].s - 0.9), "riser") && p.overlays[0].s > 1) sfx.push({ t: p.overlays[0].s - 0.9, kind: "riser", vol: 0.3 });
+  p.sfx = sfx.filter((x) => x.t < D).sort((a, b) => a.t - b.t);
+
+  // 7) color and voice
+  if (p.grade === "none") p.grade = "warm";
+  if (hasSpeech) p.enhance = true;
+  p.edited = true; p.updatedAt = Date.now();
+  return p;
+}

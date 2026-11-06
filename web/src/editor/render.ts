@@ -114,7 +114,28 @@ function drawOverlay(ctx: CanvasRenderingContext2D, o: Overlay, t: number, W: nu
     const lh = lines.length * base * 1.3 + base * 0.5;
     ctx.fillStyle = "rgba(10,10,12,0.72)"; roundRect(ctx, W / 2 - lw / 2, y0 - lh / 2, lw, lh, base * 0.35); ctx.fill();
   }
-  ctx.shadowColor = "rgba(0,0,0,0.55)"; ctx.shadowBlur = base * 0.35; ctx.shadowOffsetY = base * 0.06;
+  if (o.kind === "motion") {
+    // motion-graphics treatment: an accent bar that sweeps in under the title, corner brackets and a soft glow
+    const { lines } = layout(ctx, words, W * 0.84);
+    const tw = Math.max(...lines.map((l) => l.reduce((n, x) => n + x.width, 0))) + base * 0.4 * Math.max(0, (lines[0]?.length ?? 1) - 1);
+    const th = lines.length * base * 1.3;
+    const sweep = ease((t - o.s - 0.15) / 0.45);
+    ctx.save();
+    ctx.fillStyle = color; ctx.globalAlpha = k * 0.95;
+    const bw = tw * sweep, by = y0 + th / 2 + base * 0.18;
+    roundRect(ctx, W / 2 - bw / 2, by, Math.max(1, bw), base * 0.14, base * 0.07); ctx.fill();
+    const br = ease((t - o.s - 0.3) / 0.35) * base * 0.5;
+    if (br > 1) {
+      ctx.strokeStyle = color; ctx.lineWidth = base * 0.07; ctx.lineCap = "round";
+      const x0 = W / 2 - tw / 2 - base * 0.45, x1 = W / 2 + tw / 2 + base * 0.45, y1 = y0 - th / 2 - base * 0.2;
+      ctx.beginPath(); ctx.moveTo(x0, y1 + br); ctx.lineTo(x0, y1); ctx.lineTo(x0 + br, y1);
+      ctx.moveTo(x1, y1 + br); ctx.lineTo(x1, y1); ctx.lineTo(x1 - br, y1); ctx.stroke();
+    }
+    ctx.restore();
+    ctx.shadowColor = color; ctx.shadowBlur = base * 0.6 * (0.6 + 0.4 * Math.sin((t - o.s) * 4));
+  } else {
+    ctx.shadowColor = "rgba(0,0,0,0.55)"; ctx.shadowBlur = base * 0.35; ctx.shadowOffsetY = base * 0.06;
+  }
   drawWords(ctx, text, W / 2, y0, W * 0.84, base * 1.3, (i, x, y, _w, word) => {
     if (o.anim === "kinetic") {
       const wp = ease((t - o.s - i * 0.12) / 0.25);

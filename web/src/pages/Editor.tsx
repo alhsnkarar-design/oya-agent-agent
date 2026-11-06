@@ -10,7 +10,7 @@ import { ApiError, health, speak, type ChatMsg } from "../lib/api";
 import { toast } from "../lib/toast";
 import { applyAction, captionLines, migrate, outDuration, type Action, type Aspect, type Project } from "../editor/model";
 import { Player } from "../editor/player";
-import { autoEdit, command, voiceToText, type Step } from "../editor/ai";
+import { AUTO_INTENT, autoEdit, command, voiceToText, type Step } from "../editor/ai";
 import { describe } from "../editor/describe";
 import "./editor.css";
 
@@ -140,7 +140,8 @@ export default function Editor() {
     setMsgs((m) => [...m, ...(text ? [{ role: "user" as const, text }] : []), { role: "ai", text: "", live: "step_plan", at: started }]);
     const onStep = (s: Step | null, k?: number) => setMsgs((m) => { const c = [...m]; c[c.length - 1] = { ...c[c.length - 1], live: s, k }; return c; });
     try {
-      const r = opts.auto
+      const wantsAuto = opts.auto || (AUTO_INTENT.test(text) && !/(شيل|الغ|ألغ|رجّع|رجع|undo|remove|cancel)/i.test(text));
+      const r = wantsAuto
         ? await autoEdit(cur, file, lang, onStep, text)
         : await command(cur, file, history.current, text, lang, VOICE, onStep);
       const steps = describe(cur, r.p, lang);

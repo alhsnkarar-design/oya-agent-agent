@@ -13,8 +13,8 @@ const TTS_MODELS = ["google/gemini-3.8-flash-lite-tts", "google/gemini-3.8-flash
 
 // Until payments open, signed-in users get a trial allowance per month and guests a small one per day.
 const LIMITS = {
-  guest: { stt: 240, tts: 700, chat: 15 },
-  trial: { stt: 900, tts: 3000, chat: 60 },
+  guest: { stt: 900, tts: 4000, chat: 60 },
+  trial: { stt: 3600, tts: 15000, chat: 300 },
 };
 
 const SEC = { "X-Content-Type-Options": "nosniff", "Referrer-Policy": "strict-origin-when-cross-origin", "Permissions-Policy": "camera=(), geolocation=(), microphone=(self)" };
@@ -212,7 +212,8 @@ function systemPrompt(mode, lang) {
   if (mode === "auto_edit") {
     return base + "\n\nTask: plan a professional human-quality edit of this video. Silences are already cut. Return actions that: " +
       "cut filler words, false starts and repeated takes with remove_phrases (only clear cases); " +
-      "add a short hook title (max 6 words, in the video's language) at the start with add_title (position top, anim pop or kinetic, color gold); " +
+      "add a short hook title (max 6 words, in the video's language) at the start with add_title (position top, anim kinetic, color gold, motion true); " +
+      "add 1 to 3 more motion-graphics titles for the key phrases or numbers later in the video (add_title with motion true, anim pop or slide, box true, 2 to 3 seconds each, position center or bottom); " +
       "turn captions on (karaoke, gold) unless the user said otherwise; " +
       "add 3 to 8 add_zoom on emphasised moments (scale 1.1-1.2); add_transition (whip or flash) at the 2 to 5 biggest topic changes; " +
       "add_sfx: whoosh just before each transition, pop when the title appears, a light impact on the strongest moment; " +
@@ -276,6 +277,7 @@ async function chat(request, env, me) {
   await add(env, me, "chat", 1);
   if (mode === "translate") return json({ reply: "", actions: [], lines: Array.isArray(out.lines) ? out.lines.map(String) : [] });
   const actions = Array.isArray(out.actions) ? out.actions.filter(function (a) { return a && typeof a.type === "string"; }).slice(0, 80) : [];
+  console.log("chat " + mode + " -> " + actions.length + " actions: " + actions.map(function (a) { return a.type; }).join(","));
   return json({ reply: typeof out.reply === "string" ? out.reply : "", actions: actions });
 }
 

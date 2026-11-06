@@ -31,7 +31,8 @@ export function describe(a: Project, b: Project, lang: string): string[] {
   if (b.trans.length > a.trans.length) out.push(ar ? `ضفت ${b.trans.length - a.trans.length} انتقال` : `Added ${b.trans.length - a.trans.length} transitions`);
   if (b.sfx.length !== a.sfx.length) out.push(ar ? `مؤثرات صوتية طبيعية · ${b.sfx.length}` : `Natural sound effects · ${b.sfx.length}`);
   if (a.aspect !== b.aspect) out.push(ar ? `المقاس ${b.aspect}` : `Resized to ${b.aspect}`);
-  if (a.grade !== b.grade) out.push(ar ? `الألوان: ${b.grade}` : `Color: ${b.grade}`);
+  const GR: Record<string, string> = { none: "طبيعي", warm: "دافية", cool: "باردة", cinematic: "سينمائية", vivid: "زاهية", bw: "أبيض وأسود", fade: "باهتة ناعمة" };
+  if (a.grade !== b.grade) out.push(ar ? `الألوان: ${GR[b.grade] ?? b.grade}` : `Color: ${b.grade}`);
   if (!a.dub && b.dub) out.push(ar ? `دبلجة لـ${b.dub.lang} · ${b.dub.clips.length} جملة` : `Dubbed to ${b.dub.lang} · ${b.dub.clips.length} lines`);
   const fa = a.fx ?? [], fb = b.fx ?? [];
   if (fb.length !== fa.length) out.push(fb.length > fa.length ? (ar ? `مؤثرات بصرية · ${fb.length}` : `Visual effects · ${fb.length}`) : (ar ? "شلت مؤثرات بصرية" : "Removed visual effects"));

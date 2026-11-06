@@ -1,7 +1,7 @@
 // Zifidit.Ai orchestration: transcription, automatic editing, commands, translation and dubbing.
-import { chat, speak, transcribe, type ChatMsg, type Word } from "../lib/api";
+import { ApiError, chat, speak, transcribe, type ChatMsg, type Word } from "../lib/api";
 import { blobToWav16k, chunk16k, decodeFile, findSilences, toMono16k, wavBlob } from "../lib/audio";
-import { ASYNC_ACTIONS, applyAction, captionLines, outDuration, srcToOut, summary, type Action, type CapLine, type DubClip, type Project } from "./model";
+import { ASYNC_ACTIONS, applyAction, captionLines, outDuration, polish, srcToOut, summary, type Action, type CapLine, type DubClip, type Project } from "./model";
 
 export type Step = "step_audio" | "step_transcribe" | "step_plan" | "step_apply" | "step_translate" | "step_voice";
 export type OnStep = (s: Step | null, k?: number) => void;
@@ -38,19 +38,31 @@ export async function autoEdit(p: Project, file: Blob, lang: string, onStep: OnS
   onStep("step_apply");
   p = applyAction(p, { type: "cut_silences", min_gap: 0.4 });
   onStep("step_plan");
-  const r = await chat({ mode: "auto_edit", lang, project: summary(p), messages: [{ role: "user", content: extra || "Auto edit this video like a professional human editor." }] });
+  let r: { reply: string; actions: unknown[] };
+  try {
+    r = await chat({ mode: "auto_edit", lang, project: summary(p), messages: [{ role: "user", content: extra || "Auto edit this video like a professional human editor." }] });
+  } catch (e) {
+    // without a working key or credit nothing can be done; for a passing hiccup, still deliver the full finish below
+    if (e instanceof ApiError && ["no_key", "bad_key", "no_credits", "not_configured"].includes(e.code)) throw e;
+    r = { reply: "", actions: [] };
+  }
   onStep("step_apply");
   p = apply(p, r.actions as Action[]);
+  // the AI may also ask for narration, dubbing or translated captions as part of the edit
   for (const a of r.actions as Action[]) {
-    if (a.type === "voiceover" && typeof a.text === "string" && a.text.trim()) {
-      try { p = await voiceover(p, a.text, Number(a.at) || 0, typeof a.voice === "string" ? a.voice : "Kore", typeof a.tone === "string" ? a.tone : "", onStep); } catch { /* narration is optional in an auto edit */ }
-    }
+    try {
+      if (a.type === "voiceover" && typeof a.text === "string" && a.text.trim()) p = await voiceover(p, a.text, Number(a.at) || 0, typeof a.voice === "string" ? a.voice : "Kore", typeof a.tone === "string" ? a.tone : "", onStep);
+      else if (a.type === "dub") p = await dub(p, file, String(a.language ?? "English"), typeof a.voice === "string" ? a.voice : "Kore", lang, onStep);
+      else if (a.type === "translate_captions") p = await translateCaptions(p, file, String(a.language ?? "English"), lang, onStep);
+    } catch (e) { if (a.type === "dub") throw e; /* narration and translation are optional extras */ }
   }
-  if (!p.fx.length) p = applyAction(p, { type: "auto_effects" });
-  if (!p.captions.on && p.words.length) p = applyAction(p, { type: "captions", on: true });
-  if (!p.sfx.length) p = applyAction(p, { type: "auto_sfx" });
+  // always finish like a professional editor: motion title, captions, zooms, transitions, effects, natural sounds, color, voice
+  p = polish(p, lang);
   onStep(null);
-  return { p, reply: r.reply };
+  const reply = r.reply || (lang === "ar"
+    ? "خلصت المونتاج: قصّيت السكتات، وحطيت عنوان موشن وكابشن كلمة كلمة، وزووم وانتقالات ومؤثرات بصرية وأصوات طبيعية، وظبطت الألوان والصوت."
+    : "Done: cut the pauses, added a motion title, word-by-word captions, zooms, transitions, visual effects, natural sounds, color and a cleaner voice.");
+  return { p, reply };
 }
 
 async function translateLines(lines: string[], target: string, lang: string, onStep: OnStep) {
@@ -119,6 +131,9 @@ export async function voiceover(p: Project, text: string, at: number, voice: str
 export type CommandResult = { p: Project; reply: string };
 
 /** A free-form command from the user (text or transcribed voice). */
+/** Requests that clearly mean "edit the whole video for me". */
+export const AUTO_INTENT = /(مونتاج|منتج|منتاج|منتجه|منتجة|مَنتِج|عدّله كله|عدله كله|ظبطه كله|تلقائي|auto[\s-]?edit|edit (it|this|the video|my video)|full edit|make it professional)/i;
+
 export async function command(p: Project, file: Blob, history: ChatMsg[], text: string, lang: string, voice: string, onStep: OnStep): Promise<CommandResult> {
   // the assistant needs the words for most edits; transcribe first if this video has speech we haven't read yet
   if (!p.transcribed) p = await ensureTranscript(p, file, onStep);
