@@ -1,4 +1,4 @@
-// Tiny path router: /, /pricing, /editor, /projects, /login.
+// Tiny path router: /, /pricing, /editor, /projects, /works, /login.
 import { useSyncExternalStore } from "react";
 
 const subs = new Set<() => void>();

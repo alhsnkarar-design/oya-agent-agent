@@ -9,7 +9,7 @@ export function Nav() {
   const inApp = path === "/editor" || path === "/projects";
   const links = inApp
     ? [{ to: "/", l: t.nav_home }, { to: "/editor", l: t.nav_editor }, { to: "/projects", l: t.nav_projects }, { to: "/pricing", l: t.nav_pricing }]
-    : [{ to: "/#features", l: t.nav_features }, { to: "/pricing", l: t.nav_pricing }, { to: "/#faq", l: t.nav_faq }];
+    : [{ to: "/#features", l: t.nav_features }, { to: "/works", l: t.nav_works }, { to: "/pricing", l: t.nav_pricing }, { to: "/#faq", l: t.nav_faq }];
   return (
     <header className="nav">
       <div className="wrap row">

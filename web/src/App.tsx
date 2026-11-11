@@ -5,6 +5,7 @@ import { Home } from "./pages/Home";
 import { Pricing } from "./pages/Pricing";
 import { Login } from "./pages/Login";
 import { Projects } from "./pages/Projects";
+import { Works } from "./pages/Works";
 import { useToast } from "./lib/toast";
 import { useT } from "./i18n";
 
@@ -18,6 +19,7 @@ export function App() {
     path === "/pricing" ? <Pricing /> :
     path === "/login" ? <Login /> :
     path === "/projects" ? <Projects /> :
+    path === "/works" ? <Works /> :
     path === "/editor" ? <Suspense fallback={<div style={{ minHeight: "60vh" }} />}><Editor /></Suspense> :
     <Home />;
   return (

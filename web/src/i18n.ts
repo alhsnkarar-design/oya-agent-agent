@@ -4,7 +4,7 @@ import { useSyncExternalStore } from "react";
 export type Lang = "ar" | "en";
 
 const ar = {
-  nav_features: "المميزات", nav_pricing: "الأسعار", nav_faq: "أسئلة", nav_home: "الرئيسية", nav_editor: "المحرر", nav_projects: "مشاريعي",
+  nav_features: "المميزات", nav_pricing: "الأسعار", nav_faq: "أسئلة", nav_home: "الرئيسية", nav_editor: "المحرر", nav_projects: "مشاريعي", nav_works: "أعمالي",
   login: "دخول", get_started: "ابدأ", logout: "خروج", lang_switch: "EN",
   hero_title_a: "عدّل أي فيديو", hero_title_b: "بكلمة", hero_title_c: "منك.",
   hero_sub: "ارفع الفيديو الخام، واطلب اللي عايزه. Zifidit.Ai يعمل المونتاج والكابشن والموشن جرافيكس والدبلجة.",
@@ -65,7 +65,7 @@ const ar = {
 type Dict = typeof ar;
 
 const en: Dict = {
-  nav_features: "Features", nav_pricing: "Pricing", nav_faq: "FAQ", nav_home: "Home", nav_editor: "Project editor", nav_projects: "Projects",
+  nav_features: "Features", nav_pricing: "Pricing", nav_faq: "FAQ", nav_home: "Home", nav_editor: "Project editor", nav_projects: "Projects", nav_works: "My work",
   login: "Log in", get_started: "Get started", logout: "Log out", lang_switch: "عربي",
   hero_title_a: "Edit any video", hero_title_b: "just by", hero_title_c: "asking.",
   hero_sub: "Upload raw footage. Describe the cut. Zifidit.Ai handles editing, captions, motion graphics and dubbing.",
