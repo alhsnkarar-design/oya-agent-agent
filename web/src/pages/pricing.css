@@ -1,0 +1,34 @@
+.pricing { padding-block: clamp(30px, 5vw, 60px) 90px; display: grid; gap: 28px; justify-items: center; }
+.ptitle { text-align: center; font-size: clamp(2.4rem, 5.6vw, 4.6rem); }
+.bar { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; justify-content: center; }
+.seg { display: inline-flex; padding: 5px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--panel); }
+.seg button { height: 44px; padding: 0 24px; border-radius: 999px; border: 0; background: transparent; font-weight: 600; color: var(--ink-2); }
+.seg button.on { background: var(--ink); color: #121212; }
+.bar .div { width: 1px; height: 32px; background: var(--line-2); }
+.bar .note { color: var(--ink-2); font-size: 1.05rem; }
+.promo { display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 22px; border-radius: 999px; background: var(--amber); color: var(--amber-ink); font-weight: 600; }
+.plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; width: 100%; max-width: 1380px; }
+.plan { padding: 28px 24px 24px; display: grid; gap: 14px; align-content: start; border-radius: 26px; }
+.plan.best { border: 2px solid var(--amber); box-shadow: 0 30px 70px -40px rgba(245,165,36,.6); }
+.plan .head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.plan h2 { margin: 0; font: 500 2.2rem/1.1 var(--f-display); }
+.badge { padding: 6px 14px; border-radius: 99px; background: var(--amber); color: var(--amber-ink); font-weight: 600; font-size: .9rem; }
+.price { margin: 4px 0 0; display: flex; align-items: baseline; gap: 8px; }
+.price span { font: 600 clamp(2.6rem, 4vw, 3.4rem)/1 var(--f-body); letter-spacing: -.02em; }
+.price small { color: var(--ink-3); font-size: 1.25rem; }
+.yr { margin: -6px 0 0; color: var(--ink-3); }
+.plan ul { list-style: none; padding: 0; margin: 4px 0 10px; display: grid; gap: 12px; font-size: 1.08rem; color: var(--ink-2); }
+.plan li { display: flex; gap: 12px; align-items: center; }
+.plan li .ico { color: var(--ink-2); }
+.btn.full { width: 100%; height: 54px; font-size: 1.1rem; border-radius: 14px; }
+.extra { width: 100%; max-width: 1380px; display: flex; align-items: center; gap: 18px; padding: 20px 26px; }
+.extra strong { font-size: 1.25rem; }
+.extra .grow { flex: 1; }
+.pfaq { width: 100%; max-width: 1380px; display: grid; gap: 0; }
+.pfaq details { border-radius: 0; padding: 0 26px; }
+.pfaq details:first-child { border-radius: 18px 18px 0 0; }
+.pfaq details:last-child { border-radius: 0 0 18px 18px; border-top: 0; }
+.pfaq summary { list-style: none; display: flex; justify-content: space-between; align-items: center; padding-block: 20px; font-weight: 600; font-size: 1.15rem; cursor: pointer; }
+.pfaq summary::-webkit-details-marker { display: none; }
+.pfaq p { margin: 0 0 20px; color: var(--ink-2); }
+@media (max-width: 960px) { .plans { grid-template-columns: 1fr; max-width: 560px; } .bar .div { display: none; } .extra { flex-wrap: wrap; } }

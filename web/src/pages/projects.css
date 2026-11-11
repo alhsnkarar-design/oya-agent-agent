@@ -1,0 +1,15 @@
+.projects { padding-block: 40px 80px; display: grid; gap: 14px; }
+.projects .head { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.projects .h2 { margin: 0; }
+.empty { padding: 30px; text-align: center; color: var(--ink-2); }
+.pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.pcard { overflow: hidden; display: grid; }
+.pcard .open { position: relative; border: 0; padding: 0; background: #000; aspect-ratio: 16 / 9; display: grid; place-items: center; }
+.pcard img { width: 100%; height: 100%; object-fit: cover; }
+.pcard .ph { color: var(--ink-3); }
+.pcard .time { position: absolute; bottom: 10px; inset-inline-end: 10px; padding: 3px 8px; border-radius: 8px; background: rgba(10,10,12,.75); font-size: .85rem; }
+.pcard .tag { position: absolute; top: 10px; inset-inline-start: 10px; padding: 4px 10px; border-radius: 99px; font-size: .8rem; font-weight: 600; color: var(--amber); border: 1px solid var(--amber); background: rgba(10,10,12,.7); }
+.pcard .meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; }
+.pcard .meta strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.del { border: 0; background: none; color: var(--ink-3); width: 34px; height: 34px; border-radius: 8px; }
+.del:hover { color: var(--bad); background: var(--panel-2); }
