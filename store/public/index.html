@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>متجر Zifidit</title>
+<meta name="description" content="متجر Zifidit: تسوّق بثقة، دفع عند الاستلام، شحن لكل المحافظات، واسترجاع خلال 14 يوماً.">
+<meta name="theme-color" content="#F4F3EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E0F13" media="(prefers-color-scheme: dark)">
+<meta property="og:title" content="متجر Zifidit">
+<meta property="og:description" content="تسوّق بثقة: دفع عند الاستلام، شحن لكل المحافظات، واسترجاع خلال 14 يوماً.">
+<meta property="og:type" content="website">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/styles.css">
+<script>try{var t=localStorage.getItem('zf-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<a class="skip" href="#main">تخطَّ إلى المحتوى</a>
+
+<div class="announce"><div class="wrap announce-in" id="announce"></div></div>
+
+<header class="site-head">
+  <div class="wrap head-in">
+    <button class="icon-btn only-mobile" id="menuBtn" aria-label="القائمة" aria-expanded="false">
+      <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+    </button>
+    <a href="/" class="logo" data-link aria-label="Zifidit الرئيسية">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14"/><path d="M18 19h28L23 45h23"/></svg>
+      <span>zifidit</span>
+    </a>
+    <nav class="main-nav" id="mainNav" aria-label="القائمة الرئيسية">
+      <a href="/" data-link data-nav="home">الرئيسية</a>
+      <a href="/shop" data-link data-nav="shop">المتجر</a>
+      <a href="/about" data-link data-nav="about">من نحن</a>
+      <a href="/track" data-link data-nav="track">تتبّع طلبك</a>
+      <a href="/contact" data-link data-nav="contact">تواصل معنا</a>
+    </nav>
+    <div class="head-actions">
+      <button class="icon-btn" id="searchBtn" aria-label="بحث">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>
+      </button>
+      <button class="icon-btn hide-xs" id="themeBtn" aria-label="تبديل المظهر">
+        <svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+      </button>
+      <a href="/wishlist" data-link class="icon-btn" aria-label="المفضّلة">
+        <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/></svg>
+        <span class="badge" id="wishCount" hidden>0</span>
+      </a>
+      <button class="icon-btn cart-btn" id="cartBtn" aria-label="سلة التسوق">
+        <svg viewBox="0 0 24 24"><path d="M5 7h14l-1.2 11.1a2 2 0 0 1-2 1.9H8.2a2 2 0 0 1-2-1.9L5 7Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg>
+        <span class="badge" id="cartCount" hidden>0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main" tabindex="-1"></main>
+
+<section class="newsletter" aria-labelledby="nlTitle">
+  <div class="wrap nl-in">
+    <div>
+      <p class="eyebrow">النشرة البريدية</p>
+      <h2 id="nlTitle">كن أول من يعرف بالوصول الجديد</h2>
+      <p class="muted">رسالة واحدة عند نزول منتجات جديدة أو عروض خاصة. بدون إزعاج، وتقدر تلغي الاشتراك في أي وقت.</p>
+    </div>
+    <form class="nl-form" id="nlForm" novalidate>
+      <label class="sr" for="nlEmail">البريد الإلكتروني</label>
+      <input id="nlEmail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="بريدك الإلكتروني" dir="ltr" required>
+      <button class="btn btn-primary" type="submit">اشترك</button>
+      <p class="form-msg" id="nlMsg" role="status"></p>
+    </form>
+  </div>
+</section>
+
+<footer class="site-foot">
+  <div class="wrap foot-grid">
+    <div class="foot-brand">
+      <a href="/" data-link class="logo">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14"/><path d="M18 19h28L23 45h23"/></svg>
+        <span>zifidit</span>
+      </a>
+      <p class="muted">متجر Zifidit. منتجات مختارة بعناية، تسعير واضح، وخدمة تردّ عليك فعلاً.</p>
+    </div>
+    <div>
+      <h3>تسوّق</h3>
+      <a href="/shop" data-link>كل المنتجات</a>
+      <a href="/wishlist" data-link>المفضّلة</a>
+      <a href="/cart" data-link>سلة التسوق</a>
+      <a href="/track" data-link>تتبّع طلبك</a>
+    </div>
+    <div>
+      <h3>المساعدة</h3>
+      <a href="/shipping" data-link>الشحن والتوصيل</a>
+      <a href="/returns" data-link>الاسترجاع والاستبدال</a>
+      <a href="/faq" data-link>الأسئلة الشائعة</a>
+      <a href="/contact" data-link>تواصل معنا</a>
+    </div>
+    <div>
+      <h3>عن المتجر</h3>
+      <a href="/about" data-link>من نحن</a>
+      <a href="/privacy" data-link>سياسة الخصوصية</a>
+      <a href="/terms" data-link>الشروط والأحكام</a>
+    </div>
+  </div>
+  <div class="wrap foot-bottom">
+    <p>© <span id="year"></span> Zifidit. جميع الحقوق محفوظة.</p>
+    <div class="pay-marks" aria-label="طرق الدفع">
+      <span>الدفع عند الاستلام</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Cart drawer -->
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="cartDrawer" aria-label="سلة التسوق" aria-hidden="true">
+  <div class="drawer-head">
+    <h2>سلة التسوق</h2>
+    <button class="icon-btn" id="cartClose" aria-label="إغلاق"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot" id="drawerFoot"></div>
+</aside>
+
+<!-- Search -->
+<div class="search-layer" id="searchLayer" hidden>
+  <div class="wrap search-box">
+    <div class="search-row">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg>
+      <label class="sr" for="searchInput">ابحث في المتجر</label>
+      <input id="searchInput" type="search" placeholder="ابحث عن منتج…" autocomplete="off">
+      <button class="icon-btn" id="searchClose" aria-label="إغلاق البحث"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div id="searchResults" class="search-results"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="/app.js" defer></script>
+</body>
+</html>
