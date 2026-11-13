@@ -1,0 +1,40 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@800&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:transparent}
+.c{width:1080px;height:1080px;position:relative;overflow:hidden}
+svg{position:absolute;inset:0}
+.word{position:absolute;left:0;right:0;text-align:center;font:800 150px/1 "Plus Jakarta Sans",sans-serif;letter-spacing:-6px}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF4D8D"/><stop offset=".52" stop-color="#B145E8"/><stop offset="1" stop-color="#6C3BFF"/></linearGradient>
+<symbol id="spark" viewBox="-50 -50 100 100"><path d="M0-50C4-14 14-4 50 0 14 4 4 14 0 50-4 14-14 4-50 0-14-4-4-14 0-50Z"/></symbol>
+</defs></svg>
+
+<!-- A: gradient, white Z with spin ring -->
+<div class="c" id="a"><svg viewBox="0 0 1080 1080">
+<rect width="1080" height="1080" fill="url(#g)"/>
+<circle cx="540" cy="540" r="330" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="22"/>
+<path d="M 540 210 A 330 330 0 0 1 864 474" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round"/>
+<path d="M 216 606 A 330 330 0 0 1 300 314" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round" stroke-opacity=".7"/>
+<path d="M392 400H688L392 690H688" fill="none" stroke="#fff" stroke-width="96" stroke-linecap="round" stroke-linejoin="round"/>
+<use href="#spark" x="640" y="270" width="96" height="96" fill="#fff"/>
+<use href="#spark" x="716" y="338" width="40" height="40" fill="#fff" opacity=".85"/>
+</svg></div>
+
+<!-- B: white, gradient Z + wordmark -->
+<div class="c" id="b"><svg viewBox="0 0 1080 1080">
+<rect width="1080" height="1080" fill="#fff"/>
+<rect x="390" y="290" width="300" height="300" rx="84" fill="url(#g)"/>
+<path d="M476 378H604L476 504H604" fill="none" stroke="#fff" stroke-width="46" stroke-linecap="round" stroke-linejoin="round"/>
+<use href="#spark" x="636" y="256" width="76" height="76" fill="#141414"/>
+</svg><div class="word" style="top:670px;color:#141414">zifidit</div></div>
+
+<!-- C: black, white Z, gradient spark -->
+<div class="c" id="c"><svg viewBox="0 0 1080 1080">
+<rect width="1080" height="1080" fill="#141414"/>
+<path d="M380 390H700L380 700H700" fill="none" stroke="#fff" stroke-width="104" stroke-linecap="round" stroke-linejoin="round"/>
+<use href="#spark" x="700" y="230" width="150" height="150" fill="url(#g)"/>
+
+</svg></div>
+</body></html>
