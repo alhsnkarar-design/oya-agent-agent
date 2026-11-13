@@ -1,6 +1,6 @@
 /* Zifidit Store — client app.
    The catalog lives in /products.json and is intentionally empty. To add a product, append e.g.:
-   { "id": "zf-001", "name": "Product name", "price": 21.64, "compareAt": 39.99, "category": "Home & Living",
+   { "id": "zf-001", "name": "Product name", "price": 21.64, "compareAt": 39.99, "category": "Smart Home",
      "images": ["/img/zf-001-1.webp", "/img/zf-001-2.webp"], "description": "Short description.",
      "details": ["Bullet one", "Bullet two"], "rating": 4.8, "reviews": 21, "stock": 50, "badge": "-45%" }  */
 (function () {
@@ -16,9 +16,9 @@
     payments: ['VISA', 'Mastercard', 'AMEX', 'Discover', 'PayPal', 'Apple Pay', 'Google Pay'],
     collections: [
       { name: 'New In', text: 'Fresh drops, first.', href: '/new', glyph: 'spark' },
-      { name: 'Home & Living', text: 'Make every room work harder.', href: '/shop?c=Home%20%26%20Living', glyph: 'home' },
-      { name: 'Smart Gadgets', text: 'Small tools, big upgrades.', href: '/shop?c=Smart%20Gadgets', glyph: 'bolt' },
-      { name: 'Self Care', text: 'Everyday rituals, elevated.', href: '/shop?c=Self%20Care', glyph: 'drop' }
+      { name: 'Smart Home', text: 'Connected devices for every room.', href: '/shop?c=Smart%20Home', glyph: 'home' },
+      { name: 'Phone & Charging', text: 'Power, cases and accessories.', href: '/shop?c=Phone%20%26%20Charging', glyph: 'bolt' },
+      { name: 'Wearables & Audio', text: 'Smartwatches, earbuds and more.', href: '/shop?c=Wearables%20%26%20Audio', glyph: 'watch' }
     ]
   };
 
@@ -108,7 +108,7 @@
     spark: '<svg class="glyph" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 8c4 22 20 38 42 42-22 4-38 20-42 42-4-22-20-38-42-42 22-4 38-20 42-42Z"/><circle cx="82" cy="18" r="6"/></svg>',
     home: '<svg class="glyph" viewBox="0 0 100 100" aria-hidden="true"><path d="M14 46 50 16l36 30v40H14z"/><path d="M40 86V60h20v26"/><circle cx="50" cy="40" r="5"/></svg>',
     bolt: '<svg class="glyph" viewBox="0 0 100 100" aria-hidden="true"><rect x="22" y="10" width="56" height="82" rx="12"/><path d="M54 26 38 54h14l-6 22 18-30H50z"/></svg>',
-    drop: '<svg class="glyph" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 8C36 30 22 44 22 62a28 28 0 0 0 56 0C78 44 64 30 50 8Z"/><path d="M36 64a14 14 0 0 0 14 14"/></svg>'
+    watch: '<svg class="glyph" viewBox="0 0 100 100" aria-hidden="true"><path d="M36 22l4-14h20l4 14M36 78l4 14h20l4-14"/><rect x="24" y="22" width="52" height="56" rx="14"/><path d="M50 36v14l9 6"/></svg>'
   };
   function empty(art, title, text, actions) {
     return '<div class="empty">' + ART[art] + '<h3>' + title + '</h3><p>' + text + '</p>' + (actions ? '<div class="actions">' + actions + '</div>' : '') + '</div>';
@@ -154,8 +154,8 @@
     '<section class="hero"><div class="wrap hero-in">' +
       '<div>' +
         '<p class="eyebrow">New season · ' + new Date().getFullYear() + '</p>' +
-        '<h1>Everyday essentials, <span class="grad">made smarter.</span></h1>' +
-        '<p class="hero-sub">Thoughtfully chosen products that save you time and simply work. Dispatched in under ' + STORE.dispatchDays + ' days, with ' + STORE.returnDays + '-day returns on every order.</p>' +
+        '<h1>Smart gadgets that <span class="grad">make life easier.</span></h1>' +
+        '<p class="hero-sub">Electronics and smart devices we test before we sell, so they simply work. Dispatched in under ' + STORE.dispatchDays + ' days, with ' + STORE.returnDays + '-day returns on every order.</p>' +
         '<div class="hero-cta"><a class="btn btn-dark" href="/shop" data-link>Shop now ' + I.arrow + '</a><a class="btn btn-line" href="/about" data-link>Our story</a></div>' +
         '<div class="hero-meta"><span>' + I.check + 'Free shipping</span><span>' + I.check + STORE.returnDays + '-day returns</span><span>' + I.check + 'Secure checkout</span></div>' +
       '</div>' +
@@ -342,7 +342,7 @@
   };
 
   var PROSE = {
-    about: ['About Us', '<p>Zifidit started with a simple idea: everyday products should make life easier, not more complicated. We search for smart, well-made essentials, test them ourselves, and only list the ones we’d happily use at home.</p><h2>What we promise</h2><ul><li>Dispatch in under ' + STORE.dispatchDays + ' days, with tracking on every order.</li><li>Honest descriptions and real photos.</li><li>No minimum order and no hidden fees.</li><li>' + STORE.returnDays + '-day returns if something isn’t right.</li></ul>'],
+    about: ['About Us', '<p>Zifidit started with a simple idea: technology should make life easier, not more complicated. We search for smart, well-made gadgets and electronics, test them ourselves, and only list the ones we’d happily use at home.</p><h2>What we promise</h2><ul><li>Dispatch in under ' + STORE.dispatchDays + ' days, with tracking on every order.</li><li>Honest descriptions and real photos.</li><li>No minimum order and no hidden fees.</li><li>' + STORE.returnDays + '-day returns if something isn’t right.</li></ul>'],
     shipping: ['Shipping Policy', '<ul><li>Orders are processed and dispatched within ' + STORE.dispatchDays + ' business days.</li><li>Standard shipping is free on every order.</li><li>Typical delivery time is 7–15 business days depending on destination.</li><li>You’ll receive a tracking number by email as soon as your order ships.</li><li>Import duties or taxes, where applicable, are the responsibility of the customer.</li></ul>'],
     returns: ['Return Policy', '<ul><li>You can return any item within ' + STORE.returnDays + ' days of delivery.</li><li>Items must be unused and in their original packaging.</li><li>If an item arrives damaged or not as described, we cover return shipping and send a replacement or full refund.</li><li>Refunds are issued to your original payment method within 5–10 business days of receiving the return.</li><li>To start a return, <a href="/contact" data-link>contact us</a> with your order number.</li></ul>'],
     privacy: ['Privacy Policy', '<p>We only collect what we need to process and deliver your order: your name, email, phone and shipping address.</p><ul><li>We never sell your personal data.</li><li>We share it only with payment and shipping partners to complete your order.</li><li>Your bag, wishlist and browsing history are stored in your own browser.</li><li>You can ask us to delete your data at any time through the contact page.</li></ul>'],
@@ -380,7 +380,7 @@
     if (r.name === 'shop' && c !== null) shopState.cat = c;
     main.innerHTML = pages[r.name](r.arg);
     var p = r.name === 'product' && byId(r.arg);
-    document.title = r.name === 'home' ? 'Zifidit — Everyday essentials, made smarter' : (p ? p.name : TITLES[r.name]) + ' — Zifidit';
+    document.title = r.name === 'home' ? 'Zifidit — Smart Gadgets & Electronics' : (p ? p.name : TITLES[r.name]) + ' — Zifidit';
     $$('.main-nav a').forEach(function (a) { if (a.dataset.nav === r.name) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     document.body.classList.remove('has-bar');
     bind(r);
