@@ -1,0 +1,13 @@
+{
+  "note": "Fallback catalog used only until the AliExpress affiliate API keys are set. Replace with your own picks (tools/import_csv.py) or set the keys for live search across millions of products.",
+  "products": [
+    { "id": "s1", "title": "Wireless earbuds (Bluetooth 5.3)", "category": "Electronics", "q": "wireless earbuds bluetooth 5.3" },
+    { "id": "s2", "title": "Smart watch with heart-rate monitor", "category": "Watches", "q": "smart watch heart rate" },
+    { "id": "s3", "title": "Portable blender (USB rechargeable)", "category": "Home & Kitchen", "q": "portable blender usb" },
+    { "id": "s4", "title": "Magnetic car phone holder", "category": "Car", "q": "magnetic car phone holder" },
+    { "id": "s5", "title": "LED ring light with tripod", "category": "Electronics", "q": "led ring light tripod" },
+    { "id": "s6", "title": "Resistance bands set", "category": "Sports", "q": "resistance bands set" },
+    { "id": "s7", "title": "Electric facial cleansing brush", "category": "Beauty", "q": "facial cleansing brush electric" },
+    { "id": "s8", "title": "Self-cleaning pet grooming brush", "category": "Pets", "q": "pet grooming brush self cleaning" }
+  ]
+}

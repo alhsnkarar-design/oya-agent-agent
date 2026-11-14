@@ -1,0 +1,26 @@
+{
+  "storeName": { "ar": "وسيط", "en": "Wasit" },
+  "tagline": {
+    "ar": "نختار لك أفضل المنتجات من آلاف الموردين حول العالم — وتشتري مباشرة من المورد بحماية كاملة لأموالك.",
+    "en": "We pick great products from thousands of suppliers worldwide — you buy directly from the supplier with full buyer protection."
+  },
+  "contact": {
+    "email": "",
+    "whatsapp": ""
+  },
+  "defaultLang": "ar",
+  "partnerName": "AliExpress",
+  "updated": "2026-11-14",
+  "categories": [
+    { "ar": "إلكترونيات", "en": "Electronics", "q": "electronics gadgets" },
+    { "ar": "ساعات", "en": "Watches", "q": "smart watch" },
+    { "ar": "أزياء نسائية", "en": "Women", "q": "women fashion" },
+    { "ar": "أزياء رجالية", "en": "Men", "q": "men fashion" },
+    { "ar": "المنزل والمطبخ", "en": "Home & Kitchen", "q": "kitchen gadgets" },
+    { "ar": "الجمال", "en": "Beauty", "q": "beauty tools" },
+    { "ar": "الأطفال", "en": "Kids", "q": "kids toys" },
+    { "ar": "السيارات", "en": "Car", "q": "car accessories" },
+    { "ar": "الرياضة", "en": "Sports", "q": "fitness equipment" },
+    { "ar": "الحيوانات الأليفة", "en": "Pets", "q": "pet supplies" }
+  ]
+}

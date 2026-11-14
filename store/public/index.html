@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>وسيط | Wasit</title>
+<meta name="description" content="متجر وسيط: نرشّح لك منتجات من آلاف الموردين وتشتري مباشرة من المورد بحماية كاملة لأموالك.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f6f2;--surface:#ffffff;--ink:#1d1d1b;--muted:#6b6a65;--line:#e4e2db;
+  --accent:#0f7b5f;--accent-ink:#ffffff;--warn-bg:#fff6e0;--warn-ink:#6b4e00;--chip:#efede6;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#151513;--surface:#1f1f1c;--ink:#f0efe9;--muted:#a3a29b;--line:#34332e;
+  --accent:#3fbf95;--accent-ink:#0d1a15;--warn-bg:#2d2715;--warn-ink:#f1d88f;--chip:#2a2a26;
+}}
+:root[data-theme="dark"]{
+  --bg:#151513;--surface:#1f1f1c;--ink:#f0efe9;--muted:#a3a29b;--line:#34332e;
+  --accent:#3fbf95;--accent-ink:#0d1a15;--warn-bg:#2d2715;--warn-ink:#f1d88f;--chip:#2a2a26;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;line-height:1.6}
+a{color:var(--accent)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+header{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.bar{display:flex;align-items:center;gap:12px;padding:12px 0;flex-wrap:wrap}
+.logo{font-weight:700;font-size:1.35rem;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo span{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--accent);color:var(--accent-ink);font-size:1rem}
+.search{flex:1;min-width:220px;display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--bg)}
+.search input{flex:1;border:0;background:transparent;color:var(--ink);padding:10px 12px;font:inherit;min-width:0}
+.search button{border:0;background:var(--accent);color:var(--accent-ink);padding:0 18px;font:inherit;font-weight:500;cursor:pointer}
+.tools{display:flex;gap:6px}
+.tools button{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:8px;padding:6px 10px;font:inherit;cursor:pointer}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:0 0 12px;scrollbar-width:none}
+.chips button{flex:none;border:0;background:var(--chip);color:var(--ink);border-radius:999px;padding:6px 14px;font:inherit;font-size:.9rem;cursor:pointer}
+.chips button.on{background:var(--accent);color:var(--accent-ink)}
+.hero{padding:28px 0 8px}
+.hero h1{margin:0 0 6px;font-size:clamp(1.4rem,3.5vw,2rem)}
+.hero p{margin:0;color:var(--muted);max-width:720px}
+.trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:18px 0}
+.trust div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.92rem}
+.trust b{display:block}
+.notice{background:var(--warn-bg);color:var(--warn-ink);border-radius:10px;padding:10px 14px;font-size:.88rem;margin:6px 0 16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.card .img{aspect-ratio:1;background:var(--chip);display:grid;place-items:center;overflow:hidden}
+.card .img img{width:100%;height:100%;object-fit:cover}
+.card .img svg{width:46%;height:46%;color:var(--muted)}
+.card .body{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card h3{font-size:.92rem;font-weight:500;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;direction:ltr;text-align:start}
+.price{font-weight:700;font-size:1.05rem}
+.price s{color:var(--muted);font-weight:400;font-size:.82rem;margin-inline-start:6px}
+.meta{color:var(--muted);font-size:.8rem}
+.buy{margin-top:auto;display:block;text-align:center;background:var(--accent);color:var(--accent-ink);text-decoration:none;border-radius:9px;padding:8px;font-weight:500}
+.more{display:block;margin:0 auto 32px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 26px;font:inherit;cursor:pointer}
+.empty{color:var(--muted);text-align:center;padding:40px 0}
+footer{border-top:1px solid var(--line);background:var(--surface);padding:22px 0;font-size:.88rem;color:var(--muted)}
+footer nav{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:10px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="bar">
+      <a class="logo" href="/"><span>و</span><b data-t="storeName"></b></a>
+      <form class="search" id="sf" role="search">
+        <input id="q" type="search" autocomplete="off">
+        <button type="submit" data-t="searchBtn"></button>
+      </form>
+      <div class="tools">
+        <button id="langBtn" type="button">English</button>
+        <button id="themeBtn" type="button" aria-label="theme">◐</button>
+      </div>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1 data-t="heroTitle"></h1>
+    <p data-t="tagline"></p>
+    <div class="trust">
+      <div><b data-t="t1h"></b><span data-t="t1"></span></div>
+      <div><b data-t="t2h"></b><span data-t="t2"></span></div>
+      <div><b data-t="t3h"></b><span data-t="t3"></span></div>
+    </div>
+    <div class="notice" data-t="disclosure"></div>
+  </section>
+
+  <div class="grid" id="grid"></div>
+  <p class="empty" id="empty" hidden data-t="empty"></p>
+  <button class="more" id="more" hidden data-t="more"></button>
+</main>
+
+<footer>
+  <div class="wrap">
+    <nav>
+      <a href="/policies#about" data-t="pAbout"></a>
+      <a href="/policies#terms" data-t="pTerms"></a>
+      <a href="/policies#refunds" data-t="pRefunds"></a>
+      <a href="/policies#shipping" data-t="pShipping"></a>
+      <a href="/policies#privacy" data-t="pPrivacy"></a>
+      <a href="/policies#contact" data-t="pContact"></a>
+    </nav>
+    <div data-t="footerNote"></div>
+  </div>
+</footer>
+
+<script>
+const I18N = {
+  ar:{searchBtn:"بحث",heroTitle:"ملايين المنتجات من آلاف الموردين",
+    t1h:"ادفع للمورد مباشرة",t1:"لا ندفع ولا نستلم أموالك — الدفع يتم على منصة المورد الآمنة.",
+    t2h:"استرجاع أموال سهل",t2:"حماية المشتري لدى المنصة تضمن استرداد أموالك إن لم يصلك الطلب أو جاء مختلفًا.",
+    t3h:"نساعدك خطوة بخطوة",t3:"راسلنا وسنساعدك في فتح طلب الإرجاع أو الاسترداد خلال 24 ساعة.",
+    disclosure:"إفصاح: نحن موقع وسيط. عند الضغط على «اشترِ الآن» تنتقل إلى موقع المورد لإتمام الشراء، وقد نحصل على عمولة منه دون أي تكلفة إضافية عليك.",
+    empty:"لا توجد نتائج. جرّب كلمة أخرى بالإنجليزية.",more:"عرض المزيد",buy:"اشترِ الآن",view:"شاهد العروض",
+    sold:"تم بيع",rating:"تقييم",pAbout:"من نحن",pTerms:"الشروط والأحكام",pRefunds:"الإرجاع واسترداد الأموال",
+    pShipping:"الشحن",pPrivacy:"الخصوصية",pContact:"تواصل معنا",
+    footerNote:"وسيط موقع ترشيح منتجات. عقد البيع والدفع والشحن والإرجاع تتم بينك وبين المورد على منصته.",
+    placeholder:"ابحث عن أي منتج… (يفضّل بالإنجليزية)",all:"الكل"},
+  en:{searchBtn:"Search",heroTitle:"Millions of products from thousands of suppliers",
+    t1h:"Pay the supplier directly",t1:"We never take your payment — checkout happens on the supplier's secure platform.",
+    t2h:"Easy refunds",t2:"The platform's buyer protection refunds you if your order doesn't arrive or isn't as described.",
+    t3h:"We help step by step",t3:"Message us and we'll help you open a return or refund request within 24 hours.",
+    disclosure:"Disclosure: we are an intermediary. “Buy now” takes you to the supplier's site to complete your purchase; we may earn a commission at no extra cost to you.",
+    empty:"No results. Try another keyword.",more:"Load more",buy:"Buy now",view:"See offers",
+    sold:"sold",rating:"rating",pAbout:"About us",pTerms:"Terms",pRefunds:"Returns & refunds",
+    pShipping:"Shipping",pPrivacy:"Privacy",pContact:"Contact",
+    footerNote:"Wasit is a product-recommendation site. The sale contract, payment, shipping and returns are between you and the supplier on its platform.",
+    placeholder:"Search any product…",all:"All"}
+};
+let CFG={}, lang="ar", state={q:"",page:1,live:null,local:[]};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function store(k,v){try{v===undefined?0:localStorage.setItem(k,v);return localStorage.getItem(k)}catch(e){return null}}
+
+function applyLang(){
+  const t=I18N[lang];
+  document.documentElement.lang=lang; document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+  document.querySelectorAll("[data-t]").forEach(el=>{
+    const k=el.dataset.t; el.textContent = (CFG[k]&&CFG[k][lang]) || t[k] || "";
+  });
+  $("#q").placeholder=t.placeholder; $("#langBtn").textContent=lang==="ar"?"English":"العربية";
+  document.title=(CFG.storeName?.[lang]||"")+" | "+t.heroTitle;
+  renderChips();
+}
+function renderChips(){
+  const t=I18N[lang]; const cats=CFG.categories||[];
+  $("#chips").innerHTML=`<button data-q="" class="${state.q===""?"on":""}">${t.all}</button>`+
+    cats.map(c=>`<button data-q="${esc(c.q)}" class="${state.q===c.q?"on":""}">${esc(c[lang])}</button>`).join("");
+}
+const BOX='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg>';
+function searchUrl(q){return "https://www.aliexpress.com/w/wholesale-"+encodeURIComponent(q.trim().replace(/\s+/g,"-"))+".html"}
+
+function card(p){
+  const t=I18N[lang];
+  const img=p.image?`<img loading="lazy" src="${esc(p.image)}" alt="">`:BOX;
+  const price=p.price?`<div class="price">${esc(p.currency||"$")} ${esc(p.price)}${p.originalPrice&&p.originalPrice!==p.price?`<s>${esc(p.originalPrice)}</s>`:""}</div>`:"";
+  const meta=[p.sold?`${esc(p.sold)} ${t.sold}`:"",p.rating?`${esc(p.rating)} ${t.rating}`:""].filter(Boolean).join(" · ");
+  const link=p.link||searchUrl(p.q||p.title);
+  return `<article class="card"><div class="img">${img}</div><div class="body">
+    <h3 title="${esc(p.title)}">${esc(p.title)}</h3>${price}${meta?`<div class="meta">${meta}</div>`:""}
+    <a class="buy" href="${esc(link)}" target="_blank" rel="nofollow sponsored noopener">${p.link?t.buy:t.view}</a></div></article>`;
+}
+
+async function load(reset){
+  if(reset){state.page=1;$("#grid").innerHTML="";}
+  let items=[],hasMore=false;
+  if(state.live!==false){
+    try{
+      const r=await fetch(`/api/search?q=${encodeURIComponent(state.q)}&page=${state.page}&lang=${lang}`);
+      const j=await r.json();
+      if(j.configured===false){state.live=false}
+      else{state.live=true;items=j.products||[];hasMore=!!j.hasMore}
+    }catch(e){state.live=false}
+  }
+  if(state.live===false){
+    const q=state.q.toLowerCase().split(/\s+/).filter(Boolean);
+    items=state.local.filter(p=>!q.length||q.some(w=>(p.title+" "+p.q+" "+p.category).toLowerCase().includes(w)));
+    if(!items.length && state.q) items=[{id:"x",title:state.q,q:state.q}];
+    hasMore=false;
+  }
+  $("#grid").insertAdjacentHTML("beforeend",items.map(card).join(""));
+  $("#empty").hidden=$("#grid").children.length>0;
+  $("#more").hidden=!hasMore;
+}
+
+$("#sf").addEventListener("submit",e=>{e.preventDefault();state.q=$("#q").value.trim();renderChips();load(true)});
+$("#chips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;state.q=b.dataset.q;$("#q").value="";renderChips();load(true)});
+$("#more").addEventListener("click",()=>{state.page++;load(false)});
+$("#langBtn").addEventListener("click",()=>{lang=lang==="ar"?"en":"ar";store("lang",lang);applyLang();load(true)});
+$("#themeBtn").addEventListener("click",()=>{
+  const dark=matchMedia("(prefers-color-scheme: dark)").matches;
+  const cur=document.documentElement.dataset.theme||(dark?"dark":"light");
+  const next=cur==="dark"?"light":"dark";document.documentElement.dataset.theme=next;store("theme",next);
+});
+
+(async()=>{
+  const th=store("theme");if(th)document.documentElement.dataset.theme=th;
+  [CFG,{products:state.local}]=await Promise.all([fetch("/config.json").then(r=>r.json()),fetch("/products.json").then(r=>r.json())]);
+  lang=store("lang")||CFG.defaultLang||"ar";
+  applyLang(); load(true);
+})();
+</script>
+</body>
+</html>
