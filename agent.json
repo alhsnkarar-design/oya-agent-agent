@@ -89,6 +89,15 @@
       "category": "general",
       "catalog_type": "core",
       "config": {}
+    },
+    {
+      "skill_id": "cj-dropshipping-auth",
+      "name": "CJ Dropshipping Auth",
+      "description": "Get, refresh, or revoke a CJ Dropshipping API 2.0 access token (CJ-Access-Token)",
+      "skill_type": "sandbox",
+      "category": "ecommerce",
+      "catalog_type": "addon",
+      "config": {}
     }
   ],
   "gateways": [],
