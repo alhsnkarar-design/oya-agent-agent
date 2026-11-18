@@ -91,7 +91,6 @@ header.top .wrap{display:grid;grid-template-columns:44px 1fr 44px;align-items:ce
 .acc summary::after{content:"+"}
 .acc[open] summary::after{content:"–"}
 .acc .in{padding-bottom:14px;font-size:14px;color:var(--muted);display:grid;gap:6px}
-.sample-note{font-size:12.5px;color:var(--muted);background:var(--panel);padding:10px 12px}
 .also{padding-block:20px 24px;text-align:center}
 .also h2{font-size:24px;margin-bottom:24px}
 .also .grid{padding-block:0 24px}
@@ -110,13 +109,11 @@ footer.foot p{color:#7d7d7d;font-size:clamp(18px,3vw,24px);line-height:1.4}
 .scrim.open{opacity:1;visibility:visible}
 .drawer{position:fixed;z-index:61;top:0;bottom:0;width:min(440px,100vw);background:var(--bg);display:flex;flex-direction:column;visibility:hidden;transition:transform .3s cubic-bezier(.2,.8,.2,1),visibility .3s;padding-top:env(safe-area-inset-top,0px)}
 .drawer.right{right:0;transform:translateX(105%)}
-.drawer.left{left:0;transform:translateX(-105%)}
 .drawer[aria-hidden="false"]{transform:none;visibility:visible}
 .d-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
 .d-head h2{font-size:20px}
 .d-body{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:12px 16px}
 .d-foot{padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);display:grid;gap:10px}
-.menu a{display:block;font-family:var(--head);text-transform:uppercase;font-size:26px;padding-block:9px;text-decoration:none}
 .line{display:grid;grid-template-columns:70px 1fr auto;gap:12px;align-items:center;padding-block:12px;border-bottom:1px solid var(--line)}
 .line .th{width:70px;height:84px;background:var(--tile);display:grid;place-items:center;overflow:hidden}
 .line .th svg{width:80%}
@@ -169,7 +166,7 @@ body.locked{overflow:hidden}
 
 <header class="top g">
   <div class="wrap">
-    <button class="icon-btn" type="button" id="menu-open" aria-label="Open menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" fill="none"></path></svg></button>
+    <span aria-hidden="true"></span>
     <a class="brand" href="#grid" data-home>Zifidit</a>
     <button class="icon-btn" type="button" id="cart-open" aria-label="Open cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 8h14l-1 13H6Z" fill="none"></path><path d="M9 8V6a3 3 0 0 1 6 0v2" fill="none"></path></svg><span class="bag-count" id="cart-count" data-n="0">0</span></button>
   </div>
@@ -208,7 +205,6 @@ body.locked{overflow:hidden}
           <button class="btn btn-rust" type="button" id="p-add">Add to Cart</button>
           <button class="btn btn-ink" type="button" id="p-buy">Buy it now</button>
         </div>
-        <p class="sample-note" id="p-sample" hidden>Sample product for this preview. Connect it to your supplier and a Whop price before selling it.</p>
       </div>
     </div>
   </section>
@@ -239,10 +235,6 @@ body.locked{overflow:hidden}
 
 <div class="scrim" id="scrim"></div>
 
-<aside class="drawer left" id="menu" role="dialog" aria-modal="true" aria-label="Menu" aria-hidden="true">
-  <div class="d-head"><h2>Menu</h2><button class="icon-btn" type="button" id="menu-x" aria-label="Close menu">✕</button></div>
-  <nav class="d-body menu" id="menu-links"></nav>
-</aside>
 
 <aside class="drawer right" id="drawer" role="dialog" aria-modal="true" aria-labelledby="d-title" aria-hidden="true">
   <div class="d-head"><h2 id="d-title">Your cart</h2><button class="icon-btn" type="button" id="d-x" aria-label="Close cart">✕</button></div>
@@ -328,7 +320,6 @@ body.locked{overflow:hidden}
   function renderPDP(p){
     cur=p;sel={color:p.colors?p.colors[0][0]:null};
     $("#p-title").textContent=p.name;$("#p-price").textContent=fmt(p.price);$("#p-desc").textContent=p.desc;
-    $("#p-sample").hidden=!!p.live;
     $("#p-color-wrap").hidden=!(p.colors&&p.colors.length>1);
     $("#p-colors").innerHTML=p.colors?p.colors.map(function(c){return '<button type="button" data-color="'+c[0]+'" aria-label="'+c[0]+'" aria-pressed="'+(c[0]===sel.color)+'" style="background:'+c[1]+'"></button>'}).join(""):"";
     $("#p-color-name").textContent=sel.color||"";
@@ -355,10 +346,6 @@ body.locked{overflow:hidden}
     if(e.key==="Tab"){var f=$$("button,input,a[href],iframe",openEl).filter(function(el){return el.offsetParent!==null});if(!f.length)return;var a=f[0],z=f[f.length-1];
       if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}}});
 
-  $("#menu-links").innerHTML='<a href="#grid" data-home>Shop all</a>'+PRODUCTS.map(function(p){return '<a href="#product-'+p.id+'">'+p.name+'</a>'}).join("")+'<a href="#faq" data-home>Shipping &amp; FAQ</a>';
-  $("#menu-open").addEventListener("click",function(){openLayer($("#menu"),$("#menu-x"))});
-  $("#menu-x").addEventListener("click",function(){closeLayer()});
-  $("#menu-links").addEventListener("click",function(e){if(!e.target.closest("a"))return;openEl.setAttribute("aria-hidden","true");openEl=null;scrim.classList.remove("open");document.body.classList.remove("locked")});
 
   var cart=[];
   try{cart=JSON.parse(localStorage.getItem("zifidit-cart-v3")||"[]").filter(function(l){return byId[l.id]})}catch(_){cart=[]}
