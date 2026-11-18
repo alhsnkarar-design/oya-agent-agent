@@ -351,8 +351,9 @@ body.locked{overflow:hidden}
     $("#p-colors").innerHTML=p.colors?p.colors.map(function(c){return '<button type="button" data-color="'+c[0]+'" aria-label="'+c[0]+'" aria-pressed="'+(c[0]===sel.color)+'" style="background:'+c[1]+'"></button>'}).join(""):"";
     $("#p-color-name").textContent=sel.color||"";
     renderSlides();
-    var others=PRODUCTS.filter(function(x){return x.id!==p.id}),st=PRODUCTS.indexOf(p)%others.length;
-    $("#also").innerHTML=[0,1,2,3].map(function(k){return cardHTML(others[(st+k)%others.length])}).join("");
+    var others=PRODUCTS.filter(function(x){return x.id!==p.id});
+    $(".also").hidden=!others.length;
+    if(others.length){var st=PRODUCTS.indexOf(p)%others.length,n=Math.min(4,others.length),out=[];for(var k=0;k<n;k++)out.push(cardHTML(others[(st+k)%others.length]));$("#also").innerHTML=out.join("")}
   }
   function renderSlides(){
     var p=cur,list;

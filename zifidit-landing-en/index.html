@@ -287,7 +287,7 @@ body.locked{overflow:hidden}
       <div class="skel" id="skel"><i></i><i></i><i></i><i></i></div>
       <div id="checkout"></div>
       <div class="note" id="ck-msg" hidden></div>
-      <p class="note" id="ck-preview" hidden>Whop Checkout opens here on your live site.</p>
+      <p class="note" id="ck-preview" hidden>Checkout couldn't load. Refresh the page and try again.</p>
       <div class="done" id="ck-done" hidden><h3>Order placed</h3><p>Your receipt is on its way. Tracking follows by email once it ships.</p></div>
     </div>
   </div>
@@ -317,13 +317,6 @@ body.locked{overflow:hidden}
   };
   var PRODUCTS=[
     {id:"scrubber",name:"Spin Scrubber",price:21.64,plan:"plan_JcStFYyr7EiH5",product:"prod_HzcQ4VsshTwUA",imgs:["img/heads.jpg","img/hero.jpg","img/use-stove.jpg","img/use-sink.jpg","img/use-tile.jpg","img/use-hood.jpg"],desc:"A cordless rotating brush with swappable heads. Press one button and let it lift grease off stovetops, sinks, tiles and grout.",details:["Cordless, one-button operation","Sponge, bristle brush and polishing pad heads","Free shipping with tracking"],live:true},
-    {id:"hoodie",name:"Loopback Oversized Hoodie",price:56,art:"hoodie",colors:[["Black","#141414"],["Forest","#173a33"],["Sky","#9cc0dc"]],desc:"Midweight loopback cotton with a lined pullover hood and a kangaroo pocket. Relaxed, oversized fit.",details:["Midweight loopback cotton","Lined hood, kangaroo pocket","Oversized, relaxed fit"]},
-    {id:"tee",name:"Heavyweight Box Tee",price:28,art:"tee",colors:[["Navy","#272b3a"],["Bone","#d8d1c3"]],desc:"Thick cotton jersey in a boxy cut with a collar that keeps its shape.",details:["Heavyweight cotton","Boxy fit, dropped shoulder"]},
-    {id:"tee2",name:"Everyday Graphic Tee",price:24,art:"tee",colors:[["Charcoal","#4b4b4b"],["Blush","#f0d9de"]],desc:"Soft midweight tee with a small chest graphic. Easy regular fit.",details:["Midweight cotton","Regular fit"]},
-    {id:"beanie",name:"Ribbed Beanie",price:18,art:"beanie",colors:[["Rust","#9b5149"],["Black","#141414"],["Oat","#cfc3ab"]],desc:"Soft rib knit with a fold-over cuff and a pom on top. One size.",details:["Rib knit","One size"]},
-    {id:"socks",name:"Crew Socks · 3 Pack",price:16,art:"socks",colors:[["White","#f3f3f3"],["Black","#141414"]],desc:"Cushioned sole, reinforced heel and toe, and a rib cuff that stays up.",details:["Cushioned sole","3 pairs"]},
-    {id:"tote",name:"Canvas Tote",price:22,art:"tote",colors:[["Natural","#e2d8c2"],["Black","#141414"]],desc:"Heavy canvas with long handles that sit on the shoulder. Fits a laptop and groceries.",details:["Heavy canvas","Shoulder-length handles"]},
-    {id:"bottle",name:"Insulated Bottle 750 ml",price:29,art:"bottle",colors:[["Rust","#9b5149"],["Black","#141414"],["Frost","#eeeeee"]],desc:"Double-wall steel keeps drinks cold or hot for hours. Leak-proof screw cap.",details:["Double-wall steel","750 ml"]}
   ];
   var byId={};PRODUCTS.forEach(function(p){byId[p.id]=p});
   function art(p,c){return p.art?ART[p.art](c||p.colors[0][1]):'<img src="'+p.imgs[0]+'" alt="">'}
@@ -360,8 +353,9 @@ body.locked{overflow:hidden}
     $("#p-colors").innerHTML=p.colors?p.colors.map(function(c){return '<button type="button" data-color="'+c[0]+'" aria-label="'+c[0]+'" aria-pressed="'+(c[0]===sel.color)+'" style="background:'+c[1]+'"></button>'}).join(""):"";
     $("#p-color-name").textContent=sel.color||"";
     renderSlides();
-    var others=PRODUCTS.filter(function(x){return x.id!==p.id}),st=PRODUCTS.indexOf(p)%others.length;
-    $("#also").innerHTML=[0,1,2,3].map(function(k){return cardHTML(others[(st+k)%others.length])}).join("");
+    var others=PRODUCTS.filter(function(x){return x.id!==p.id});
+    $(".also").hidden=!others.length;
+    if(others.length){var st=PRODUCTS.indexOf(p)%others.length,n=Math.min(4,others.length),out=[];for(var k=0;k<n;k++)out.push(cardHTML(others[(st+k)%others.length]));$("#also").innerHTML=out.join("")}
   }
   function renderSlides(){
     var p=cur,list;
