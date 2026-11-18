@@ -22,7 +22,11 @@
   },
   "homepage": "https://github.com/alhsnkarar-design/oya-agent-agent#readme",
   "devDependencies": {
+    "@trigger.dev/build": "^4.8.6",
     "trigger.dev": "^4.8.6"
   },
-  "private": true
+  "private": true,
+  "dependencies": {
+    "@trigger.dev/sdk": "^4.8.6"
+  }
 }
