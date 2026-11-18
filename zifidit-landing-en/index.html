@@ -93,6 +93,23 @@ header.top .wrap{display:grid;grid-template-columns:44px 1fr 44px;align-items:ce
 
 footer.foot{padding-block:48px 48px;text-align:center}
 footer.foot p{color:#7d7d7d;font-size:clamp(18px,3vw,24px);line-height:1.4}
+.legal{display:flex;justify-content:center;flex-wrap:wrap;gap:8px 22px;margin-bottom:22px;font-size:14px}
+.legal a{text-decoration:underline;text-underline-offset:3px;color:var(--muted)}
+.ship-line{font-size:13px;color:var(--muted);line-height:1.6}
+.ship-line a{color:var(--ink)}
+.policy{padding-block:0 40px}
+.policy .wrap{max-width:760px}
+.policy article{display:grid;gap:12px}
+.policy h1{font-size:clamp(30px,4vw,42px);margin-bottom:6px}
+.policy h2{font-size:20px;margin-top:14px}
+.policy p,.policy li{font-size:15px;line-height:1.7}
+.policy ul{margin:0;padding-inline-start:20px;display:grid;gap:6px}
+.policy .small{font-size:13px;color:var(--muted)}
+.tbl{overflow-x:auto}
+.policy table{border-collapse:collapse;width:100%;max-width:480px;font-size:15px}
+.policy th,.policy td{text-align:start;padding:10px 12px;border-bottom:1px solid var(--line)}
+.policy th{font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.policy td:last-child,.policy th:last-child{font-variant-numeric:tabular-nums;text-align:end}
 
 .scrim{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
 .scrim.open{opacity:1;visibility:visible}
@@ -181,6 +198,7 @@ body.locked{overflow:hidden}
           <button class="btn btn-rust" type="button" id="p-add">Add to Cart</button>
           <button class="btn btn-ink" type="button" id="p-buy">Buy it now</button>
         </div>
+        <p class="ship-line">Free shipping · Tracking within 3–5 business days · Delivery in 8–18 business days · <a href="#shipping-policy">Shipping &amp; returns</a></p>
       </div>
     </div>
   </section>
@@ -192,10 +210,67 @@ body.locked{overflow:hidden}
   </section>
 </div>
 
+<div id="view-policy" hidden>
+  <section class="policy g">
+    <div class="wrap">
+      <button class="back" type="button" data-back-shop>← Back to shop</button>
+
+      <article id="pol-shipping" hidden>
+        <h1>Shipping policy</h1>
+        <h2>Our fulfillment partner</h2>
+        <p>To keep quality high and international delivery fast, Zifidit works with EPROLO, a global fulfillment and shipping company that runs more than 26 certified warehouses across the US, UK, Europe and Asia.</p>
+        <h2>Quality check and tracking</h2>
+        <p>Every order is quality-checked by our fulfillment partner before it ships. You'll receive a tracking number by email within 3–5 business days of payment confirmation.</p>
+        <h2>Estimated delivery times</h2>
+        <div class="tbl">
+          <table>
+            <thead><tr><th scope="col">Destination</th><th scope="col">Business days</th></tr></thead>
+            <tbody>
+              <tr><td>United States</td><td>9–15</td></tr>
+              <tr><td>United Kingdom</td><td>8–13</td></tr>
+              <tr><td>Australia</td><td>9–12</td></tr>
+              <tr><td>Canada</td><td>10–18</td></tr>
+              <tr><td>Europe and other countries</td><td>8–18</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small">Allow 3–5 extra days during holidays and peak seasons.</p>
+        <h2>Delivery guarantee</h2>
+        <ul>
+          <li><b>United States, Europe, Canada and New Zealand:</b> if your parcel hasn't arrived within 35 days of shipping, we'll refund you in full or send a free replacement.</li>
+          <li><b>Middle East, Africa, South America and India:</b> we guarantee delivery within 65 days of shipping.</li>
+        </ul>
+        <h2>Delivery confirmation, address and customs</h2>
+        <p>Once tracking shows “Delivered”, Zifidit is no longer responsible for the parcel. Please enter your shipping address and phone number carefully. We can't compensate for orders lost because of an incorrect address or a parcel that wasn't collected from the local carrier. Any customs duties charged by your country are paid by the customer.</p>
+      </article>
+
+      <article id="pol-refund" hidden>
+        <h1>Refund &amp; return policy</h1>
+        <h2>Damaged, defective or wrong items</h2>
+        <p>If your item arrives damaged, incomplete or different from what you ordered, email <b>info@zifidit.com</b> within 10 days of delivery. Include your order number and clear photos or a short video showing the problem. We'll send a free replacement or refund you in full right away, and you won't need to ship the item back.</p>
+        <h2>Not covered</h2>
+        <ul>
+          <li>Parcels that tracking shows as “Delivered”.</li>
+          <li>Parcels not collected from the delivery company.</li>
+          <li>Parcels refused at customs.</li>
+          <li>A wrong shipping address entered at checkout.</li>
+          <li>Change of mind, or not liking an item's look or smell when it arrived intact and as described.</li>
+        </ul>
+      </article>
+
+      <article id="pol-contact" hidden>
+        <h1>Contact</h1>
+        <p>Email us at <b>info@zifidit.com</b> with your order number and we'll get back to you.</p>
+      </article>
+    </div>
+  </section>
+</div>
+
 </main>
 
 <footer class="foot g">
   <div class="wrap">
+    <nav class="legal" aria-label="Policies"><a href="#shipping-policy">Shipping policy</a><a href="#refund-policy">Refund policy</a><a href="#contact">Contact</a></nav>
     <p>© 2026 Zifidit<br>Secure payments by Whop</p>
   </div>
 </footer>
@@ -260,10 +335,14 @@ body.locked{overflow:hidden}
   $("#grid").innerHTML=PRODUCTS.map(cardHTML).join("");
 
   var cur=null,sel={};
-  function goHome(){$("#view-product").hidden=true;$("#view-home").hidden=false}
+  var POL={"shipping-policy":"pol-shipping","refund-policy":"pol-refund","contact":"pol-contact"};
+  function goHome(){$("#view-product").hidden=true;$("#view-policy").hidden=true;$("#view-home").hidden=false}
+  function showPolicy(h){$("#view-home").hidden=true;$("#view-product").hidden=true;$("#view-policy").hidden=false;
+    $$("#view-policy article").forEach(function(a){a.hidden=a.id!==POL[h]});window.scrollTo(0,0)}
   function show(){
     var h=location.hash.replace("#","");
-    if(h.indexOf("product-")===0&&byId[h.slice(8)]){renderPDP(byId[h.slice(8)]);$("#view-home").hidden=true;$("#view-product").hidden=false;window.scrollTo(0,0)}
+    if(POL[h]){showPolicy(h)}
+    else if(h.indexOf("product-")===0&&byId[h.slice(8)]){renderPDP(byId[h.slice(8)]);$("#view-home").hidden=true;$("#view-policy").hidden=true;$("#view-product").hidden=false;window.scrollTo(0,0)}
     else{goHome();if(h==="grid"||h==="faq"){var t=$("#"+h);t&&t.scrollIntoView()}}
   }
   window.addEventListener("hashchange",show);
@@ -272,6 +351,7 @@ body.locked{overflow:hidden}
     var hm=e.target.closest("[data-home]");if(hm)goHome();
   });
   $("#pdp-back").addEventListener("click",function(){location.hash="grid"});
+  $("[data-back-shop]").addEventListener("click",function(){location.hash="grid"});
 
   function renderPDP(p){
     cur=p;sel={color:p.colors?p.colors[0][0]:null};
