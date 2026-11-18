@@ -5,7 +5,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
 <style>
-/* Layout: product-first store page — gallery + buy box, then a surface guide that teaches which head to use, then proof, payments, FAQ. Checkout slides in as a sheet. */
+/* Layout: product-first store page — gallery + buy box, then a surface guide that teaches which head to use, then where it works and how to use it. Checkout slides in as a sheet. */
 :root{
   --bg:#f5f8f8; --surface:#ffffff; --surface-2:#eaf1f0; --ink:#0d1b1e; --muted:#566a6d; --line:#d9e3e2;
   --foam:#0e7c72; --foam-ink:#ffffff; --foam-soft:#d6ece9; --sponge:#f3c331; --sponge-ink:#1d1600;
@@ -74,14 +74,12 @@ nav.links a:hover{color:var(--ink)}
 .qty button{width:46px;height:50px;border:0;background:transparent;color:var(--ink);font-size:20px;cursor:pointer;border-radius:999px}
 .qty output{min-width:34px;text-align:center;font:600 17px var(--body);font-variant-numeric:tabular-nums}
 .qty-row .btn-buy{flex:1;min-width:200px}
-.total-line{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
 .paychips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{font:600 12px var(--body);letter-spacing:.01em;padding:6px 11px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
 .assure{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .assure div{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px;font-size:13px;color:var(--muted)}
 .assure b{display:block;color:var(--ink);font-size:14px;margin-bottom:2px}
 details.acc{border-top:1px solid var(--line);padding-block:14px}
-details.acc:last-of-type{border-bottom:1px solid var(--line)}
 details.acc summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:12px}
 details.acc summary::after{content:"+";font-family:var(--mono);color:var(--muted)}
 details.acc[open] summary::after{content:"–"}
@@ -124,19 +122,7 @@ section.band{padding-block:72px}
 .step h3{font-size:22px}
 .step p{color:var(--muted);font-size:15px}
 
-/* payments */
-.pay{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
-.pay-list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.pay-item{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:16px;display:grid;gap:4px;min-width:0}
-.pay-item b{font-size:15px}
-.pay-item span{font-size:13px;color:var(--muted)}
-.lock{display:flex;gap:14px;align-items:flex-start;background:var(--foam-soft);border-radius:var(--r-md);padding:18px;margin-top:22px}
-.lock svg{flex:0 0 28px;color:var(--foam)}
-.lock p{font-size:14px;color:var(--ink)}
 
-/* faq */
-.faq{max-width:780px}
-.faq details.acc summary{font-size:17px}
 
 /* closing */
 .closing{background:var(--ink);color:var(--bg);border-radius:var(--r-lg);padding:48px 32px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center}
@@ -189,7 +175,7 @@ footer.site a{text-decoration:none}
 body.locked{overflow:hidden}
 
 @media (max-width:900px){
-  .product .wrap,.guide,.pay{grid-template-columns:1fr}
+  .product .wrap,.guide{grid-template-columns:1fr}
   .buybox{position:static}
   nav.links{display:none}
   .hdr-buy{margin-inline-start:auto}
@@ -204,7 +190,6 @@ body.locked{overflow:hidden}
 }
 @media (max-width:480px){
   .assure{grid-template-columns:1fr}
-  .pay-list{grid-template-columns:1fr}
   .thumbs{grid-template-columns:repeat(5,1fr);gap:6px}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.sheet,.scrim,.mbar,.btn,.uses img{transition:none}.skel i{animation:none}}
@@ -216,7 +201,7 @@ body.locked{overflow:hidden}
   <div class="wrap">
     <a class="logo" href="#top">Zifi<i>dit</i></a>
     <nav class="links" aria-label="Sections">
-      <a href="#guide">Heads</a><a href="#uses">Where it works</a><a href="#payments">Payments</a><a href="#faq">FAQ</a>
+      <a href="#guide">Heads</a><a href="#uses">Where it works</a><a href="#how">How to use</a>
     </nav>
     <button class="btn btn-buy hdr-buy" type="button" data-buy>Buy now</button>
   </div>
@@ -256,7 +241,6 @@ body.locked{overflow:hidden}
         </div>
         <button class="btn btn-buy" type="button" data-buy>Buy now · <span class="js-total">$21.64</span></button>
       </div>
-      <p class="total-line">Pay in one step with Apple Pay, Google Pay, PayPal or card. Local methods appear based on your country.</p>
       <div class="paychips" aria-label="Accepted payments">
         <span class="chip">Apple Pay</span><span class="chip">Google Pay</span><span class="chip">PayPal</span><span class="chip">Visa</span><span class="chip">Mastercard</span><span class="chip">Amex</span><span class="chip">Klarna</span>
       </div>
@@ -268,9 +252,6 @@ body.locked{overflow:hidden}
       <div>
         <details class="acc"><summary>What's in the box</summary>
           <ul><li>Cordless spin scrubber</li><li>Sponge head</li><li>Bristle brush head</li><li>Polishing pad head</li></ul>
-        </details>
-        <details class="acc"><summary>Shipping</summary>
-          <p>Shipping is free. After your order ships you get a tracking number at the email you use at checkout.</p>
         </details>
       </div>
     </div>
@@ -323,7 +304,7 @@ body.locked{overflow:hidden}
   </div>
 </section>
 
-<section class="band band-alt gutter">
+<section class="band band-alt gutter" id="how">
   <div class="wrap">
     <div class="sec-head">
       <span class="eyebrow">How to use it</span>
@@ -334,41 +315,6 @@ body.locked{overflow:hidden}
       <div class="step"><h3>Press and glide</h3><p>Press the button and move slowly. The rotation does the scrubbing, so light pressure is enough.</p></div>
       <div class="step"><h3>Rinse the head</h3><p>Pull the head off, rinse it under the tap and let it air dry.</p></div>
     </div>
-  </div>
-</section>
-
-<section class="band gutter" id="payments">
-  <div class="wrap pay">
-    <div>
-      <div class="sec-head" style="margin-bottom:0">
-        <span class="eyebrow">Checkout</span>
-        <h2>Pay without leaving this page.</h2>
-        <p>Checkout opens right here in a secure panel. Wallets fill in your shipping address for you, so most orders take one tap.</p>
-      </div>
-      <div class="lock">
-        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2" fill="none"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none"></path></svg>
-        <p>Card details are entered in isolated, encrypted fields run by Whop, our payment provider. They never touch our servers.</p>
-      </div>
-    </div>
-    <div class="pay-list">
-      <div class="pay-item"><b>Apple Pay &amp; Google Pay</b><span>One tap with Face ID or fingerprint</span></div>
-      <div class="pay-item"><b>Credit &amp; debit cards</b><span>Visa, Mastercard, Amex and more</span></div>
-      <div class="pay-item"><b>PayPal</b><span>Pay with your PayPal balance or card</span></div>
-      <div class="pay-item"><b>Pay later</b><span>Klarna, Afterpay and others where available</span></div>
-      <div class="pay-item"><b>Local methods</b><span>Shown automatically for your country</span></div>
-      <div class="pay-item"><b>Your currency</b><span>Prices convert to your local currency at checkout</span></div>
-    </div>
-  </div>
-</section>
-
-<section class="band band-alt gutter" id="faq">
-  <div class="wrap faq">
-    <div class="sec-head"><span class="eyebrow">Questions</span><h2>Before you order</h2></div>
-    <details class="acc"><summary>How much is shipping?</summary><p>Shipping is free on every order.</p></details>
-    <details class="acc"><summary>How do I track my order?</summary><p>Once your order ships, a tracking number is emailed to the address you enter at checkout.</p></details>
-    <details class="acc"><summary>Which payment methods can I use?</summary><p>Apple Pay, Google Pay, PayPal, major cards and, depending on your country, pay-later and local methods. The checkout shows the ones available to you.</p></details>
-    <details class="acc"><summary>Can I order more than one?</summary><p>Yes. Set the quantity before you open checkout and the total updates for you.</p></details>
-    <details class="acc"><summary>Is my payment secure?</summary><p>Payments are processed by Whop. Card numbers are entered in encrypted fields that we never see or store.</p></details>
   </div>
 </section>
 
@@ -386,7 +332,7 @@ body.locked{overflow:hidden}
 <footer class="site gutter">
   <div class="wrap">
     <span>© Zifidit</span>
-    <nav aria-label="Footer"><a href="#faq">Shipping</a><a href="#payments">Payments</a><a href="#faq">FAQ</a></nav>
+    <nav aria-label="Footer"><a href="#guide">Heads</a><a href="#uses">Where it works</a><a href="#how">How to use</a></nav>
   </div>
 </footer>
 
