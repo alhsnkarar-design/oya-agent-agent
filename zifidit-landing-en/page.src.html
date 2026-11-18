@@ -39,8 +39,6 @@ header.top .wrap{display:grid;grid-template-columns:44px 1fr 44px;align-items:ce
 .bag-count{position:absolute;top:6px;right:4px;min-width:17px;height:17px;border-radius:9px;background:var(--rust);color:var(--rust-ink);font:700 10px/17px var(--body);text-align:center;padding:0 4px}
 .bag-count[data-n="0"]{display:none}
 
-.collection{padding-block:20px 0;display:grid;gap:18px;justify-items:center;text-align:center}
-.collection .btn{max-width:420px}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px 16px;padding-block:28px 64px}
 .card{background:none;border:0;padding:0;cursor:pointer;text-align:center;display:grid;gap:10px;align-content:start;min-width:0}
 .tile{background:var(--tile);aspect-ratio:3/4;display:grid;place-items:center;overflow:hidden;max-width:100%}
@@ -150,9 +148,6 @@ body.locked{overflow:hidden}
 <div id="view-home">
   <section class="g">
     <div class="wrap">
-      <div class="collection">
-        <a class="btn btn-rust" href="#grid">Shop now</a>
-      </div>
       <div class="grid" id="grid"></div>
     </div>
   </section>
