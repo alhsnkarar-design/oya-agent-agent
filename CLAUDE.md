@@ -9,7 +9,11 @@ The storefront lives in `zifidit-landing-en/` and is deployed to https://zifidit
 - Create it with the affiliate program off: `global_affiliate_status: "disabled"`,
   `global_affiliate_percentage: 0`. Whop defaults new products to 30% otherwise.
 - Price in USD only: set `adaptive_pricing_enabled: false` on every variant (no local-currency conversion).
-- `collect_shipping_address: true` (physical goods).
+- `collect_shipping_address: true` (physical goods). Whop's checkout then requires the email and
+  the full shipping address (country, address, city, state/governorate in each country's format).
+- Add a required phone field on every variant: `custom_fields: [{field_type: "text",
+  name: "Phone number with country code (for delivery)", placeholder: "+1 555 123 4567",
+  required: true, order: 1}]`. Sending `custom_fields` replaces the list, so always include it.
 - Title, headline and description in English, matching the storefront.
 - Only add products the owner has a real supplier for, with real photos and a cost price
   from the owner. Never publish sample/placeholder products, invented reviews, fake
