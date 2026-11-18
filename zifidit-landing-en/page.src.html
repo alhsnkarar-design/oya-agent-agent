@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
 <!--WHOP_SCRIPT-->
 <style>
-/* Layout: creator-store style — centered header, banner, two-up product grid, full product page with slider, big footer links. One committed light look. */
+/* Layout: creator-store style — centered header, banner, two-up product grid, full product page with slider. One committed light look. */
 :root{
   --bg:#d9d9d9; --tile:#c8c8c8; --panel:#e4e4e4; --ink:#161616; --muted:#5a5a5a; --line:#b4b4b4;
   --rust:#9b5149; --rust-ink:#ffffff; --white:#ffffff;
@@ -91,14 +91,8 @@ header.top .wrap{display:grid;grid-template-columns:44px 1fr 44px;align-items:ce
 .also .grid{padding-block:0 24px}
 .back{display:inline-flex;align-items:center;gap:6px;background:none;border:0;cursor:pointer;font-size:14px;padding-block:14px;color:var(--muted)}
 
-footer.foot{padding-block:56px 56px;text-align:center}
-footer.foot nav{display:grid;gap:18px;justify-items:center;margin-bottom:40px}
-footer.foot nav a{font-size:clamp(24px,4vw,34px);text-decoration:none;letter-spacing:-.01em}
-footer.foot nav a:hover{color:var(--rust)}
+footer.foot{padding-block:48px 48px;text-align:center}
 footer.foot p{color:#7d7d7d;font-size:clamp(18px,3vw,24px);line-height:1.4}
-.faq{padding-block:40px 0}
-.faq .wrap{max-width:720px}
-.faq h2{font-size:28px;text-align:center;margin-bottom:20px}
 
 .scrim{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
 .scrim.open{opacity:1;visibility:visible}
@@ -129,13 +123,6 @@ footer.foot p{color:#7d7d7d;font-size:clamp(18px,3vw,24px);line-height:1.4}
 @keyframes sh{to{background-position:-200% 0}}
 .note{border:1px dashed var(--line);padding:14px;font-size:13.5px;color:var(--muted);display:grid;gap:12px}
 .note b{color:var(--ink)}
-.demo{display:grid;gap:10px}
-.demo .wallet{height:48px;background:#000;color:#fff;display:grid;place-items:center;font-weight:700}
-.demo .or{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--muted)}
-.demo .or::before,.demo .or::after{content:"";flex:1;height:1px;background:var(--line)}
-.demo label{display:grid;gap:5px;font-size:12.5px;font-weight:600}
-.demo input{font:15px var(--body);padding:12px;border:1px solid var(--line);background:var(--white);color:var(--ink);width:100%;border-radius:0}
-.demo .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .done{text-align:center;display:grid;gap:10px;padding:36px 8px}
 .done h3{font-size:26px}
 .lockline{display:flex;gap:8px;align-items:center;justify-content:center;font-size:12px;color:var(--muted)}
@@ -207,19 +194,10 @@ body.locked{overflow:hidden}
   </section>
 </div>
 
-<section class="faq g" id="faq">
-  <div class="wrap">
-    <h2>Shipping &amp; FAQ</h2>
-    <details class="acc"><summary>How much is shipping?</summary><div class="in"><p>Shipping is free on every order.</p></div></details>
-    <details class="acc"><summary>How do I track my order?</summary><div class="in"><p>A tracking number is emailed to you once your order ships.</p></div></details>
-    <details class="acc"><summary>How can I pay?</summary><div class="in"><p>Checkout is handled by Whop and shows the payment methods available in your country.</p></div></details>
-  </div>
-</section>
 </main>
 
 <footer class="foot g">
   <div class="wrap">
-    <nav aria-label="Footer"><a href="#faq">Shipping &amp; FAQ</a><a href="#grid" data-home>Shop all</a></nav>
     <p>© 2026 Zifidit<br>Secure payments by Whop</p>
   </div>
 </footer>
@@ -236,18 +214,7 @@ body.locked{overflow:hidden}
       <div class="skel" id="skel"><i></i><i></i><i></i><i></i></div>
       <div id="checkout"></div>
       <div class="note" id="ck-msg" hidden></div>
-      <div class="note" id="ck-preview" hidden>
-        <span><b id="ck-method"></b><b>Preview mode.</b> On your live domain, Whop's secure checkout loads here with real wallets and card fields. This form shows the layout only and takes no payment.</span>
-        <form class="demo" id="demo-form">
-          <div class="wallet">Apple Pay / Google Pay</div>
-          <div class="or">or pay with card</div>
-          <label for="d-email">Email<input id="d-email" type="email" placeholder="you@example.com" autocomplete="off"></label>
-          <label for="d-addr">Shipping address<input id="d-addr" type="text" placeholder="Street, city, postal code" autocomplete="off"></label>
-          <label for="d-card">Card number<input id="d-card" type="text" inputmode="numeric" placeholder="1234 1234 1234 1234" autocomplete="off"></label>
-          <div class="two"><label for="d-exp">Expiry<input id="d-exp" type="text" placeholder="MM / YY" autocomplete="off"></label><label for="d-cvc">CVC<input id="d-cvc" type="text" placeholder="123" autocomplete="off"></label></div>
-          <button class="btn btn-rust" type="submit">Pay <span id="ck-total"></span></button>
-        </form>
-      </div>
+      <p class="note" id="ck-preview" hidden>Whop Checkout opens here on your live site.</p>
       <div class="done" id="ck-done" hidden><h3>Order placed</h3><p>Your receipt is on its way. Tracking follows by email once it ships.</p></div>
     </div>
   </div>
@@ -375,7 +342,7 @@ body.locked{overflow:hidden}
   function startCheckout(method){
     $("#cart-view").hidden=true;$("#d-foot").hidden=true;$("#pay-view").hidden=false;$("#d-title").textContent="Checkout";$("#back-cart").hidden=!ckFromCart;
     $("#ck-msg").hidden=true;$("#ck-done").hidden=true;$("#ck-preview").hidden=true;box.hidden=false;
-    var tot=linesTotal(ckLines);$("#ck-total").textContent=fmt(tot);$("#ck-method").textContent=method?method+" selected. ":"";
+    var tot=linesTotal(ckLines);
     track("initiate_checkout",{value:tot,currency:"USD"});
     if(!window.WhopElements){$("#skel").hidden=true;$("#ck-preview").hidden=false;return}
     var sample=ckLines.filter(function(l){return !byId[l.id].plan});
@@ -394,7 +361,6 @@ body.locked{overflow:hidden}
     }catch(e){console.error(e);$("#skel").hidden=true;msg("<b>Checkout didn't load.</b> Check your connection and try again.")}
   }
   $("#to-pay").addEventListener("click",function(){ckLines=cart.map(function(l){return {id:l.id,c:l.c,q:l.q}});ckFromCart=true;startCheckout()});
-  $("#demo-form").addEventListener("submit",function(e){e.preventDefault();$("#ck-preview").hidden=true;$("#ck-done").hidden=false;if(ckFromCart){cart=[];save();renderCart()}$("#d-foot").hidden=true});
 
   show();
 })();
