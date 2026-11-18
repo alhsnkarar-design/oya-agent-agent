@@ -1,0 +1,534 @@
+<title>Zifidit Spin Scrubber</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Cordless electric spin scrubber with interchangeable heads for kitchen and bathroom. Free shipping, secure checkout.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: product-first store page — gallery + buy box, then a surface guide that teaches which head to use, then proof, payments, FAQ. Checkout slides in as a sheet. */
+:root{
+  --bg:#f5f8f8; --surface:#ffffff; --surface-2:#eaf1f0; --ink:#0d1b1e; --muted:#566a6d; --line:#d9e3e2;
+  --foam:#0e7c72; --foam-ink:#ffffff; --foam-soft:#d6ece9; --sponge:#f3c331; --sponge-ink:#1d1600;
+  --shadow:0 18px 50px rgba(13,40,42,.12);
+  --display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r-sm:10px; --r-md:16px; --r-lg:24px; --maxw:1180px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b1415; --surface:#122022; --surface-2:#172a2c; --ink:#e8f1f0; --muted:#9bb0b1; --line:#24393b;
+  --foam:#3cc2b2; --foam-ink:#04211e; --foam-soft:#173a37; --sponge:#f3c331; --sponge-ink:#1d1600;
+  --shadow:0 18px 50px rgba(0,0,0,.45); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b1415; --surface:#122022; --surface-2:#172a2c; --ink:#e8f1f0; --muted:#9bb0b1; --line:#24393b;
+  --foam:#3cc2b2; --foam-ink:#04211e; --foam-soft:#173a37; --sponge:#f3c331; --sponge-ink:#1d1600;
+  --shadow:0 18px 50px rgba(0,0,0,.45); color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--surface)}
+img,video{display:block;max-width:100%}
+a{color:inherit}
+h1,h2,h3{font-family:var(--display);line-height:1.08;letter-spacing:-.02em;text-wrap:balance;margin:0}
+p{margin:0}
+.gutter{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:var(--maxw);margin:0 auto}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--foam)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;cursor:pointer;font:600 16px/1 var(--body);border-radius:999px;padding:17px 28px;text-decoration:none;transition:transform .15s,box-shadow .15s,background .15s}
+.btn:focus-visible,button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--foam);outline-offset:3px}
+.btn-buy{background:var(--sponge);color:var(--sponge-ink);box-shadow:0 10px 24px rgba(243,195,49,.35)}
+.btn-buy:hover{transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+
+/* announcement + header */
+.announce{background:var(--ink);color:var(--bg);font-size:13px;text-align:center;padding-block:9px}
+.announce b{color:var(--sponge);font-weight:600}
+header.site{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
+header.site .wrap{display:flex;align-items:center;gap:24px;height:64px}
+.logo{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-.03em;text-decoration:none}
+.logo i{font-style:normal;color:var(--foam)}
+nav.links{display:flex;gap:22px;margin-inline-start:auto;font-size:14px;font-weight:500}
+nav.links a{text-decoration:none;color:var(--muted)}
+nav.links a:hover{color:var(--ink)}
+.hdr-buy{padding:11px 18px;font-size:14px}
+
+/* hero / product */
+.product{padding-block:40px 56px}
+.product .wrap{display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:start}
+.gallery{display:grid;gap:12px;min-width:0}
+.stage{position:relative;border-radius:var(--r-lg);overflow:hidden;background:var(--surface-2);aspect-ratio:4/5;max-width:100%}
+.stage video,.stage img{width:100%;height:100%;object-fit:cover}
+.stage .tag{position:absolute;inset-inline-start:14px;top:14px;background:var(--surface);color:var(--ink);font:500 12px var(--mono);padding:6px 10px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.thumbs{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.thumbs button{padding:0;border:2px solid transparent;border-radius:var(--r-sm);overflow:hidden;cursor:pointer;background:var(--surface-2);aspect-ratio:1;max-width:100%}
+.thumbs button[aria-pressed="true"]{border-color:var(--foam)}
+.thumbs img{width:100%;height:100%;object-fit:cover}
+.buybox{position:sticky;top:calc(84px + env(safe-area-inset-top,0px));display:grid;gap:22px;min-width:0}
+.buybox h1{font-size:clamp(34px,4.4vw,54px);font-weight:800}
+.buybox .lede{font-size:18px;color:var(--muted);max-width:52ch}
+.price-row{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.price{font-family:var(--display);font-weight:700;font-size:40px;font-variant-numeric:tabular-nums}
+.ship-note{font-size:14px;color:var(--foam);font-weight:600}
+.qty-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.qty button{width:46px;height:50px;border:0;background:transparent;color:var(--ink);font-size:20px;cursor:pointer;border-radius:999px}
+.qty output{min-width:34px;text-align:center;font:600 17px var(--body);font-variant-numeric:tabular-nums}
+.qty-row .btn-buy{flex:1;min-width:200px}
+.total-line{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.paychips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:600 12px var(--body);letter-spacing:.01em;padding:6px 11px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.assure{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.assure div{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px;font-size:13px;color:var(--muted)}
+.assure b{display:block;color:var(--ink);font-size:14px;margin-bottom:2px}
+details.acc{border-top:1px solid var(--line);padding-block:14px}
+details.acc:last-of-type{border-bottom:1px solid var(--line)}
+details.acc summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:12px}
+details.acc summary::after{content:"+";font-family:var(--mono);color:var(--muted)}
+details.acc[open] summary::after{content:"–"}
+details.acc p,details.acc ul{margin-top:10px;color:var(--muted);font-size:15px}
+details.acc ul{padding-inline-start:18px;display:grid;gap:4px}
+
+/* surface guide */
+section.band{padding-block:72px}
+.band-alt{background:var(--surface)}
+.sec-head{display:grid;gap:12px;margin-bottom:36px;max-width:640px}
+.sec-head h2{font-size:clamp(30px,3.6vw,44px);font-weight:800}
+.sec-head p{color:var(--muted);font-size:17px}
+.guide{display:grid;grid-template-columns:1fr 1.15fr;gap:40px;align-items:center}
+.guide-img{border-radius:var(--r-lg);overflow:hidden;background:var(--surface-2);min-width:0}
+.heads{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.heads button{font:600 14px var(--body);padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.heads button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.head-panel{display:grid;gap:16px;min-width:0}
+.head-panel h3{font-size:28px}
+.head-panel p{color:var(--muted)}
+.surfaces{display:flex;flex-wrap:wrap;gap:8px}
+.surfaces span{background:var(--foam-soft);color:var(--ink);font-size:14px;padding:6px 12px;border-radius:999px}
+.feel{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px;align-items:center}
+.feel dt{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.feel dd{margin:0;display:flex;gap:4px}
+.feel i{width:28px;height:8px;border-radius:4px;background:var(--line)}
+.feel i.on{background:var(--foam)}
+
+/* where it works */
+.uses{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.uses figure{margin:0;position:relative;border-radius:var(--r-md);overflow:hidden;background:var(--surface-2);aspect-ratio:4/5;max-width:100%}
+.uses img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.uses figure:hover img{transform:scale(1.04)}
+.uses figcaption{position:absolute;inset:auto 10px 10px;background:var(--surface);color:var(--ink);font-weight:600;font-size:14px;padding:8px 12px;border-radius:10px;width:max-content;max-width:calc(100% - 20px)}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;counter-reset:st}
+.step{background:var(--bg);border:1px solid var(--line);border-radius:var(--r-md);padding:24px;display:grid;gap:10px}
+.step::before{counter-increment:st;content:"Step " counter(st);font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--foam)}
+.step h3{font-size:22px}
+.step p{color:var(--muted);font-size:15px}
+
+/* payments */
+.pay{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.pay-list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.pay-item{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:16px;display:grid;gap:4px;min-width:0}
+.pay-item b{font-size:15px}
+.pay-item span{font-size:13px;color:var(--muted)}
+.lock{display:flex;gap:14px;align-items:flex-start;background:var(--foam-soft);border-radius:var(--r-md);padding:18px;margin-top:22px}
+.lock svg{flex:0 0 28px;color:var(--foam)}
+.lock p{font-size:14px;color:var(--ink)}
+
+/* faq */
+.faq{max-width:780px}
+.faq details.acc summary{font-size:17px}
+
+/* closing */
+.closing{background:var(--ink);color:var(--bg);border-radius:var(--r-lg);padding:48px 32px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center}
+.closing h2{font-size:clamp(28px,3.4vw,42px);font-weight:800;color:var(--bg)}
+.closing p{color:color-mix(in srgb,var(--bg) 70%,transparent);margin-top:8px}
+footer.site{padding-block:40px 120px;color:var(--muted);font-size:14px}
+footer.site .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:24px}
+footer.site nav{display:flex;gap:18px;flex-wrap:wrap}
+footer.site a{text-decoration:none}
+
+/* sticky mobile bar */
+.mbar{position:fixed;inset:auto 0 0 0;z-index:35;background:var(--surface);border-top:1px solid var(--line);display:none;gap:12px;align-items:center;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));transform:translateY(110%);transition:transform .25s}
+.mbar.show{transform:none}
+.mbar .p{font-family:var(--display);font-weight:700;font-size:22px;font-variant-numeric:tabular-nums}
+.mbar small{display:block;font-size:12px;color:var(--foam);font-weight:600}
+.mbar .btn{flex:1;padding:15px 20px}
+
+/* checkout sheet */
+.scrim{position:fixed;inset:0;z-index:60;background:rgba(5,14,15,.55);opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+.scrim.open{opacity:1;visibility:visible}
+.sheet{position:fixed;z-index:61;background:var(--surface);display:flex;flex-direction:column;visibility:hidden;box-shadow:var(--shadow);transition:transform .34s cubic-bezier(.2,.8,.2,1),visibility .34s}
+.sheet[aria-hidden="false"]{visibility:visible;transform:none}
+.sheet-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.sheet-top h2{font-size:20px}
+.x{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font-size:18px}
+.summary{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;padding:16px 20px;background:var(--surface-2)}
+.summary img{width:64px;height:64px;border-radius:12px;object-fit:cover}
+.summary b{display:block;font-size:15px}
+.summary span{font-size:13px;color:var(--muted)}
+.summary .amt{font-family:var(--display);font-weight:700;font-size:20px;font-variant-numeric:tabular-nums}
+.sheet-body{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:20px}
+.sheet-foot{padding:12px 20px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);display:flex;gap:8px;align-items:center;justify-content:center;text-align:center}
+.skel{display:grid;gap:12px}
+.skel i{display:block;height:48px;border-radius:12px;background:linear-gradient(90deg,var(--surface-2) 25%,var(--bg) 50%,var(--surface-2) 75%);background-size:200% 100%;animation:sh 1.2s infinite}
+.skel i.dark{background:var(--ink);height:54px;animation:none}
+@keyframes sh{to{background-position:-200% 0}}
+.ck-note{border:1px dashed var(--line);border-radius:var(--r-md);padding:16px;font-size:14px;color:var(--muted);display:grid;gap:12px}
+.ck-note b{color:var(--ink)}
+.demo{display:grid;gap:12px}
+.demo .wallet{height:52px;border-radius:12px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-weight:600}
+.demo .or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}
+.demo .or::before,.demo .or::after{content:"";flex:1;height:1px;background:var(--line)}
+.demo label{display:grid;gap:6px;font-size:13px;font-weight:500}
+.demo input,.demo select{font:15px var(--body);padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+.demo .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.demo .pay{display:block;width:100%;background:var(--foam);color:var(--foam-ink);padding:16px;border-radius:12px;border:0;font:600 16px var(--body);cursor:pointer}
+.done{text-align:center;display:grid;gap:10px;padding:30px 10px}
+.done h3{font-size:26px}
+.err{text-align:center;display:grid;gap:12px;padding:20px 8px}
+body.locked{overflow:hidden}
+
+@media (max-width:900px){
+  .product .wrap,.guide,.pay{grid-template-columns:1fr}
+  .buybox{position:static}
+  nav.links{display:none}
+  .hdr-buy{margin-inline-start:auto}
+  .uses{grid-template-columns:repeat(2,1fr)}
+  .steps{grid-template-columns:1fr}
+  .closing{grid-template-columns:1fr}
+  .mbar{display:flex}
+  .sheet{inset:auto 0 0 0;height:94dvh;border-radius:24px 24px 0 0;transform:translateY(105%)}
+}
+@media (min-width:901px){
+  .sheet{top:0;bottom:0;right:0;width:min(500px,100vw);transform:translateX(105%);padding-top:env(safe-area-inset-top,0px)}
+}
+@media (max-width:480px){
+  .assure{grid-template-columns:1fr}
+  .pay-list{grid-template-columns:1fr}
+  .thumbs{grid-template-columns:repeat(5,1fr);gap:6px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.sheet,.scrim,.mbar,.btn,.uses img{transition:none}.skel i{animation:none}}
+</style>
+
+<div class="announce gutter"><b>Free shipping</b> on every order · Tracked delivery to your door</div>
+
+<header class="site gutter">
+  <div class="wrap">
+    <a class="logo" href="#top">Zifi<i>dit</i></a>
+    <nav class="links" aria-label="Sections">
+      <a href="#guide">Heads</a><a href="#uses">Where it works</a><a href="#payments">Payments</a><a href="#faq">FAQ</a>
+    </nav>
+    <button class="btn btn-buy hdr-buy" type="button" data-buy>Buy now</button>
+  </div>
+</header>
+
+<main id="top">
+<section class="product gutter" data-whop-product-id="prod_HzcQ4VsshTwUA" data-whop-variant-id="plan_JcStFYyr7EiH5" data-whop-price="21.64" data-whop-currency="USD">
+  <div class="wrap">
+    <div class="gallery">
+      <div class="stage" id="stage">
+        <video id="stage-video" src="img/demo.mp4" poster="img/poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="The spin scrubber cleaning a stove, sink and floor mat"></video>
+        <img id="stage-img" src="img/hero.jpg" alt="" hidden>
+        <span class="tag">Cordless · Rotating head</span>
+      </div>
+      <div class="thumbs" role="group" aria-label="Product media">
+        <button type="button" aria-pressed="true" data-media="video" aria-label="Show video"><img src="img/poster.jpg" alt=""></button>
+        <button type="button" aria-pressed="false" data-media="img/hero.jpg" aria-label="Show scrubber in a sink"><img src="img/hero.jpg" alt=""></button>
+        <button type="button" aria-pressed="false" data-media="img/heads.jpg" aria-label="Show the heads"><img src="img/heads.jpg" alt=""></button>
+        <button type="button" aria-pressed="false" data-media="img/use-stove.jpg" aria-label="Show stove cleaning"><img src="img/use-stove.jpg" alt=""></button>
+        <button type="button" aria-pressed="false" data-media="img/use-tile.jpg" aria-label="Show tile cleaning"><img src="img/use-tile.jpg" alt=""></button>
+      </div>
+    </div>
+
+    <div class="buybox">
+      <span class="eyebrow">Kitchen &amp; bathroom</span>
+      <h1>The spin scrubber that does the scrubbing for you.</h1>
+      <p class="lede">A cordless rotating brush with swappable heads. Press one button and let it lift grease off stovetops, sinks, tiles and grout while your wrist rests.</p>
+      <div class="price-row">
+        <span class="price" id="unit-price">$21.64</span>
+        <span class="ship-note">Free shipping included</span>
+      </div>
+      <div class="qty-row">
+        <div class="qty" aria-label="Quantity">
+          <button type="button" id="qty-minus" aria-label="Decrease quantity">−</button>
+          <output id="qty-out" aria-live="polite">1</output>
+          <button type="button" id="qty-plus" aria-label="Increase quantity">+</button>
+        </div>
+        <button class="btn btn-buy" type="button" data-buy>Buy now · <span class="js-total">$21.64</span></button>
+      </div>
+      <p class="total-line">Pay in one step with Apple Pay, Google Pay, PayPal or card. Local methods appear based on your country.</p>
+      <div class="paychips" aria-label="Accepted payments">
+        <span class="chip">Apple Pay</span><span class="chip">Google Pay</span><span class="chip">PayPal</span><span class="chip">Visa</span><span class="chip">Mastercard</span><span class="chip">Amex</span><span class="chip">Klarna</span>
+      </div>
+      <div class="assure">
+        <div><b>Free shipping</b>On every order</div>
+        <div><b>Secure checkout</b>Encrypted by Whop</div>
+        <div><b>Tracked</b>Number sent by email</div>
+      </div>
+      <div>
+        <details class="acc"><summary>What's in the box</summary>
+          <ul><li>Cordless spin scrubber</li><li>Sponge head</li><li>Bristle brush head</li><li>Polishing pad head</li></ul>
+        </details>
+        <details class="acc"><summary>Shipping</summary>
+          <p>Shipping is free. After your order ships you get a tracking number at the email you use at checkout.</p>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band band-alt gutter" id="guide">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Surface guide</span>
+      <h2>Pick the head for the surface.</h2>
+      <p>Each head clicks onto the same motor. Choose by how delicate the surface is and how stuck-on the mess is.</p>
+    </div>
+    <div class="guide">
+      <div class="guide-img"><img src="img/heads.jpg" alt="The polishing pad, bristle brush and sponge heads on the scrubber"></div>
+      <div>
+        <div class="heads" role="tablist" aria-label="Heads">
+          <button type="button" role="tab" id="tab-sponge" aria-selected="true" aria-controls="head-panel" data-head="sponge">Sponge</button>
+          <button type="button" role="tab" id="tab-bristle" aria-selected="false" aria-controls="head-panel" data-head="bristle">Bristle brush</button>
+          <button type="button" role="tab" id="tab-pad" aria-selected="false" aria-controls="head-panel" data-head="pad">Polishing pad</button>
+        </div>
+        <div class="head-panel" id="head-panel" role="tabpanel" aria-live="polite">
+          <h3 id="hp-title">Sponge</h3>
+          <p id="hp-text">Soft and absorbent. Use it with dish soap on surfaces you don't want to scratch.</p>
+          <div class="surfaces" id="hp-surfaces"></div>
+          <dl class="feel">
+            <dt>Scrub</dt><dd id="hp-scrub"></dd>
+            <dt>Gentle</dt><dd id="hp-gentle"></dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band gutter" id="uses">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Where it works</span>
+      <h2>One tool for the jobs you put off.</h2>
+    </div>
+    <div class="uses">
+      <figure><img src="img/use-sink.jpg" alt="Scrubbing a stainless steel sink" loading="lazy"><figcaption>Sinks</figcaption></figure>
+      <figure><img src="img/use-stove.jpg" alt="Cleaning a gas stove burner" loading="lazy"><figcaption>Stovetops &amp; burners</figcaption></figure>
+      <figure><img src="img/use-hood.jpg" alt="Cleaning a range hood filter" loading="lazy"><figcaption>Range hoods</figcaption></figure>
+      <figure><img src="img/use-tile.jpg" alt="Scrubbing tiles under a cabinet" loading="lazy"><figcaption>Tiles &amp; grout</figcaption></figure>
+      <figure><img src="img/use-mat.jpg" alt="Scrubbing a floor mat" loading="lazy"><figcaption>Floor mats</figcaption></figure>
+      <figure><img src="img/use-shoe.jpg" alt="Cleaning a sneaker" loading="lazy"><figcaption>Sneakers</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="band band-alt gutter">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">How to use it</span>
+      <h2>Clean in three moves.</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>Click on a head</h3><p>Push the head onto the motor until it seats. Swap it any time for a different surface.</p></div>
+      <div class="step"><h3>Press and glide</h3><p>Press the button and move slowly. The rotation does the scrubbing, so light pressure is enough.</p></div>
+      <div class="step"><h3>Rinse the head</h3><p>Pull the head off, rinse it under the tap and let it air dry.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band gutter" id="payments">
+  <div class="wrap pay">
+    <div>
+      <div class="sec-head" style="margin-bottom:0">
+        <span class="eyebrow">Checkout</span>
+        <h2>Pay without leaving this page.</h2>
+        <p>Checkout opens right here in a secure panel. Wallets fill in your shipping address for you, so most orders take one tap.</p>
+      </div>
+      <div class="lock">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2" fill="none"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none"></path></svg>
+        <p>Card details are entered in isolated, encrypted fields run by Whop, our payment provider. They never touch our servers.</p>
+      </div>
+    </div>
+    <div class="pay-list">
+      <div class="pay-item"><b>Apple Pay &amp; Google Pay</b><span>One tap with Face ID or fingerprint</span></div>
+      <div class="pay-item"><b>Credit &amp; debit cards</b><span>Visa, Mastercard, Amex and more</span></div>
+      <div class="pay-item"><b>PayPal</b><span>Pay with your PayPal balance or card</span></div>
+      <div class="pay-item"><b>Pay later</b><span>Klarna, Afterpay and others where available</span></div>
+      <div class="pay-item"><b>Local methods</b><span>Shown automatically for your country</span></div>
+      <div class="pay-item"><b>Your currency</b><span>Prices convert to your local currency at checkout</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="band band-alt gutter" id="faq">
+  <div class="wrap faq">
+    <div class="sec-head"><span class="eyebrow">Questions</span><h2>Before you order</h2></div>
+    <details class="acc"><summary>How much is shipping?</summary><p>Shipping is free on every order.</p></details>
+    <details class="acc"><summary>How do I track my order?</summary><p>Once your order ships, a tracking number is emailed to the address you enter at checkout.</p></details>
+    <details class="acc"><summary>Which payment methods can I use?</summary><p>Apple Pay, Google Pay, PayPal, major cards and, depending on your country, pay-later and local methods. The checkout shows the ones available to you.</p></details>
+    <details class="acc"><summary>Can I order more than one?</summary><p>Yes. Set the quantity before you open checkout and the total updates for you.</p></details>
+    <details class="acc"><summary>Is my payment secure?</summary><p>Payments are processed by Whop. Card numbers are entered in encrypted fields that we never see or store.</p></details>
+  </div>
+</section>
+
+<section class="band gutter">
+  <div class="wrap closing">
+    <div>
+      <h2>Give your wrists the day off.</h2>
+      <p>$21.64 with free, tracked shipping.</p>
+    </div>
+    <button class="btn btn-buy" type="button" data-buy>Buy now</button>
+  </div>
+</section>
+</main>
+
+<footer class="site gutter">
+  <div class="wrap">
+    <span>© Zifidit</span>
+    <nav aria-label="Footer"><a href="#faq">Shipping</a><a href="#payments">Payments</a><a href="#faq">FAQ</a></nav>
+  </div>
+</footer>
+
+<div class="mbar" id="mbar">
+  <div><span class="p js-total">$21.64</span><small>Free shipping</small></div>
+  <button class="btn btn-buy" type="button" data-buy>Buy now</button>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" aria-hidden="true">
+  <div class="sheet-top">
+    <h2 id="sheet-title">Checkout</h2>
+    <button class="x" id="sheet-x" type="button" aria-label="Close checkout">✕</button>
+  </div>
+  <div class="summary">
+    <img src="img/hero.jpg" alt="">
+    <div><b>Spin Scrubber</b><span>Qty <span id="sum-qty">1</span> · Free shipping</span></div>
+    <span class="amt js-total">$21.64</span>
+  </div>
+  <div class="sheet-body">
+    <div class="skel" id="skel"><i class="dark"></i><i></i><i></i><i></i><i></i></div>
+    <div id="checkout"></div>
+    <div class="err" id="ck-err" hidden>
+      <p>Checkout didn't load. Check your connection and try again.</p>
+      <button class="btn btn-buy" type="button" id="ck-retry">Try again</button>
+    </div>
+    <div class="ck-note" id="ck-preview" hidden>
+      <span><b>Preview mode.</b> On your live domain, Whop's secure checkout loads here with real wallets and card fields. The form below shows the layout only and does not take payments.</span>
+      <form class="demo" id="demo-form">
+        <div class="wallet">Apple Pay / Google Pay</div>
+        <div class="or">or pay with card</div>
+        <label for="d-email">Email<input id="d-email" type="email" placeholder="you@example.com" autocomplete="off"></label>
+        <label for="d-addr">Shipping address<input id="d-addr" type="text" placeholder="Street, city, postal code" autocomplete="off"></label>
+        <label for="d-card">Card number<input id="d-card" type="text" inputmode="numeric" placeholder="1234 1234 1234 1234" autocomplete="off"></label>
+        <div class="row"><label for="d-exp">Expiry<input id="d-exp" type="text" placeholder="MM / YY" autocomplete="off"></label><label for="d-cvc">CVC<input id="d-cvc" type="text" placeholder="123" autocomplete="off"></label></div>
+        <button class="pay" type="submit">Pay <span class="js-total">$21.64</span></button>
+      </form>
+    </div>
+    <div class="done" id="ck-done" hidden>
+      <h3>Order confirmed</h3>
+      <p>Your receipt is on its way to your inbox. We'll email tracking as soon as it ships.</p>
+    </div>
+  </div>
+  <div class="sheet-foot"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2" fill="none"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none"></path></svg>Secure payment processed by Whop</div>
+</aside>
+
+<script>
+(function(){
+  var PLAN="plan_JcStFYyr7EiH5",PROD="prod_HzcQ4VsshTwUA",UNIT=21.64,MAXQ=10;
+  var qty=1;
+  var $=function(s){return document.querySelector(s)},$$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
+  var fmt=function(n){return "$"+n.toFixed(2)};
+  function track(e,d){try{window.whop&&window.whop.track&&window.whop.track(e,d)}catch(_){}}
+
+  /* gallery */
+  var vid=$("#stage-video"),img=$("#stage-img");
+  $$(".thumbs button").forEach(function(b){b.addEventListener("click",function(){
+    $$(".thumbs button").forEach(function(x){x.setAttribute("aria-pressed","false")});b.setAttribute("aria-pressed","true");
+    var m=b.getAttribute("data-media");
+    if(m==="video"){img.hidden=true;vid.hidden=false;try{vid.play()}catch(_){}}else{vid.hidden=true;try{vid.pause()}catch(_){}img.src=m;img.alt=b.getAttribute("aria-label").replace("Show ","");img.hidden=false}
+  })});
+
+  /* surface guide */
+  var HEADS={
+    sponge:{t:"Sponge",x:"Soft and absorbent. Use it with dish soap on surfaces you don't want to scratch.",s:["Pots & pans","Sinks","Bathtubs","Glass shower doors"],scrub:2,gentle:5},
+    bristle:{t:"Bristle brush",x:"Stiff bristles reach into grooves and textured surfaces where buildup hides.",s:["Grout lines","Stove burners","Floor mats","Sneaker soles"],scrub:5,gentle:2},
+    pad:{t:"Polishing pad",x:"A soft, fluffy pad for buffing smooth surfaces to a streak-free finish.",s:["Stainless steel","Ceramic tiles","Countertops","Faucets"],scrub:1,gentle:5}
+  };
+  function bars(n){var h="";for(var i=1;i<=5;i++)h+='<i class="'+(i<=n?"on":"")+'"></i>';return h}
+  function showHead(k){var h=HEADS[k];
+    $("#hp-title").textContent=h.t;$("#hp-text").textContent=h.x;
+    $("#hp-surfaces").innerHTML=h.s.map(function(s){return "<span>"+s.replace("&","&amp;")+"</span>"}).join("");
+    $("#hp-scrub").innerHTML=bars(h.scrub);$("#hp-gentle").innerHTML=bars(h.gentle);
+    $$(".heads button").forEach(function(b){b.setAttribute("aria-selected",b.getAttribute("data-head")===k?"true":"false")});
+  }
+  $$(".heads button").forEach(function(b){b.addEventListener("click",function(){showHead(b.getAttribute("data-head"))})});
+  showHead("sponge");
+
+  /* quantity */
+  function setQty(n){qty=Math.max(1,Math.min(MAXQ,n));$("#qty-out").textContent=qty;$("#sum-qty").textContent=qty;
+    $$(".js-total").forEach(function(e){e.textContent=fmt(UNIT*qty)})}
+  $("#qty-minus").addEventListener("click",function(){setQty(qty-1)});
+  $("#qty-plus").addEventListener("click",function(){setQty(qty+1)});
+
+  /* sticky mobile bar after hero */
+  var mbar=$("#mbar"),hero=$(".buybox");
+  if("IntersectionObserver" in window){new IntersectionObserver(function(es){mbar.classList.toggle("show",!es[0].isIntersecting)},{rootMargin:"0px 0px -40% 0px"}).observe(hero)}else{mbar.classList.add("show")}
+
+  /* checkout */
+  var sheet=$("#sheet"),scrim=$("#scrim"),box=$("#checkout"),skel=$("#skel"),err=$("#ck-err"),prev=$("#ck-preview"),done=$("#ck-done");
+  var handle=null,mountedQty=0,isOpen=false,lastFocus=null,live=false;
+  var q=new URLSearchParams(location.search),attr={};
+  [["utm_source","utmSource"],["utm_medium","utmMedium"],["utm_campaign","utmCampaign"],["utm_term","utmTerm"],["utm_content","utmContent"]].forEach(function(k){var v=q.get(k[0]);if(v)attr[k[1]]=v});
+
+  function mountLive(){
+    if(!window.WhopElements)return false;
+    live=true;
+    if(handle&&mountedQty===qty)return true;
+    try{handle&&handle.destroy()}catch(_){}
+    box.innerHTML="";skel.hidden=false;err.hidden=true;
+    try{
+      var opts={plan:PLAN,quantity:qty,metadata:{source:"zifidit-en-landing"},returnUrl:location.origin+location.pathname.replace(/[^/]*$/,"")+"return.html",
+        appearance:{theme:{appearance:document.documentElement.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"),accentColor:"teal",grayColor:"slate"},variables:{"--radius":"12px"}},
+        onComplete:function(c){if(c&&c.result==="payment"){track("purchase",{value:UNIT*qty,currency:"USD",variant_id:PLAN,product_id:PROD});box.hidden=true;done.hidden=false}},
+        onLoadingChange:function(l){if(!l)skel.hidden=true}};
+      if(Object.keys(attr).length)opts.attribution=attr;
+      handle=window.WhopElements().checkout.create(opts);
+      handle.create("checkout",{onReady:function(){skel.hidden=true},onError:function(e){console.error(e);skel.hidden=true;err.hidden=false}}).mount(box);
+      mountedQty=qty;
+    }catch(e){console.error(e);handle=null;skel.hidden=true;err.hidden=false}
+    return true;
+  }
+  function showPreview(){skel.hidden=true;prev.hidden=false}
+  /* warm the checkout in the background so the sheet opens instantly */
+  (function warm(n){if(mountLive())return;if(n<20)setTimeout(function(){warm(n+1)},150);else showPreview()})(0);
+  $("#ck-retry").addEventListener("click",function(){handle=null;mountLive()});
+  $("#demo-form").addEventListener("submit",function(e){e.preventDefault();prev.hidden=true;done.hidden=false});
+
+  function open(){
+    if(isOpen)return;isOpen=true;lastFocus=document.activeElement;
+    if(live)mountLive();
+    sheet.setAttribute("aria-hidden","false");scrim.classList.add("open");document.body.classList.add("locked");
+    setTimeout(function(){$("#sheet-x").focus()},60);
+    track("initiate_checkout",{value:UNIT*qty,currency:"USD",variant_id:PLAN,product_id:PROD});
+  }
+  function close(){
+    if(!isOpen)return;isOpen=false;
+    sheet.setAttribute("aria-hidden","true");scrim.classList.remove("open");document.body.classList.remove("locked");
+    if(lastFocus&&lastFocus.focus)lastFocus.focus();
+  }
+  $$("[data-buy]").forEach(function(b){b.addEventListener("click",open)});
+  $("#sheet-x").addEventListener("click",close);scrim.addEventListener("click",close);
+  document.addEventListener("keydown",function(e){
+    if(!isOpen)return;
+    if(e.key==="Escape")close();
+    if(e.key==="Tab"){var f=$$("#sheet button:not([hidden]),#sheet input,#sheet iframe,#sheet a[href]").filter(function(el){return el.offsetParent!==null});if(!f.length)return;
+      var a=f[0],z=f[f.length-1];if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}}
+  });
+  var y0=null,top=$(".sheet-top");
+  top.addEventListener("touchstart",function(e){y0=e.touches[0].clientY},{passive:true});
+  top.addEventListener("touchend",function(e){if(y0!==null&&e.changedTouches[0].clientY-y0>70)close();y0=null},{passive:true});
+
+  window.addEventListener("load",function(){track("view_content",{value:UNIT,currency:"USD",variant_id:PLAN,product_id:PROD})});
+})();
+</script>
