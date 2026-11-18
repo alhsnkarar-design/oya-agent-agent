@@ -13,7 +13,10 @@ The storefront lives in `zifidit-landing-en/` and is deployed to https://zifidit
   the full shipping address (country, address, city, state/governorate in each country's format).
 - Add a required phone field on every variant: `custom_fields: [{field_type: "text",
   name: "Phone number with country code (for delivery)", placeholder: "+1 555 123 4567",
-  required: true, order: 1}]`. Sending `custom_fields` replaces the list, so always include it.
+  required: true, order: 1}]`. Whop clears custom fields on any variant update that omits
+  `custom_fields`, so include this list in EVERY variants_update call, then read it back.
+- No bank wire and no crypto: set `payment_method_configuration` with `disabled: ["bank_wire",
+  "international_bank_wire", "crypto", "crypto_subscription", "coinbase"]` (keep the other methods enabled).
 - Title, headline and description in English, matching the storefront.
 - Only add products the owner has a real supplier for, with real photos and a cost price
   from the owner. Never publish sample/placeholder products, invented reviews, fake
