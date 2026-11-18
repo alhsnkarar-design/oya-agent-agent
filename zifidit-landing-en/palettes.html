@@ -1,0 +1,107 @@
+<title>Zifidit Color Options</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap">
+<style>
+/* Layout: three phone mockups of the same product page, one per palette, with a name and swatches above each. */
+:root{--page:#f3f4f5;--text:#141414;--sub:#5f6368;--head:"Oswald","Arial Narrow",Impact,sans-serif;--body:"Plus Jakarta Sans",system-ui,sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+body{background:var(--page);color:var(--text);font-family:var(--body);padding-block:24px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-family:var(--head);font-weight:500;text-transform:uppercase;text-align:center;font-size:clamp(24px,4vw,34px);margin:0 0 6px}
+.lead{text-align:center;color:var(--sub);margin:0 0 26px;font-size:15px}
+.row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;max-width:1120px;margin:0 auto}
+.opt{display:grid;gap:12px;justify-items:center;min-width:0}
+.label{text-align:center;display:grid;gap:4px}
+.label b{font-size:18px}
+.label span{font-size:13px;color:var(--sub)}
+.sw{display:flex;gap:6px;justify-content:center}
+.sw i{width:22px;height:22px;border-radius:50%;border:1px solid rgba(0,0,0,.12)}
+.rec{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:#0e4f5c;color:#fff;padding:3px 8px;border-radius:4px;justify-self:center}
+
+/* phone mockup */
+.phone{width:100%;max-width:320px;border-radius:28px;padding:10px;background:#111;box-shadow:0 18px 40px rgba(0,0,0,.18)}
+.screen{border-radius:20px;overflow:hidden;background:var(--bg);color:var(--ink)}
+.hdr{display:grid;grid-template-columns:28px 1fr 28px;align-items:center;padding:12px 14px}
+.hdr .b{grid-column:2;justify-self:center;font-family:var(--head);font-size:15px;letter-spacing:.08em}
+.bag{justify-self:end;position:relative;width:18px;height:18px;border:1.6px solid var(--ink);border-radius:2px 2px 4px 4px}
+.bag::after{content:"1";position:absolute;top:-8px;right:-9px;width:14px;height:14px;border-radius:50%;background:var(--badge);color:var(--badge-ink);font:700 9px/14px var(--body);text-align:center}
+.img{background:var(--tile);aspect-ratio:1/1;display:grid;place-items:center;overflow:hidden}
+.img img{width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply}
+.dots{display:flex;gap:5px;justify-content:center;padding:8px 0;background:var(--tile)}
+.dots i{width:5px;height:5px;border-radius:50%;background:var(--dot)}
+.dots i:first-child{background:var(--ink)}
+.info{padding:14px;display:grid;gap:8px}
+.info h2{font-family:var(--head);font-weight:500;text-transform:uppercase;font-size:22px;margin:0;line-height:1.05}
+.price{font-weight:700;font-size:14px}
+.desc{font-size:12px;color:var(--muted);line-height:1.5;margin:0}
+.btn{display:block;text-align:center;font-weight:600;font-size:13px;padding:12px;border-radius:var(--r)}
+.b1{background:var(--primary);color:var(--primary-ink)}
+.b2{background:var(--secondary);color:var(--secondary-ink)}
+.ship{font-size:10.5px;color:var(--muted);line-height:1.5}
+.ship u{color:var(--ink)}
+.foot{padding:14px;text-align:center;font-size:10.5px;color:var(--muted);border-top:1px solid var(--line)}
+
+.p1{--bg:#ffffff;--tile:#eef2f4;--ink:#0f1a1f;--muted:#5d6b73;--line:#dfe5e8;--dot:#b9c4ca;--primary:#0e4f5c;--primary-ink:#fff;--secondary:#0f1a1f;--secondary-ink:#fff;--badge:#0e4f5c;--badge-ink:#fff;--r:0px}
+.p2{--bg:#fbfaf7;--tile:#f1eee6;--ink:#1d221e;--muted:#646a63;--line:#e6e2d8;--dot:#c3beb1;--primary:#2f4a3a;--primary-ink:#fff;--secondary:#1d221e;--secondary-ink:#fff;--badge:#2f4a3a;--badge-ink:#fff;--r:2px}
+.p3{--bg:#ffffff;--tile:#f2f2f2;--ink:#0a0a0a;--muted:#666;--line:#e6e6e6;--dot:#bdbdbd;--primary:#0a0a0a;--primary-ink:#fff;--secondary:#ffffff;--secondary-ink:#0a0a0a;--badge:#e8a33d;--badge-ink:#1a1206;--r:999px}
+.p3 .b2{border:1.5px solid #0a0a0a;padding:10.5px}
+
+@media (max-width:860px){.row{grid-template-columns:1fr;gap:34px}}
+</style>
+
+<h1>Zifidit color options</h1>
+<p class="lead">نفس صفحة المنتج بالتلات ألوان · اختار اللي يعجبك</p>
+
+<div class="row">
+  <div class="opt">
+    <div class="label"><span class="rec">مُرشَّح</span><b>1 · نظافة</b><span>أزرق مخضر غامق على أبيض</span></div>
+    <div class="sw"><i style="background:#ffffff"></i><i style="background:#eef2f4"></i><i style="background:#0e4f5c"></i><i style="background:#0f1a1f"></i></div>
+    <div class="phone"><div class="screen p1">
+      <div class="hdr"><span class="b">ZIFIDIT</span><span class="bag"></span></div>
+      <div class="img"><img src="img/heads.jpg" alt="Spin Scrubber heads"></div>
+      <div class="dots"><i></i><i></i><i></i><i></i></div>
+      <div class="info">
+        <h2>Spin Scrubber</h2><span class="price">$21.64</span>
+        <p class="desc">A cordless rotating brush with swappable heads.</p>
+        <span class="btn b1">Add to Cart</span><span class="btn b2">Buy it now</span>
+        <span class="ship">Free shipping · Delivery in 8–18 business days · <u>Shipping &amp; returns</u></span>
+      </div>
+      <div class="foot">© 2026 Zifidit · Secure payments by Whop</div>
+    </div></div>
+  </div>
+
+  <div class="opt">
+    <div class="label"><b>2 · فاخر هادي</b><span>أخضر زيتوني على أبيض دافي</span></div>
+    <div class="sw"><i style="background:#fbfaf7"></i><i style="background:#f1eee6"></i><i style="background:#2f4a3a"></i><i style="background:#1d221e"></i></div>
+    <div class="phone"><div class="screen p2">
+      <div class="hdr"><span class="b">ZIFIDIT</span><span class="bag"></span></div>
+      <div class="img"><img src="img/heads.jpg" alt="Spin Scrubber heads"></div>
+      <div class="dots"><i></i><i></i><i></i><i></i></div>
+      <div class="info">
+        <h2>Spin Scrubber</h2><span class="price">$21.64</span>
+        <p class="desc">A cordless rotating brush with swappable heads.</p>
+        <span class="btn b1">Add to Cart</span><span class="btn b2">Buy it now</span>
+        <span class="ship">Free shipping · Delivery in 8–18 business days · <u>Shipping &amp; returns</u></span>
+      </div>
+      <div class="foot">© 2026 Zifidit · Secure payments by Whop</div>
+    </div></div>
+  </div>
+
+  <div class="opt">
+    <div class="label"><b>3 · عصري جريء</b><span>أسود وأبيض مع لمسة كهرماني</span></div>
+    <div class="sw"><i style="background:#ffffff"></i><i style="background:#f2f2f2"></i><i style="background:#0a0a0a"></i><i style="background:#e8a33d"></i></div>
+    <div class="phone"><div class="screen p3">
+      <div class="hdr"><span class="b">ZIFIDIT</span><span class="bag"></span></div>
+      <div class="img"><img src="img/heads.jpg" alt="Spin Scrubber heads"></div>
+      <div class="dots"><i></i><i></i><i></i><i></i></div>
+      <div class="info">
+        <h2>Spin Scrubber</h2><span class="price">$21.64</span>
+        <p class="desc">A cordless rotating brush with swappable heads.</p>
+        <span class="btn b1">Add to Cart</span><span class="btn b2">Buy it now</span>
+        <span class="ship">Free shipping · Delivery in 8–18 business days · <u>Shipping &amp; returns</u></span>
+      </div>
+      <div class="foot">© 2026 Zifidit · Secure payments by Whop</div>
+    </div></div>
+  </div>
+</div>
