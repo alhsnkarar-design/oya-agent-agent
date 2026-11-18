@@ -5,7 +5,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: creator-store style — centered header, banner, two-up product grid, full product page with slider. One committed light look. */
+/* Layout: creator-store style — centered header, two-up product grid, full product page with slider. One committed light look. */
 :root{
   --bg:#d9d9d9; --tile:#c8c8c8; --panel:#e4e4e4; --ink:#161616; --muted:#5a5a5a; --line:#b4b4b4;
   --rust:#9b5149; --rust-ink:#ffffff; --white:#ffffff;
@@ -38,10 +38,7 @@ header.top .wrap{display:grid;grid-template-columns:44px 1fr 44px;align-items:ce
 .bag-count{position:absolute;top:6px;right:4px;min-width:17px;height:17px;border-radius:9px;background:var(--rust);color:var(--rust-ink);font:700 10px/17px var(--body);text-align:center;padding:0 4px}
 .bag-count[data-n="0"]{display:none}
 
-.banner{position:relative;max-width:100%;aspect-ratio:16/7;background:var(--tile);overflow:hidden}
-.banner video{width:100%;height:100%;object-fit:cover}
-.collection{padding-block:40px 12px;display:grid;gap:18px;justify-items:center;text-align:center}
-.collection h1{font-size:clamp(24px,3.4vw,36px)}
+.collection{padding-block:20px 0;display:grid;gap:18px;justify-items:center;text-align:center}
 .collection .btn{max-width:420px}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px 16px;padding-block:28px 64px}
 .card{background:none;border:0;padding:0;cursor:pointer;text-align:center;display:grid;gap:10px;align-content:start;min-width:0}
@@ -133,7 +130,6 @@ body.locked{overflow:hidden}
 @media (max-width:960px){.grid{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:760px){
   .grid{grid-template-columns:repeat(2,1fr);gap:24px 14px}
-  .banner{aspect-ratio:4/3}
   .pdp .wrap{grid-template-columns:1fr;gap:0}
   .pdp .slider{margin-left:calc(-1 * max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)))}
   .info{padding-top:16px}
@@ -151,11 +147,9 @@ body.locked{overflow:hidden}
 
 <main>
 <div id="view-home">
-  <div class="banner"><video src="img/demo.mp4" poster="img/poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="The spin scrubber cleaning a stove, sink and floor mat"></video></div>
   <section class="g">
     <div class="wrap">
       <div class="collection">
-        <h1>Shop the collection</h1>
         <a class="btn btn-rust" href="#grid">Shop now</a>
       </div>
       <div class="grid" id="grid"></div>
