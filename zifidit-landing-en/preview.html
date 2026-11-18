@@ -77,9 +77,6 @@ header.top .wrap{display:grid;grid-template-columns:44px 1fr 44px;align-items:ce
 .swatches{display:flex;gap:12px;flex-wrap:wrap}
 .swatches button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);cursor:pointer;padding:0}
 .swatches button[aria-pressed="true"]{box-shadow:0 0 0 3px var(--bg),0 0 0 4px var(--rust)}
-.sizes{display:flex;gap:6px;flex-wrap:wrap}
-.sizes button{min-width:54px;height:38px;border:1px solid var(--line);background:transparent;font-size:14px;cursor:pointer;padding:0 10px}
-.sizes button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .actions{display:grid;gap:8px}
 .xpay{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .xp{height:42px;border:0;font:800 15px/1 var(--body);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 6px;white-space:nowrap;min-width:0;transition:filter .15s}
@@ -91,6 +88,17 @@ header.top .wrap{display:grid;grid-template-columns:44px 1fr 44px;align-items:ce
 .xp-venmo{background:#008cff;color:#fff;font-style:italic}
 .xp-klarna{background:#ffb3c7;color:#17120f}
 .xp-afterpay{background:#b2fce4;color:#000}
+.xp-card{grid-column:1/-1;background:var(--white);color:var(--ink);border:1px solid var(--line);font-weight:700;font-size:14px;gap:10px;height:46px}
+.brands{display:inline-flex;gap:5px;align-items:center}
+.cb{display:inline-grid;place-items:center;height:22px;min-width:34px;padding:0 5px;border-radius:3px;font:800 10px/1 var(--body);letter-spacing:.02em}
+.cb-visa{background:#1a1f71;color:#fff;font-style:italic;font-size:11px}
+.cb-mc{background:#fff;border:1px solid var(--line);position:relative;width:34px}
+.cb-mc::before,.cb-mc::after{content:"";position:absolute;top:4px;width:13px;height:13px;border-radius:50%}
+.cb-mc::before{left:6px;background:#eb001b}
+.cb-mc::after{left:13px;background:#f79e1b;mix-blend-mode:multiply}
+.cb-amex{background:#2e77bc;color:#fff}
+.cb-disc{background:#fff;color:#111;border:1px solid var(--line);white-space:nowrap;font-size:8.5px;display:inline-flex;align-items:center}
+.cb-disc i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#f58220;margin:0 1px}
 .xmore{font-size:12.5px;color:var(--muted);text-align:center}
 .acc{border-top:1px solid var(--line)}
 .acc:last-of-type{border-bottom:1px solid var(--line)}
@@ -208,7 +216,6 @@ body.locked{overflow:hidden}
         <span class="price" id="p-price"></span>
         <p class="desc" id="p-desc"></p>
         <div class="pick" id="p-color-wrap"><span class="lbl">Select color: <b id="p-color-name"></b></span><div class="swatches" id="p-colors" role="group" aria-label="Color"></div></div>
-        <div class="pick" id="p-size-wrap"><span class="lbl">Select size</span><div class="sizes" id="p-sizes" role="group" aria-label="Size"></div></div>
         <div class="actions">
           <button class="btn btn-rust" type="button" id="p-add">Add to Cart</button>
           <button class="btn btn-ink" type="button" id="p-buy">Buy it now</button>
@@ -219,8 +226,9 @@ body.locked{overflow:hidden}
             <button class="xp xp-venmo" type="button" data-pay="Venmo" aria-label="Buy with Venmo">venmo</button>
             <button class="xp xp-klarna" type="button" data-pay="Klarna" aria-label="Pay later with Klarna">Klarna.</button>
             <button class="xp xp-afterpay" type="button" data-pay="Afterpay" aria-label="Pay in 4 with Afterpay">afterpay</button>
+            <button class="xp xp-card" type="button" data-pay="Card" aria-label="Pay with debit or credit card">Debit or credit card <span class="brands" aria-hidden="true"><span class="cb cb-visa">VISA</span><span class="cb cb-mc"></span><span class="cb cb-amex">AMEX</span><span class="cb cb-disc">DISC<i></i>VER</span></span></button>
           </div>
-          <p class="xmore">Also: Visa · Mastercard · Amex · Affirm · Crypto. Methods shown at checkout depend on your country.</p>
+          <p class="xmore">Also: Affirm · Crypto. Methods shown at checkout depend on your country.</p>
         </div>
         <p class="sample-note" id="p-sample" hidden>Sample product for this preview. Connect it to your supplier and a Whop price before selling it.</p>
         <div>
@@ -243,7 +251,7 @@ body.locked{overflow:hidden}
     <h2>Shipping &amp; FAQ</h2>
     <details class="acc"><summary>How much is shipping?</summary><div class="in"><p>Shipping is free on every order.</p></div></details>
     <details class="acc"><summary>How do I track my order?</summary><div class="in"><p>A tracking number is emailed to you once your order ships.</p></div></details>
-    <details class="acc"><summary>How can I pay?</summary><div class="in"><p>Apple Pay, Google Pay, PayPal, Venmo, Klarna, Afterpay, Affirm, crypto and major cards. Checkout shows the methods available in your country.</p></div></details>
+    <details class="acc"><summary>How can I pay?</summary><div class="in"><p>Debit and credit cards (Visa, Mastercard, Amex, Discover), Apple Pay, Google Pay, PayPal, Venmo, Klarna, Afterpay, Affirm and crypto. Checkout shows the methods available in your country.</p></div></details>
   </div>
 </section>
 </main>
@@ -312,11 +320,11 @@ body.locked{overflow:hidden}
   };
   var PRODUCTS=[
     {id:"scrubber",name:"Spin Scrubber",price:21.64,plan:"plan_JcStFYyr7EiH5",product:"prod_HzcQ4VsshTwUA",imgs:["img/heads.jpg","img/hero.jpg","img/use-stove.jpg","img/use-sink.jpg","img/use-tile.jpg","img/use-hood.jpg"],desc:"A cordless rotating brush with swappable heads. Press one button and let it lift grease off stovetops, sinks, tiles and grout.",details:["Cordless, one-button operation","Sponge, bristle brush and polishing pad heads","Free shipping with tracking"],live:true},
-    {id:"hoodie",name:"Loopback Oversized Hoodie",price:56,art:"hoodie",colors:[["Black","#141414"],["Forest","#173a33"],["Sky","#9cc0dc"]],sizes:["S","M","L","XL","2XL","3XL"],desc:"Midweight loopback cotton with a lined pullover hood and a kangaroo pocket. Relaxed, oversized fit.",details:["Midweight loopback cotton","Lined hood, kangaroo pocket","Oversized fit; size down for a closer fit"]},
-    {id:"tee",name:"Heavyweight Box Tee",price:28,art:"tee",colors:[["Navy","#272b3a"],["Bone","#d8d1c3"]],sizes:["S","M","L","XL","2XL","3XL"],desc:"Thick cotton jersey in a boxy cut with a collar that keeps its shape.",details:["Heavyweight cotton","Boxy fit, dropped shoulder"]},
-    {id:"tee2",name:"Everyday Graphic Tee",price:24,art:"tee",colors:[["Charcoal","#4b4b4b"],["Blush","#f0d9de"]],sizes:["S","M","L","XL","2XL"],desc:"Soft midweight tee with a small chest graphic. Easy regular fit.",details:["Midweight cotton","Regular fit"]},
+    {id:"hoodie",name:"Loopback Oversized Hoodie",price:56,art:"hoodie",colors:[["Black","#141414"],["Forest","#173a33"],["Sky","#9cc0dc"]],desc:"Midweight loopback cotton with a lined pullover hood and a kangaroo pocket. Relaxed, oversized fit.",details:["Midweight loopback cotton","Lined hood, kangaroo pocket","Oversized, relaxed fit"]},
+    {id:"tee",name:"Heavyweight Box Tee",price:28,art:"tee",colors:[["Navy","#272b3a"],["Bone","#d8d1c3"]],desc:"Thick cotton jersey in a boxy cut with a collar that keeps its shape.",details:["Heavyweight cotton","Boxy fit, dropped shoulder"]},
+    {id:"tee2",name:"Everyday Graphic Tee",price:24,art:"tee",colors:[["Charcoal","#4b4b4b"],["Blush","#f0d9de"]],desc:"Soft midweight tee with a small chest graphic. Easy regular fit.",details:["Midweight cotton","Regular fit"]},
     {id:"beanie",name:"Ribbed Beanie",price:18,art:"beanie",colors:[["Rust","#9b5149"],["Black","#141414"],["Oat","#cfc3ab"]],desc:"Soft rib knit with a fold-over cuff and a pom on top. One size.",details:["Rib knit","One size"]},
-    {id:"socks",name:"Crew Socks · 3 Pack",price:16,art:"socks",colors:[["White","#f3f3f3"],["Black","#141414"]],sizes:["S/M","L/XL"],desc:"Cushioned sole, reinforced heel and toe, and a rib cuff that stays up.",details:["Cushioned sole","3 pairs"]},
+    {id:"socks",name:"Crew Socks · 3 Pack",price:16,art:"socks",colors:[["White","#f3f3f3"],["Black","#141414"]],desc:"Cushioned sole, reinforced heel and toe, and a rib cuff that stays up.",details:["Cushioned sole","3 pairs"]},
     {id:"tote",name:"Canvas Tote",price:22,art:"tote",colors:[["Natural","#e2d8c2"],["Black","#141414"]],desc:"Heavy canvas with long handles that sit on the shoulder. Fits a laptop and groceries.",details:["Heavy canvas","Shoulder-length handles"]},
     {id:"bottle",name:"Insulated Bottle 750 ml",price:29,art:"bottle",colors:[["Rust","#9b5149"],["Black","#141414"],["Frost","#eeeeee"]],desc:"Double-wall steel keeps drinks cold or hot for hours. Leak-proof screw cap.",details:["Double-wall steel","750 ml"]}
   ];
@@ -344,13 +352,12 @@ body.locked{overflow:hidden}
   $("#pdp-back").addEventListener("click",function(){location.hash="grid"});
 
   function renderPDP(p){
-    cur=p;sel={color:p.colors?p.colors[0][0]:null,size:p.sizes?p.sizes[Math.min(1,p.sizes.length-1)]:null};
+    cur=p;sel={color:p.colors?p.colors[0][0]:null};
     $("#p-title").textContent=p.name;$("#p-price").textContent=fmt(p.price);$("#p-desc").textContent=p.desc;
     $("#p-details").innerHTML=p.details.map(function(d){return "<p>"+d+"</p>"}).join("");
     $("#p-sample").hidden=!!p.live;
-    $("#p-color-wrap").hidden=!(p.colors&&p.colors.length>1);$("#p-size-wrap").hidden=!p.sizes;
+    $("#p-color-wrap").hidden=!(p.colors&&p.colors.length>1);
     $("#p-colors").innerHTML=p.colors?p.colors.map(function(c){return '<button type="button" data-color="'+c[0]+'" aria-label="'+c[0]+'" aria-pressed="'+(c[0]===sel.color)+'" style="background:'+c[1]+'"></button>'}).join(""):"";
-    $("#p-sizes").innerHTML=p.sizes?p.sizes.map(function(s){return '<button type="button" data-size="'+s+'" aria-pressed="'+(s===sel.size)+'">'+s+'</button>'}).join(""):"";
     $("#p-color-name").textContent=sel.color||"";
     renderSlides();
     var others=PRODUCTS.filter(function(x){return x.id!==p.id}),st=PRODUCTS.indexOf(p)%others.length;
@@ -366,7 +373,6 @@ body.locked{overflow:hidden}
   $("#slides").addEventListener("scroll",function(){var sl=this,i=Math.round(Math.abs(sl.scrollLeft)/sl.clientWidth);$$("#pager button").forEach(function(b,j){b.setAttribute("aria-current",j===i?"true":"false")})},{passive:true});
   $("#pager").addEventListener("click",function(e){var b=e.target.closest("[data-i]");if(!b)return;var sl=$("#slides");sl.scrollTo({left:sl.clientWidth*(+b.getAttribute("data-i")),behavior:"smooth"})});
   $("#p-colors").addEventListener("click",function(e){var b=e.target.closest("[data-color]");if(!b)return;sel.color=b.getAttribute("data-color");$$("#p-colors button").forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false")});$("#p-color-name").textContent=sel.color;renderSlides()});
-  $("#p-sizes").addEventListener("click",function(e){var b=e.target.closest("[data-size]");if(!b)return;sel.size=b.getAttribute("data-size");$$("#p-sizes button").forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false")})});
 
   var scrim=$("#scrim"),openEl=null,lastFocus=null;
   function openLayer(el,focus){if(openEl)closeLayer(true);openEl=el;lastFocus=document.activeElement;el.setAttribute("aria-hidden","false");scrim.classList.add("open");document.body.classList.add("locked");setTimeout(function(){(focus||el).focus()},60)}
@@ -382,11 +388,11 @@ body.locked{overflow:hidden}
   $("#menu-links").addEventListener("click",function(e){if(!e.target.closest("a"))return;openEl.setAttribute("aria-hidden","true");openEl=null;scrim.classList.remove("open");document.body.classList.remove("locked")});
 
   var cart=[];
-  try{cart=JSON.parse(localStorage.getItem("zifidit-cart-v2")||"[]").filter(function(l){return byId[l.id]})}catch(_){cart=[]}
-  function save(){try{localStorage.setItem("zifidit-cart-v2",JSON.stringify(cart))}catch(_){}}
+  try{cart=JSON.parse(localStorage.getItem("zifidit-cart-v3")||"[]").filter(function(l){return byId[l.id]})}catch(_){cart=[]}
+  function save(){try{localStorage.setItem("zifidit-cart-v3",JSON.stringify(cart))}catch(_){}}
   var tt;function toast(m){var t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("show")},1800)}
-  function addToCart(id,c,s){var p=byId[id];c=c||(p.colors?p.colors[0][0]:null);s=s||(p.sizes?p.sizes[Math.min(1,p.sizes.length-1)]:null);
-    var k=id+"|"+(c||"")+"|"+(s||""),l=cart.filter(function(x){return x.k===k})[0];if(l)l.q=Math.min(10,l.q+1);else cart.push({k:k,id:id,c:c,s:s,q:1});
+  function addToCart(id,c){var p=byId[id];c=c||(p.colors?p.colors[0][0]:null);
+    var k=id+"|"+(c||""),l=cart.filter(function(x){return x.k===k})[0];if(l)l.q=Math.min(10,l.q+1);else cart.push({k:k,id:id,c:c,q:1});
     save();renderCart();toast(p.name+" added to cart");if(p.live)track("add_to_cart",{variant_id:p.plan,product_id:p.product,value:p.price,currency:"USD"})}
   function linesTotal(L){return L.reduce(function(t,l){return t+byId[l.id].price*l.q},0)}
   function renderCart(){
@@ -395,7 +401,7 @@ body.locked{overflow:hidden}
     var v=$("#cart-view");
     if(!cart.length){v.innerHTML='<div class="empty"><p>Your cart is empty.</p><a class="btn btn-rust" href="#grid" id="empty-shop">Shop now</a></div>';$("#d-foot").hidden=true;$("#empty-shop").addEventListener("click",function(){goHome();closeLayer()});return}
     $("#d-foot").hidden=false;
-    v.innerHTML=cart.map(function(l,i){var p=byId[l.id];return '<div class="line"><div class="th">'+art(p,colorHex(p,l.c))+'</div><div><b>'+p.name+'</b><small>'+[p.colors&&p.colors.length>1?l.c:null,l.s,p.live?null:"Sample"].filter(Boolean).join(" · ")+'</small><br><span class="stepper"><button type="button" data-dec="'+i+'" aria-label="Decrease">−</button><output>'+l.q+'</output><button type="button" data-inc="'+i+'" aria-label="Increase">+</button></span></div><div class="pr">'+fmt(p.price*l.q)+'<button class="rm" type="button" data-rm="'+i+'">Remove</button></div></div>'}).join("");
+    v.innerHTML=cart.map(function(l,i){var p=byId[l.id];return '<div class="line"><div class="th">'+art(p,colorHex(p,l.c))+'</div><div><b>'+p.name+'</b><small>'+[p.colors&&p.colors.length>1?l.c:null,p.live?null:"Sample"].filter(Boolean).join(" · ")+'</small><br><span class="stepper"><button type="button" data-dec="'+i+'" aria-label="Decrease">−</button><output>'+l.q+'</output><button type="button" data-inc="'+i+'" aria-label="Increase">+</button></span></div><div class="pr">'+fmt(p.price*l.q)+'<button class="rm" type="button" data-rm="'+i+'">Remove</button></div></div>'}).join("");
   }
   $("#cart-view").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;
     if(b.hasAttribute("data-inc")){var l=cart[+b.getAttribute("data-inc")];l.q=Math.min(10,l.q+1)}
@@ -407,13 +413,13 @@ body.locked{overflow:hidden}
   $("#cart-open").addEventListener("click",function(){showCart();openLayer(drawer,$("#d-x"))});
   $("#d-x").addEventListener("click",function(){closeLayer()});
   $("#back-cart").addEventListener("click",showCart);
-  $("#p-add").addEventListener("click",function(){addToCart(cur.id,sel.color,sel.size)});
+  $("#p-add").addEventListener("click",function(){addToCart(cur.id,sel.color)});
 
   var handle=null,box=$("#checkout"),ckLines=[],ckFromCart=true;
   var q=new URLSearchParams(location.search),attr={};
   [["utm_source","utmSource"],["utm_medium","utmMedium"],["utm_campaign","utmCampaign"],["utm_term","utmTerm"],["utm_content","utmContent"]].forEach(function(k){var v=q.get(k[0]);if(v)attr[k[1]]=v});
   function msg(t){var m=$("#ck-msg");m.innerHTML=t;m.hidden=false}
-  function buyNow(method){ckLines=[{id:cur.id,c:sel.color,s:sel.size,q:1}];ckFromCart=false;openLayer(drawer,$("#d-x"));startCheckout(method)}
+  function buyNow(method){ckLines=[{id:cur.id,c:sel.color,q:1}];ckFromCart=false;openLayer(drawer,$("#d-x"));startCheckout(method)}
   $("#p-buy").addEventListener("click",function(){buyNow()});
   $(".xpay").addEventListener("click",function(e){var b=e.target.closest("[data-pay]");if(b)buyNow(b.getAttribute("data-pay"))});
   function startCheckout(method){
@@ -437,7 +443,7 @@ body.locked{overflow:hidden}
       handle.create("checkout",{onReady:function(){$("#skel").hidden=true},onError:function(e){console.error(e);$("#skel").hidden=true;msg("<b>Checkout didn't load.</b> Check your connection and try again.")}}).mount(box);
     }catch(e){console.error(e);$("#skel").hidden=true;msg("<b>Checkout didn't load.</b> Check your connection and try again.")}
   }
-  $("#to-pay").addEventListener("click",function(){ckLines=cart.map(function(l){return {id:l.id,c:l.c,s:l.s,q:l.q}});ckFromCart=true;startCheckout()});
+  $("#to-pay").addEventListener("click",function(){ckLines=cart.map(function(l){return {id:l.id,c:l.c,q:l.q}});ckFromCart=true;startCheckout()});
   $("#demo-form").addEventListener("submit",function(e){e.preventDefault();$("#ck-preview").hidden=true;$("#ck-done").hidden=false;if(ckFromCart){cart=[];save();renderCart()}$("#d-foot").hidden=true});
 
   show();
