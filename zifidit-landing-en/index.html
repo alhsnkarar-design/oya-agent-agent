@@ -84,28 +84,6 @@ header.top .wrap{display:grid;grid-template-columns:44px 1fr 44px;align-items:ce
 .swatches button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);cursor:pointer;padding:0}
 .swatches button[aria-pressed="true"]{box-shadow:0 0 0 3px var(--bg),0 0 0 4px var(--rust)}
 .actions{display:grid;gap:8px}
-.xpay{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.xp{height:42px;border:0;font:800 15px/1 var(--body);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 6px;white-space:nowrap;min-width:0;transition:filter .15s}
-.xp:hover{filter:brightness(1.08)}
-.xp small{font-weight:500;font-size:13px}
-.xp-apple,.xp-gpay{background:#000;color:#fff}
-.xp-paypal{background:#ffc439;color:#003087}
-.xp-paypal em{color:#0079c1}
-.xp-venmo{background:#008cff;color:#fff;font-style:italic}
-.xp-klarna{background:#ffb3c7;color:#17120f}
-.xp-afterpay{background:#b2fce4;color:#000}
-.xp-card{grid-column:1/-1;background:var(--white);color:var(--ink);border:1px solid var(--line);font-weight:700;font-size:14px;gap:10px;height:46px}
-.brands{display:inline-flex;gap:5px;align-items:center}
-.cb{display:inline-grid;place-items:center;height:22px;min-width:34px;padding:0 5px;border-radius:3px;font:800 10px/1 var(--body);letter-spacing:.02em}
-.cb-visa{background:#1a1f71;color:#fff;font-style:italic;font-size:11px}
-.cb-mc{background:#fff;border:1px solid var(--line);position:relative;width:34px}
-.cb-mc::before,.cb-mc::after{content:"";position:absolute;top:4px;width:13px;height:13px;border-radius:50%}
-.cb-mc::before{left:6px;background:#eb001b}
-.cb-mc::after{left:13px;background:#f79e1b;mix-blend-mode:multiply}
-.cb-amex{background:#2e77bc;color:#fff}
-.cb-disc{background:#fff;color:#111;border:1px solid var(--line);white-space:nowrap;font-size:8.5px;display:inline-flex;align-items:center}
-.cb-disc i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#f58220;margin:0 1px}
-.xmore{font-size:12.5px;color:var(--muted);text-align:center}
 .acc{border-top:1px solid var(--line)}
 .acc:last-of-type{border-bottom:1px solid var(--line)}
 .acc summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;padding-block:13px;font-size:14px}
@@ -229,16 +207,6 @@ body.locked{overflow:hidden}
         <div class="actions">
           <button class="btn btn-rust" type="button" id="p-add">Add to Cart</button>
           <button class="btn btn-ink" type="button" id="p-buy">Buy it now</button>
-          <div class="xpay" role="group" aria-label="Express checkout">
-            <button class="xp xp-apple" type="button" data-pay="Apple Pay" aria-label="Buy with Apple Pay">Apple Pay</button>
-            <button class="xp xp-gpay" type="button" data-pay="Google Pay" aria-label="Buy with Google Pay">G Pay</button>
-            <button class="xp xp-paypal" type="button" data-pay="PayPal" aria-label="Buy with PayPal"><small>Pay with</small>&nbsp;<i>Pay<em>Pal</em></i></button>
-            <button class="xp xp-venmo" type="button" data-pay="Venmo" aria-label="Buy with Venmo">venmo</button>
-            <button class="xp xp-klarna" type="button" data-pay="Klarna" aria-label="Pay later with Klarna">Klarna.</button>
-            <button class="xp xp-afterpay" type="button" data-pay="Afterpay" aria-label="Pay in 4 with Afterpay">afterpay</button>
-            <button class="xp xp-card" type="button" data-pay="Card" aria-label="Pay with debit or credit card">Debit or credit card <span class="brands" aria-hidden="true"><span class="cb cb-visa">VISA</span><span class="cb cb-mc"></span><span class="cb cb-amex">AMEX</span><span class="cb cb-disc">DISC<i></i>VER</span></span></button>
-          </div>
-          <p class="xmore">Also: Affirm · Crypto. Methods shown at checkout depend on your country.</p>
         </div>
         <p class="sample-note" id="p-sample" hidden>Sample product for this preview. Connect it to your supplier and a Whop price before selling it.</p>
         <div>
@@ -261,7 +229,7 @@ body.locked{overflow:hidden}
     <h2>Shipping &amp; FAQ</h2>
     <details class="acc"><summary>How much is shipping?</summary><div class="in"><p>Shipping is free on every order.</p></div></details>
     <details class="acc"><summary>How do I track my order?</summary><div class="in"><p>A tracking number is emailed to you once your order ships.</p></div></details>
-    <details class="acc"><summary>How can I pay?</summary><div class="in"><p>Debit and credit cards (Visa, Mastercard, Amex, Discover), Apple Pay, Google Pay, PayPal, Venmo, Klarna, Afterpay, Affirm and crypto. Checkout shows the methods available in your country.</p></div></details>
+    <details class="acc"><summary>How can I pay?</summary><div class="in"><p>Checkout is handled by Whop and shows the payment methods available in your country.</p></div></details>
   </div>
 </section>
 </main>
@@ -431,7 +399,6 @@ body.locked{overflow:hidden}
   function msg(t){var m=$("#ck-msg");m.innerHTML=t;m.hidden=false}
   function buyNow(method){ckLines=[{id:cur.id,c:sel.color,q:1}];ckFromCart=false;openLayer(drawer,$("#d-x"));startCheckout(method)}
   $("#p-buy").addEventListener("click",function(){buyNow()});
-  $(".xpay").addEventListener("click",function(e){var b=e.target.closest("[data-pay]");if(b)buyNow(b.getAttribute("data-pay"))});
   function startCheckout(method){
     $("#cart-view").hidden=true;$("#d-foot").hidden=true;$("#pay-view").hidden=false;$("#d-title").textContent="Checkout";$("#back-cart").hidden=!ckFromCart;
     $("#ck-msg").hidden=true;$("#ck-done").hidden=true;$("#ck-preview").hidden=true;box.hidden=false;
