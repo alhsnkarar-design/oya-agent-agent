@@ -98,6 +98,15 @@
       "category": "ecommerce",
       "catalog_type": "addon",
       "config": {}
+    },
+    {
+      "skill_id": "cj-product-search",
+      "name": "CJ Product Search",
+      "description": "Search CJ Dropshipping products by keyword, category or SKU, or get one product's full details",
+      "skill_type": "sandbox",
+      "category": "ecommerce",
+      "catalog_type": "addon",
+      "config": {}
     }
   ],
   "gateways": [],
