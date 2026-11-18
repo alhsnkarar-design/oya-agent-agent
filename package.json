@@ -1,0 +1,28 @@
+{
+  "name": "oya-agent-agent",
+  "version": "1.0.0",
+  "description": "> Built with [Oya AI](https://oya.ai)",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "trigger:login": "trigger login",
+    "trigger:dev": "trigger dev",
+    "trigger:deploy": "trigger deploy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alhsnkarar-design/oya-agent-agent.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alhsnkarar-design/oya-agent-agent/issues"
+  },
+  "homepage": "https://github.com/alhsnkarar-design/oya-agent-agent#readme",
+  "devDependencies": {
+    "trigger.dev": "^4.8.6"
+  },
+  "private": true
+}
