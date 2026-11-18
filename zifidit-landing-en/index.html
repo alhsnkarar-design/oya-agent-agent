@@ -147,6 +147,25 @@ footer.foot .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:
 .opts button{border:1.5px solid var(--line);background:var(--card);border-radius:8px;padding:9px 14px;font-weight:600;font-size:14px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
 .opts button i{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--line)}
 .opts button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.qv-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.qv-actions .btn{padding:15px 12px}
+.btn-outline{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.xwrap{display:grid;gap:10px}
+.xhead{display:flex;align-items:center;gap:10px;font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.xhead::before,.xhead::after{content:"";flex:1;height:1px;background:var(--line)}
+.xpay{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.xp{height:46px;border-radius:8px;border:0;font:800 15px/1 var(--body);letter-spacing:-.01em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:filter .15s,transform .15s;min-width:0;padding:0 6px;white-space:nowrap}
+.xp:hover{filter:brightness(1.08)}
+.xp:active{transform:scale(.97)}
+.xp-apple,.xp-gpay{background:#000;color:#fff}
+.xp-paypal{background:#ffc439;color:#003087;font-style:italic}
+.xp-paypal span{color:#0079c1}
+.xp-venmo{background:#008cff;color:#fff;font-style:italic}
+.xp-klarna{background:#ffb3c7;color:#17120f}
+.xp-afterpay{background:#b2fce4;color:#000}
+.xmore{font-size:12.5px;color:var(--muted);text-align:center}
+.hero-feature .acts{display:flex;gap:8px;flex-wrap:wrap}
+.hero-feature .btn-outline{color:var(--paper);border-color:color-mix(in srgb,var(--paper) 55%,transparent);background:transparent}
 .qv .x{position:absolute;top:12px;right:12px;z-index:2}
 .sample-note{font-size:13px;color:var(--muted);background:var(--well);border-radius:10px;padding:10px 12px}
 
@@ -224,7 +243,7 @@ body.locked{overflow:hidden}
         <video src="img/demo.mp4" poster="img/poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="The spin scrubber cleaning a stove, sink and floor mat"></video>
         <div class="cap">
           <div><b>Spin Scrubber</b><br><span>$21.64 · Cordless, swappable heads</span></div>
-          <button class="btn" type="button" data-add="scrubber">Add to cart</button>
+          <div class="acts"><button class="btn btn-outline" type="button" data-add="scrubber">Add to cart</button><button class="btn" type="button" data-buynow="scrubber">Buy now</button></div>
         </div>
       </div>
     </div>
@@ -266,7 +285,22 @@ body.locked{overflow:hidden}
     <p id="qv-desc"></p>
     <div class="opt" id="qv-color-wrap"><span class="lbl">Color · <span id="qv-color-name"></span></span><div class="opts" id="qv-colors"></div></div>
     <div class="opt" id="qv-size-wrap"><span class="lbl">Size</span><div class="opts" id="qv-sizes"></div></div>
-    <button class="btn btn-cobalt" type="button" id="qv-add">Add to cart</button>
+    <div class="qv-actions">
+      <button class="btn btn-outline" type="button" id="qv-add">Add to cart</button>
+      <button class="btn btn-cobalt" type="button" id="qv-buy">Buy now</button>
+    </div>
+    <div class="xwrap">
+      <span class="xhead">Express checkout</span>
+      <div class="xpay" role="group" aria-label="Pay with">
+        <button class="xp xp-apple" type="button" data-pay="Apple Pay" aria-label="Buy with Apple Pay">Apple Pay</button>
+        <button class="xp xp-gpay" type="button" data-pay="Google Pay" aria-label="Buy with Google Pay">G Pay</button>
+        <button class="xp xp-paypal" type="button" data-pay="PayPal" aria-label="Buy with PayPal">Pay<span>Pal</span></button>
+        <button class="xp xp-venmo" type="button" data-pay="Venmo" aria-label="Buy with Venmo">venmo</button>
+        <button class="xp xp-klarna" type="button" data-pay="Klarna" aria-label="Pay later with Klarna">Klarna.</button>
+        <button class="xp xp-afterpay" type="button" data-pay="Afterpay" aria-label="Pay in 4 with Afterpay">afterpay</button>
+      </div>
+      <p class="xmore">Also: Visa · Mastercard · Amex · Affirm · Crypto. Options shown at checkout depend on your country.</p>
+    </div>
     <p class="sample-note" id="qv-sample" hidden>Sample product for this preview. Connect it to your supplier and a Whop price before selling it.</p>
   </div>
 </div>
@@ -282,7 +316,7 @@ body.locked{overflow:hidden}
       <div id="checkout"></div>
       <div class="note" id="ck-msg" hidden></div>
       <div class="note" id="ck-preview" hidden>
-        <span><b>Preview mode.</b> On your live domain, Whop's secure checkout loads here with real wallets and card fields. This form shows the layout only and takes no payment.</span>
+        <span><b id="ck-method"></b><b>Preview mode.</b> On your live domain, Whop's secure checkout loads here with real wallets and card fields. This form shows the layout only and takes no payment.</span>
         <form class="demo" id="demo-form">
           <div class="wallet">Apple Pay / Google Pay</div>
           <div class="or">or pay with card</div>
@@ -290,7 +324,7 @@ body.locked{overflow:hidden}
           <label for="d-addr">Shipping address<input id="d-addr" type="text" placeholder="Street, city, postal code" autocomplete="off"></label>
           <label for="d-card">Card number<input id="d-card" type="text" inputmode="numeric" placeholder="1234 1234 1234 1234" autocomplete="off"></label>
           <div class="two"><label for="d-exp">Expiry<input id="d-exp" type="text" placeholder="MM / YY" autocomplete="off"></label><label for="d-cvc">CVC<input id="d-cvc" type="text" placeholder="123" autocomplete="off"></label></div>
-          <button class="btn btn-cobalt" type="submit">Pay <span class="js-sub"></span></button>
+          <button class="btn btn-cobalt" type="submit">Pay <span id="ck-total"></span></button>
         </form>
       </div>
       <div class="done" id="ck-done" hidden><h3>Order placed</h3><p>Your receipt is on its way. Tracking follows by email once it ships.</p></div>
@@ -381,7 +415,9 @@ body.locked{overflow:hidden}
   $("#qv-sizes").addEventListener("click",function(e){var b=e.target.closest("[data-size]");if(!b)return;sel.size=b.getAttribute("data-size");$$("[data-size]",qv).forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false")})});
   $("#qv-x").addEventListener("click",function(){closeLayer()});
   $("#qv-add").addEventListener("click",function(){addToCart(cur.id,sel.color,sel.size);closeLayer();});
-  document.addEventListener("click",function(e){var o=e.target.closest("[data-open]");if(o){openQV(o.getAttribute("data-open"))}var a=e.target.closest("[data-add]");if(a){addToCart(a.getAttribute("data-add"))}});
+  $("#qv-buy").addEventListener("click",function(){buyNow(cur.id,sel.color,sel.size)});
+  $(".xpay").addEventListener("click",function(e){var b=e.target.closest("[data-pay]");if(b)buyNow(cur.id,sel.color,sel.size,b.getAttribute("data-pay"))});
+  document.addEventListener("click",function(e){var o=e.target.closest("[data-open]");if(o){openQV(o.getAttribute("data-open"))}var a=e.target.closest("[data-add]");if(a){addToCart(a.getAttribute("data-add"))}var bn=e.target.closest("[data-buynow]");if(bn){buyNow(bn.getAttribute("data-buynow"))}});
 
   /* cart */
   var cart=[];
@@ -418,7 +454,7 @@ body.locked{overflow:hidden}
   renderCart();
 
   function showCart(){$("#cart-view").hidden=false;$("#pay-view").hidden=true;$("#d-foot").hidden=!cart.length;$("#d-title").textContent="Your cart"}
-  $("#cart-open").addEventListener("click",function(){showCart();openLayer(drawer,$("#d-x"))});
+  $("#cart-open").addEventListener("click",function(){$("#back-cart").hidden=false;showCart();openLayer(drawer,$("#d-x"))});
   $("#d-x").addEventListener("click",function(){closeLayer()});
   $("#back-cart").addEventListener("click",showCart);
 
@@ -427,27 +463,38 @@ body.locked{overflow:hidden}
   var q=new URLSearchParams(location.search),attr={};
   [["utm_source","utmSource"],["utm_medium","utmMedium"],["utm_campaign","utmCampaign"],["utm_term","utmTerm"],["utm_content","utmContent"]].forEach(function(k){var v=q.get(k[0]);if(v)attr[k[1]]=v});
   function msg(t){var m=$("#ck-msg");m.innerHTML=t;m.hidden=false}
-  $("#to-pay").addEventListener("click",function(){
+  var ckLines=[],ckFromCart=true;
+  function linesTotal(L){return L.reduce(function(t,l){return t+byId[l.id].price*l.q},0)}
+  function buyNow(id,color,size,method){
+    var p=byId[id];
+    ckLines=[{id:id,c:color||(p.colors?p.colors[0][0]:null),s:size||(p.sizes?p.sizes[Math.min(1,p.sizes.length-1)]:null),q:1}];ckFromCart=false;
+    closeLayer(true);openLayer(drawer,$("#d-x"));startCheckout(method);
+  }
+  function startCheckout(method){
     $("#cart-view").hidden=true;$("#d-foot").hidden=true;$("#pay-view").hidden=false;$("#d-title").textContent="Checkout";
+    $("#back-cart").hidden=!ckFromCart;
     $("#ck-msg").hidden=true;$("#ck-done").hidden=true;$("#ck-preview").hidden=true;box.hidden=false;
-    track("initiate_checkout",{value:subtotal(),currency:"USD"});
+    var tot=linesTotal(ckLines);$("#ck-total").textContent=fmt(tot);
+    $("#ck-method").textContent=method?method+" selected. ":"";
+    track("initiate_checkout",{value:tot,currency:"USD"});
     if(!window.WhopElements){$("#skel").hidden=true;$("#ck-preview").hidden=false;return}
-    var sample=cart.filter(function(l){return !byId[l.id].plan});
-    if(sample.length){$("#skel").hidden=true;msg("<b>Some items aren't for sale yet.</b> "+sample.map(function(l){return byId[l.id].name}).join(", ")+" are sample products with no Whop price. Remove them to continue.");return}
-    var items={};cart.forEach(function(l){var p=byId[l.id].plan;items[p]=(items[p]||0)+l.q});
+    var sample=ckLines.filter(function(l){return !byId[l.id].plan});
+    if(sample.length){$("#skel").hidden=true;msg("<b>Not for sale yet.</b> "+sample.map(function(l){return byId[l.id].name}).join(", ")+(sample.length>1?" are sample products":" is a sample product")+" with no Whop price."+(ckFromCart?" Remove "+(sample.length>1?"them":"it")+" to continue.":""));return}
+    var items={};ckLines.forEach(function(l){var pl=byId[l.id].plan;items[pl]=(items[pl]||0)+l.q});
     try{handle&&handle.destroy()}catch(_){} box.innerHTML="";$("#skel").hidden=false;
     try{
-      var opts={items:Object.keys(items).map(function(p){return {plan:p,quantity:items[p]}}),metadata:{source:"zifidit-store"},
+      var opts={items:Object.keys(items).map(function(pl){return {plan:pl,quantity:items[pl]}}),metadata:{source:"zifidit-store",flow:ckFromCart?"cart":"buy_now"},
         returnUrl:location.origin+location.pathname.replace(/[^/]*$/,"")+"return.html",
         appearance:{theme:{appearance:matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light",accentColor:"indigo",grayColor:"slate"},variables:{"--radius":"10px"}},
-        onComplete:function(c){if(c&&c.result==="payment"){track("purchase",{value:subtotal(),currency:"USD"});cart=[];save();renderCart();box.hidden=true;$("#ck-done").hidden=false}},
+        onComplete:function(c){if(c&&c.result==="payment"){track("purchase",{value:tot,currency:"USD"});if(ckFromCart){cart=[];save();renderCart()}box.hidden=true;$("#ck-done").hidden=false}},
         onLoadingChange:function(l){if(!l)$("#skel").hidden=true}};
       if(Object.keys(attr).length)opts.attribution=attr;
       handle=window.WhopElements().checkout.create(opts);
-      handle.create("checkout",{onReady:function(){$("#skel").hidden=true},onError:function(e){console.error(e);$("#skel").hidden=true;msg("<b>Checkout didn't load.</b> Check your connection and press Checkout again.")}}).mount(box);
-    }catch(e){console.error(e);$("#skel").hidden=true;msg("<b>Checkout didn't load.</b> Check your connection and press Checkout again.")}
-  });
-  $("#demo-form").addEventListener("submit",function(e){e.preventDefault();$("#ck-preview").hidden=true;$("#ck-done").hidden=false;cart=[];save();renderCart();$("#d-foot").hidden=true});
+      handle.create("checkout",{onReady:function(){$("#skel").hidden=true},onError:function(e){console.error(e);$("#skel").hidden=true;msg("<b>Checkout didn't load.</b> Check your connection and try again.")}}).mount(box);
+    }catch(e){console.error(e);$("#skel").hidden=true;msg("<b>Checkout didn't load.</b> Check your connection and try again.")}
+  }
+  $("#to-pay").addEventListener("click",function(){ckLines=cart.map(function(l){return {id:l.id,c:l.c,s:l.s,q:l.q}});ckFromCart=true;startCheckout()});
+  $("#demo-form").addEventListener("submit",function(e){e.preventDefault();$("#ck-preview").hidden=true;$("#ck-done").hidden=false;if(ckFromCart){cart=[];save();renderCart()}$("#d-foot").hidden=true});
 })();
 </script>
 
