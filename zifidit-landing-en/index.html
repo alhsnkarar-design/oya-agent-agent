@@ -209,10 +209,6 @@ body.locked{overflow:hidden}
           <button class="btn btn-ink" type="button" id="p-buy">Buy it now</button>
         </div>
         <p class="sample-note" id="p-sample" hidden>Sample product for this preview. Connect it to your supplier and a Whop price before selling it.</p>
-        <div>
-          <details class="acc"><summary>More details</summary><div class="in" id="p-details"></div></details>
-          <details class="acc"><summary>Shipping &amp; tracking</summary><div class="in"><p>Shipping is free on every order. Once your order ships, a tracking number is emailed to the address you use at checkout.</p></div></details>
-        </div>
       </div>
     </div>
   </section>
@@ -332,7 +328,6 @@ body.locked{overflow:hidden}
   function renderPDP(p){
     cur=p;sel={color:p.colors?p.colors[0][0]:null};
     $("#p-title").textContent=p.name;$("#p-price").textContent=fmt(p.price);$("#p-desc").textContent=p.desc;
-    $("#p-details").innerHTML=p.details.map(function(d){return "<p>"+d+"</p>"}).join("");
     $("#p-sample").hidden=!!p.live;
     $("#p-color-wrap").hidden=!(p.colors&&p.colors.length>1);
     $("#p-colors").innerHTML=p.colors?p.colors.map(function(c){return '<button type="button" data-color="'+c[0]+'" aria-label="'+c[0]+'" aria-pressed="'+(c[0]===sel.color)+'" style="background:'+c[1]+'"></button>'}).join(""):"";
